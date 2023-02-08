@@ -1,5 +1,5 @@
 import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { applicationNames } from "~/models/applicaton.server";
 
 export const loader = async () => {
@@ -16,7 +16,7 @@ export default function Applications() {
       <ol>
         {applications.map((a) => (
           <li key={a}>
-            <a href={`/applications/${a}`}>{a}</a>
+            <Link to={`/applications/${a}`}>{a}</Link>
           </li>
         ))}
       </ol>

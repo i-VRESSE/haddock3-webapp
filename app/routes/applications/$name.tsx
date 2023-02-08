@@ -1,5 +1,6 @@
 import { type ActionArgs, json, type LoaderArgs, redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
+import { getAccessToken } from "~/cookies";
 
 import { applicationByName, submitJob } from "~/models/applicaton.server";
 
@@ -14,15 +15,16 @@ export const action = async ({ request, params }: ActionArgs) => {
   const formData = await request.formData();
   const upload = formData.get('upload');
 
-  console.log(name)
-  console.log(upload)
   if (typeof upload === 'string' || upload === null) {
     throw new Error('Bad upload')
   }
+  const access_token = await getAccessToken(request)
+  if (access_token === undefined) {
+    throw new Error('Unauthenticated')
+  }
 
-  const jobid = await submitJob(name, upload)
-  const job_url = `/jobs/${jobid}`
-  console.log()
+  const job = await submitJob(name, upload, access_token)
+  const job_url = `/jobs/${job.id}`
   return redirect(job_url)
 };
 

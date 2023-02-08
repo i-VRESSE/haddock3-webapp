@@ -1,17 +1,10 @@
 import { ApplicationApi } from "~/bartender-client/apis/ApplicationApi";
-import { Configuration } from "~/bartender-client/runtime";
+import type { JobModelDTO } from "~/bartender-client/models/JobModelDTO";
+import { buildConfig } from "./config.server";
 
-const BARTENDER_API_URL = "http://127.0.0.1:8000";
-// TODO move to session?
-// TODO dont hardcode but get by authenticating to bartender ws
-const accessToken = '...'
 
 function buildApplicationApi(accessToken: string = '') {
-    const config = new Configuration({
-        basePath: BARTENDER_API_URL,
-        accessToken
-      });
-      return new ApplicationApi(config);
+      return new ApplicationApi(buildConfig(accessToken));
 }
 
 export async function applicationNames() {
@@ -26,17 +19,12 @@ export async function applicationByName(name: string) {
     })
 }
 
-export async function submitJob(application: string, upload: File) {
+export async function submitJob(application: string, upload: File, accessToken: string) {
     const api = buildApplicationApi(accessToken)
     const response = await api.uploadJobApiApplicationApplicationJobPutRaw({
         application,
         upload,
     })
-    console.log(response.raw.status)
-    console.log(await response.raw.text())
-    console.log(response.raw.headers)
-    const location = response.raw.headers.get('location') || ''
-    console.log(location)
-    const jobid = location.replace('/api/job/', '')
-    return jobid
+    const job: JobModelDTO = await response.raw.json()
+    return job
 }
