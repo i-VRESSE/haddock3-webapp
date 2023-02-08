@@ -5,6 +5,13 @@ function buildJobApi(accessToken: string = '') {
     return new JobApi(buildConfig(accessToken));
 }
 
+export async function getJobs(accessToken: string, limit= 10, offset = 0) {
+    const api = buildJobApi(accessToken)
+    return await api.retrieveJobsApiJobGet({
+        limit, offset
+    })
+}
+
 export async function getJobById(jobid: number, accessToken: string) {
     const api = buildJobApi(accessToken)
     return await api.retrieveJobApiJobJobidGet({
@@ -36,3 +43,4 @@ export async function getJobfile(jobid: number, path: string, accessToken: strin
     })
     return response.raw;
 }
+
