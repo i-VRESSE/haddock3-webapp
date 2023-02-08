@@ -20,6 +20,7 @@ export async function applicationByName(name: string) {
 }
 
 export async function submitJob(application: string, upload: File, accessToken: string) {
+    console.log({application, upload, accessToken})
     const api = buildApplicationApi(accessToken)
     const response = await api.uploadJobApiApplicationApplicationJobPutRaw({
         application,

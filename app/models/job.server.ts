@@ -19,3 +19,20 @@ export async function getJobStdout(jobid: number, accessToken: string) {
     })
     return response.raw;
 }
+
+export async function getJobStderr(jobid: number, accessToken: string) {
+    const api = buildJobApi(accessToken)
+    const response = await api.retrieveJobStderrApiJobJobidStderrGetRaw({
+        jobid
+    })
+    return response.raw;
+}
+
+export async function getJobfile(jobid: number, path: string, accessToken: string) {
+    const api = buildJobApi(accessToken)
+    const response = await api.retrieveJobFilesApiJobJobidFilesPathGetRaw({
+        jobid,
+        path
+    })
+    return response.raw;
+}

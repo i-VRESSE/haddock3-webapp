@@ -1,12 +1,16 @@
 import { type ActionArgs, json, type LoaderArgs, redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import { getAccessToken } from "~/cookies";
+import { getAccessToken } from "~/cookies.server";
 
 import { applicationByName, submitJob } from "~/models/applicaton.server";
 
-export const loader = async ({ params }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderArgs) => {
   const name = params.name || "";
   const app = await applicationByName(name);
+  const access_token = await getAccessToken(request)
+    if (access_token === undefined) {
+      throw new Error('Unauthenticated')
+    }
   return json({ name, ...app });
 };
 

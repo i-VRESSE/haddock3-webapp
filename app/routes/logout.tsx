@@ -1,5 +1,5 @@
 import { redirect } from "@remix-run/node";
-import { userPrefs } from "~/cookies";
+import { userPrefs } from "~/cookies.server";
 
 export async function loader() {
     return redirect("/", {

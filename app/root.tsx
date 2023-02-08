@@ -7,7 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import { getAccessToken } from "./cookies";
+import { getAccessToken } from "./cookies.server";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",

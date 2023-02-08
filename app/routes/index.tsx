@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import { useIsAuthenticated } from "~/cookies";
+import { useIsAuthenticated } from "~/cookies.client";
 
 export default function Index() {
   const isAuthenticated = useIsAuthenticated()

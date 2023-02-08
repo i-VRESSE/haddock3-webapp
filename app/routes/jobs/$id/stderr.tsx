@@ -1,6 +1,6 @@
 import { type LoaderArgs } from "@remix-run/node";
 import { getAccessToken } from "~/cookies.server";
-import {  getJobStdout } from "~/models/job.server";
+import {  getJobStderr } from "~/models/job.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
     const job_id = params.id || "";
@@ -8,5 +8,5 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     if (access_token === undefined) {
       throw new Error('Unauthenticated')
     }
-    return await getJobStdout(parseInt(job_id), access_token);
+    return await getJobStderr(parseInt(job_id), access_token);
 };

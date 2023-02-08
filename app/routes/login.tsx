@@ -1,6 +1,6 @@
 import { type ActionArgs, json, redirect } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
-import { userPrefs } from "~/cookies";
+import { userPrefs } from "~/cookies.server";
 import { localLogin } from "~/models/user.server";
 
 export async function action({request}: ActionArgs) {

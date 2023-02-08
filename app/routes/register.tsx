@@ -1,35 +1,40 @@
-import { type ActionArgs, json, type LoaderArgs, redirect } from "@remix-run/node";
+import {
+  type ActionArgs,
+  json,
+  type LoaderArgs,
+  redirect,
+} from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
-import { userPrefs } from "~/cookies";
+import { userPrefs } from "~/cookies.server";
 import { localLogin, register } from "~/models/user.server";
 
-export async function loader({ request}: LoaderArgs) {
-    // TODO check already logged in
-    return json({});
+export async function loader({ request }: LoaderArgs) {
+  // TODO check already logged in
+  return json({});
 }
 
-export async function action({request}: ActionArgs) {
-    const formData = await request.formData();
-  const email = formData.get("email");
+export async function action({ request }: ActionArgs) {
+  const formData = await request.formData();
+  const username = formData.get("username");
   const password = formData.get("password");
 
-  if (typeof email !== "string" || typeof password !== "string") {
+  if (typeof username !== "string" || typeof password !== "string") {
     return json(
-        { errors: { email: "Email is required", password: "Password is required" } },
-        { status: 400 }
-      );
+      {
+        errors: {
+          email: "Email is required",
+          password: "Password is required",
+        },
+      },
+      { status: 400 }
+    );
   }
+  await register(username, password);
 
-  await register(email, password)
-
-  const cookieHeader = request.headers.get("Cookie");
-  const cookie =
-    (await userPrefs.parse(cookieHeader)) || {};
-  const access_token = await localLogin(email, password)
-  cookie.access_token = access_token
+  const access_token = await localLogin(username, password);
   return redirect("/", {
     headers: {
-      "Set-Cookie": await userPrefs.serialize(cookie),
+      "Set-Cookie": await userPrefs.serialize({ access_token }),
     },
   });
 }
@@ -58,7 +63,9 @@ export default function RegisterPage() {
         </label>
         <button type="submit">Log in</button>
       </Form>
-      <p>Or <Link to="/login">login</Link> if you already have an account.</p>
+      <p>
+        Or <Link to="/login">login</Link> if you already have an account.
+      </p>
     </main>
   );
 }
