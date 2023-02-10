@@ -9,12 +9,15 @@
     "generate-client": "openapi-generator-cli generate -g typescript-fetch -i http://localhost:8000/api/openapi.json -o app/bartender-client"
   },
   "dependencies": {
+    "@i-vresse/wb-core": "^1.1.2",
     "@remix-run/node": "^1.12.0",
     "@remix-run/react": "^1.12.0",
     "@remix-run/serve": "^1.12.0",
+    "bootstrap": "^4.6.2",
     "isbot": "^3.6.5",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "remix-utils": "^6.0.0"
   },
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "^2.5.2",
