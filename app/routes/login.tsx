@@ -34,6 +34,14 @@ export async function action({ request }: ActionArgs) {
 export default function LoginPage() {
   return (
     <main>
+      <form method="post" action="/auth/github/authorize">
+        <button type="submit">Login with GitHub</button>
+      </form>
+      <p>Or</p>
+      <form method="post" action="/auth/orcidsandbox/authorize">
+        <button type="submit">Login with Orcid sandbox</button>
+      </form>
+      <p>Or</p>
       <Form method="post">
         <label>
           Username:

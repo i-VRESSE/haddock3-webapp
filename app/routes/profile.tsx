@@ -17,7 +17,11 @@ export default function JobPage() {
   return (
     <main>
       <p>Email: {profile.email}</p>
-      <p>OAuth accounts: {profile.oauthAccounts.join(',')}</p>
+      <p>OAuth accounts: 
+        <ul>
+          {profile.oauthAccounts.map(a => <li key={a.accountId}>{a.oauthName}: {a.accountEmail}</li>)}
+        </ul>
+      </p>
       <Link to="/logout">Logout</Link>
     </main>
   );
