@@ -4,60 +4,23 @@ import {
   GridArea,
   NodePanel,
   WorkflowPanel,
+  WorkflowUploadButton,
   Wrapper,
 } from "@i-vresse/wb-core";
 import { useSetCatalog } from "@i-vresse/wb-core/dist/store";
 import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog";
 import { useEffect } from "react";
 import { WorkflowSubmitButton } from "./SubmitButton";
+import { useLoaderData } from "@remix-run/react";
+import type {loader} from '~/routes/applications/haddock3'
 
 const App = () => {
+  const { catalog } = useLoaderData<typeof loader>();
   const setCatalog = useSetCatalog();
   useEffect(() => {
-    const catalog = {
-      title: "Some title",
-      global: {
-        schema: {
-          type: "object",
-          properties: {
-            parameterY: {
-              type: "string",
-            },
-          },
-        },
-        uiSchema: {},
-      },
-      categories: [
-        {
-          name: "cat1",
-          description: "First category",
-        },
-      ],
-      nodes: [
-        {
-          category: "cat1",
-          description: "Description of somenode",
-          id: "somenode",
-          label: "Some node",
-          schema: {
-            type: "object",
-            properties: {
-              parameterX: {
-                type: "string",
-              },
-            },
-          },
-          uiSchema: {},
-        },
-      ],
-      examples: {},
-    };
     setCatalog(prepareCatalog(catalog)); // On mount configure catalog
-  }, [setCatalog]);
+  }, [catalog, setCatalog]);
 
-  function submit() {
-
-  }
   return (
     <div className='page'>
         <GridArea area='catalog'>
@@ -65,7 +28,9 @@ const App = () => {
           </CatalogPanel>
         </GridArea>
         <GridArea area='workflow'>
-          <WorkflowPanel />
+          <WorkflowPanel>
+          <WorkflowUploadButton />
+            </WorkflowPanel>
         </GridArea>
         <GridArea area='node'>
           <NodePanel />

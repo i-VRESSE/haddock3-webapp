@@ -6,12 +6,20 @@ import { getAccessToken } from "~/cookies.server";
 
 import { submitJob } from "~/models/applicaton.server";
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderArgs) => {
   const access_token = await getAccessToken(request);
   if (access_token === undefined) {
     throw new Error("Unauthenticated");
   }
-  return null;
+  // TODO do not hardcode level to guru, but make it part of user. Possibly using a role, see https://github.com/i-VRESSE/bartender/issues/22
+  const level = 'guru'
+  // TODO do not download each time
+  const catalog_url = `https://github.com/i-VRESSE/workflow-builder/raw/main/packages/haddock3_catalog/public/catalog/haddock3.${level}.yaml`
+  const {fetchCatalog } = await import("@i-vresse/wb-core/dist/catalog.js");
+  const catalog = await fetchCatalog(catalog_url)
+  // TODO example can not found on this server, so disable for now
+  catalog.examples = {}
+  return { catalog };
 };
 
 export const action = async ({ request }: ActionArgs) => {
@@ -38,7 +46,7 @@ export default function ApplicationSlug() {
   return (
     <main>
       <ClientOnly fallback={<p>Loading...</p>}>
-        {() => <Haddock3WorkflowBuilder />}
+        {() => <Haddock3WorkflowBuilder/>}
       </ClientOnly>
     </main>
   );
