@@ -51,3 +51,41 @@ rm -rf app
 # copy your app over
 cp -R ../my-old-remix-app/app app
 ```
+
+## Bartender web service client
+
+This web app uses a client to consume the bartender web service.
+
+The client can be (re-)generated with
+
+```shell
+npm run generate-client
+```
+(This command requires that the bartender webservice is running at http://localhost:8000)
+
+## Bartender web service configuration
+
+### Social login
+
+To enable GitHub or Orcid login the bartender web service needs following environment variables.
+
+```shell
+BARTENDER_GITHUB_REDIRECT_URL="http://localhost:3000/auth/github/callback"
+BARTENDER_ORCIDSANDBOX_REDIRECT_URL="http://localhost:3000/auth/orcidsandbox/callback"
+BARTENDER_ORCID_REDIRECT_URL="http://localhost:3000/auth/orcid/callback"
+```
+
+Where `http://localhost:3000` is the URL where the Remix run app is running.
+
+## Haddock3 application 
+
+This web app expects that the following application is registered in bartender web service.
+
+```yaml
+applications:
+    haddock3:
+        command: haddock3 $config
+        config: workflow.cfg
+```
+
+This allows the archive generated with the workflow builder to be submitted.
