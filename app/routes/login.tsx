@@ -42,6 +42,10 @@ export default function LoginPage() {
         <button type="submit">Login with Orcid sandbox</button>
       </form>
       <p>Or</p>
+      <form method="post" action="/auth/orcid/authorize">
+        <button type="submit">Login with Orcid</button>
+      </form>
+      <p>Or</p>
       <Form method="post">
         <label>
           Username:

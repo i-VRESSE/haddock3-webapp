@@ -41,8 +41,11 @@ export async function oauthAuthorize(provider: string) {
         case 'github':
             url = (await api.oauthGithubRemoteAuthorizeAuthGithubAuthorizeGet()).authorizationUrl;
             break;
+        case 'orcid':
+            url = (await api.oauthOrcidOrgRemoteAuthorizeAuthOrcidAuthorizeGet()).authorizationUrl;
+            break;
         case 'orcidsandbox':
-            url = (await api.oauthGithubRemoteCallbackAuthGithubCallbackGet()).authorizationUrl;
+            url = (await api.oauthSandboxOrcidOrgRemoteAuthorizeAuthOrcidsandboxAuthorizeGet()).authorizationUrl;
             break;
         default:
             throw new Error("Unknown provider");
@@ -59,15 +62,13 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
         error: search.get('error') || undefined,
     }
     let response: ApiResponse<any>;
-    console.log(provider)
     switch (provider) {
         case 'github':
             response = await api.oauthGithubRemoteCallbackAuthGithubCallbackGetRaw(request);
             break;
-        // TODO regenerate bartender-client when bartender has orcid login configured
-        // case 'orcid':
-        //     response = await api.oauthSandboxOrcidOrgRemoteCallbackAuthOrcidsandboxCallbackGetRaw(request)
-        //     break;
+        case 'orcid':
+            response = await api.oauthOrcidOrgRemoteCallbackAuthOrcidCallbackGetRaw(request)
+            break;
         case 'orcidsandbox':
             response = await api.oauthSandboxOrcidOrgRemoteCallbackAuthOrcidsandboxCallbackGetRaw(request);
             break;
