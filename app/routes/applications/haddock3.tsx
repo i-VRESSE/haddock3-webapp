@@ -43,6 +43,8 @@ export const action = async ({ request }: ActionArgs) => {
 export const links = () => [...haddock3Styles()];
 
 export default function ApplicationSlug() {
+  // TODO replace ClientOnly with Suspense, 
+  // see https://github.com/sergiodxa/remix-utils#clientonly
   return (
     <main>
       <ClientOnly fallback={<p>Loading...</p>}>

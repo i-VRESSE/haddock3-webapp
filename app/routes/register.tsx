@@ -61,7 +61,7 @@ export default function RegisterPage() {
             autoComplete="current-password"
           />
         </label>
-        <button type="submit">Log in</button>
+        <button type="submit">Register</button>
       </Form>
       <p>
         Or <Link to="/login">login</Link> if you already have an account.

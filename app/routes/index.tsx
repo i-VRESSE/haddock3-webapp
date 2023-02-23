@@ -6,8 +6,16 @@ export default function Index() {
   return (
     <main>
       <ul>
+        Haddock3
         <li>
-          <Link to="/applications">Applications</Link>
+          <ul>
+            <li>
+              <Link to={`/applications/haddock3`}>
+                 with workflow builder
+              </Link>
+            </li>
+            <li>Upload archive</li>
+          </ul>
         </li>
         {isAuthenticated ? (
           <>
