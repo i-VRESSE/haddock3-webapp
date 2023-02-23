@@ -5,6 +5,9 @@ export default function Index() {
   const isAuthenticated = useIsAuthenticated();
   return (
     <main>
+      <h1 className="text-2xl font-bold underline">
+    Hello world!
+  </h1>
       <ul>
         Haddock3
         <li>
