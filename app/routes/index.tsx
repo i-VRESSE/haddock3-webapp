@@ -6,15 +6,15 @@ export default function Index() {
   return (
     <main>
       <h1 className="text-2xl font-bold underline">
-    Hello world!
-  </h1>
+        Hello world!
+      </h1>
       <ul>
-        Haddock3
         <li>
+          Haddock3
           <ul>
             <li>
               <Link to={`/applications/haddock3`}>
-                 with workflow builder
+                with workflow builder
               </Link>
             </li>
             <li>Upload archive</li>
