@@ -1,13 +1,12 @@
 import { Link } from "@remix-run/react";
 import Card from "~/components/Card";
-import { useIsAuthenticated } from "~/cookies";
 
 const cards = [
   {
     "target": "/builder",
     "image": "https://static.thenounproject.com/png/1781890-200.png",
     "title": "Build",
-    "description": "Use the workflow builder to create and submit a jobs.",
+    "description": "Use the workflow builder to create and submit a job.",
   },
   {
     "target": "/upload",
@@ -18,13 +17,12 @@ const cards = [
   {
     "target": "/jobs",
     "image": "https://www.strategie-bourse.com/nl/images/categories/technische-analyse.jpg",
-    "title": "Analyse",
+    "title": "Manage",
     "description": "Explore and analyse the results of completed jobs.",
   },
 ]
 
 export default function Index() {
-  const isAuthenticated = useIsAuthenticated();
   return (
     <main className="p-24 flex justify-evenly">
       {cards.map((card) => (

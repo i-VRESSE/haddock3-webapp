@@ -31,7 +31,7 @@ export const Navbar = () => {
     const isAuthenticated = useIsAuthenticated();
 
     return (
-        <div className="navbar bg-primary">
+        <div className="navbar bg-gradient-to-r from-primary via-primary/90 to-primary/100]">
             <div>
                 <NavLink to="/" className="btn btn-ghost normal-case text-xl">Haddock3</NavLink>
             </div>

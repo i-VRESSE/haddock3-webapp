@@ -12,8 +12,10 @@ export default function Layout() {
     return (
         <div className="h-screen flex flex-col">
             <header>
-                <div className="h-48 bg-cover bg-[url('https://www.bonvinlab.org/images/pages/banner_home-mini.jpg')]" />
-                <Navbar />
+                <div className="h-64 flex flex-col bg-cover bg-[url('https://www.bonvinlab.org/images/pages/banner_home-mini.jpg')]">
+                    <div className="flex-grow" />
+                    <Navbar />
+                </div>
             </header>
             <div className="grow m-6">
                 <Outlet />

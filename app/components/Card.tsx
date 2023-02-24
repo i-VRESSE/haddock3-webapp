@@ -9,9 +9,9 @@ interface CardProps {
 
 export default function Card(props: CardProps) {
     return (
-        <div className="card w-96 bg-base-100 shadow-xl">
+        <div className="card w-96 bg-base-100 shadow-lg hover:shadow-xl">
             <Link to={props.target}>
-                <figure><img src={props.image} alt={props.title} className="max-h-72" /></figure>
+                <figure><img src={props.image} alt={props.title} className="h-48" /></figure>
                 <div className="card-body">
                     <h2 className="card-title">{props.title}</h2>
                     <p>{props.description}</p>
