@@ -33,59 +33,57 @@ export async function action({ request }: ActionArgs) {
 
 export default function LoginPage() {
   return (
-    <main className="prose container">
+    <main className="flex flex-col items-center gap-4">
 
-      <h2>Log in with username and password</h2>
-      <Form method="post" className="flex flex-col gap-2">
-        <div className="form-control">
-          <label className="input-group">
-            <span>Email</span>
-            <input
-              id="username"
-              name="username"
-              type="email"
-              autoComplete="email"
-              className="px-2"
-            />
-          </label>
-        </div>
-        <label className="input-group">
-          <span>Password</span>
+      <Form method="post" className="flex flex-col gap-4 border-2 rounded shadow-lg p-4">
+        <h2 className="text-lg font-semibold">Log in with username and password</h2>
+        <label>
+          <p className="">Email</p>
+          <input
+            id="username"
+            name="username"
+            type="email"
+            autoComplete="email"
+            className="border-2 rounded p-1 w-full"
+          />
+        </label>
+        <label>
+          <p className="">Password</p>
           <input
             id="password"
             name="password"
             type="password"
             autoComplete="current-password"
-            className="px-2"
+            className="border-2 rounded p-1 w-full"
           />
         </label>
-        <button type="submit" className="btn w-24">Log in</button>
+        {/* <button type="submit" className="bg-primary rounded p-1">Log in</button> */}
+        <button type="submit" className="btn btn-sm btn-primary">Log in</button>
+        <p>
+          New user? <Link to="/register" className="link link-primary link-hover">Click here to register.</Link>
+        </p>
       </Form>
-
-      <h2>New user?</h2>
-      <button className="btn w-24">Register</button>
-
-      <h2>Other login methods</h2>
+      <h2 className="text-lg font-semibold">Other login methods</h2>
       <div className="flex space-evenly gap-4">
         <form method="post" action="/auth/github/authorize">
-          <button type="submit" className="btn gap-2 h-auto">
+          <button type="submit" className="btn h-auto">
             <img height="32" width="32" src="github-fill.svg" />
-            GitHub
+            <p className="px-2">GitHub</p>
           </button>
         </form>
         <form method="post" action="/auth/orcidsandbox/authorize">
-          <button type="submit" className="btn gap-2 h-auto">
+          <button type="submit" className="btn h-auto">
             <img height="32" width="32" src="orcid.svg" />
-            ORCID sandbox
+            <p className="px-2">ORCID sandbox</p>
           </button>
         </form>
         <form method="post" action="/auth/orcid/authorize">
-          <button type="submit" className="btn gap-2 h-auto">
+          <button type="submit" className="btn h-auto">
             <img height="32" width="32" src="orcid.svg" />
-            ORCID
+            <p className="px-2">ORCID</p>
           </button>
-        </form>
-      </div>
-    </main>
+        </form >
+      </div >
+    </main >
   );
 }
