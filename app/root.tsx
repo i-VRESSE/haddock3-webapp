@@ -37,10 +37,10 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <div className="h-screen flex flex-col">
+        <div className="flex flex-col min-h-screen">
           <header>
             <div className="h-64 flex flex-col bg-cover bg-[url('https://www.bonvinlab.org/images/pages/banner_home-mini.jpg')]">
-              <div className="flex-grow" />
+              <div className="flex-grow" />  {/* Push the navbar to the bottom of the banner */}
               <Navbar />
             </div>
           </header>

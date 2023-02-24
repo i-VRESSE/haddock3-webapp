@@ -46,7 +46,7 @@ export default function ApplicationSlug() {
   // TODO replace ClientOnly with Suspense,
   // see https://github.com/sergiodxa/remix-utils#clientonly
   return (
-    <main className="">
+    <main className="flex overflow-auto max-h-full">
       <ClientOnly fallback={<p>Loading...</p>}>
         {() => <Haddock3WorkflowBuilder />}
       </ClientOnly>

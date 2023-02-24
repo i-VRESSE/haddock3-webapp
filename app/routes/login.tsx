@@ -57,7 +57,6 @@ export default function LoginPage() {
             className="border-2 rounded p-1 w-full"
           />
         </label>
-        {/* <button type="submit" className="bg-primary rounded p-1">Log in</button> */}
         <button type="submit" className="btn btn-sm btn-primary">Log in</button>
         <p>
           New user? <Link to="/register" className="link link-primary link-hover">Click here to register.</Link>
