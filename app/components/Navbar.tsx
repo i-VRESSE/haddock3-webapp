@@ -31,7 +31,7 @@ export const Navbar = () => {
     const isAuthenticated = useIsAuthenticated();
 
     return (
-        <div className="navbar bg-base-100">
+        <div className="navbar bg-primary">
             <div>
                 <NavLink to="/" className="btn btn-ghost normal-case text-xl">Haddock3</NavLink>
             </div>
@@ -43,7 +43,7 @@ export const Navbar = () => {
                             <svg className="fill-current" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" /></svg>
                         </a>
                         <ul className="p-2 bg-base-100 opacity-100">
-                            <li><NavLink to="/applications/haddock3">Builder</NavLink></li>
+                            <li><NavLink to="/builder">Builder</NavLink></li>
                             <li><a>Upload</a></li>
                         </ul>
                     </li>

@@ -23,7 +23,7 @@ export async function loader({ request }: LoaderArgs) {
 
 export default function App() {
   return (
-    <html lang="en" data-theme="cupcake">
+    <html lang="en" data-theme="bonvinlab">
       <head>
         <Meta />
         <Links />
