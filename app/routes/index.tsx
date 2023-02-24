@@ -1,9 +1,8 @@
-import { Link } from "@remix-run/react";
 import Card from "~/components/Card";
 
 const cards = [
   {
-    "target": "/builder",
+    "target": "/applications/haddock",
     "image": "https://static.thenounproject.com/png/1781890-200.png",
     "title": "Build",
     "description": "Use the workflow builder to create and submit a job.",
