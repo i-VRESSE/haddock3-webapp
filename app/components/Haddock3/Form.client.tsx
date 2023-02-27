@@ -22,7 +22,7 @@ const App = () => {
   }, [catalog, setCatalog]);
 
   return (
-    <div className='page'>
+    <div className='grid h-full w-full gap-2 p-4 page'>
       <GridArea area='catalog'>
         <CatalogPanel>
         </CatalogPanel>
