@@ -12,7 +12,7 @@ import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog";
 import { useEffect } from "react";
 import { WorkflowSubmitButton } from "./SubmitButton";
 import { useLoaderData } from "@remix-run/react";
-import type {loader} from '~/routes/applications/haddock3'
+import type { loader } from '~/routes/applications/haddock3'
 
 const App = () => {
   const { catalog } = useLoaderData<typeof loader>();
@@ -23,25 +23,25 @@ const App = () => {
 
   return (
     <div className='page'>
-        <GridArea area='catalog'>
-          <CatalogPanel>
-          </CatalogPanel>
-        </GridArea>
-        <GridArea area='workflow'>
-          <WorkflowPanel>
+      <GridArea area='catalog'>
+        <CatalogPanel>
+        </CatalogPanel>
+      </GridArea>
+      <GridArea area='workflow'>
+        <WorkflowPanel>
           <WorkflowUploadButton />
-            </WorkflowPanel>
-        </GridArea>
-        <GridArea area='node'>
-          <NodePanel />
-        </GridArea>
-        <GridArea className='action-row' area='workflow-actions'>
-          <WorkflowSubmitButton/>
-        </GridArea>
-        <GridArea className='action-row' area='node-actions'>
-          <FormActions />
-        </GridArea>
-      </div>
+        </WorkflowPanel>
+      </GridArea>
+      <GridArea area='node'>
+        <NodePanel />
+      </GridArea>
+      <GridArea className='action-row' area='workflow-actions'>
+        <WorkflowSubmitButton />
+      </GridArea>
+      <GridArea className='action-row' area='node-actions'>
+        <FormActions />
+      </GridArea>
+    </div>
   );
 };
 

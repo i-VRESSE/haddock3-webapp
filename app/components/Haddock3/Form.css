@@ -18,28 +18,28 @@ h5 {
   @apply inline-block rounded px-3 py-1.5 text-center align-middle text-base font-normal transition-colors duration-150 ease-in-out;
 }
 
-.btn-primary {
-  @apply bg-blue-500 text-white hover:bg-blue-600;
-}
-
 .btn-light {
-  @apply bg-gray-100 hover:bg-gray-200;
+  @apply bg-gray-100 text-primary border-gray-100  hover:bg-gray-200;
 }
 
 .btn-sm {
-  @apply p-1 text-sm;
+  @apply p-1 text-sm h-12;
+}
+
+.grip {
+  @apply border-0 h-auto
 }
 
 .btn-link {
-  @apply text-blue-600;
+  @apply text-primary bg-base-100 hover:bg-base-200 border-0;
 }
 
 .btn-outline-danger {
-  @apply border border-red-500 text-red-500 hover:bg-red-500 hover:text-white;
+  @apply border border-error text-error hover:bg-error hover:text-white;
 }
 
 .btn-danger {
-  @apply bg-red-500 text-white;
+  @apply bg-error text-white;
 }
 
 .btn-toolbar {
@@ -141,15 +141,15 @@ li {
 }
 
 .nav-tabs {
-  @apply border-b-2  border-b-gray-100;
+  @apply border-b-4  border-b-primary-content;
 }
 
 .nav-link {
-  @apply block rounded-t-md border bg-gray-100 px-4 py-2;
+  @apply block rounded-t-md border bg-base-200 px-4 py-2;
 }
 
 .nav .active {
-  @apply border-gray-100 bg-white text-black;
+  @apply border-base-200 bg-primary-content text-primary;
 }
 
 .justify-content-end {

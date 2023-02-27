@@ -15,7 +15,7 @@ export const loader = async ({ request }: LoaderArgs) => {
   const level = 'guru'
   // TODO do not download each time
   const catalog_url = `https://github.com/i-VRESSE/workflow-builder/raw/main/packages/haddock3_catalog/public/catalog/haddock3.${level}.yaml`
-  const {fetchCatalog } = await import("@i-vresse/wb-core/dist/catalog.js");
+  const { fetchCatalog } = await import("@i-vresse/wb-core/dist/catalog.js");
   const catalog = await fetchCatalog(catalog_url)
   // TODO example can not found on this server, so disable for now
   catalog.examples = {}
@@ -43,12 +43,12 @@ export const action = async ({ request }: ActionArgs) => {
 export const links = () => [...haddock3Styles()];
 
 export default function ApplicationSlug() {
-  // TODO replace ClientOnly with Suspense, 
+  // TODO replace ClientOnly with Suspense,
   // see https://github.com/sergiodxa/remix-utils#clientonly
   return (
     <main>
       <ClientOnly fallback={<p>Loading...</p>}>
-        {() => <Haddock3WorkflowBuilder/>}
+        {() => <Haddock3WorkflowBuilder />}
       </ClientOnly>
     </main>
   );

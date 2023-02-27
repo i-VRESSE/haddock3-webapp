@@ -33,43 +33,56 @@ export async function action({ request }: ActionArgs) {
 
 export default function LoginPage() {
   return (
-    <main>
-      <form method="post" action="/auth/github/authorize">
-        <button type="submit">Login with GitHub</button>
-      </form>
-      <p>Or</p>
-      <form method="post" action="/auth/orcidsandbox/authorize">
-        <button type="submit">Login with Orcid sandbox</button>
-      </form>
-      <p>Or</p>
-      <form method="post" action="/auth/orcid/authorize">
-        <button type="submit">Login with Orcid</button>
-      </form>
-      <p>Or</p>
-      <Form method="post">
+    <main className="flex flex-col items-center gap-4">
+
+      <Form method="post" className="flex flex-col gap-4 border-2 rounded shadow-lg p-4">
+        <h2 className="text-lg font-semibold">Log in with username and password</h2>
         <label>
-          Username:
+          <p className="">Email</p>
           <input
             id="username"
             name="username"
             type="email"
             autoComplete="email"
+            className="border-2 rounded p-1 w-full"
           />
         </label>
         <label>
-          Password:
+          <p className="">Password</p>
           <input
             id="password"
             name="password"
             type="password"
             autoComplete="current-password"
+            className="border-2 rounded p-1 w-full"
           />
         </label>
-        <button type="submit">Log in</button>
+        <button type="submit" className="btn btn-sm btn-primary">Log in</button>
+        <p>
+          New user? <Link to="/register" className="link link-primary link-hover">Click here to register.</Link>
+        </p>
       </Form>
-      <p>
-        Or <Link to="/register">register</Link>
-      </p>
-    </main>
+      <h2 className="text-lg font-semibold">Other login methods</h2>
+      <div className="flex space-evenly gap-4">
+        <form method="post" action="/auth/github/authorize">
+          <button type="submit" className="btn h-auto">
+            <img height="32" width="32" src="github-fill.svg" />
+            <p className="px-2">GitHub</p>
+          </button>
+        </form>
+        <form method="post" action="/auth/orcidsandbox/authorize">
+          <button type="submit" className="btn h-auto">
+            <img height="32" width="32" src="orcid.svg" />
+            <p className="px-2">ORCID sandbox</p>
+          </button>
+        </form>
+        <form method="post" action="/auth/orcid/authorize">
+          <button type="submit" className="btn h-auto">
+            <img height="32" width="32" src="orcid.svg" />
+            <p className="px-2">ORCID</p>
+          </button>
+        </form >
+      </div >
+    </main >
   );
 }
