@@ -31,7 +31,7 @@ export const Navbar = () => {
             </div>
             <div className="navbar-start flex">
                 <ul className="menu menu-horizontal px-1">
-                    <li><NavLink to="/applications/haddock3">Build</NavLink></li>
+                    <li><NavLink to="/applications/builder">Build</NavLink></li>
                     <li><NavLink to="/applications/upload">Upload</NavLink></li>
                     <li><NavLink to="/jobs">Manage</NavLink></li>
                     <li><NavLink to="/about">About</NavLink></li>
