@@ -59,7 +59,7 @@ li {
 }
 
 .card {
-  @apply border border-gray-300;
+  @apply border border-gray-300 rounded;
 }
 
 .card-header {
@@ -165,7 +165,7 @@ li {
 }
 
 .table-field {
-  @apply mb-4 table w-full border-collapse border border-gray-300;
+  @apply mb-4 table border-collapse border border-gray-300;
 }
 
 .table-bordered td,
@@ -175,6 +175,10 @@ li {
 
 .table-striped tbody tr:nth-of-type(odd) {
   @apply bg-gray-100;
+}
+
+.table-field th:first-child {
+  @apply relative
 }
 
 .array-item-remove {
