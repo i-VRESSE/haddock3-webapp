@@ -1,14 +1,17 @@
 import {
-    BlobReader,
-    BlobWriter,
-    TextReader,
-    TextWriter,
-    ZipReader,
-    ZipWriter
-} from '@zip.js/zip.js'
-import { assert, describe, test } from 'vitest'
+  BlobReader,
+  BlobWriter,
+  TextReader,
+  TextWriter,
+  ZipReader,
+  ZipWriter,
+} from "@zip.js/zip.js";
+import { assert, describe, test } from "vitest";
 
-import { rewriteConfigInArchive } from './applicaton.server';
+import {
+  rewriteConfigInArchive,
+  WORKFLOW_CONFIG_FILENAME,
+} from "./applicaton.server";
 
 const HY3_PDB = `\
 ATOM      1  SHA SHA S   1      30.913  40.332   2.133  1.00 36.12      S       
@@ -43,67 +46,69 @@ ATOM     29  SHA SHA S  29      30.407  31.764   1.687  1.00 37.79      S
 ATOM     30  SHA SHA S  30      30.478  30.539   0.736  1.00 41.97      S       
 ATOM     31  SHA SHA S  31      31.695  30.650  -0.211  1.00 42.49      S       
 END
-` as const
+` as const;
 
 async function prepareArchive(config: string) {
-    const files = new Map([['hy3.pdb', HY3_PDB]]);
-    const writer = new ZipWriter(new BlobWriter('application/zip'));
-    for (const [filename, content] of files) {
-        // All files should be text
-        await writer.add(filename, new TextReader(content))
-    }
-    writer.add('workflow.cfg', new TextReader(config))
-    return await writer.close()
+  const files = new Map([["hy3.pdb", HY3_PDB]]);
+  const writer = new ZipWriter(new BlobWriter("application/zip"));
+  for (const [filename, content] of files) {
+    // All files should be text
+    await writer.add(filename, new TextReader(content));
+  }
+  writer.add(WORKFLOW_CONFIG_FILENAME, new TextReader(config));
+  return await writer.close();
 }
 
 async function retrieveConfigFromArchive(file: Blob) {
-    const reader = new ZipReader(new BlobReader(file))
-    const entries = await reader.getEntries()
-    const entry = entries.find(e => e.filename === 'workflow.cfg')
-    if (entry === undefined) {
-        throw new Error("Unable to find workflow.cfg in archive");
-    }
-    return await entry.getData(new TextWriter())
+  const reader = new ZipReader(new BlobReader(file));
+  const entries = await reader.getEntries();
+  const entry = entries.find((e) => e.filename === WORKFLOW_CONFIG_FILENAME);
+  if (entry === undefined) {
+    throw new Error(`Unable to find ${WORKFLOW_CONFIG_FILENAME} in archive`);
+  }
+  return await entry.getData(new TextWriter());
 }
 
-describe('rewriteConfigInArchive()', () => {
-    test('given zip with config with only molecules field should add run_dir and mode fields', async () => {
-        const input_config = `\
+describe("rewriteConfigInArchive()", () => {
+  test("given zip with config with only molecules field should add run_dir and mode fields", async () => {
+    const input_config = `\
 molecules = ['hy3.pdb']
-`
-        const archive = await prepareArchive(input_config)
+`;
+    const archive = await prepareArchive(input_config);
 
-        const result = await rewriteConfigInArchive(archive)
+    const result = await rewriteConfigInArchive(archive);
 
-        const expected_config = `\
+    const expected_config = `\
 
 molecules = ['hy3.pdb']
 run_dir = 'output'
 mode = 'local'
-`
-        const output_config = await retrieveConfigFromArchive(result)
-        assert.equal(output_config, expected_config)
-    })
+postprocess = true
+`;
+    const output_config = await retrieveConfigFromArchive(result);
+    assert.equal(output_config, expected_config);
+  });
 
-    test('given zip with config with mode and run_dir fields should overwrite fields', async () => {
-        const input_config = `\
+  test("given zip with config with mode and run_dir fields should overwrite fields", async () => {
+    const input_config = `\
 run_dir = 'some_random_dir'
 mode = 'hpc'
-`
-        const archive = await prepareArchive(input_config)
+`;
+    const archive = await prepareArchive(input_config);
 
-        const result = await rewriteConfigInArchive(archive)
-        const expected_config = `\
+    const result = await rewriteConfigInArchive(archive);
+    const expected_config = `\
 
 run_dir = 'output'
 mode = 'local'
-`
-        const output_config = await retrieveConfigFromArchive(result)
-        assert.equal(output_config, expected_config)
-    })
+postprocess = true
+`;
+    const output_config = await retrieveConfigFromArchive(result);
+    assert.equal(output_config, expected_config);
+  });
 
-    test('given zip with config with all mode fields, cns_exec and run_dir fields should overwrite run_dir and mode fields and remove all other', async () => {
-        const input_config = `\
+  test("given zip with config with all mode fields, cns_exec and run_dir fields should overwrite run_dir and mode fields and remove all other", async () => {
+    const input_config = `\
 run_dir = 'x'
 mode = 'hpc'
 ncores = 2
@@ -113,41 +118,43 @@ concat = 5
 self_contained = true
 queue = 'somequeue'
 cns_exec = '/usr/bin/cns'
-`
-        const archive = await prepareArchive(input_config)
+`;
+    const archive = await prepareArchive(input_config);
 
-        const result = await rewriteConfigInArchive(archive)
-        const expected_config = `\
+    const result = await rewriteConfigInArchive(archive);
+    const expected_config = `\
 
 run_dir = 'output'
 mode = 'local'
-`
-        const output_config = await retrieveConfigFromArchive(result)
-        assert.equal(output_config, expected_config)
-    })
+postprocess = true
+`;
+    const output_config = await retrieveConfigFromArchive(result);
+    assert.equal(output_config, expected_config);
+  });
 
-    test('given zip with config with molecules field and nested table should add run_dir and mode fields', async () => {
-        const input_config = `\
+  test("given zip with config with molecules field and nested table should add run_dir and mode fields", async () => {
+    const input_config = `\
 molecules = ['hy3.pdb']
 
 [seletop]
 select = 5
-`
-        const archive = await prepareArchive(input_config)
+`;
+    const archive = await prepareArchive(input_config);
 
-        const result = await rewriteConfigInArchive(archive)
+    const result = await rewriteConfigInArchive(archive);
 
-        const expected_config = `\
+    const expected_config = `\
 
 molecules = ['hy3.pdb']
 run_dir = 'output'
 mode = 'local'
+postprocess = true
 
 [seletop]
 
 select = 5
-`
-        const output_config = await retrieveConfigFromArchive(result)
-        assert.equal(output_config, expected_config)
-    })
-})
+`;
+    const output_config = await retrieveConfigFromArchive(result);
+    assert.equal(output_config, expected_config);
+  });
+});
