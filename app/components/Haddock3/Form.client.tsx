@@ -1,7 +1,5 @@
 import {
   CatalogPanel,
-  FormActions,
-  GridArea,
   NodePanel,
   WorkflowPanel,
   WorkflowUploadButton,
@@ -12,7 +10,9 @@ import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog";
 import { useEffect } from "react";
 import { WorkflowSubmitButton } from "./SubmitButton";
 import { useLoaderData } from "@remix-run/react";
-import type { loader } from '~/routes/applications/builder'
+import type { loader } from "~/routes/applications/builder";
+import { WorkflowDownloadButton } from "./DownloadButton";
+import { FormActions } from "./FormActions";
 
 const App = () => {
   const { catalog } = useLoaderData<typeof loader>();
@@ -22,25 +22,28 @@ const App = () => {
   }, [catalog, setCatalog]);
 
   return (
-    <div className='grid h-full w-full gap-2 p-4 page'>
-      <GridArea area='catalog'>
-        <CatalogPanel>
-        </CatalogPanel>
-      </GridArea>
-      <GridArea area='workflow'>
-        <WorkflowPanel>
-          <WorkflowUploadButton />
-        </WorkflowPanel>
-      </GridArea>
-      <GridArea area='node'>
-        <NodePanel />
-      </GridArea>
-      <GridArea className='action-row' area='workflow-actions'>
+    <div>
+      <div className="grid h-full w-full gap-2 p-4 page">
+        <div>
+          <CatalogPanel></CatalogPanel>
+        </div>
+        <div>
+          <WorkflowPanel>
+            <WorkflowUploadButton />
+          </WorkflowPanel>
+        </div>
+        <div>
+          <NodePanel />
+        </div>
+      </div>
+      <div className="grid page sticky inset-x-0 bottom-0 h-16">
+        <div></div>
+      <div role="group" className="btn-group">
         <WorkflowSubmitButton />
-      </GridArea>
-      <GridArea className='action-row' area='node-actions'>
+        <WorkflowDownloadButton/>
+      </div>
         <FormActions />
-      </GridArea>
+      </div>
     </div>
   );
 };
@@ -52,4 +55,3 @@ export const Haddock3WorkflowBuilder = () => {
     </Wrapper>
   );
 };
-

@@ -194,11 +194,11 @@ li {
 }
 
 .page {
-  grid-template-areas:
+  /* grid-template-areas:
     "catalog workflow node"
-    "catalog workflow-actions node-actions";
+    "catalog workflow-actions node-actions"; */
   grid-template-columns: 1fr 1fr 2fr;
-  grid-template-rows: 1fr auto;
+  /* grid-template-rows: 1fr auto; */
 }
 
 .page > .action-row {
