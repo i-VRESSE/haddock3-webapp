@@ -52,22 +52,8 @@ export const FormActions = (): JSX.Element => {
   return (
     <div className="btn-group justify-end">
       <button
-        className='btn btn-primary'
-        title={editingGlobal ? 'Save global parameters and close form' : 'Save parameters to node and close form'}
-        onClick={() => {
-            submitFormRef.click();
-            if (editingGlobal) {
-                toggleGlobalEdit()
-            } else {
-                clearNodeSelection()
-            }
-        }}
-      >
-        Save & close
-      </button>
-      <button
         type='submit'
-        className='btn btn-light'
+        className='btn btn-primary'
         title={editingGlobal ? 'Save global parameters' : 'Save parameters to node'}
         onClick={() => submitFormRef.click()}
       >
