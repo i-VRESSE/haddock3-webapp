@@ -1,4 +1,5 @@
-import { ApiResponse, UsersApi } from "~/bartender-client";
+import type { ApiResponse} from "~/bartender-client";
+import { UsersApi } from "~/bartender-client";
 import { AuthApi } from "~/bartender-client/apis/AuthApi";
 import { buildConfig } from "./config.server";
 
@@ -77,4 +78,9 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
     }
     const body = await response.raw.json();
     return body.access_token;
+}
+
+export async function getLevel(accessToken: string): Promise<string> {
+    // TODO get level from bartender ws
+    return 'guru'
 }

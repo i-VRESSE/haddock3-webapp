@@ -89,3 +89,13 @@ applications:
 ```
 
 This allows the archive generated with the workflow builder to be submitted.
+
+## Catalogs
+
+This repo has a copy (`./app/catalogs/*.yaml`) of the [haddock3 workflow build catalogs](https://github.com/i-VRESSE/workflow-builder/tree/main/packages/haddock3_catalog/public/catalog).
+
+To fetch the latest catalogs run
+
+```shell
+npm run catalogs
+```
