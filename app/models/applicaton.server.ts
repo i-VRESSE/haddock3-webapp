@@ -1,5 +1,4 @@
-import type { ZipEntry, ZipFileEntry } from "@zip.js/zip.js";
-import { fs } from "@zip.js/zip.js";
+import JSZip from 'jszip'
 import { stringify, parse } from "@ltd/j-toml";
 
 import { ApplicationApi } from "~/bartender-client/apis/ApplicationApi";
@@ -30,7 +29,6 @@ export async function submitJob(
   upload: File,
   accessToken: string
 ) {
-  console.log({ application, upload, accessToken });
   const api = buildApplicationApi(accessToken);
   const rewritten_upload = await rewriteConfigInArchive(upload);
   const response = await api.uploadJobApiApplicationApplicationJobPutRaw({
@@ -39,12 +37,6 @@ export async function submitJob(
   });
   const job: JobModelDTO = await response.raw.json();
   return job;
-}
-
-function isZipFileEntry(
-  entry: ZipEntry | ZipFileEntry<any, any>
-): entry is ZipFileEntry<any, any> {
-  return !("directory" in entry);
 }
 
 /**
@@ -81,22 +73,22 @@ function rewriteConfig(config_body: string) {
 }
 
 export async function rewriteConfigInArchive(upload: Blob) {
-  const zip_fs = new fs.FS();
-  await zip_fs.importBlob(upload);
-  const config = zip_fs.getChildByName(WORKFLOW_CONFIG_FILENAME);
-  if (config === undefined) {
+  const zip = new JSZip();
+  // Tried to give upload blob directly to loadAsync, but failed with
+  // Error: Can't read the data of 'the loaded zip file'. Is it in a supported JavaScript type (String, Blob, ArrayBuffer, etc) ?
+  // however converting to array buffer works.
+  await zip.loadAsync(await upload.arrayBuffer())
+  const config_file = zip.file(WORKFLOW_CONFIG_FILENAME)
+  if (config_file === null) {
     throw new Error(`Unable to find ${WORKFLOW_CONFIG_FILENAME} in archive`);
   }
-  if (!isZipFileEntry(config)) {
-    throw new Error(`${WORKFLOW_CONFIG_FILENAME} in archive is not a file`);
-  }
-  const config_body = await config.getText();
+  const config_body = await config_file.async("string")
+  zip.file(`${WORKFLOW_CONFIG_FILENAME}.orig`, config_body)
 
   // TODO validate config using catalog and ajv
 
   const new_config = rewriteConfig(config_body);
 
-  config.rename(`${WORKFLOW_CONFIG_FILENAME}.orig`);
-  zip_fs.addText(WORKFLOW_CONFIG_FILENAME, new_config);
-  return await zip_fs.exportBlob();
+  zip.file(WORKFLOW_CONFIG_FILENAME, new_config);
+  return await zip.generateAsync({type: "blob"});
 }
