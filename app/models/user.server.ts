@@ -1,4 +1,4 @@
-import type { ApiResponse} from "~/bartender-client";
+import { ApiResponse, RolesApi} from "~/bartender-client";
 import { UsersApi } from "~/bartender-client";
 import { AuthApi } from "~/bartender-client/apis/AuthApi";
 import { buildConfig } from "./config.server";
@@ -9,6 +9,10 @@ function buildAuthApi(accessToken: string = '') {
 
 function buildUsersApi(accessToken: string) {
     return new UsersApi(buildConfig(accessToken));
+}
+
+function buildRolesApi(accessToken: string) {
+    return new RolesApi(buildConfig(accessToken));
 }
 
 export async function register(email: string, password: string) {
@@ -83,4 +87,19 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
 export async function getLevel(accessToken: string): Promise<string> {
     // TODO get level from bartender ws
     return 'guru'
+}
+
+export async function getCurrentUser(accessToken: string) {
+    const api = buildUsersApi(accessToken)
+    return await api.usersCurrentUserUsersMeGet()
+}
+
+export async function listUsers(accessToken: string, limit = 100, offset = 0) {
+    const api = buildUsersApi(accessToken)
+    return await api.listUsersApiUsersGet({limit, offset})
+}
+
+export async function listRoles(accessToken: string) {
+    const api = buildRolesApi(accessToken)
+    return await api.listRolesApiRolesGet()
 }
