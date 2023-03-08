@@ -1,4 +1,17 @@
-# Welcome to Remix!
+# Web application for haddock3
+
+Uses 
+* [bartender](https://github.com/i-VRESSE/bartender) for user and job management.
+* [workflow-builder](https://github.com/i-VRESSE/workflow-builder) to construct a Haddock3 workflow config file.
+
+```mermaid
+sequenceDiagram
+    Web app->>+Bartender: Login
+    Web app->>+Builder: Construct workflow config
+    Builder->>+Bartender: Submit job
+    Web app->>+Bartender: State of job
+    Web app->>+Bartender: Result of job
+```
 
 - [Remix Docs](https://remix.run/docs)
 
