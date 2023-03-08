@@ -3,12 +3,14 @@
 Uses 
 * [bartender](https://github.com/i-VRESSE/bartender) for user and job management.
 * [workflow-builder](https://github.com/i-VRESSE/workflow-builder) to construct a Haddock3 workflow config file.
+* [haddock3](https://github.com/haddocking/haddock3) to compute
 
 ```mermaid
 sequenceDiagram
     Web app->>+Bartender: Login
     Web app->>+Builder: Construct workflow config
     Builder->>+Bartender: Submit job
+    Bartender->>+haddock3: Run
     Web app->>+Bartender: State of job
     Web app->>+Bartender: Result of job
 ```
