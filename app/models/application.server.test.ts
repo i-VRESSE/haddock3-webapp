@@ -1,11 +1,4 @@
-import {
-  BlobReader,
-  BlobWriter,
-  TextReader,
-  TextWriter,
-  ZipReader,
-  ZipWriter,
-} from "@zip.js/zip.js";
+import JSZip from 'jszip'
 import { assert, describe, test } from "vitest";
 
 import {
@@ -50,23 +43,23 @@ END
 
 async function prepareArchive(config: string) {
   const files = new Map([["hy3.pdb", HY3_PDB]]);
-  const writer = new ZipWriter(new BlobWriter("application/zip"));
+  const zip = new JSZip();
   for (const [filename, content] of files) {
     // All files should be text
-    await writer.add(filename, new TextReader(content));
+    zip.file(filename, content)
   }
-  writer.add(WORKFLOW_CONFIG_FILENAME, new TextReader(config));
-  return await writer.close();
+  zip.file(WORKFLOW_CONFIG_FILENAME, config)
+  return await zip.generateAsync({type: "blob"});
 }
 
 async function retrieveConfigFromArchive(file: Blob) {
-  const reader = new ZipReader(new BlobReader(file));
-  const entries = await reader.getEntries();
-  const entry = entries.find((e) => e.filename === WORKFLOW_CONFIG_FILENAME);
-  if (entry === undefined) {
+  const zip = new JSZip();
+  await zip.loadAsync(await file.arrayBuffer())
+  const config_file = zip.file(WORKFLOW_CONFIG_FILENAME)
+  if (config_file === null) {
     throw new Error(`Unable to find ${WORKFLOW_CONFIG_FILENAME} in archive`);
   }
-  return await entry.getData(new TextWriter());
+  return await config_file.async("string")
 }
 
 describe("rewriteConfigInArchive()", () => {
