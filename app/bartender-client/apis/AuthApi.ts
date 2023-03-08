@@ -57,17 +57,6 @@ export interface OauthAssociateGithubCallbackAuthAssociateGithubCallbackGetReque
     error?: string;
 }
 
-export interface OauthAssociateOrcidOrgAuthorizeAuthAssociateOrcidAuthorizeGetRequest {
-    scopes?: Array<string>;
-}
-
-export interface OauthAssociateOrcidOrgCallbackAuthAssociateOrcidCallbackGetRequest {
-    code?: string;
-    codeVerifier?: string;
-    state?: string;
-    error?: string;
-}
-
 export interface OauthAssociateSandboxOrcidOrgAuthorizeAuthAssociateOrcidsandboxAuthorizeGetRequest {
     scopes?: Array<string>;
 }
@@ -84,17 +73,6 @@ export interface OauthGithubRemoteAuthorizeAuthGithubAuthorizeGetRequest {
 }
 
 export interface OauthGithubRemoteCallbackAuthGithubCallbackGetRequest {
-    code?: string;
-    codeVerifier?: string;
-    state?: string;
-    error?: string;
-}
-
-export interface OauthOrcidOrgRemoteAuthorizeAuthOrcidAuthorizeGetRequest {
-    scopes?: Array<string>;
-}
-
-export interface OauthOrcidOrgRemoteCallbackAuthOrcidCallbackGetRequest {
     code?: string;
     codeVerifier?: string;
     state?: string;
@@ -334,106 +312,6 @@ export class AuthApi extends runtime.BaseAPI {
     }
 
     /**
-     * Oauth-Associate:Orcid.Org.Authorize
-     */
-    async oauthAssociateOrcidOrgAuthorizeAuthAssociateOrcidAuthorizeGetRaw(requestParameters: OauthAssociateOrcidOrgAuthorizeAuthAssociateOrcidAuthorizeGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2AuthorizeResponse>> {
-        const queryParameters: any = {};
-
-        if (requestParameters.scopes) {
-            queryParameters['scopes'] = requestParameters.scopes;
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("HTTPBearer", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-        if (this.configuration && this.configuration.accessToken) {
-            // oauth required
-            headerParameters["Authorization"] = await this.configuration.accessToken("OAuth2PasswordBearer", []);
-        }
-
-        const response = await this.request({
-            path: `/auth/associate/orcid/authorize`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => OAuth2AuthorizeResponseFromJSON(jsonValue));
-    }
-
-    /**
-     * Oauth-Associate:Orcid.Org.Authorize
-     */
-    async oauthAssociateOrcidOrgAuthorizeAuthAssociateOrcidAuthorizeGet(requestParameters: OauthAssociateOrcidOrgAuthorizeAuthAssociateOrcidAuthorizeGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OAuth2AuthorizeResponse> {
-        const response = await this.oauthAssociateOrcidOrgAuthorizeAuthAssociateOrcidAuthorizeGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * The response varies based on the authentication backend used.
-     * Oauth-Associate:Orcid.Org.Callback
-     */
-    async oauthAssociateOrcidOrgCallbackAuthAssociateOrcidCallbackGetRaw(requestParameters: OauthAssociateOrcidOrgCallbackAuthAssociateOrcidCallbackGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserRead>> {
-        const queryParameters: any = {};
-
-        if (requestParameters.code !== undefined) {
-            queryParameters['code'] = requestParameters.code;
-        }
-
-        if (requestParameters.codeVerifier !== undefined) {
-            queryParameters['code_verifier'] = requestParameters.codeVerifier;
-        }
-
-        if (requestParameters.state !== undefined) {
-            queryParameters['state'] = requestParameters.state;
-        }
-
-        if (requestParameters.error !== undefined) {
-            queryParameters['error'] = requestParameters.error;
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("HTTPBearer", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-        if (this.configuration && this.configuration.accessToken) {
-            // oauth required
-            headerParameters["Authorization"] = await this.configuration.accessToken("OAuth2PasswordBearer", []);
-        }
-
-        const response = await this.request({
-            path: `/auth/associate/orcid/callback`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => UserReadFromJSON(jsonValue));
-    }
-
-    /**
-     * The response varies based on the authentication backend used.
-     * Oauth-Associate:Orcid.Org.Callback
-     */
-    async oauthAssociateOrcidOrgCallbackAuthAssociateOrcidCallbackGet(requestParameters: OauthAssociateOrcidOrgCallbackAuthAssociateOrcidCallbackGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserRead> {
-        const response = await this.oauthAssociateOrcidOrgCallbackAuthAssociateOrcidCallbackGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
      * Oauth-Associate:Sandbox.Orcid.Org.Authorize
      */
     async oauthAssociateSandboxOrcidOrgAuthorizeAuthAssociateOrcidsandboxAuthorizeGetRaw(requestParameters: OauthAssociateSandboxOrcidOrgAuthorizeAuthAssociateOrcidsandboxAuthorizeGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2AuthorizeResponse>> {
@@ -604,80 +482,6 @@ export class AuthApi extends runtime.BaseAPI {
      */
     async oauthGithubRemoteCallbackAuthGithubCallbackGet(requestParameters: OauthGithubRemoteCallbackAuthGithubCallbackGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
         const response = await this.oauthGithubRemoteCallbackAuthGithubCallbackGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Oauth:Orcid.Org.Remote.Authorize
-     */
-    async oauthOrcidOrgRemoteAuthorizeAuthOrcidAuthorizeGetRaw(requestParameters: OauthOrcidOrgRemoteAuthorizeAuthOrcidAuthorizeGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2AuthorizeResponse>> {
-        const queryParameters: any = {};
-
-        if (requestParameters.scopes) {
-            queryParameters['scopes'] = requestParameters.scopes;
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/auth/orcid/authorize`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => OAuth2AuthorizeResponseFromJSON(jsonValue));
-    }
-
-    /**
-     * Oauth:Orcid.Org.Remote.Authorize
-     */
-    async oauthOrcidOrgRemoteAuthorizeAuthOrcidAuthorizeGet(requestParameters: OauthOrcidOrgRemoteAuthorizeAuthOrcidAuthorizeGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OAuth2AuthorizeResponse> {
-        const response = await this.oauthOrcidOrgRemoteAuthorizeAuthOrcidAuthorizeGetRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * The response varies based on the authentication backend used.
-     * Oauth:Orcid.Org.Remote.Callback
-     */
-    async oauthOrcidOrgRemoteCallbackAuthOrcidCallbackGetRaw(requestParameters: OauthOrcidOrgRemoteCallbackAuthOrcidCallbackGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
-        const queryParameters: any = {};
-
-        if (requestParameters.code !== undefined) {
-            queryParameters['code'] = requestParameters.code;
-        }
-
-        if (requestParameters.codeVerifier !== undefined) {
-            queryParameters['code_verifier'] = requestParameters.codeVerifier;
-        }
-
-        if (requestParameters.state !== undefined) {
-            queryParameters['state'] = requestParameters.state;
-        }
-
-        if (requestParameters.error !== undefined) {
-            queryParameters['error'] = requestParameters.error;
-        }
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/auth/orcid/callback`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.TextApiResponse(response) as any;
-    }
-
-    /**
-     * The response varies based on the authentication backend used.
-     * Oauth:Orcid.Org.Remote.Callback
-     */
-    async oauthOrcidOrgRemoteCallbackAuthOrcidCallbackGet(requestParameters: OauthOrcidOrgRemoteCallbackAuthOrcidCallbackGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
-        const response = await this.oauthOrcidOrgRemoteCallbackAuthOrcidCallbackGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

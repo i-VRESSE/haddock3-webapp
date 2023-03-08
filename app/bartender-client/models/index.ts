@@ -9,6 +9,7 @@ export * from './JobModelDTO';
 export * from './LocationInner';
 export * from './OAuth2AuthorizeResponse';
 export * from './OAuthAccountName';
+export * from './UserAsListItem';
 export * from './UserCreate';
 export * from './UserProfileInputDTO';
 export * from './UserRead';

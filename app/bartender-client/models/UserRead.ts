@@ -49,6 +49,12 @@ export interface UserRead {
      * @memberof UserRead
      */
     isVerified?: boolean;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof UserRead
+     */
+    roles: Array<string>;
 }
 
 /**
@@ -57,6 +63,7 @@ export interface UserRead {
 export function instanceOfUserRead(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "email" in value;
+    isInstance = isInstance && "roles" in value;
 
     return isInstance;
 }
@@ -76,6 +83,7 @@ export function UserReadFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'isActive': !exists(json, 'is_active') ? undefined : json['is_active'],
         'isSuperuser': !exists(json, 'is_superuser') ? undefined : json['is_superuser'],
         'isVerified': !exists(json, 'is_verified') ? undefined : json['is_verified'],
+        'roles': json['roles'],
     };
 }
 
@@ -93,6 +101,7 @@ export function UserReadToJSON(value?: UserRead | null): any {
         'is_active': value.isActive,
         'is_superuser': value.isSuperuser,
         'is_verified': value.isVerified,
+        'roles': value.roles,
     };
 }
 

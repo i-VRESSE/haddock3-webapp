@@ -2,6 +2,7 @@ apis/ApplicationApi.ts
 apis/AuthApi.ts
 apis/DefaultApi.ts
 apis/JobApi.ts
+apis/RolesApi.ts
 apis/UsersApi.ts
 apis/index.ts
 index.ts
@@ -14,6 +15,7 @@ models/JobModelDTO.ts
 models/LocationInner.ts
 models/OAuth2AuthorizeResponse.ts
 models/OAuthAccountName.ts
+models/UserAsListItem.ts
 models/UserCreate.ts
 models/UserProfileInputDTO.ts
 models/UserRead.ts
