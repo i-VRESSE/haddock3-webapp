@@ -20,7 +20,6 @@ export async function loader({ request }: LoaderArgs) {
 
 export default function AdminUsersPage() {
     const {users, roles} = useLoaderData<typeof loader>()
-    console.log({users, roles})
     return (
         <main>
             <h1 className="my-6 text-3xl">User admin</h1>
