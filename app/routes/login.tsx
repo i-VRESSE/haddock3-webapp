@@ -66,19 +66,19 @@ export default function LoginPage() {
       <div className="flex space-evenly gap-4">
         <form method="post" action="/auth/github/authorize">
           <button type="submit" className="btn h-auto">
-            <img height="32" width="32" src="github-fill.svg" />
+            <img height="32" width="32" src="github-fill.svg" alt="GitHub logo"/>
             <p className="px-2">GitHub</p>
           </button>
         </form>
         <form method="post" action="/auth/orcidsandbox/authorize">
           <button type="submit" className="btn h-auto">
-            <img height="32" width="32" src="orcid.svg" />
+            <img height="32" width="32" src="orcid.png" alt="ORCID logo"/>
             <p className="px-2">ORCID sandbox</p>
           </button>
         </form>
         <form method="post" action="/auth/orcid/authorize">
           <button type="submit" className="btn h-auto">
-            <img height="32" width="32" src="orcid.svg" />
+            <img height="32" width="32" src="orcid.png" alt="ORCID logo"/>
             <p className="px-2">ORCID</p>
           </button>
         </form >
