@@ -1,6 +1,6 @@
 import type { LoaderArgs} from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import { UserTableRow } from "~/components/admin/UserTableRow";
 import { getAccessToken } from "~/cookies.server";
 import { listRoles, listUsers } from "~/models/user.server";
@@ -20,6 +20,7 @@ export async function loader({ request }: LoaderArgs) {
 
 export default function AdminUsersPage() {
     const {users, roles} = useLoaderData<typeof loader>()
+    const fetcher = useFetcher();
     return (
         <main>
             <h1 className="my-6 text-3xl">User admin</h1>
@@ -33,8 +34,15 @@ export default function AdminUsersPage() {
                 </thead>
                 <tbody>
             {users.map(user => {
+
+                const update = (data: FormData) => {
+                    fetcher.submit(data, {
+                        method: 'post',
+                        action: `/admin/users/${user.id}`
+                    })
+                }
                 return (
-                    <UserTableRow key={user.id} user={user} roles={roles}/>
+                    <UserTableRow key={user.id} onUpdate={update} user={user} roles={roles}/>
                 )
             })}
             </tbody>

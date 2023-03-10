@@ -1,4 +1,5 @@
-import { ApiResponse, RolesApi} from "~/bartender-client";
+import type { ApiResponse} from "~/bartender-client";
+import { RolesApi} from "~/bartender-client";
 import { UsersApi } from "~/bartender-client";
 import { AuthApi } from "~/bartender-client/apis/AuthApi";
 import { buildConfig } from "./config.server";
@@ -102,4 +103,14 @@ export async function listUsers(accessToken: string, limit = 100, offset = 0) {
 export async function listRoles(accessToken: string) {
     const api = buildRolesApi(accessToken)
     return await api.listRolesApiRolesGet()
+}
+
+export async function setSuperUser(accessToken: string, userId: string, checked: boolean) {
+    const api = buildUsersApi(accessToken)
+    return await api.usersPatchUserUsersIdPatch({
+        id: userId,
+        userUpdate: {
+            isSuperuser: checked
+        }
+    })
 }
