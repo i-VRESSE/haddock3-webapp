@@ -4,9 +4,10 @@ interface IProps {
   user: UserAsListItem;
   roles: string[];
   onUpdate: (data: FormData) => void;
+  submitting: boolean;
 }
 
-export const UserTableRow = ({ user, roles, onUpdate }: IProps) => {
+export const UserTableRow = ({ user, roles, onUpdate, submitting }: IProps) => {
   return (
     <tr>
       <td>{user.email}</td>
@@ -16,6 +17,7 @@ export const UserTableRow = ({ user, roles, onUpdate }: IProps) => {
           type="checkbox"
           checked={user.isSuperuser}
           className="checkbox"
+          disabled={submitting}
           onChange={() => {
             const data = new FormData();
             data.set("isSuperuser", user.isSuperuser ? "false" : "true");
@@ -24,7 +26,7 @@ export const UserTableRow = ({ user, roles, onUpdate }: IProps) => {
         />
       </td>
       <td>
-        <ul>
+        <ul className="flex">
           {roles.map((role) => {
             return (
               <li key={role}>
@@ -33,13 +35,14 @@ export const UserTableRow = ({ user, roles, onUpdate }: IProps) => {
                   <span className="label-text">{role}</span> 
                   <input
                     type="checkbox"
-                    checked={role in user.roles}
-                    className="checkbox"
+                    checked={user.roles.includes(role)}
+                    className="checkbox ml-2"
+                    disabled={submitting}
                     onChange={() => {
                       const data = new FormData();
                       data.set(
-                        `role:${role}`,
-                        role in user.roles ? "false" : "true"
+                        role,
+                        user.roles.includes(role) ? "false" : "true"
                       );
                       onUpdate(data);
                     }}

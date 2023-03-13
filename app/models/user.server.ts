@@ -114,3 +114,19 @@ export async function setSuperUser(accessToken: string, userId: string, checked:
         }
     })
 }
+
+export async function grantRole(accessToken: string, userId: string, roleId: string) {
+    const api = buildRolesApi(accessToken)
+    api.grantRoleToUserApiRolesRoleIdUserIdPut({
+        userId,
+        roleId
+    })
+}
+
+export async function revokeRole(accessToken: string, userId: string, roleId: string) {
+    const api = buildRolesApi(accessToken)
+    api.revokeRoleFromUserApiRolesRoleIdUserIdDelete({
+        userId,
+        roleId
+    })
+}
