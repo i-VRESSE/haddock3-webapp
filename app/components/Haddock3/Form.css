@@ -15,7 +15,7 @@ h5 {
 }
 
 .btn {
-  @apply inline-block rounded px-3 py-1.5 text-center align-middle text-base capitalize font-normal transition-colors duration-150 ease-in-out;
+  @apply inline-block rounded px-3 py-1.5 text-center align-middle text-base normal-case font-normal transition-colors duration-150 ease-in-out;
 }
 
 .btn-light {
@@ -84,6 +84,19 @@ li {
 
 .form-check-label {
   @apply ml-2;
+}
+
+/* rjsf uses .checkbox in div and input. daisyui uses checkbox on input. */
+div.checkbox {
+  @apply w-auto h-auto cursor-default border-none
+}
+
+.form-check-input {
+  @apply checkbox;
+}
+
+.custom-select {
+  @apply ml-2 select
 }
 
 .array-item-add,
