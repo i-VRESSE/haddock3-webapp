@@ -9,13 +9,14 @@ import { submitJob } from "~/models/applicaton.server";
 import { getLevel } from "~/models/user.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
-  const access_token = await getAccessToken(request);
-  if (access_token === undefined) {
-    throw new Error("Unauthenticated");
-  }
-  const level = await getLevel(access_token)
-  const catalog = await getCatalog(level)
-  return { catalog };
+  const accessToken = await getAccessToken(request);
+  const level = accessToken === undefined ? '' : await getLevel(accessToken);
+  // When user does not have a level he/she
+  // can still use builder with easy level
+  // but cannot submit only download
+  const catalogLevel = level === '' ? 'easy' : level
+  const catalog = await getCatalog(catalogLevel)
+  return { catalog, submitAllowed: level !== '' };
 };
 
 export const action = async ({ request }: ActionArgs) => {
@@ -44,7 +45,7 @@ export default function ApplicationSlug() {
   return (
     <main>
       <ClientOnly fallback={<p>Loading...</p>}>
-        {() => <Haddock3WorkflowBuilder />}
+        {() => <Haddock3WorkflowBuilder/>}
       </ClientOnly>
     </main>
   );

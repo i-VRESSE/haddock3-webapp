@@ -1,7 +1,8 @@
 import { Link, NavLink } from "@remix-run/react";
-import { useIsAuthenticated } from "~/cookies";
+import { useIsAuthenticated, useIsSuperUser } from "~/cookies";
 
 const LoggedInButton = () => {
+    const isSuperUser = useIsSuperUser();
     return (
         <div className="dropdown dropdown-end">
             <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
@@ -11,7 +12,7 @@ const LoggedInButton = () => {
             </label>
             <ul tabIndex={0} className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
                 <li><Link to="/profile">Profile</Link></li>
-                <li><Link to="/admin">Admin</Link></li>
+                {isSuperUser && <li><Link to="/admin">Admin</Link></li>}
                 <li><Link to="/logout">Logout</Link></li>
             </ul>
         </div>

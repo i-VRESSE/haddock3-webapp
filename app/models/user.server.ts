@@ -86,8 +86,16 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
 }
 
 export async function getLevel(accessToken: string): Promise<string> {
-    // TODO get level from bartender ws
-    return 'guru'
+    const me = await getCurrentUser(accessToken)
+    const roles = new Set(me.roles);
+    if (roles.has('haddock3:guru')) {
+        return 'guru'
+    } else if (roles.has('haddock3:expert')) {
+        return 'expert'
+    } else if (roles.has('haddock3:easy')) {
+        return 'easy'
+    }
+    return ''
 }
 
 export async function getCurrentUser(accessToken: string) {
