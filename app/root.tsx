@@ -1,4 +1,4 @@
-import { json, type LinksFunction, type LoaderArgs, type MetaFunction } from "@remix-run/node";
+import { json, redirect, type LinksFunction, type LoaderArgs, type MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -7,7 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import { getAccessToken } from "./cookies.server";
+import { getAccessToken, isExpired } from "./cookies.server";
 import { Navbar } from "~/components/Navbar";
 
 import styles from "./tailwind.css";
@@ -22,9 +22,13 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request}: LoaderArgs) {
+  const accessToken = await getAccessToken(request)
+  if (isExpired(accessToken) && new URL(request.url).pathname !== '/login') {
+    return redirect('/login')
+  }
   return json({
-    access_token: await getAccessToken(request),
+    accessToken
   });
 }
 

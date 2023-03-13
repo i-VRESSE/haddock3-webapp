@@ -19,6 +19,7 @@
     "@remix-run/react": "^1.13.0",
     "@remix-run/serve": "^1.13.0",
     "isbot": "^3.6.5",
+    "jose": "^4.13.1",
     "js-yaml": "^4.1.0",
     "jszip": "^3.10.1",
     "react": "^18.2.0",
