@@ -40,32 +40,43 @@ export async function action({ request }: ActionArgs) {
 }
 
 export default function RegisterPage() {
+  // Shared style between login and register. Extract if we use it more often
+  const centeredColumn = "flex flex-col items-center gap-4";
+  const formStyle = "flex flex-col items-stretch gap-4 border-2 rounded shadow-lg p-4";
+  const inputStyle = "border-2 rounded p-1 w-full";
+  const buttonStyle = "btn btn-sm btn-primary";
+  const linkStyle = "link link-primary link-hover";
+  const headerStyle = "text-lg text-center font-semibold";
+
   return (
-    <main>
-      <Form method="post">
+    <main className={centeredColumn}>
+      <Form method="post" className={formStyle}>
+        <h2 className={headerStyle}>Register</h2>
         <label>
-          Username:
+          <p>Email</p>
           <input
             id="username"
             name="username"
             type="email"
             autoComplete="email"
+            className={inputStyle}
           />
         </label>
         <label>
-          Password:
+          <p>Password</p>
           <input
             id="password"
             name="password"
             type="password"
             autoComplete="current-password"
+            className={inputStyle}
           />
         </label>
-        <button type="submit">Register</button>
+        <button type="submit" className={buttonStyle}>Register</button>
+        <p>
+          Or <Link to="/login" className={linkStyle}>login</Link> if you already have an account.
+        </p>
       </Form>
-      <p>
-        Or <Link to="/login">login</Link> if you already have an account.
-      </p>
     </main>
   );
 }
