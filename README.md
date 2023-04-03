@@ -126,9 +126,9 @@ applications:
         command: haddock3 $config
         config: workflow.cfg
         allowed_roles:
-            - haddock3:easy
-            - haddock3:expert
-            - haddock3:guru
+            - easy
+            - expert
+            - guru
 ```
 
 This allows the archive generated with the workflow builder to be submitted.

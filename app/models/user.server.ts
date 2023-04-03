@@ -88,11 +88,11 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
 export async function getLevel(accessToken: string): Promise<string> {
     const me = await getCurrentUser(accessToken)
     const roles = new Set(me.roles);
-    if (roles.has('haddock3:guru')) {
+    if (roles.has('guru')) {
         return 'guru'
-    } else if (roles.has('haddock3:expert')) {
+    } else if (roles.has('expert')) {
         return 'expert'
-    } else if (roles.has('haddock3:easy')) {
+    } else if (roles.has('easy')) {
         return 'easy'
     }
     return ''
