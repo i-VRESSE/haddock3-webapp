@@ -52,19 +52,33 @@ Make sure to deploy the output of `remix build`
 - `build/`
 - `public/build/`
 
-### Using a Template
+### Docker
 
-When you ran `npx create-remix@latest` there were a few choices for hosting. You can run that again to create a new project, then copy over your `app/` folder to the new project that's pre-configured for your target server.
+The web application can be run inside a Docker container.
+
+Requirements:
+1. [bartender repo](https://github.com/i-VRESSE/bartender) to be cloned in `../bartender` directory.
+2. bartender repo should have [.env file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#environment-variables)
+3. bartender repo should have a [config.yaml file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#configuration-file)
+
+Build with
 
 ```sh
-cd ..
-# create a new project, and pick a pre-configured host
-npx create-remix@latest
-cd my-new-remix-app
-# remove the new project's app (not the old one!)
-rm -rf app
-# copy your app over
-cp -R ../my-old-remix-app/app app
+docker compose build
+```
+
+Run with
+```sh
+docker compose up
+```
+
+Web application running at http://localhost:8080 .
+
+Create super user with
+
+```sh
+# First register user in web application
+docker compose exec bartender bartender super <email>
 ```
 
 ## Bartender web service client
@@ -79,6 +93,16 @@ npm run generate-client
 (This command requires that the bartender webservice is running at http://localhost:8000)
 
 ## Bartender web service configuration
+
+### Bartender
+
+The web application needs to know where the [Bartender web service](https://github.com/i-VRESSE/bartender) is running.
+Configure bartender location with `BARTENDER_API_URL` environment variable.
+
+```sh
+export BARTENDER_API_URL='http://127.0.0.1:8000'
+npm start
+```
 
 ### Social login
 

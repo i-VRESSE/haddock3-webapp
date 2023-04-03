@@ -1,0 +1,80 @@
+
+
+version: '3.9'
+
+services:
+  webapp:
+    image: i-vresse/bartended-haddock3
+    build: 
+      context: .
+    restart: always
+    depends_on:
+      bartender:
+        condition: service_started
+    ports:
+      - '8080:8080'
+    environment:
+      BARTENDER_API_URL: 'http://bartender:8000'
+
+  bartender:
+    build:
+      context: ../bartender
+      dockerfile: ./deploy/Dockerfile
+    image: bartender:${BARTENDER_VERSION:-latest}
+    restart: always
+    env_file:
+    - ../bartender/.env
+    volumes:
+      - type: bind
+        source: ../bartender/config.yaml
+        target: /app/src/config.yaml
+      # TODO use mount instead of Docker volume
+      # so job root dir can be on a NFS share
+      - bartender-job-data:/tmp/jobs
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      BARTENDER_HOST: 0.0.0.0
+      BARTENDER_DB_HOST: bartender-db
+      BARTENDER_DB_PORT: 5432
+      BARTENDER_DB_USER: bartender
+      BARTENDER_DB_PASS: bartender
+      BARTENDER_DB_BASE: bartender
+
+  db:
+    image: postgres:13.6-bullseye
+    hostname: bartender-db
+    environment:
+      POSTGRES_PASSWORD: "bartender"
+      POSTGRES_USER: "bartender"
+      POSTGRES_DB: "bartender"
+    volumes:
+    - bartender-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U bartender
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  migrator:
+    build:
+      context: ../bartender
+      dockerfile: ./deploy/Dockerfile
+    image: bartender:${BARTENDER_VERSION:-latest}
+    restart: "no"
+    command: alembic upgrade head
+    environment:
+      BARTENDER_DB_HOST: bartender-db
+      BARTENDER_DB_PORT: 5432
+      BARTENDER_DB_USER: bartender
+      BARTENDER_DB_PASS: bartender
+      BARTENDER_DB_BASE: bartender
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  bartender-db-data:
+  bartender-job-data:
