@@ -5,6 +5,8 @@ import expert from "./haddock3.expert.json";
 import guru from "./haddock3.guru.json";
 
 export async function getCatalog(level: string) {
+  // Tried serverDependenciesToBundle in remix.config.js but it didn't work
+  // Fallback to using dynamic import
   const { prepareCatalog } = await import("@i-vresse/wb-core/dist/catalog.js");
   const catalogs: Record<string, ICatalog> = {
     easy: easy as unknown as ICatalog,
