@@ -17,7 +17,6 @@ export async function getCatalog(level: string) {
   if (!(level in catalogs)) {
     throw new Error(`No catalog found for level ${level}`)
   }
-  // TODO drop examples, they will be shown as scenarios
   catalog.examples = {}
   return prepareCatalog(catalog);
 }
