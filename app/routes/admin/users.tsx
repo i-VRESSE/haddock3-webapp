@@ -4,11 +4,11 @@ import { useFetcher, useLoaderData } from "@remix-run/react";
 import { UserTableRow } from "~/components/admin/UserTableRow";
 import { getAccessToken } from "~/cookies.server";
 import {
-  grantRole,
+  assignRole,
   listRoles,
   listUsers,
-  revokeRole,
   setSuperUser,
+  unassignRole,
 } from "~/models/user.server";
 
 export async function loader({ request }: LoaderArgs) {
@@ -43,9 +43,9 @@ export async function action({ request }: ActionArgs) {
     const roleState = formData.get(role);
     if (roleState !== null) {
       if (roleState === "true") {
-        grantRole(accessToken, userId, role);
+        assignRole(accessToken, userId, role);
       } else {
-        revokeRole(accessToken, userId, role);
+        unassignRole(accessToken, userId, role);
       }
     }
   }
