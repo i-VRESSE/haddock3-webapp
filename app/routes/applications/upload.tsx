@@ -5,7 +5,7 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import { getAccessToken } from "~/cookies.server";
+import { getAccessToken } from "~/token.server";
 
 import { applicationByName, submitJob } from "~/models/applicaton.server";
 import { getLevel } from "~/models/user.server";

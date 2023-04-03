@@ -2,7 +2,7 @@ import type { ActionArgs, LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { UserTableRow } from "~/components/admin/UserTableRow";
-import { getAccessToken } from "~/cookies.server";
+import { getAccessToken } from "~/token.server";
 import {
   assignRole,
   listRoles,

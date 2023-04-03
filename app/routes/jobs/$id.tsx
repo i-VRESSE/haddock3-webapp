@@ -1,6 +1,6 @@
 import { json, type LoaderArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { getAccessToken } from "~/cookies.server";
+import { getAccessToken } from "~/token.server";
 import { applicationByName } from "~/models/applicaton.server";
 import { getJobById } from "~/models/job.server";
 import { CompletedJobs } from "~/utils";

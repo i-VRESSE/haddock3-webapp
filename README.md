@@ -81,6 +81,14 @@ Create super user with
 docker compose exec bartender bartender super <email>
 ```
 
+## Sessions
+
+Making the login session secure requires a session secret.
+The session secret can be configured by setting the `SESSION_SECRET` environment variable.
+If not set, a hardcoded secret is used, which should not be used in production.
+
+The data of the login sessions in stored in the `./sessions` directory.
+
 ## Bartender web service client
 
 This web app uses a client to consume the bartender web service.
