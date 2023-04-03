@@ -22,6 +22,7 @@ export function getTokenPayload(accessToken: string | undefined) {
   if (accessToken === undefined) {
     return {};
   }
-  // TODO verify token by using HS256 algorithm
+  // TODO verify token by using HS256 algorithm,
+  // see https://github.com/i-VRESSE/bartender/issues/58
   return decodeJwt(accessToken)
 }
