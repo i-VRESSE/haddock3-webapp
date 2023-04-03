@@ -22,12 +22,12 @@ import {
     HTTPValidationErrorToJSON,
 } from '../models';
 
-export interface GrantRoleToUserApiRolesRoleIdUserIdPutRequest {
+export interface AssignRoleToUserApiRolesRoleIdUserIdPutRequest {
     roleId: string;
     userId: string;
 }
 
-export interface RevokeRoleFromUserApiRolesRoleIdUserIdDeleteRequest {
+export interface UnassignRoleFromUserApiRolesRoleIdUserIdDeleteRequest {
     roleId: string;
     userId: string;
 }
@@ -38,16 +38,16 @@ export interface RevokeRoleFromUserApiRolesRoleIdUserIdDeleteRequest {
 export class RolesApi extends runtime.BaseAPI {
 
     /**
-     * Grant role to user.  Requires super user powers.  Args:     role_id: Role id     user_id: User id     roles: Set of allowed roles     super_user: Check if current user is super.     user_db: User db.  Raises:     HTTPException: When user is not found  Returns:     Roles granted to user.
-     * Grant Role To User
+     * Assign role to user.  Requires super user powers.  Args:     role_id: Role id     user_id: User id     roles: Set of allowed roles     super_user: Check if current user is super.     user_db: User db.  Raises:     HTTPException: When user is not found  Returns:     Roles assigned to user.
+     * Assign Role To User
      */
-    async grantRoleToUserApiRolesRoleIdUserIdPutRaw(requestParameters: GrantRoleToUserApiRolesRoleIdUserIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
+    async assignRoleToUserApiRolesRoleIdUserIdPutRaw(requestParameters: AssignRoleToUserApiRolesRoleIdUserIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
         if (requestParameters.roleId === null || requestParameters.roleId === undefined) {
-            throw new runtime.RequiredError('roleId','Required parameter requestParameters.roleId was null or undefined when calling grantRoleToUserApiRolesRoleIdUserIdPut.');
+            throw new runtime.RequiredError('roleId','Required parameter requestParameters.roleId was null or undefined when calling assignRoleToUserApiRolesRoleIdUserIdPut.');
         }
 
         if (requestParameters.userId === null || requestParameters.userId === undefined) {
-            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling grantRoleToUserApiRolesRoleIdUserIdPut.');
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling assignRoleToUserApiRolesRoleIdUserIdPut.');
         }
 
         const queryParameters: any = {};
@@ -74,15 +74,15 @@ export class RolesApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.TextApiResponse(response) as any;
+        return new runtime.JSONApiResponse<any>(response);
     }
 
     /**
-     * Grant role to user.  Requires super user powers.  Args:     role_id: Role id     user_id: User id     roles: Set of allowed roles     super_user: Check if current user is super.     user_db: User db.  Raises:     HTTPException: When user is not found  Returns:     Roles granted to user.
-     * Grant Role To User
+     * Assign role to user.  Requires super user powers.  Args:     role_id: Role id     user_id: User id     roles: Set of allowed roles     super_user: Check if current user is super.     user_db: User db.  Raises:     HTTPException: When user is not found  Returns:     Roles assigned to user.
+     * Assign Role To User
      */
-    async grantRoleToUserApiRolesRoleIdUserIdPut(requestParameters: GrantRoleToUserApiRolesRoleIdUserIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
-        const response = await this.grantRoleToUserApiRolesRoleIdUserIdPutRaw(requestParameters, initOverrides);
+    async assignRoleToUserApiRolesRoleIdUserIdPut(requestParameters: AssignRoleToUserApiRolesRoleIdUserIdPutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+        const response = await this.assignRoleToUserApiRolesRoleIdUserIdPutRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -128,16 +128,16 @@ export class RolesApi extends runtime.BaseAPI {
     }
 
     /**
-     * Revoke role from user.  Requires super user powers.  Args:     role_id: Role id     user_id: User id     roles: Set of allowed roles     super_user: Check if current user is super.     user_db: User db.  Raises:     HTTPException: When user is not found  Returns:     Roles granted to user.
-     * Revoke Role From User
+     * Unassign role from user.  Requires super user powers.  Args:     role_id: Role id     user_id: User id     roles: Set of allowed roles     super_user: Check if current user is super.     user_db: User db.  Raises:     HTTPException: When user is not found  Returns:     Roles assigned to user.
+     * Unassign Role From User
      */
-    async revokeRoleFromUserApiRolesRoleIdUserIdDeleteRaw(requestParameters: RevokeRoleFromUserApiRolesRoleIdUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
+    async unassignRoleFromUserApiRolesRoleIdUserIdDeleteRaw(requestParameters: UnassignRoleFromUserApiRolesRoleIdUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
         if (requestParameters.roleId === null || requestParameters.roleId === undefined) {
-            throw new runtime.RequiredError('roleId','Required parameter requestParameters.roleId was null or undefined when calling revokeRoleFromUserApiRolesRoleIdUserIdDelete.');
+            throw new runtime.RequiredError('roleId','Required parameter requestParameters.roleId was null or undefined when calling unassignRoleFromUserApiRolesRoleIdUserIdDelete.');
         }
 
         if (requestParameters.userId === null || requestParameters.userId === undefined) {
-            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling revokeRoleFromUserApiRolesRoleIdUserIdDelete.');
+            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling unassignRoleFromUserApiRolesRoleIdUserIdDelete.');
         }
 
         const queryParameters: any = {};
@@ -164,15 +164,15 @@ export class RolesApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.TextApiResponse(response) as any;
+        return new runtime.JSONApiResponse<any>(response);
     }
 
     /**
-     * Revoke role from user.  Requires super user powers.  Args:     role_id: Role id     user_id: User id     roles: Set of allowed roles     super_user: Check if current user is super.     user_db: User db.  Raises:     HTTPException: When user is not found  Returns:     Roles granted to user.
-     * Revoke Role From User
+     * Unassign role from user.  Requires super user powers.  Args:     role_id: Role id     user_id: User id     roles: Set of allowed roles     super_user: Check if current user is super.     user_db: User db.  Raises:     HTTPException: When user is not found  Returns:     Roles assigned to user.
+     * Unassign Role From User
      */
-    async revokeRoleFromUserApiRolesRoleIdUserIdDelete(requestParameters: RevokeRoleFromUserApiRolesRoleIdUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
-        const response = await this.revokeRoleFromUserApiRolesRoleIdUserIdDeleteRaw(requestParameters, initOverrides);
+    async unassignRoleFromUserApiRolesRoleIdUserIdDelete(requestParameters: UnassignRoleFromUserApiRolesRoleIdUserIdDeleteRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+        const response = await this.unassignRoleFromUserApiRolesRoleIdUserIdDeleteRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

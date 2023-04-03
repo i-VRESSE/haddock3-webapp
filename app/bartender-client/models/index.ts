@@ -3,6 +3,7 @@
 export * from './ApplicatonConfiguration';
 export * from './BearerResponse';
 export * from './Detail';
+export * from './DirectoryItem';
 export * from './ErrorModel';
 export * from './HTTPValidationError';
 export * from './JobModelDTO';

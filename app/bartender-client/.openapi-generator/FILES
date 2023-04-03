@@ -9,6 +9,7 @@ index.ts
 models/ApplicatonConfiguration.ts
 models/BearerResponse.ts
 models/Detail.ts
+models/DirectoryItem.ts
 models/ErrorModel.ts
 models/HTTPValidationError.ts
 models/JobModelDTO.ts
