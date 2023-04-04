@@ -33,7 +33,10 @@ export const WorkflowSubmitButton = ({
     );
   }
   return (
-    <div className="tooltip" data-tip="You don't have permission to submit. Please login.">
+    <div
+      className="tooltip"
+      data-tip="You don't have permission to submit. Please login and make sure you have the right expertise level."
+    >
       <button className="btn" disabled>
         Submit
       </button>
