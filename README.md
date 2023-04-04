@@ -143,7 +143,7 @@ This allows the archive generated with the workflow builder to be submitted.
 
 The user can only submit jobs when he/she has any of these allowed roles.
 A super user should assign a role to the user at http://localhost:3000/admin/users.
-A super user can be made by running `bartender super <email>`.
+A super user can be made through the admin page or by running `bartender super <email>` on the server
 
 ## Catalogs
 

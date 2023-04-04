@@ -67,7 +67,7 @@ export default function AdminUsersPage() {
         <thead>
           <tr>
             <th>Email</th>
-            <th>Super user?</th>
+            <th>Super user</th>
             <th>Roles</th>
           </tr>
         </thead>
