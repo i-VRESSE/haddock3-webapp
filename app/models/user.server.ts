@@ -98,6 +98,10 @@ export async function getLevel(accessToken: string): Promise<string> {
     return ''
 }
 
+export function isSubmitAllowed(level: string) {
+    return level !== ''
+}
+
 export async function getCurrentUser(accessToken: string) {
     const api = buildUsersApi(accessToken)
     return await api.usersCurrentUserUsersMeGet()

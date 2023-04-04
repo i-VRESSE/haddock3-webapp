@@ -7,7 +7,7 @@ import { Haddock3WorkflowBuilder } from "~/components/Haddock3/Form.client";
 import { haddock3Styles } from "~/components/Haddock3/styles";
 import { getAccessToken } from "~/token.server";
 import { submitJob } from "~/models/applicaton.server";
-import { getLevel } from "~/models/user.server";
+import { getLevel, isSubmitAllowed } from "~/models/user.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
   const accessToken = await getAccessToken(request);
@@ -17,7 +17,7 @@ export const loader = async ({ request }: LoaderArgs) => {
   // but cannot submit only download
   const catalogLevel = level === "" ? "easy" : level;
   const catalog = await getCatalog(catalogLevel);
-  return { catalog, submitAllowed: level !== "" };
+  return { catalog, submitAllowed: isSubmitAllowed(level) };
 };
 
 export const action = async ({ request }: ActionArgs) => {
