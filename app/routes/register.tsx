@@ -5,8 +5,8 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
-import { userPrefs } from "~/cookies.server";
-import { localLogin, register } from "~/models/user.server";
+import { getCurrentUser, localLogin, register } from "~/models/user.server";
+import { getSession, commitSession, setSession } from "~/session.server";
 
 export async function loader({ request }: LoaderArgs) {
   // TODO check already logged in
@@ -17,7 +17,6 @@ export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
   const username = formData.get("username");
   const password = formData.get("password");
-
   if (typeof username !== "string" || typeof password !== "string") {
     return json(
       {
@@ -32,9 +31,11 @@ export async function action({ request }: ActionArgs) {
   await register(username, password);
 
   const access_token = await localLogin(username, password);
+  const session = await setSession(access_token, request);
+
   return redirect("/", {
     headers: {
-      "Set-Cookie": await userPrefs.serialize({ access_token }),
+      "Set-Cookie": await commitSession(session),
     },
   });
 }
@@ -42,7 +43,8 @@ export async function action({ request }: ActionArgs) {
 export default function RegisterPage() {
   // Shared style between login and register. Extract if we use it more often
   const centeredColumn = "flex flex-col items-center gap-4";
-  const formStyle = "flex flex-col items-stretch gap-4 border-2 rounded shadow-lg p-4";
+  const formStyle =
+    "flex flex-col items-stretch gap-4 border-2 rounded shadow-lg p-4";
   const inputStyle = "border-2 rounded p-1 w-full";
   const buttonStyle = "btn btn-sm btn-primary";
   const linkStyle = "link link-primary link-hover";
@@ -72,9 +74,15 @@ export default function RegisterPage() {
             className={inputStyle}
           />
         </label>
-        <button type="submit" className={buttonStyle}>Register</button>
+        <button type="submit" className={buttonStyle}>
+          Register
+        </button>
         <p>
-          Or <Link to="/login" className={linkStyle}>login</Link> if you already have an account.
+          Or{" "}
+          <Link to="/login" className={linkStyle}>
+            login
+          </Link>{" "}
+          if you already have an account.
         </p>
       </Form>
     </main>

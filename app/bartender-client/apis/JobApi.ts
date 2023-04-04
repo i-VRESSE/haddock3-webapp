@@ -15,10 +15,13 @@
 
 import * as runtime from '../runtime';
 import type {
+  DirectoryItem,
   HTTPValidationError,
   JobModelDTO,
 } from '../models';
 import {
+    DirectoryItemFromJSON,
+    DirectoryItemToJSON,
     HTTPValidationErrorFromJSON,
     HTTPValidationErrorToJSON,
     JobModelDTOFromJSON,
@@ -27,6 +30,17 @@ import {
 
 export interface RetrieveJobApiJobJobidGetRequest {
     jobid: number;
+}
+
+export interface RetrieveJobDirectoriesApiJobJobidDirectoriesGetRequest {
+    jobid: number;
+    maxDepth?: number;
+}
+
+export interface RetrieveJobDirectoriesFromPathApiJobJobidDirectoriesPathGetRequest {
+    path: string;
+    jobid: number;
+    maxDepth?: number;
 }
 
 export interface RetrieveJobFilesApiJobJobidFilesPathGetRequest {
@@ -53,7 +67,7 @@ export interface RetrieveJobsApiJobGetRequest {
 export class JobApi extends runtime.BaseAPI {
 
     /**
-     * Retrieve specific job from the database.  Args:     jobid: identifier of job instance.     job_dao: JobDAO object.     user: Current active user.     context: Context with destinations.  Raises:     HTTPException: When job is not found or user is not allowed to see job.  Returns:     job models.
+     * Retrieve specific job from the database.  Args:     jobid: identifier of job instance.     job_dao: JobDAO object.     user: Current active user.     context: Context with destinations.     file_staging_queue: When scheduler reports job is complete.         The output files need to be copied back.         Use queue to perform download outside request/response handling.  Raises:     HTTPException: When job is not found or user is not allowed to see job.  Returns:     job models.
      * Retrieve Job
      */
     async retrieveJobApiJobJobidGetRaw(requestParameters: RetrieveJobApiJobJobidGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JobModelDTO>> {
@@ -89,7 +103,7 @@ export class JobApi extends runtime.BaseAPI {
     }
 
     /**
-     * Retrieve specific job from the database.  Args:     jobid: identifier of job instance.     job_dao: JobDAO object.     user: Current active user.     context: Context with destinations.  Raises:     HTTPException: When job is not found or user is not allowed to see job.  Returns:     job models.
+     * Retrieve specific job from the database.  Args:     jobid: identifier of job instance.     job_dao: JobDAO object.     user: Current active user.     context: Context with destinations.     file_staging_queue: When scheduler reports job is complete.         The output files need to be copied back.         Use queue to perform download outside request/response handling.  Raises:     HTTPException: When job is not found or user is not allowed to see job.  Returns:     job models.
      * Retrieve Job
      */
     async retrieveJobApiJobJobidGet(requestParameters: RetrieveJobApiJobJobidGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JobModelDTO> {
@@ -98,10 +112,112 @@ export class JobApi extends runtime.BaseAPI {
     }
 
     /**
+     * List directory contents of a job.  Args:     max_depth: Number of directories to traverse into.     job_dir: The job directory.  Returns:     DirectoryItem: Listing of files and directories.
+     * Retrieve Job Directories
+     */
+    async retrieveJobDirectoriesApiJobJobidDirectoriesGetRaw(requestParameters: RetrieveJobDirectoriesApiJobJobidDirectoriesGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DirectoryItem>> {
+        if (requestParameters.jobid === null || requestParameters.jobid === undefined) {
+            throw new runtime.RequiredError('jobid','Required parameter requestParameters.jobid was null or undefined when calling retrieveJobDirectoriesApiJobJobidDirectoriesGet.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.maxDepth !== undefined) {
+            queryParameters['max_depth'] = requestParameters.maxDepth;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("HTTPBearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        if (this.configuration && this.configuration.accessToken) {
+            // oauth required
+            headerParameters["Authorization"] = await this.configuration.accessToken("OAuth2PasswordBearer", []);
+        }
+
+        const response = await this.request({
+            path: `/api/job/{jobid}/directories`.replace(`{${"jobid"}}`, encodeURIComponent(String(requestParameters.jobid))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => DirectoryItemFromJSON(jsonValue));
+    }
+
+    /**
+     * List directory contents of a job.  Args:     max_depth: Number of directories to traverse into.     job_dir: The job directory.  Returns:     DirectoryItem: Listing of files and directories.
+     * Retrieve Job Directories
+     */
+    async retrieveJobDirectoriesApiJobJobidDirectoriesGet(requestParameters: RetrieveJobDirectoriesApiJobJobidDirectoriesGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DirectoryItem> {
+        const response = await this.retrieveJobDirectoriesApiJobJobidDirectoriesGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * List directory contents of a job.  Args:     path: Sub directory inside job directory to start from.     max_depth: Number of directories to traverse into.     job_dir: The job directory.  Raises:     HTTPException: When path is not found or is outside job directory.  Returns:     DirectoryItem: Listing of files and directories.
+     * Retrieve Job Directories From Path
+     */
+    async retrieveJobDirectoriesFromPathApiJobJobidDirectoriesPathGetRaw(requestParameters: RetrieveJobDirectoriesFromPathApiJobJobidDirectoriesPathGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DirectoryItem>> {
+        if (requestParameters.path === null || requestParameters.path === undefined) {
+            throw new runtime.RequiredError('path','Required parameter requestParameters.path was null or undefined when calling retrieveJobDirectoriesFromPathApiJobJobidDirectoriesPathGet.');
+        }
+
+        if (requestParameters.jobid === null || requestParameters.jobid === undefined) {
+            throw new runtime.RequiredError('jobid','Required parameter requestParameters.jobid was null or undefined when calling retrieveJobDirectoriesFromPathApiJobJobidDirectoriesPathGet.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.maxDepth !== undefined) {
+            queryParameters['max_depth'] = requestParameters.maxDepth;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("HTTPBearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        if (this.configuration && this.configuration.accessToken) {
+            // oauth required
+            headerParameters["Authorization"] = await this.configuration.accessToken("OAuth2PasswordBearer", []);
+        }
+
+        const response = await this.request({
+            path: `/api/job/{jobid}/directories/{path}`.replace(`{${"path"}}`, encodeURIComponent(String(requestParameters.path))).replace(`{${"jobid"}}`, encodeURIComponent(String(requestParameters.jobid))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => DirectoryItemFromJSON(jsonValue));
+    }
+
+    /**
+     * List directory contents of a job.  Args:     path: Sub directory inside job directory to start from.     max_depth: Number of directories to traverse into.     job_dir: The job directory.  Raises:     HTTPException: When path is not found or is outside job directory.  Returns:     DirectoryItem: Listing of files and directories.
+     * Retrieve Job Directories From Path
+     */
+    async retrieveJobDirectoriesFromPathApiJobJobidDirectoriesPathGet(requestParameters: RetrieveJobDirectoriesFromPathApiJobJobidDirectoriesPathGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DirectoryItem> {
+        const response = await this.retrieveJobDirectoriesFromPathApiJobJobidDirectoriesPathGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Retrieve files from a completed job.  Args:     path: Path to file that job has produced.     job_dir: Directory with job output files.  Raises:     HTTPException: When file is not found or is outside job directory.  Returns:     The file content.
      * Retrieve Job Files
      */
-    async retrieveJobFilesApiJobJobidFilesPathGetRaw(requestParameters: RetrieveJobFilesApiJobJobidFilesPathGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async retrieveJobFilesApiJobJobidFilesPathGetRaw(requestParameters: RetrieveJobFilesApiJobJobidFilesPathGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
         if (requestParameters.path === null || requestParameters.path === undefined) {
             throw new runtime.RequiredError('path','Required parameter requestParameters.path was null or undefined when calling retrieveJobFilesApiJobJobidFilesPathGet.');
         }
@@ -134,22 +250,23 @@ export class JobApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.TextApiResponse(response) as any;
     }
 
     /**
      * Retrieve files from a completed job.  Args:     path: Path to file that job has produced.     job_dir: Directory with job output files.  Raises:     HTTPException: When file is not found or is outside job directory.  Returns:     The file content.
      * Retrieve Job Files
      */
-    async retrieveJobFilesApiJobJobidFilesPathGet(requestParameters: RetrieveJobFilesApiJobJobidFilesPathGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.retrieveJobFilesApiJobJobidFilesPathGetRaw(requestParameters, initOverrides);
+    async retrieveJobFilesApiJobJobidFilesPathGet(requestParameters: RetrieveJobFilesApiJobJobidFilesPathGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
+        const response = await this.retrieveJobFilesApiJobJobidFilesPathGetRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
      * Retrieve the jobs standard error.  Args:     job_dir: Directory with job output files.  Returns:     Content of standard error.
      * Retrieve Job Stderr
      */
-    async retrieveJobStderrApiJobJobidStderrGetRaw(requestParameters: RetrieveJobStderrApiJobJobidStderrGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async retrieveJobStderrApiJobJobidStderrGetRaw(requestParameters: RetrieveJobStderrApiJobJobidStderrGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
         if (requestParameters.jobid === null || requestParameters.jobid === undefined) {
             throw new runtime.RequiredError('jobid','Required parameter requestParameters.jobid was null or undefined when calling retrieveJobStderrApiJobJobidStderrGet.');
         }
@@ -178,22 +295,23 @@ export class JobApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.TextApiResponse(response) as any;
     }
 
     /**
      * Retrieve the jobs standard error.  Args:     job_dir: Directory with job output files.  Returns:     Content of standard error.
      * Retrieve Job Stderr
      */
-    async retrieveJobStderrApiJobJobidStderrGet(requestParameters: RetrieveJobStderrApiJobJobidStderrGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.retrieveJobStderrApiJobJobidStderrGetRaw(requestParameters, initOverrides);
+    async retrieveJobStderrApiJobJobidStderrGet(requestParameters: RetrieveJobStderrApiJobJobidStderrGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
+        const response = await this.retrieveJobStderrApiJobJobidStderrGetRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
      * Retrieve the jobs standard output.  Args:     job_dir: Directory with job output files.  Returns:     Content of standard output.
      * Retrieve Job Stdout
      */
-    async retrieveJobStdoutApiJobJobidStdoutGetRaw(requestParameters: RetrieveJobStdoutApiJobJobidStdoutGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async retrieveJobStdoutApiJobJobidStdoutGetRaw(requestParameters: RetrieveJobStdoutApiJobJobidStdoutGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
         if (requestParameters.jobid === null || requestParameters.jobid === undefined) {
             throw new runtime.RequiredError('jobid','Required parameter requestParameters.jobid was null or undefined when calling retrieveJobStdoutApiJobJobidStdoutGet.');
         }
@@ -222,19 +340,20 @@ export class JobApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.TextApiResponse(response) as any;
     }
 
     /**
      * Retrieve the jobs standard output.  Args:     job_dir: Directory with job output files.  Returns:     Content of standard output.
      * Retrieve Job Stdout
      */
-    async retrieveJobStdoutApiJobJobidStdoutGet(requestParameters: RetrieveJobStdoutApiJobJobidStdoutGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.retrieveJobStdoutApiJobJobidStdoutGetRaw(requestParameters, initOverrides);
+    async retrieveJobStdoutApiJobJobidStdoutGet(requestParameters: RetrieveJobStdoutApiJobJobidStdoutGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
+        const response = await this.retrieveJobStdoutApiJobJobidStdoutGetRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
-     * Retrieve all jobs of user from the database.  Args:     limit: limit of jobs.     offset: offset of jobs.     job_dao: JobDAO object.     user: Current active user.     context: Context with destinations.  Returns:     stream of jobs.
+     * Retrieve all jobs of user from the database.  Args:     limit: limit of jobs.     offset: offset of jobs.     job_dao: JobDAO object.     user: Current active user.     context: Context with destinations.     file_staging_queue: When scheduler reports job is complete.         The output files need to be copied back.         Use queue to perform download outside request/response handling.  Returns:     stream of jobs.
      * Retrieve Jobs
      */
     async retrieveJobsApiJobGetRaw(requestParameters: RetrieveJobsApiJobGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<JobModelDTO>>> {
@@ -274,7 +393,7 @@ export class JobApi extends runtime.BaseAPI {
     }
 
     /**
-     * Retrieve all jobs of user from the database.  Args:     limit: limit of jobs.     offset: offset of jobs.     job_dao: JobDAO object.     user: Current active user.     context: Context with destinations.  Returns:     stream of jobs.
+     * Retrieve all jobs of user from the database.  Args:     limit: limit of jobs.     offset: offset of jobs.     job_dao: JobDAO object.     user: Current active user.     context: Context with destinations.     file_staging_queue: When scheduler reports job is complete.         The output files need to be copied back.         Use queue to perform download outside request/response handling.  Returns:     stream of jobs.
      * Retrieve Jobs
      */
     async retrieveJobsApiJobGet(requestParameters: RetrieveJobsApiJobGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<JobModelDTO>> {

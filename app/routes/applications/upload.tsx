@@ -5,16 +5,21 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import { getAccessToken } from "~/cookies.server";
+import { getAccessToken } from "~/token.server";
 
 import { applicationByName, submitJob } from "~/models/applicaton.server";
+import { getLevel, isSubmitAllowed } from "~/models/user.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
   const name = "haddock3";
   const app = await applicationByName(name);
-  const access_token = await getAccessToken(request);
-  if (access_token === undefined) {
+  const accessToken = await getAccessToken(request);
+  if (accessToken === undefined) {
     throw new Error("Unauthenticated");
+  }
+  const level = await getLevel(accessToken)
+  if (isSubmitAllowed(level)) {
+    throw new Error("Forbidden");
   }
   return json({ name, ...app });
 };

@@ -67,6 +67,7 @@ export const JobModelDTOStateEnum = {
     New: 'new',
     Queued: 'queued',
     Running: 'running',
+    StagingOut: 'staging_out',
     Ok: 'ok',
     Error: 'error'
 } as const;

@@ -15,7 +15,7 @@ import { WorkflowDownloadButton } from "./DownloadButton";
 import { FormActions } from "./FormActions";
 
 const App = () => {
-  const { catalog } = useLoaderData<typeof loader>();
+  const { catalog, submitAllowed } = useLoaderData<typeof loader>();
   const setCatalog = useSetCatalog();
   useEffect(() => {
     setCatalog(prepareCatalog(catalog)); // On mount configure catalog
@@ -36,12 +36,12 @@ const App = () => {
           <NodePanel />
         </div>
       </div>
-      <div className="grid page sticky inset-x-0 bottom-0 h-16">
+      <div className="grid page sticky inset-x-0 bottom-0 h-14">
         <div></div>
-      <div role="group" className="btn-group">
-        <WorkflowSubmitButton />
-        <WorkflowDownloadButton/>
-      </div>
+        <div role="group" className="btn-group">
+          <WorkflowSubmitButton submitAllowed={submitAllowed} />
+          <WorkflowDownloadButton />
+        </div>
         <FormActions />
       </div>
     </div>

@@ -1,4 +1,10 @@
-import { json, type LinksFunction, type LoaderArgs, type MetaFunction } from "@remix-run/node";
+import {
+  json,
+  redirect,
+  type LinksFunction,
+  type LoaderArgs,
+  type MetaFunction,
+} from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -7,14 +13,13 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import { getAccessToken } from "./cookies.server";
-import { Navbar } from "~/components/Navbar";
 
+import { Navbar } from "~/components/Navbar";
+import { getSession } from "./session.server";
+import { isExpired } from "./token.server";
 import styles from "./tailwind.css";
 
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: styles },
-];
+export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -23,11 +28,17 @@ export const meta: MetaFunction = () => ({
 });
 
 export async function loader({ request }: LoaderArgs) {
+  const session = await getSession(request);
+
+  const accessToken = session.data.bartenderToken;
+  if (isExpired(accessToken) && new URL(request.url).pathname !== "/login") {
+    return redirect("/login");
+  }
   return json({
-    access_token: await getAccessToken(request),
+    isAuthenticated: accessToken !== undefined,
+    isSuperUser: session.data.isSuperUser,
   });
 }
-
 
 export default function App() {
   return (
@@ -40,7 +51,8 @@ export default function App() {
         <div className="flex flex-col min-h-screen">
           <header>
             <div className="h-64 flex flex-col bg-cover bg-[url('https://www.bonvinlab.org/images/pages/banner_home-mini.jpg')]">
-              <div className="flex-grow" />  {/* Push the navbar to the bottom of the banner */}
+              <div className="flex-grow" />{" "}
+              {/* Push the navbar to the bottom of the banner */}
               <Navbar />
             </div>
           </header>
@@ -49,11 +61,14 @@ export default function App() {
           </div>
           <footer className="bg-primary text-center p-1">
             <p className="text-sm">
-              This work is co-funded by the Horizon 2020 projects EOSC-hub and EGI-ACE (grant numbers 777536 and 101017567), BioExcel (grant numbers 823830 and 675728)
-              and by a computing grant from NWO-ENW (project number 2019.053).
+              This work is co-funded by the Horizon 2020 projects EOSC-hub and
+              EGI-ACE (grant numbers 777536 and 101017567), BioExcel (grant
+              numbers 823830 and 675728) and by a computing grant from NWO-ENW
+              (project number 2019.053).
             </p>
             <p className="text-sm">
-              2008-2023 © Computational Structural Biology group. All rights reserved.
+              2008-2023 © Computational Structural Biology group. All rights
+              reserved.
             </p>
           </footer>
         </div>

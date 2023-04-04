@@ -41,6 +41,12 @@ export interface ApplicatonConfiguration {
      * @memberof ApplicatonConfiguration
      */
     config: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ApplicatonConfiguration
+     */
+    allowedRoles?: Array<string>;
 }
 
 /**
@@ -66,6 +72,7 @@ export function ApplicatonConfigurationFromJSONTyped(json: any, ignoreDiscrimina
         
         'command': json['command'],
         'config': json['config'],
+        'allowedRoles': !exists(json, 'allowed_roles') ? undefined : json['allowed_roles'],
     };
 }
 
@@ -80,6 +87,7 @@ export function ApplicatonConfigurationToJSON(value?: ApplicatonConfiguration | 
         
         'command': value.command,
         'config': value.config,
+        'allowed_roles': value.allowedRoles,
     };
 }
 

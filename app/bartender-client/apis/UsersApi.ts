@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   ErrorModel,
   HTTPValidationError,
+  UserAsListItem,
   UserProfileInputDTO,
   UserRead,
   UserUpdate,
@@ -26,6 +27,8 @@ import {
     ErrorModelToJSON,
     HTTPValidationErrorFromJSON,
     HTTPValidationErrorToJSON,
+    UserAsListItemFromJSON,
+    UserAsListItemToJSON,
     UserProfileInputDTOFromJSON,
     UserProfileInputDTOToJSON,
     UserReadFromJSON,
@@ -33,6 +36,11 @@ import {
     UserUpdateFromJSON,
     UserUpdateToJSON,
 } from '../models';
+
+export interface ListUsersApiUsersGetRequest {
+    limit?: number;
+    offset?: number;
+}
 
 export interface UsersDeleteUserUsersIdDeleteRequest {
     id: any;
@@ -55,6 +63,55 @@ export interface UsersUserUsersIdGetRequest {
  * 
  */
 export class UsersApi extends runtime.BaseAPI {
+
+    /**
+     * List of users.  Requires super user powers.  Args:     limit: Number of users to return. Defaults to 50.     offset: Offset. Defaults to 0.     super_user: Check if current user is super.     user_db: User db.  Returns:     List of users.
+     * List Users
+     */
+    async listUsersApiUsersGetRaw(requestParameters: ListUsersApiUsersGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<UserAsListItem>>> {
+        const queryParameters: any = {};
+
+        if (requestParameters.limit !== undefined) {
+            queryParameters['limit'] = requestParameters.limit;
+        }
+
+        if (requestParameters.offset !== undefined) {
+            queryParameters['offset'] = requestParameters.offset;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("HTTPBearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        if (this.configuration && this.configuration.accessToken) {
+            // oauth required
+            headerParameters["Authorization"] = await this.configuration.accessToken("OAuth2PasswordBearer", []);
+        }
+
+        const response = await this.request({
+            path: `/api/users/`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserAsListItemFromJSON));
+    }
+
+    /**
+     * List of users.  Requires super user powers.  Args:     limit: Number of users to return. Defaults to 50.     offset: Offset. Defaults to 0.     super_user: Check if current user is super.     user_db: User db.  Returns:     List of users.
+     * List Users
+     */
+    async listUsersApiUsersGet(requestParameters: ListUsersApiUsersGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserAsListItem>> {
+        const response = await this.listUsersApiUsersGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Retrieve profile of currently logged in user.  Args:     user: Current active user.  Returns:     user profile.

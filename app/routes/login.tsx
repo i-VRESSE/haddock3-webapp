@@ -1,7 +1,7 @@
 import { type ActionArgs, json, redirect } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
-import { userPrefs } from "~/cookies.server";
 import { localLogin } from "~/models/user.server";
+import { commitSession, setSession } from "~/session.server";
 
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
@@ -20,21 +20,22 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const cookieHeader = request.headers.get("Cookie");
-  const cookie = (await userPrefs.parse(cookieHeader)) || {};
   const access_token = await localLogin(username, password);
-  cookie.access_token = access_token;
+  const session = await setSession(access_token, request);
+
   return redirect("/", {
     headers: {
-      "Set-Cookie": await userPrefs.serialize(cookie),
+      "Set-Cookie": await commitSession(session),
     },
   });
 }
 
+
 export default function LoginPage() {
   // Shared style between login and register. Extract if we use it more often?
   const centeredColumn = "flex flex-col items-center gap-4";
-  const formStyle = "flex flex-col items-stretch gap-4 border-2 rounded shadow-lg p-4";
+  const formStyle =
+    "flex flex-col items-stretch gap-4 border-2 rounded shadow-lg p-4";
   const inputStyle = "border-2 rounded p-1 w-full";
   const buttonStyle = "btn btn-sm btn-primary";
   const linkStyle = "link link-primary link-hover";
@@ -42,7 +43,6 @@ export default function LoginPage() {
 
   return (
     <main className={centeredColumn}>
-
       <Form method="post" className={formStyle}>
         <h2 className={headerStyle}>Log in with username and password</h2>
         <label>
@@ -65,9 +65,14 @@ export default function LoginPage() {
             className={inputStyle}
           />
         </label>
-        <button type="submit" className={buttonStyle}>Log in</button>
+        <button type="submit" className={buttonStyle}>
+          Log in
+        </button>
         <p>
-          New user? <Link to="/register" className={linkStyle}>Click here to register.</Link>
+          New user?{" "}
+          <Link to="/register" className={linkStyle}>
+            Click here to register.
+          </Link>
         </p>
       </Form>
 
@@ -76,23 +81,28 @@ export default function LoginPage() {
       <div className="flex space-evenly gap-4">
         <form method="post" action="/auth/github/authorize">
           <button type="submit" className="btn h-auto">
-            <img height="32" width="32" src="github-fill.svg" alt="GitHub logo"/>
+            <img
+              height="32"
+              width="32"
+              src="github-fill.svg"
+              alt="GitHub logo"
+            />
             <p className="px-2">GitHub</p>
           </button>
         </form>
         <form method="post" action="/auth/orcidsandbox/authorize">
           <button type="submit" className="btn h-auto">
-            <img height="32" width="32" src="orcid.png" alt="ORCID logo"/>
+            <img height="32" width="32" src="orcid.png" alt="ORCID logo" />
             <p className="px-2">ORCID sandbox</p>
           </button>
         </form>
         <form method="post" action="/auth/orcid/authorize">
           <button type="submit" className="btn h-auto">
-            <img height="32" width="32" src="orcid.png" alt="ORCID logo"/>
+            <img height="32" width="32" src="orcid.png" alt="ORCID logo" />
             <p className="px-2">ORCID</p>
           </button>
-        </form >
-      </div >
-    </main >
+        </form>
+      </div>
+    </main>
   );
 }

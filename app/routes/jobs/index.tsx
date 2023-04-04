@@ -1,6 +1,6 @@
 import { json, type LoaderArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { getAccessToken } from "~/cookies.server";
+import { getAccessToken } from "~/token.server";
 import { getJobs } from "~/models/job.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -22,7 +22,6 @@ export default function JobPage() {
             <th>ID</th>
             <th>Status</th>
             <th>Name</th>
-            <th>Application</th>
           </tr>
         </thead>
         <tbody>
@@ -33,9 +32,6 @@ export default function JobPage() {
               </td>
               <td>{job.state}</td>
               <td>{job.name}</td>
-              <td>
-                <Link to={`/application/${job.application}`}>{job.application}</Link>
-              </td>
             </tr>
           ))}
         </tbody>

@@ -21,48 +21,76 @@ import {
 } from './OAuthAccountName';
 
 /**
- * DTO for profile of current user model.
+ * DTO for user in a list.
  * @export
- * @interface UserProfileInputDTO
+ * @interface UserAsListItem
  */
-export interface UserProfileInputDTO {
+export interface UserAsListItem {
     /**
      * 
      * @type {string}
-     * @memberof UserProfileInputDTO
+     * @memberof UserAsListItem
      */
     email: string;
     /**
      * 
      * @type {Array<OAuthAccountName>}
-     * @memberof UserProfileInputDTO
+     * @memberof UserAsListItem
      */
     oauthAccounts: Array<OAuthAccountName>;
     /**
      * 
      * @type {Array<string>}
-     * @memberof UserProfileInputDTO
+     * @memberof UserAsListItem
      */
     roles: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof UserAsListItem
+     */
+    id: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UserAsListItem
+     */
+    isActive: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UserAsListItem
+     */
+    isSuperuser: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UserAsListItem
+     */
+    isVerified: boolean;
 }
 
 /**
- * Check if a given object implements the UserProfileInputDTO interface.
+ * Check if a given object implements the UserAsListItem interface.
  */
-export function instanceOfUserProfileInputDTO(value: object): boolean {
+export function instanceOfUserAsListItem(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "email" in value;
     isInstance = isInstance && "oauthAccounts" in value;
     isInstance = isInstance && "roles" in value;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "isActive" in value;
+    isInstance = isInstance && "isSuperuser" in value;
+    isInstance = isInstance && "isVerified" in value;
 
     return isInstance;
 }
 
-export function UserProfileInputDTOFromJSON(json: any): UserProfileInputDTO {
-    return UserProfileInputDTOFromJSONTyped(json, false);
+export function UserAsListItemFromJSON(json: any): UserAsListItem {
+    return UserAsListItemFromJSONTyped(json, false);
 }
 
-export function UserProfileInputDTOFromJSONTyped(json: any, ignoreDiscriminator: boolean): UserProfileInputDTO {
+export function UserAsListItemFromJSONTyped(json: any, ignoreDiscriminator: boolean): UserAsListItem {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -71,10 +99,14 @@ export function UserProfileInputDTOFromJSONTyped(json: any, ignoreDiscriminator:
         'email': json['email'],
         'oauthAccounts': ((json['oauth_accounts'] as Array<any>).map(OAuthAccountNameFromJSON)),
         'roles': json['roles'],
+        'id': json['id'],
+        'isActive': json['is_active'],
+        'isSuperuser': json['is_superuser'],
+        'isVerified': json['is_verified'],
     };
 }
 
-export function UserProfileInputDTOToJSON(value?: UserProfileInputDTO | null): any {
+export function UserAsListItemToJSON(value?: UserAsListItem | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -86,6 +118,10 @@ export function UserProfileInputDTOToJSON(value?: UserProfileInputDTO | null): a
         'email': value.email,
         'oauth_accounts': ((value.oauthAccounts as Array<any>).map(OAuthAccountNameToJSON)),
         'roles': value.roles,
+        'id': value.id,
+        'is_active': value.isActive,
+        'is_superuser': value.isSuperuser,
+        'is_verified': value.isVerified,
     };
 }
 

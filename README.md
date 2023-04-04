@@ -81,6 +81,14 @@ Create super user with
 docker compose exec bartender bartender super <email>
 ```
 
+## Sessions
+
+Making the login session secure requires a session secret.
+The session secret can be configured by setting the `SESSION_SECRET` environment variable.
+If not set, a hardcoded secret is used, which should not be used in production.
+
+The data of the login sessions in stored in the `./sessions` directory.
+
 ## Bartender web service client
 
 This web app uses a client to consume the bartender web service.
@@ -125,6 +133,24 @@ applications:
     haddock3:
         command: haddock3 $config
         config: workflow.cfg
+        allowed_roles:
+            - easy
+            - expert
+            - guru
 ```
 
 This allows the archive generated with the workflow builder to be submitted.
+
+The user can only submit jobs when he/she has any of these allowed roles.
+A super user should assign a role to the user at http://localhost:3000/admin/users.
+A super user can be made through the admin page or by running `bartender super <email>` on the server
+
+## Catalogs
+
+This repo has a copy (`./app/catalogs/*.yaml`) of the [haddock3 workflow build catalogs](https://github.com/i-VRESSE/workflow-builder/tree/main/packages/haddock3_catalog/public/catalog).
+
+To fetch the latest catalogs run
+
+```shell
+npm run catalogs
+```
