@@ -1,22 +1,18 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";
-import { getAccessToken } from "~/token.server";
-import { getCurrentUser } from "~/models/user.server";
+import { getSession } from "~/session.server";
 
 export async function loader({ request }: LoaderArgs) {
-  const access_token = await getAccessToken(request);
-  if (access_token === undefined) {
+  const session = await getSession(request);
+  const accessToken = session.data.bartenderToken;
+  if (accessToken === undefined) {
     throw new Error("Unauthenticated");
   }
-  const { isSuperuser, roles } = await getCurrentUser(access_token);
-  if (!isSuperuser) {
+  if (!session.data.isSuperUser) {
     throw new Error("Forbidden");
   }
-  return json({
-    isSuperuser,
-    roles,
-  });
+  return json({});
 }
 
 export default function AdminIndexPage() {

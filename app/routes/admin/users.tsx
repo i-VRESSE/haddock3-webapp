@@ -10,11 +10,16 @@ import {
   setSuperUser,
   unassignRole,
 } from "~/models/user.server";
+import { getSession } from "~/session.server";
 
 export async function loader({ request }: LoaderArgs) {
-  const accessToken = await getAccessToken(request);
+  const session = await getSession(request);
+  const accessToken = session.data.bartenderToken;
   if (accessToken === undefined) {
     throw new Error("Unauthenticated");
+  }
+  if (!session.data.isSuperUser) {
+    throw new Error("Forbidden");
   }
   const users = await listUsers(accessToken);
   const roles = await listRoles(accessToken);
