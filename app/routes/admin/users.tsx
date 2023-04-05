@@ -5,6 +5,7 @@ import { UserTableRow } from "~/components/admin/UserTableRow";
 import { getAccessToken } from "~/token.server";
 import {
   assignRole,
+  checkAuthenticated,
   listRoles,
   listUsers,
   setSuperUser,
@@ -15,14 +16,12 @@ import { getSession } from "~/session.server";
 export async function loader({ request }: LoaderArgs) {
   const session = await getSession(request);
   const accessToken = session.data.bartenderToken;
-  if (accessToken === undefined) {
-    throw new Error("Unauthenticated");
-  }
+  checkAuthenticated(accessToken);
   if (!session.data.isSuperUser) {
     throw new Error("Forbidden");
   }
-  const users = await listUsers(accessToken);
-  const roles = await listRoles(accessToken);
+  const users = await listUsers(accessToken!);
+  const roles = await listRoles(accessToken!);
   return json({
     users,
     roles,

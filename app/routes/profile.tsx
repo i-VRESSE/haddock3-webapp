@@ -1,17 +1,17 @@
 import { json, type LoaderArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { getAccessToken, getTokenPayload } from "~/token.server";
-import { getLevel, getProfile } from "~/models/user.server";
+import { getTokenPayload } from "~/token.server";
+import { checkAuthenticated, getLevel, getProfile } from "~/models/user.server";
+import { getSession } from "~/session.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
-  const accessToken = await getAccessToken(request);
-  if (accessToken === undefined) {
-    throw new Error("Unauthenticated");
-  }
-  const profile = await getProfile(accessToken)
+  const session = await getSession(request);
+  const accessToken = session.data.bartenderToken;
+  checkAuthenticated(accessToken);
+  const profile = await getProfile(accessToken!)
   const tokenPayload = getTokenPayload(accessToken);
   const expireDate = tokenPayload.exp === undefined ? Date.now() : tokenPayload.exp * 1000;
-  const level = await getLevel(accessToken);
+  const level = await getLevel(session.data.roles);
   return json({ profile, expireDate, level });
 };
 

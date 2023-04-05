@@ -8,10 +8,11 @@ import { haddock3Styles } from "~/components/Haddock3/styles";
 import { getAccessToken } from "~/token.server";
 import { submitJob } from "~/models/applicaton.server";
 import { getLevel, isSubmitAllowed } from "~/models/user.server";
+import { getSession } from "~/session.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
-  const accessToken = await getAccessToken(request);
-  const level = accessToken === undefined ? "" : await getLevel(accessToken);
+  const session = await getSession(request);
+  const level = await getLevel(session.data.roles);
   // When user does not have a level he/she
   // can still use builder with easy level
   // but cannot submit only download

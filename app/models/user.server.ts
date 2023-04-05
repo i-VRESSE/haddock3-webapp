@@ -85,9 +85,11 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
     return body.access_token;
 }
 
-export async function getLevel(accessToken: string): Promise<string> {
-    const me = await getCurrentUser(accessToken)
-    const roles = new Set(me.roles);
+export async function getLevel(userRoles: string[] | undefined): Promise<string> {
+    if (!userRoles) {
+        return ''
+    }
+    const roles = new Set(userRoles);
     if (roles.has('guru')) {
         return 'guru'
     } else if (roles.has('expert')) {
@@ -96,6 +98,12 @@ export async function getLevel(accessToken: string): Promise<string> {
         return 'easy'
     }
     return ''
+}
+
+export function checkAuthenticated(accessToken : string | undefined) {
+  if (accessToken === undefined) {
+    throw new Error("Unauthenticated");
+  }
 }
 
 export function isSubmitAllowed(level: string) {
