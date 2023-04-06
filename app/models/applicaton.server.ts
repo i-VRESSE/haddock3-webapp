@@ -4,9 +4,7 @@ import { stringify, parse } from "@ltd/j-toml";
 import { ApplicationApi } from "~/bartender-client/apis/ApplicationApi";
 import type { JobModelDTO } from "~/bartender-client/models/JobModelDTO";
 import { buildConfig } from "./config.server";
-
-export const WORKFLOW_CONFIG_FILENAME = "workflow.cfg";
-const JOB_OUTPUT_DIR = "output";
+import { JOB_OUTPUT_DIR, WORKFLOW_CONFIG_FILENAME } from './constants';
 
 function buildApplicationApi(accessToken: string = "") {
   return new ApplicationApi(buildConfig(accessToken));
@@ -30,11 +28,21 @@ export async function submitJob(
   accessToken: string
 ) {
   const api = buildApplicationApi(accessToken);
-  const rewritten_upload = await rewriteConfigInArchive(upload);
+  const rewritten_upload = new File([await rewriteConfigInArchive(upload)], upload.name, {
+    type: upload.type,
+    lastModified: upload.lastModified,
+  });
   const response = await api.uploadJobApiApplicationApplicationJobPutRaw({
     application,
     upload: rewritten_upload,
   });
+  if (!response.raw.ok) {
+    console.log([
+      response.raw.status,
+      response.raw.statusText,
+      await response.raw.text()
+    ]);
+  }
   const job: JobModelDTO = await response.raw.json();
   return job;
 }
@@ -52,7 +60,11 @@ export async function submitJob(
  * @param config_body Body of workflow config file to rewrite
  * @returns The rewritten config file
  */
-function rewriteConfig(config_body: string) {
+async function rewriteConfig(config_body: string) {
+  // TODO handle config file with duplicated sections
+  // use dedupWorkflow from https://github.com/i-VRESSE/workflow-builder/blob/807a2007963376906d801f20ac3731eb2b49429a/packages/core/src/toml.ts#L258
+  // Got stuck on papaparse import error
+  // so for now use workflow-builder web app to dedup the config file by uploading and downloading it
   const table = parse(config_body, { bigint: false });
   table.run_dir = JOB_OUTPUT_DIR;
   table.mode = "local";
@@ -87,7 +99,7 @@ export async function rewriteConfigInArchive(upload: Blob) {
 
   // TODO validate config using catalog and ajv
 
-  const new_config = rewriteConfig(config_body);
+  const new_config = await rewriteConfig(config_body);
 
   zip.file(WORKFLOW_CONFIG_FILENAME, new_config);
   return await zip.generateAsync({type: "blob"});

@@ -1,56 +1,73 @@
 import { json, type LoaderArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { getAccessToken } from "~/token.server";
-import { applicationByName } from "~/models/applicaton.server";
-import { getJobById } from "~/models/job.server";
+import { WORKFLOW_CONFIG_FILENAME } from "~/models/constants";
+import { listOutputFiles, getJobById } from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
 import { checkAuthenticated } from "~/models/user.server";
+import type { DirectoryItem } from "~/bartender-client";
+import { ListReportFiles } from "~/components/ListReportFiles";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
-  const job_id = params.id || "";
+  const jobId = parseInt(params.id || "");
   const accessToken = await getAccessToken(request);
   checkAuthenticated(accessToken);
-  const job = await getJobById(parseInt(job_id), accessToken!);
+  const job = await getJobById(jobId, accessToken!);
   // TODO check if job belongs to user
-  const app = await applicationByName(job.application);
-  return json({ job, app });
+  let outputFiles: DirectoryItem | undefined = undefined;
+  if (CompletedJobs.has(job.state)) {
+    outputFiles = await listOutputFiles(jobId, accessToken!);    
+  }
+  return json({ job, outputFiles});
 };
 
 export default function JobPage() {
-  const { job, app } = useLoaderData<typeof loader>();
+  const { job, outputFiles } = useLoaderData<typeof loader>();
   return (
-    <main>
-      <p>
-        Application:
-        <Link to={`/applications/${job.application}`}>{job.application}</Link>
-      </p>
+    <main className="flex justify-around">
+      <div>
       <p>State: {job.state}</p>
-      <p>createdOn: {job.createdOn}</p>
-      <p>updatedOn: {job.updatedOn}</p>
+      <p>Created on: {job.createdOn}</p>
+      <p>Updated on: {job.updatedOn}</p>
       <p>Name: {job.name}</p>
+      </div>
+      <div>
+      <h2 className="text-xl">Input</h2>
+      <ul className="list-disc list-inside">
+      <li>
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href={`/jobs/${job.id}/files/${WORKFLOW_CONFIG_FILENAME}`}
+        >
+          {WORKFLOW_CONFIG_FILENAME}
+        </a>
+      </li>
+      {/* TODO list files mentioned in workflow config */}
+      </ul>
+      </div>
       {CompletedJobs.has(job.state) && (
-        <>
-          <p>
+        <div>
+          <h2 className="text-xl">Output</h2>
+          <ListReportFiles files={outputFiles!} prefix={`/jobs/${job.id}/files/`}/>
+          <ul className="list-disc list-inside">
+            <li>
             <a target="_blank" rel="noreferrer" href={`/jobs/${job.id}/stdout`}>
               Stdout
             </a>
-          </p>
-          <p>
+          </li>
+          <li>
             <a target="_blank" rel="noreferrer" href={`/jobs/${job.id}/stderr`}>
               Stderr
             </a>
-          </p>
-          <p>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href={`/jobs/${job.id}/files/${app.config}`}
-            >
-              {app.config}
+          </li>
+          <li>
+            <a target="_blank" rel="noreferrer" href={`/jobs/${job.id}/files/output/log`}>
+              Haddock3 log
             </a>
-          </p>
-          <p><a href={`/jobs/${job.id}/result`}>Result</a></p>
-        </>
+          </li>
+          </ul>
+        </div>
       )}
     </main>
   );

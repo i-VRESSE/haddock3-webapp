@@ -1,5 +1,6 @@
 import { JobApi } from "~/bartender-client/apis/JobApi";
 import { buildConfig } from "./config.server";
+import { JOB_OUTPUT_DIR } from "./constants";
 
 function buildJobApi(accessToken: string = '') {
     return new JobApi(buildConfig(accessToken));
@@ -44,11 +45,11 @@ export async function getJobfile(jobid: number, path: string, accessToken: strin
     return response.raw;
 }
 
-export async function getHTMLfiles(jobid: number, accessToken: string) {
+export async function listOutputFiles(jobid: number, accessToken: string) {
     const api = buildJobApi(accessToken)
     const items = await api.retrieveJobDirectoriesFromPathApiJobJobidDirectoriesPathGet({
         jobid,
-        path: 'output',
+        path: JOB_OUTPUT_DIR,
         maxDepth: 3
     })
     // Filter on html files
