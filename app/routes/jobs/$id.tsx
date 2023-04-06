@@ -24,7 +24,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 export default function JobPage() {
   const { job, outputFiles } = useLoaderData<typeof loader>();
   return (
-    <main className="flex justify-around">
+    <main className="flex gap-16">
       <div>
       <p>State: {job.state}</p>
       <p>Created on: {job.createdOn}</p>

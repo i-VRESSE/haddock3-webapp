@@ -22,7 +22,7 @@ export function ListReportFiles({ files, prefix }: { files: DirectoryItem, prefi
   return (
     <ul className="list-disc list-inside">
       {htmlFiles.map(([module, htmls]) => {
-        return <li key={module}><a href={`${prefix}${htmls[0].path}`}>{module}</a></li>;
+        return <li key={module}><a target="_blank" rel="noreferrer" href={`${prefix}${htmls[0].path}`}>{module}</a></li>;
       })}
     </ul>
   );
