@@ -10,13 +10,6 @@ function buildApplicationApi(accessToken: string = "") {
   return new ApplicationApi(buildConfig(accessToken));
 }
 
-export async function applicationByName(name: string) {
-  const api = buildApplicationApi();
-  return await api.getApplicationApiApplicationApplicationGet({
-    application: name,
-  });
-}
-
 export async function submitJob(
   upload: File,
   accessToken: string
@@ -47,7 +40,7 @@ export async function submitJob(
  * @param config_body Body of workflow config file to rewrite
  * @returns The rewritten config file
  */
-async function rewriteConfig(config_body: string) {
+function rewriteConfig(config_body: string) {
   // TODO handle config file with duplicated sections
   // use dedupWorkflow from https://github.com/i-VRESSE/workflow-builder/blob/807a2007963376906d801f20ac3731eb2b49429a/packages/core/src/toml.ts#L258
   // Got stuck on papaparse import error
@@ -86,7 +79,7 @@ export async function rewriteConfigInArchive(upload: Blob) {
 
   // TODO validate config using catalog and ajv
 
-  const new_config = await rewriteConfig(config_body);
+  const new_config = rewriteConfig(config_body);
 
   zip.file(WORKFLOW_CONFIG_FILENAME, new_config);
   return await zip.generateAsync({type: "blob"});
