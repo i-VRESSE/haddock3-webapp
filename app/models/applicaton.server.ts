@@ -40,12 +40,9 @@ export async function submitJob(
  * @param config_body Body of workflow config file to rewrite
  * @returns The rewritten config file
  */
-function rewriteConfig(config_body: string) {
-  // TODO handle config file with duplicated sections
-  // use dedupWorkflow from https://github.com/i-VRESSE/workflow-builder/blob/807a2007963376906d801f20ac3731eb2b49429a/packages/core/src/toml.ts#L258
-  // Got stuck on papaparse import error
-  // so for now use workflow-builder web app to dedup the config file by uploading and downloading it
-  const table = parse(config_body, { bigint: false });
+async function rewriteConfig(config_body: string) {
+  const { dedupWorkflow } = await import('@i-vresse/wb-core/dist/toml.js');
+  const table = parse(dedupWorkflow(config_body), { bigint: false });
   table.run_dir = JOB_OUTPUT_DIR;
   table.mode = "local";
   table.postprocess = true;
@@ -79,7 +76,7 @@ export async function rewriteConfigInArchive(upload: Blob) {
 
   // TODO validate config using catalog and ajv
 
-  const new_config = rewriteConfig(config_body);
+  const new_config = await rewriteConfig(config_body);
 
   zip.file(WORKFLOW_CONFIG_FILENAME, new_config);
   return await zip.generateAsync({type: "blob"});
