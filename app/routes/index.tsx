@@ -2,13 +2,13 @@ import Card from "~/components/Card";
 
 const cards = [
   {
-    "target": "/applications/builder",
+    "target": "/builder",
     "image": "https://static.thenounproject.com/png/1781890-200.png",
     "title": "Build",
     "description": "Use the workflow builder to create and submit a job.",
   },
   {
-    "target": "/applications/upload",
+    "target": "/upload",
     "image": "https://www.filemail.com/images/marketing/anonymously-upload-files.svg",
     "title": "Upload",
     "description": "Upload a workflow and submit as job.",

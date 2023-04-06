@@ -26,10 +26,10 @@ export default function JobPage() {
   return (
     <main className="flex gap-16">
       <div>
-      <p>State: {job.state}</p>
+      <p>Name: {job.name}</p>
+      <p>State: <b>{job.state}</b></p>
       <p>Created on: {job.createdOn}</p>
       <p>Updated on: {job.updatedOn}</p>
-      <p>Name: {job.name}</p>
       </div>
       <div>
       <h2 className="text-xl">Input</h2>

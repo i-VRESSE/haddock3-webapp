@@ -4,15 +4,10 @@ import { stringify, parse } from "@ltd/j-toml";
 import { ApplicationApi } from "~/bartender-client/apis/ApplicationApi";
 import type { JobModelDTO } from "~/bartender-client/models/JobModelDTO";
 import { buildConfig } from "./config.server";
-import { JOB_OUTPUT_DIR, WORKFLOW_CONFIG_FILENAME } from './constants';
+import { BARTENDER_APPLICATION_NAME, JOB_OUTPUT_DIR, WORKFLOW_CONFIG_FILENAME } from './constants';
 
 function buildApplicationApi(accessToken: string = "") {
   return new ApplicationApi(buildConfig(accessToken));
-}
-
-export async function applicationNames() {
-  const api = buildApplicationApi();
-  return await api.listApplicationsApiApplicationGet();
 }
 
 export async function applicationByName(name: string) {
@@ -23,7 +18,6 @@ export async function applicationByName(name: string) {
 }
 
 export async function submitJob(
-  application: string,
   upload: File,
   accessToken: string
 ) {
@@ -33,16 +27,9 @@ export async function submitJob(
     lastModified: upload.lastModified,
   });
   const response = await api.uploadJobApiApplicationApplicationJobPutRaw({
-    application,
+    application: BARTENDER_APPLICATION_NAME,
     upload: rewritten_upload,
   });
-  if (!response.raw.ok) {
-    console.log([
-      response.raw.status,
-      response.raw.statusText,
-      await response.raw.text()
-    ]);
-  }
   const job: JobModelDTO = await response.raw.json();
   return job;
 }

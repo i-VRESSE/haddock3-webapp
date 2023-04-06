@@ -46,10 +46,10 @@ export const Navbar = () => {
       <div className="navbar-start flex">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <NavLink to="/applications/builder">Build</NavLink>
+            <NavLink to="/builder">Build</NavLink>
           </li>
           <li>
-            <NavLink to="/applications/upload">Upload</NavLink>
+            <NavLink to="/upload">Upload</NavLink>
           </li>
           <li>
             <NavLink to="/jobs">Manage</NavLink>
