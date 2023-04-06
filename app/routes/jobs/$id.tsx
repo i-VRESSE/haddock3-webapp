@@ -4,14 +4,14 @@ import { getAccessToken } from "~/token.server";
 import { applicationByName } from "~/models/applicaton.server";
 import { getJobById } from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
+import { checkAuthenticated } from "~/models/user.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const job_id = params.id || "";
-  const access_token = await getAccessToken(request);
-  if (access_token === undefined) {
-    throw new Error("Unauthenticated");
-  }
-  const job = await getJobById(parseInt(job_id), access_token);
+  const accessToken = await getAccessToken(request);
+  checkAuthenticated(accessToken);
+  const job = await getJobById(parseInt(job_id), accessToken!);
+  // TODO check if job belongs to user
   const app = await applicationByName(job.application);
   return json({ job, app });
 };
@@ -49,6 +49,7 @@ export default function JobPage() {
               {app.config}
             </a>
           </p>
+          <p><a href={`/jobs/${job.id}/result`}>Result</a></p>
         </>
       )}
     </main>

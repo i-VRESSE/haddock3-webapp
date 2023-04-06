@@ -44,3 +44,13 @@ export async function getJobfile(jobid: number, path: string, accessToken: strin
     return response.raw;
 }
 
+export async function getHTMLfiles(jobid: number, accessToken: string) {
+    const api = buildJobApi(accessToken)
+    const items = await api.retrieveJobDirectoriesFromPathApiJobJobidDirectoriesPathGet({
+        jobid,
+        path: 'output',
+        maxDepth: 3
+    })
+    // Filter on html files
+    return items
+}
