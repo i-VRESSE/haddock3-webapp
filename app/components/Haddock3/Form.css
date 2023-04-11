@@ -218,3 +218,7 @@ div.checkbox {
   padding: 0.25rem;
   overflow: unset;
 }
+
+code .table{
+  @apply contents
+}
