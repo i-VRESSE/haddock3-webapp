@@ -17,7 +17,7 @@ export const loader = async ({ request }: LoaderArgs) => {
   const session = await getSession(request);
   checkAuthenticated(session.data.bartenderToken);
   const level = await getLevel(session.data.roles)
-  if (isSubmitAllowed(level)) {
+  if (!isSubmitAllowed(level)) {
     throw new Error("Forbidden");
   }
   return json({ name, ...app });
