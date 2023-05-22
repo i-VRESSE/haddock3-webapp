@@ -18,7 +18,7 @@ function buildRolesApi(accessToken: string) {
 
 export async function register(email: string, password: string) {
     const api = buildAuthApi()
-    return await api.registerRegisterAuthRegisterPost({
+    return await api.registerRegister({
         userCreate: {
             email,
             password
@@ -28,7 +28,7 @@ export async function register(email: string, password: string) {
 
 export async function localLogin(username: string, password: string) {
     const api = buildAuthApi()
-    const response = await api.authLocalLoginAuthJwtLoginPost({
+    const response = await api.authLocalLogin({
         username,
         password
     })
@@ -37,7 +37,7 @@ export async function localLogin(username: string, password: string) {
 
 export async function getProfile(accessToken: string) {
     const api = buildUsersApi(accessToken)
-    return await api.profileApiUsersProfileGet()
+    return await api.profile()
 }
 
 export async function oauthAuthorize(provider: string) {
@@ -45,13 +45,13 @@ export async function oauthAuthorize(provider: string) {
     let url: string;
     switch (provider) {
         case 'github':
-            url = (await api.oauthGithubRemoteAuthorizeAuthGithubAuthorizeGet()).authorizationUrl;
+            url = (await api.oauthGithubRemoteAuthorize()).authorizationUrl;
             break;
         case 'orcid':
-            url = (await api.oauthOrcidOrgRemoteAuthorizeAuthOrcidAuthorizeGet()).authorizationUrl;
+            url = (await api.oauthOrcidOrgRemoteAuthorize()).authorizationUrl;
             break;
         case 'orcidsandbox':
-            url = (await api.oauthSandboxOrcidOrgRemoteAuthorizeAuthOrcidsandboxAuthorizeGet()).authorizationUrl;
+            url = (await api.oauthSandboxOrcidOrgRemoteAuthorize()).authorizationUrl;
             break;
         default:
             throw new Error("Unknown provider");
@@ -70,13 +70,13 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
     let response: ApiResponse<any>;
     switch (provider) {
         case 'github':
-            response = await api.oauthGithubRemoteCallbackAuthGithubCallbackGetRaw(request);
+            response = await api.oauthGithubRemoteCallback(request);
             break;
         case 'orcid':
-            response = await api.oauthOrcidOrgRemoteCallbackAuthOrcidCallbackGetRaw(request)
+            response = await api.oauthOrcidOrgRemoteCallback(request)
             break;
         case 'orcidsandbox':
-            response = await api.oauthSandboxOrcidOrgRemoteCallbackAuthOrcidsandboxCallbackGetRaw(request);
+            response = await api.oauthSandboxOrcidOrgRemoteCallback(request);
             break;
         default:
             throw new Error("Unknown provider");
@@ -112,22 +112,22 @@ export function isSubmitAllowed(level: string) {
 
 export async function getCurrentUser(accessToken: string) {
     const api = buildUsersApi(accessToken)
-    return await api.usersCurrentUserUsersMeGet()
+    return await api.usersCurrentUser()
 }
 
 export async function listUsers(accessToken: string, limit = 100, offset = 0) {
     const api = buildUsersApi(accessToken)
-    return await api.listUsersApiUsersGet({limit, offset})
+    return await api.listUsers({limit, offset})
 }
 
 export async function listRoles(accessToken: string) {
     const api = buildRolesApi(accessToken)
-    return await api.listRolesApiRolesGet()
+    return await api.listRoles()
 }
 
 export async function setSuperUser(accessToken: string, userId: string, checked: boolean) {
     const api = buildUsersApi(accessToken)
-    return await api.usersPatchUserUsersIdPatch({
+    return await api.usersPatchUser({
         id: userId,
         userUpdate: {
             isSuperuser: checked
@@ -137,7 +137,7 @@ export async function setSuperUser(accessToken: string, userId: string, checked:
 
 export async function assignRole(accessToken: string, userId: string, roleId: string) {
     const api = buildRolesApi(accessToken)
-    api.assignRoleToUserApiRolesRoleIdUserIdPut({
+    api.assignRoleToUser({
         userId,
         roleId
     })
@@ -145,7 +145,7 @@ export async function assignRole(accessToken: string, userId: string, roleId: st
 
 export async function unassignRole(accessToken: string, userId: string, roleId: string) {
     const api = buildRolesApi(accessToken)
-    api.unassignRoleFromUserApiRolesRoleIdUserIdDelete({
+    api.unassignRoleFromUser({
         userId,
         roleId
     })

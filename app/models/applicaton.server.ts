@@ -14,12 +14,12 @@ function buildApplicationApi(accessToken: string = "") {
 
 export async function applicationNames() {
   const api = buildApplicationApi();
-  return await api.listApplicationsApiApplicationGet();
+  return await api.listApplications();
 }
 
 export async function applicationByName(name: string) {
   const api = buildApplicationApi();
-  return await api.getApplicationApiApplicationApplicationGet({
+  return await api.getApplication({
     application: name,
   });
 }
@@ -31,7 +31,7 @@ export async function submitJob(
 ) {
   const api = buildApplicationApi(accessToken);
   const rewritten_upload = await rewriteConfigInArchive(upload);
-  const response = await api.uploadJobApiApplicationApplicationJobPutRaw({
+  const response = await api.uploadJobRaw({
     application,
     upload: rewritten_upload,
   });

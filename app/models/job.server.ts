@@ -7,21 +7,21 @@ function buildJobApi(accessToken: string = '') {
 
 export async function getJobs(accessToken: string, limit= 10, offset = 0) {
     const api = buildJobApi(accessToken)
-    return await api.retrieveJobsApiJobGet({
+    return await api.retrieveJobs({
         limit, offset
     })
 }
 
 export async function getJobById(jobid: number, accessToken: string) {
     const api = buildJobApi(accessToken)
-    return await api.retrieveJobApiJobJobidGet({
+    return await api.retrieveJob({
         jobid
     })
 }
 
 export async function getJobStdout(jobid: number, accessToken: string) {
     const api = buildJobApi(accessToken)
-    const response = await api.retrieveJobStdoutApiJobJobidStdoutGetRaw({
+    const response = await api.retrieveJobStdoutRaw({
         jobid
     })
     return response.raw;
@@ -29,7 +29,7 @@ export async function getJobStdout(jobid: number, accessToken: string) {
 
 export async function getJobStderr(jobid: number, accessToken: string) {
     const api = buildJobApi(accessToken)
-    const response = await api.retrieveJobStderrApiJobJobidStderrGetRaw({
+    const response = await api.retrieveJobStderrRaw({
         jobid
     })
     return response.raw;
@@ -37,7 +37,7 @@ export async function getJobStderr(jobid: number, accessToken: string) {
 
 export async function getJobfile(jobid: number, path: string, accessToken: string) {
     const api = buildJobApi(accessToken)
-    const response = await api.retrieveJobFilesApiJobJobidFilesPathGetRaw({
+    const response = await api.retrieveJobFilesRaw({
         jobid,
         path
     })
