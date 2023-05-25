@@ -7,7 +7,7 @@ const LoggedInButton = () => {
     <div className="dropdown-end dropdown">
       <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
         <div className="w-10 rounded-full">
-          <img src="https://www.gravatar.com/avatar/HASH" />{" "}
+          <img alt="gravatar" src="https://www.gravatar.com/avatar/HASH" />{" "}
           {/* TODO: Make hash from user email */}
         </div>
       </label>
