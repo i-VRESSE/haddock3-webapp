@@ -47,7 +47,7 @@ export async function getJobfile(jobid: number, path: string, accessToken: strin
 
 export async function listOutputFiles(jobid: number, accessToken: string) {
     const api = buildJobApi(accessToken)
-    const items = await api.retrieveJobDirectoriesFromPathApiJobJobidDirectoriesPathGet({
+    const items = await api.retrieveJobDirectoriesFromPath({
         jobid,
         path: JOB_OUTPUT_DIR,
         maxDepth: 3
