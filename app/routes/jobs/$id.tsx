@@ -44,7 +44,9 @@ export default function JobPage() {
                 <a
                   target="_blank"
                   rel="noreferrer"
-                  href={url(`/jobs/${job.id}/files/${WORKFLOW_CONFIG_FILENAME}`)}
+                  href={url(
+                    `/jobs/${job.id}/files/${WORKFLOW_CONFIG_FILENAME}`
+                  )}
                 >
                   {WORKFLOW_CONFIG_FILENAME}
                 </a>

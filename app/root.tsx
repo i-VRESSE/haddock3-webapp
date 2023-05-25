@@ -32,7 +32,10 @@ export async function loader({ request }: LoaderArgs) {
   const session = await getSession(request);
 
   const accessToken = session.data.bartenderToken;
-  if (isExpired(accessToken) && new URL(request.url).pathname !== url("/login")) {
+  if (
+    isExpired(accessToken) &&
+    new URL(request.url).pathname !== url("/login")
+  ) {
     return redirect(url("/login"));
   }
   return json({

@@ -1,5 +1,4 @@
 import Card from "~/components/Card";
-import { url } from "~/utils";
 
 // TODO host images from /public
 const cards = [

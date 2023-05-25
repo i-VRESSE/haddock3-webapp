@@ -118,7 +118,7 @@ For example
 
 ```sh
 REMIX_BASEPATH=/haddock3 npm run dev
-# or 
+# or
 REMIX_BASEPATH=/haddock3 npm run build
 npm run start
 ```

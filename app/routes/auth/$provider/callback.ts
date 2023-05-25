@@ -2,7 +2,7 @@ import type { LoaderArgs } from "@remix-run/node";
 import { redirect } from "react-router";
 import { oauthCallback } from "~/models/user.server";
 import { commitSession, setSession } from "~/session.server";
-import { url as absUrl} from "~/utils";
+import { url as absUrl } from "~/utils";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const provider = params.provider || "";
