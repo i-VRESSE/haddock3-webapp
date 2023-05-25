@@ -10,6 +10,7 @@
     "dev": "remix dev",
     "format": "prettier --write .",
     "generate-client": "openapi-generator-cli generate -g typescript-fetch -i http://localhost:8000/api/openapi.json -o app/bartender-client",
+    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve build",
     "test": "vitest",
     "typecheck": "tsc"
