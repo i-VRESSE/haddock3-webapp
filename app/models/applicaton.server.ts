@@ -9,7 +9,6 @@ import {
   JOB_OUTPUT_DIR,
   WORKFLOW_CONFIG_FILENAME,
 } from "./constants";
-import { dedupWorkflow } from "@i-vresse/wb-core/dist/toml.js";
 
 function buildApplicationApi(accessToken: string = "") {
   return new ApplicationApi(buildConfig(accessToken));
@@ -82,7 +81,7 @@ export async function rewriteConfigInArchive(upload: Blob) {
 
   // TODO validate config using catalog and ajv
 
-  const new_config = await rewriteConfig(dedupWorkflow(config_body));
+  const new_config = await rewriteConfig(config_body);
 
   zip.file(WORKFLOW_CONFIG_FILENAME, new_config);
   return await zip.generateAsync({ type: "blob" });
