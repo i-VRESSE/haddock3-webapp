@@ -19,7 +19,7 @@ export async function submitJob(
     type: upload.type,
     lastModified: upload.lastModified,
   });
-  const response = await api.uploadJobApiApplicationApplicationJobPutRaw({
+  const response = await api.uploadJobRaw({
     application: BARTENDER_APPLICATION_NAME,
     upload: rewritten_upload,
   });
