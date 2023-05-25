@@ -3,7 +3,7 @@ import { useLoaderData } from "@remix-run/react";
 import { getAccessToken } from "~/token.server";
 import { WORKFLOW_CONFIG_FILENAME } from "~/models/constants";
 import { listOutputFiles, getJobById } from "~/models/job.server";
-import { CompletedJobs } from "~/utils";
+import { CompletedJobs, url } from "~/utils";
 import { checkAuthenticated } from "~/models/user.server";
 import type { DirectoryItem } from "~/bartender-client";
 import { ListReportFiles } from "~/components/ListReportFiles";
@@ -44,7 +44,7 @@ export default function JobPage() {
                 <a
                   target="_blank"
                   rel="noreferrer"
-                  href={`/jobs/${job.id}/files/${WORKFLOW_CONFIG_FILENAME}`}
+                  href={url(`/jobs/${job.id}/files/${WORKFLOW_CONFIG_FILENAME}`)}
                 >
                   {WORKFLOW_CONFIG_FILENAME}
                 </a>
@@ -56,14 +56,14 @@ export default function JobPage() {
             <h2 className="text-xl">Output</h2>
             <ListReportFiles
               files={outputFiles!}
-              prefix={`/jobs/${job.id}/files/`}
+              prefix={url(`/jobs/${job.id}/files/`)}
             />
             <ul className="list-inside list-disc">
               <li>
                 <a
                   target="_blank"
                   rel="noreferrer"
-                  href={`/jobs/${job.id}/stdout`}
+                  href={url(`/jobs/${job.id}/stdout`)}
                 >
                   Stdout
                 </a>
@@ -72,7 +72,7 @@ export default function JobPage() {
                 <a
                   target="_blank"
                   rel="noreferrer"
-                  href={`/jobs/${job.id}/stderr`}
+                  href={url(`/jobs/${job.id}/stderr`)}
                 >
                   Stderr
                 </a>
@@ -81,7 +81,7 @@ export default function JobPage() {
                 <a
                   target="_blank"
                   rel="noreferrer"
-                  href={`/jobs/${job.id}/files/output/log`}
+                  href={url(`/jobs/${job.id}/files/output/log`)}
                 >
                   Haddock3 log
                 </a>

@@ -110,6 +110,19 @@ Create super user with
 docker compose exec bartender bartender super <email>
 ```
 
+### Deploy under /prefix
+
+To run application under an URL prefix (e.g. http://localhost:8080/prefix) set the `REMIX_BASEPATH` environment variable.
+
+For example
+
+```sh
+REMIX_BASEPATH=/haddock3 npm run dev
+# or 
+REMIX_BASEPATH=/haddock3 npm run build
+npm run start
+```
+
 ## Sessions
 
 Making the login session secure requires a session secret.

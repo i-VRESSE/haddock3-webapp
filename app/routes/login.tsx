@@ -2,6 +2,7 @@ import { type ActionArgs, json, redirect } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
 import { localLogin } from "~/models/user.server";
 import { commitSession, setSession } from "~/session.server";
+import { url } from "~/utils";
 
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
@@ -23,7 +24,7 @@ export async function action({ request }: ActionArgs) {
   const access_token = await localLogin(username, password);
   const session = await setSession(access_token, request);
 
-  return redirect("/", {
+  return redirect(url("/"), {
     headers: {
       "Set-Cookie": await commitSession(session),
     },
@@ -69,7 +70,7 @@ export default function LoginPage() {
         </button>
         <p>
           New user?{" "}
-          <Link to="/register" className={linkStyle}>
+          <Link to={url("/register")} className={linkStyle}>
             Click here to register.
           </Link>
         </p>
@@ -78,7 +79,7 @@ export default function LoginPage() {
       {/* Social buttons */}
       <h2 className="text-lg font-semibold">Other login methods</h2>
       <div className="space-evenly flex gap-4">
-        <form method="post" action="/auth/github/authorize">
+        <form method="post" action={url("/auth/github/authorize")}>
           <button type="submit" className="btn h-auto">
             <img
               height="32"
@@ -89,13 +90,13 @@ export default function LoginPage() {
             <p className="px-2">GitHub</p>
           </button>
         </form>
-        <form method="post" action="/auth/orcidsandbox/authorize">
+        <form method="post" action={url("/auth/orcidsandbox/authorize")}>
           <button type="submit" className="btn h-auto">
             <img height="32" width="32" src="orcid.png" alt="ORCID logo" />
             <p className="px-2">ORCID sandbox</p>
           </button>
         </form>
-        <form method="post" action="/auth/orcid/authorize">
+        <form method="post" action={url("/auth/orcid/authorize")}>
           <button type="submit" className="btn h-auto">
             <img height="32" width="32" src="orcid.png" alt="ORCID logo" />
             <p className="px-2">ORCID</p>

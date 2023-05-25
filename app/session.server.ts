@@ -1,5 +1,6 @@
 import { createCookie, createFileSessionStorage } from "@remix-run/node";
 import { getCurrentUser } from "./models/user.server";
+import { url } from "./utils";
 
 type SessionData = {
   bartenderToken: string;
@@ -18,7 +19,7 @@ const sessionCookie = createCookie(COOKIE_NAME, {
   sameSite: true,
   httpOnly: true,
   maxAge: 604_800, // one week
-  path: "/",
+  path: url("/"),
   secrets: [process.env.SESSION_SECRET || "somebadsecret"],
   secure: process.env.NODE_ENV === "production",
 });

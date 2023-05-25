@@ -7,6 +7,7 @@ import {
 import { Form, Link } from "@remix-run/react";
 import { localLogin, register } from "~/models/user.server";
 import { commitSession, setSession } from "~/session.server";
+import { url } from "~/utils";
 
 export async function loader({ request }: LoaderArgs) {
   // TODO check already logged in
@@ -33,7 +34,7 @@ export async function action({ request }: ActionArgs) {
   const access_token = await localLogin(username, password);
   const session = await setSession(access_token, request);
 
-  return redirect("/", {
+  return redirect(url("/"), {
     headers: {
       "Set-Cookie": await commitSession(session),
     },
@@ -79,7 +80,7 @@ export default function RegisterPage() {
         </button>
         <p>
           Or{" "}
-          <Link to="/login" className={linkStyle}>
+          <Link to={url("/login")} className={linkStyle}>
             login
           </Link>{" "}
           if you already have an account.

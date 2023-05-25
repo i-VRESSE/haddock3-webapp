@@ -18,6 +18,7 @@ import { Navbar } from "~/components/Navbar";
 import { getSession } from "./session.server";
 import { isExpired } from "./token.server";
 import styles from "./tailwind.css";
+import { url } from "./utils";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -31,8 +32,8 @@ export async function loader({ request }: LoaderArgs) {
   const session = await getSession(request);
 
   const accessToken = session.data.bartenderToken;
-  if (isExpired(accessToken) && new URL(request.url).pathname !== "/login") {
-    return redirect("/login");
+  if (isExpired(accessToken) && new URL(request.url).pathname !== url("/login")) {
+    return redirect(url("/login"));
   }
   return json({
     isAuthenticated: accessToken !== undefined,

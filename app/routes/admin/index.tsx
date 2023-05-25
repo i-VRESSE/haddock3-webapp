@@ -3,6 +3,7 @@ import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { checkAuthenticated } from "~/models/user.server";
 import { getSession } from "~/session.server";
+import { url } from "~/utils";
 
 export async function loader({ request }: LoaderArgs) {
   const session = await getSession(request);
@@ -20,7 +21,7 @@ export default function AdminIndexPage() {
       <h1 className="my-6 text-3xl">Admin</h1>
       <ul>
         <li>
-          <Link to="/admin/users">Users</Link>
+          <Link to={url("/admin/users")}>Users</Link>
         </li>
       </ul>
     </main>

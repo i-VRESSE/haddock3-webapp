@@ -3,6 +3,7 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { getTokenPayload } from "~/token.server";
 import { checkAuthenticated, getLevel, getProfile } from "~/models/user.server";
 import { getSession } from "~/session.server";
+import { url } from "~/utils";
 
 export const loader = async ({ request }: LoaderArgs) => {
   const session = await getSession(request);
@@ -33,7 +34,7 @@ export default function JobPage() {
         </ul>
       </p>
       <p>Login expires: {new Date(expireDate).toISOString()}</p>
-      <Link role="button" className="btn btn-sm" to="/logout">
+      <Link role="button" className="btn btn-sm" to={url("/logout")}>
         Logout
       </Link>
     </main>

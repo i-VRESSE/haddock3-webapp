@@ -1,5 +1,6 @@
 import { Link, NavLink } from "@remix-run/react";
 import { useIsAuthenticated, useIsSuperUser } from "~/session";
+import { url } from "~/utils";
 
 const LoggedInButton = () => {
   const isSuperUser = useIsSuperUser();
@@ -16,15 +17,15 @@ const LoggedInButton = () => {
         className="dropdown-content menu rounded-box menu-compact mt-3 w-52 bg-base-100 p-2 shadow"
       >
         <li>
-          <Link to="/profile">Profile</Link>
+          <Link to={url("/profile")}>Profile</Link>
         </li>
         {isSuperUser && (
           <li>
-            <Link to="/admin">Admin</Link>
+            <Link to={url("/admin")}>Admin</Link>
           </li>
         )}
         <li>
-          <Link to="/logout">Logout</Link>
+          <Link to={url("/logout")}>Logout</Link>
         </li>
       </ul>
     </div>
@@ -46,19 +47,19 @@ export const Navbar = () => {
       <div className="navbar-start flex">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <NavLink to="/builder">Build</NavLink>
+            <NavLink to={url("/builder")}>Build</NavLink>
           </li>
           <li>
-            <NavLink to="/upload">Upload</NavLink>
+            <NavLink to={url("/upload")}>Upload</NavLink>
           </li>
           <li>
-            <NavLink to="/jobs">Manage</NavLink>
+            <NavLink to={url("/jobs")}>Manage</NavLink>
           </li>
           <li>
-            <NavLink to="/about">About</NavLink>
+            <NavLink to={url("/about")}>About</NavLink>
           </li>
           <li>
-            <NavLink to="/help">Help</NavLink>
+            <NavLink to={url("/help")}>Help</NavLink>
           </li>
         </ul>
       </div>
