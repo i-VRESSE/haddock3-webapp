@@ -28,6 +28,32 @@ npm run dev
 
 This starts your app in development mode, rebuilding assets on file changes.
 
+To format according to [prettier](https://prettier.io) run
+
+```sh
+npm run format
+```
+
+It's recommended to install an editor plugin (like the [VSCode Prettier plugin](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)) to get auto-formatting on save.
+
+To lint according [eslint](https://eslint.org) run
+
+```sh
+npm run lint
+```
+
+To check the Typescript types run
+
+```sh
+npm run typecheck
+```
+
+To run unit tests (`app/**/*.test.ts`) with [Vitest](https://vitest.dev) use
+
+```sh
+npm run test
+```
+
 ## Deployment
 
 First, build your app for production:
