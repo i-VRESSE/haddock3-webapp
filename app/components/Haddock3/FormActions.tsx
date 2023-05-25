@@ -1,4 +1,8 @@
-import { useSelectNodeIndex, useWorkflow, useActiveSubmitButton } from "@i-vresse/wb-core/dist/store"
+import {
+  useSelectNodeIndex,
+  useWorkflow,
+  useActiveSubmitButton,
+} from "@i-vresse/wb-core/dist/store";
 
 /**
  * Panel for actions to be performed on the currently active form.
@@ -33,40 +37,44 @@ import { useSelectNodeIndex, useWorkflow, useActiveSubmitButton } from "@i-vress
  * ```
  */
 export const FormActions = (): JSX.Element => {
-  const index = useSelectNodeIndex()
-  const { deleteNode, clearNodeSelection } = useWorkflow()
-  const submitFormRef = useActiveSubmitButton()
-  const { editingGlobal, toggleGlobalEdit } = useWorkflow()
+  const index = useSelectNodeIndex();
+  const { deleteNode, clearNodeSelection } = useWorkflow();
+  const submitFormRef = useActiveSubmitButton();
+  const { editingGlobal, toggleGlobalEdit } = useWorkflow();
   if (submitFormRef === undefined || !(index > -1 || editingGlobal)) {
-    return <></>
+    return <></>;
   }
   const DeleteButton = (
     <button
-      className='btn btn-light'
+      className="btn-light btn"
       onClick={() => deleteNode(index)}
-      title='Delete node from workflow'
+      title="Delete node from workflow"
     >
       Delete
     </button>
-  )
+  );
   return (
     <div className="btn-group justify-end">
       <button
-        type='submit'
-        className='btn btn-primary'
-        title={editingGlobal ? 'Save global parameters' : 'Save parameters to node'}
+        type="submit"
+        className="btn btn-primary"
+        title={
+          editingGlobal ? "Save global parameters" : "Save parameters to node"
+        }
         onClick={() => submitFormRef.click()}
       >
         Save
       </button>
       <button
-        className='btn btn-light'
-        onClick={() => editingGlobal ? toggleGlobalEdit() : clearNodeSelection()}
-        title='Forget changes made in form and close form'
+        className="btn-light btn"
+        onClick={() =>
+          editingGlobal ? toggleGlobalEdit() : clearNodeSelection()
+        }
+        title="Forget changes made in form and close form"
       >
         Cancel
       </button>
       {!editingGlobal && DeleteButton}
     </div>
-  )
-}
+  );
+};

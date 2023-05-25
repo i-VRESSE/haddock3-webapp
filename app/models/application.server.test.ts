@@ -1,9 +1,7 @@
-import JSZip from 'jszip'
+import JSZip from "jszip";
 import { assert, describe, test } from "vitest";
 
-import {
-  rewriteConfigInArchive,
-} from "./applicaton.server";
+import { rewriteConfigInArchive } from "./applicaton.server";
 import { WORKFLOW_CONFIG_FILENAME } from "./constants";
 
 const HY3_PDB = `\
@@ -46,20 +44,20 @@ async function prepareArchive(config: string) {
   const zip = new JSZip();
   for (const [filename, content] of files) {
     // All files should be text
-    zip.file(filename, content)
+    zip.file(filename, content);
   }
-  zip.file(WORKFLOW_CONFIG_FILENAME, config)
-  return await zip.generateAsync({type: "blob"});
+  zip.file(WORKFLOW_CONFIG_FILENAME, config);
+  return await zip.generateAsync({ type: "blob" });
 }
 
 async function retrieveConfigFromArchive(file: Blob) {
   const zip = new JSZip();
-  await zip.loadAsync(await file.arrayBuffer())
-  const config_file = zip.file(WORKFLOW_CONFIG_FILENAME)
+  await zip.loadAsync(await file.arrayBuffer());
+  const config_file = zip.file(WORKFLOW_CONFIG_FILENAME);
   if (config_file === null) {
     throw new Error(`Unable to find ${WORKFLOW_CONFIG_FILENAME} in archive`);
   }
-  return await config_file.async("string")
+  return await config_file.async("string");
 }
 
 describe("rewriteConfigInArchive()", () => {

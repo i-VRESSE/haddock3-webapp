@@ -15,8 +15,8 @@ export async function getCatalog(level: string) {
   };
   const catalog = catalogs[level];
   if (!(level in catalogs)) {
-    throw new Error(`No catalog found for level ${level}`)
+    throw new Error(`No catalog found for level ${level}`);
   }
-  catalog.examples = {}
+  catalog.examples = {};
   return prepareCatalog(catalog);
 }

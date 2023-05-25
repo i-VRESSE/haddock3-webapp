@@ -15,23 +15,24 @@ h5 {
 }
 
 .btn {
-  @apply inline-block rounded px-3 py-1.5 text-center align-middle text-base normal-case font-normal transition-colors duration-150 ease-in-out;
+  @apply inline-block rounded px-3 py-1.5 text-center align-middle text-base font-normal normal-case transition-colors duration-150 ease-in-out;
 }
 
 .btn-light {
-  @apply bg-gray-100 text-start text-primary border-gray-100  hover:bg-gray-200;
+  @apply border-gray-100 bg-gray-100 text-start text-primary  hover:bg-gray-200;
 }
 
 .btn-sm {
-  @apply p-1 text-sm h-12;
+  @apply h-12 p-1 text-sm;
 }
 
-.grip, .delete {
-  @apply border-0 h-auto
+.grip,
+.delete {
+  @apply h-auto border-0;
 }
 
 .btn-link {
-  @apply text-primary bg-inherit hover:bg-base-200 border-0;
+  @apply border-0 bg-inherit text-primary hover:bg-base-200;
 }
 
 .btn-outline-danger {
@@ -59,7 +60,7 @@ li {
 }
 
 .card {
-  @apply border border-gray-300 rounded;
+  @apply rounded border border-gray-300;
 }
 
 .card-header {
@@ -88,7 +89,7 @@ li {
 
 /* rjsf uses .checkbox in div and input. daisyui uses checkbox on input. */
 div.checkbox {
-  @apply w-auto h-auto cursor-default border-none
+  @apply h-auto w-auto cursor-default border-none;
 }
 
 .form-check-input {
@@ -96,7 +97,7 @@ div.checkbox {
 }
 
 .custom-select {
-  @apply ml-2 select
+  @apply select ml-2;
 }
 
 .array-item-add,
@@ -191,7 +192,7 @@ div.checkbox {
 }
 
 .table-field th:first-child {
-  @apply relative
+  @apply relative;
 }
 
 .array-item-remove {
@@ -219,6 +220,6 @@ div.checkbox {
   overflow: unset;
 }
 
-code .table{
-  @apply contents
+code .table {
+  @apply contents;
 }
