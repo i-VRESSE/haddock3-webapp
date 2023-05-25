@@ -5,7 +5,6 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Form } from "@remix-run/react";
-import { getAccessToken } from "~/token.server";
 
 import { submitJob } from "~/models/applicaton.server";
 import { checkAuthenticated, getLevel, isSubmitAllowed } from "~/models/user.server";
