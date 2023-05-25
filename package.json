@@ -21,7 +21,7 @@
     "/build",
     "/public/build",
     "/.sessions"
-  ],  
+  ],
   "dependencies": {
     "@i-vresse/wb-core": "^1.2.0",
     "@remix-run/node": "^1.15.0",
