@@ -43,6 +43,7 @@ export async function getProfile(accessToken: string) {
 export async function oauthAuthorize(provider: string) {
     const api = buildAuthApi()
     let url: string;
+    console.log("provider", JSON.stringify(provider))
     switch (provider) {
         case 'github':
             url = (await api.oauthGithubRemoteAuthorize()).authorizationUrl;
@@ -52,6 +53,9 @@ export async function oauthAuthorize(provider: string) {
             break;
         case 'orcidsandbox':
             url = (await api.oauthSandboxOrcidOrgRemoteAuthorize()).authorizationUrl;
+            break;
+        case 'egi':
+            url = (await api.oauthEGICheckinRemoteAuthorize()).authorizationUrl;
             break;
         default:
             throw new Error("Unknown provider");
@@ -77,6 +81,9 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
             break;
         case 'orcidsandbox':
             response = await api.oauthSandboxOrcidOrgRemoteCallback(request);
+            break;
+        case 'egi':
+            response = await api.oauthEGICheckinRemoteCallback(request);
             break;
         default:
             throw new Error("Unknown provider");

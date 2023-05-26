@@ -114,17 +114,18 @@ npm start
 
 ### Social login
 
-To enable GitHub or Orcid login the bartender web service needs following environment variables.
+To enable GitHub or Orcid or EGI Check-in login the bartender web service needs following environment variables.
 
 ```shell
 BARTENDER_GITHUB_REDIRECT_URL="http://localhost:3000/auth/github/callback"
 BARTENDER_ORCIDSANDBOX_REDIRECT_URL="http://localhost:3000/auth/orcidsandbox/callback"
 BARTENDER_ORCID_REDIRECT_URL="http://localhost:3000/auth/orcid/callback"
+BARTENDER_EGI_REDIRECT_URL="http://localhost:3000/auth/egi/callback"
 ```
 
 Where `http://localhost:3000` is the URL where the Remix run app is running.
 
-## Haddock3 application 
+## Haddock3 application
 
 This web app expects that the following application is registered in bartender web service.
 
