@@ -46,6 +46,17 @@ export interface AuthLocalLoginRequest {
     clientSecret?: string;
 }
 
+export interface OauthAssociateEGICheckinAuthorizeRequest {
+    scopes?: Array<string>;
+}
+
+export interface OauthAssociateEGICheckinCallbackRequest {
+    code?: string;
+    codeVerifier?: string;
+    state?: string;
+    error?: string;
+}
+
 export interface OauthAssociateGithubAuthorizeRequest {
     scopes?: Array<string>;
 }
@@ -73,6 +84,17 @@ export interface OauthAssociateSandboxOrcidOrgAuthorizeRequest {
 }
 
 export interface OauthAssociateSandboxOrcidOrgCallbackRequest {
+    code?: string;
+    codeVerifier?: string;
+    state?: string;
+    error?: string;
+}
+
+export interface OauthEGICheckinRemoteAuthorizeRequest {
+    scopes?: Array<string>;
+}
+
+export interface OauthEGICheckinRemoteCallbackRequest {
     code?: string;
     codeVerifier?: string;
     state?: string;
@@ -234,6 +256,106 @@ export class AuthApi extends runtime.BaseAPI {
      */
     async authLocalLogout(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
         const response = await this.authLocalLogoutRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Oauth-Associate:Egi Checkin.Authorize
+     */
+    async oauthAssociateEGICheckinAuthorizeRaw(requestParameters: OauthAssociateEGICheckinAuthorizeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2AuthorizeResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters.scopes) {
+            queryParameters['scopes'] = requestParameters.scopes;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            // oauth required
+            headerParameters["Authorization"] = await this.configuration.accessToken("OAuth2PasswordBearer", []);
+        }
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("HTTPBearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/auth/associate/egi/authorize`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => OAuth2AuthorizeResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Oauth-Associate:Egi Checkin.Authorize
+     */
+    async oauthAssociateEGICheckinAuthorize(requestParameters: OauthAssociateEGICheckinAuthorizeRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OAuth2AuthorizeResponse> {
+        const response = await this.oauthAssociateEGICheckinAuthorizeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * The response varies based on the authentication backend used.
+     * Oauth-Associate:Egi Checkin.Callback
+     */
+    async oauthAssociateEGICheckinCallbackRaw(requestParameters: OauthAssociateEGICheckinCallbackRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserRead>> {
+        const queryParameters: any = {};
+
+        if (requestParameters.code !== undefined) {
+            queryParameters['code'] = requestParameters.code;
+        }
+
+        if (requestParameters.codeVerifier !== undefined) {
+            queryParameters['code_verifier'] = requestParameters.codeVerifier;
+        }
+
+        if (requestParameters.state !== undefined) {
+            queryParameters['state'] = requestParameters.state;
+        }
+
+        if (requestParameters.error !== undefined) {
+            queryParameters['error'] = requestParameters.error;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            // oauth required
+            headerParameters["Authorization"] = await this.configuration.accessToken("OAuth2PasswordBearer", []);
+        }
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("HTTPBearer", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/auth/associate/egi/callback`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserReadFromJSON(jsonValue));
+    }
+
+    /**
+     * The response varies based on the authentication backend used.
+     * Oauth-Associate:Egi Checkin.Callback
+     */
+    async oauthAssociateEGICheckinCallback(requestParameters: OauthAssociateEGICheckinCallbackRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserRead> {
+        const response = await this.oauthAssociateEGICheckinCallbackRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -534,6 +656,84 @@ export class AuthApi extends runtime.BaseAPI {
      */
     async oauthAssociateSandboxOrcidOrgCallback(requestParameters: OauthAssociateSandboxOrcidOrgCallbackRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserRead> {
         const response = await this.oauthAssociateSandboxOrcidOrgCallbackRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Oauth:Egi Checkin.Remote.Authorize
+     */
+    async oauthEGICheckinRemoteAuthorizeRaw(requestParameters: OauthEGICheckinRemoteAuthorizeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<OAuth2AuthorizeResponse>> {
+        const queryParameters: any = {};
+
+        if (requestParameters.scopes) {
+            queryParameters['scopes'] = requestParameters.scopes;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/auth/egi/authorize`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => OAuth2AuthorizeResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Oauth:Egi Checkin.Remote.Authorize
+     */
+    async oauthEGICheckinRemoteAuthorize(requestParameters: OauthEGICheckinRemoteAuthorizeRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<OAuth2AuthorizeResponse> {
+        const response = await this.oauthEGICheckinRemoteAuthorizeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * The response varies based on the authentication backend used.
+     * Oauth:Egi Checkin.Remote.Callback
+     */
+    async oauthEGICheckinRemoteCallbackRaw(requestParameters: OauthEGICheckinRemoteCallbackRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
+        const queryParameters: any = {};
+
+        if (requestParameters.code !== undefined) {
+            queryParameters['code'] = requestParameters.code;
+        }
+
+        if (requestParameters.codeVerifier !== undefined) {
+            queryParameters['code_verifier'] = requestParameters.codeVerifier;
+        }
+
+        if (requestParameters.state !== undefined) {
+            queryParameters['state'] = requestParameters.state;
+        }
+
+        if (requestParameters.error !== undefined) {
+            queryParameters['error'] = requestParameters.error;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/auth/egi/callback`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<any>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     * The response varies based on the authentication backend used.
+     * Oauth:Egi Checkin.Remote.Callback
+     */
+    async oauthEGICheckinRemoteCallback(requestParameters: OauthEGICheckinRemoteCallbackRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
+        const response = await this.oauthEGICheckinRemoteCallbackRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
