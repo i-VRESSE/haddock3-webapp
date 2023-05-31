@@ -10,7 +10,7 @@ import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog";
 import { useEffect } from "react";
 import { WorkflowSubmitButton } from "./SubmitButton";
 import { useLoaderData } from "@remix-run/react";
-import type { loader } from "~/routes/applications/builder";
+import type { loader } from "~/routes/builder";
 import { WorkflowDownloadButton } from "./DownloadButton";
 import { FormActions } from "./FormActions";
 

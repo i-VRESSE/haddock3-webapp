@@ -1,54 +1,93 @@
 import { json, type LoaderArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { getAccessToken } from "~/token.server";
-import { applicationByName } from "~/models/applicaton.server";
-import { getJobById } from "~/models/job.server";
+import { WORKFLOW_CONFIG_FILENAME } from "~/models/constants";
+import { listOutputFiles, getJobById } from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
+import { checkAuthenticated } from "~/models/user.server";
+import type { DirectoryItem } from "~/bartender-client";
+import { ListReportFiles } from "~/components/ListReportFiles";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
-  const job_id = params.id || "";
-  const access_token = await getAccessToken(request);
-  if (access_token === undefined) {
-    throw new Error("Unauthenticated");
+  const jobId = parseInt(params.id || "");
+  const accessToken = await getAccessToken(request);
+  checkAuthenticated(accessToken);
+  const job = await getJobById(jobId, accessToken!);
+  // TODO check if job belongs to user
+  let outputFiles: DirectoryItem | undefined = undefined;
+  if (CompletedJobs.has(job.state)) {
+    outputFiles = await listOutputFiles(jobId, accessToken!);
   }
-  const job = await getJobById(parseInt(job_id), access_token);
-  const app = await applicationByName(job.application);
-  return json({ job, app });
+  return json({ job, outputFiles });
 };
 
 export default function JobPage() {
-  const { job, app } = useLoaderData<typeof loader>();
+  const { job, outputFiles } = useLoaderData<typeof loader>();
   return (
-    <main>
-      <p>
-        Application:
-        <Link to={`/applications/${job.application}`}>{job.application}</Link>
-      </p>
-      <p>State: {job.state}</p>
-      <p>createdOn: {job.createdOn}</p>
-      <p>updatedOn: {job.updatedOn}</p>
-      <p>Name: {job.name}</p>
+    <main className="flex gap-16">
+      <div>
+        <p>ID: {job.id}</p>
+        <p>Name: {job.name}</p>
+        <p>
+          State: <b>{job.state}</b>
+        </p>
+        <p>Created on: {job.createdOn}</p>
+        <p>Updated on: {job.updatedOn}</p>
+      </div>
       {CompletedJobs.has(job.state) && (
         <>
-          <p>
-            <a target="_blank" rel="noreferrer" href={`/jobs/${job.id}/stdout`}>
-              Stdout
-            </a>
-          </p>
-          <p>
-            <a target="_blank" rel="noreferrer" href={`/jobs/${job.id}/stderr`}>
-              Stderr
-            </a>
-          </p>
-          <p>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href={`/jobs/${job.id}/files/${app.config}`}
-            >
-              {app.config}
-            </a>
-          </p>
+          {/* TODO allow to read input files when job is not completed */}
+          <div>
+            <h2 className="text-xl">Input</h2>
+            <ul className="list-disc list-inside">
+              <li>
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`/jobs/${job.id}/files/${WORKFLOW_CONFIG_FILENAME}`}
+                >
+                  {WORKFLOW_CONFIG_FILENAME}
+                </a>
+              </li>
+              {/* TODO list files mentioned in workflow config */}
+            </ul>
+          </div>
+          <div>
+            <h2 className="text-xl">Output</h2>
+            <ListReportFiles
+              files={outputFiles!}
+              prefix={`/jobs/${job.id}/files/`}
+            />
+            <ul className="list-disc list-inside">
+              <li>
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`/jobs/${job.id}/stdout`}
+                >
+                  Stdout
+                </a>
+              </li>
+              <li>
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`/jobs/${job.id}/stderr`}
+                >
+                  Stderr
+                </a>
+              </li>
+              <li>
+                <a
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`/jobs/${job.id}/files/output/log`}
+                >
+                  Haddock3 log
+                </a>
+              </li>
+            </ul>
+          </div>
         </>
       )}
     </main>

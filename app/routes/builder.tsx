@@ -5,9 +5,8 @@ import { type ActionArgs, type LoaderArgs, redirect } from "@remix-run/node";
 import { getCatalog } from "~/catalogs/index.server";
 import { Haddock3WorkflowBuilder } from "~/components/Haddock3/Form.client";
 import { haddock3Styles } from "~/components/Haddock3/styles";
-import { getAccessToken } from "~/token.server";
 import { submitJob } from "~/models/applicaton.server";
-import { getLevel, isSubmitAllowed } from "~/models/user.server";
+import { checkAuthenticated, getLevel, isSubmitAllowed } from "~/models/user.server";
 import { getSession } from "~/session.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -22,19 +21,20 @@ export const loader = async ({ request }: LoaderArgs) => {
 };
 
 export const action = async ({ request }: ActionArgs) => {
-  const name = "haddock3";
   const formData = await request.formData();
   const upload = formData.get("upload");
 
   if (typeof upload === "string" || upload === null) {
     throw new Error("Bad upload");
   }
-  const access_token = await getAccessToken(request);
-  if (access_token === undefined) {
-    throw new Error("Unauthenticated");
+  const session = await getSession(request)
+  const accessToken = session.data.bartenderToken
+  checkAuthenticated(accessToken);
+  const level = await getLevel(session.data.roles)
+  if (!isSubmitAllowed(level)) {
+    throw new Error("Forbidden");
   }
-
-  const job = await submitJob(name, upload, access_token);
+  const job = await submitJob(upload, accessToken!);
   const job_url = `/jobs/${job.id}`;
   return redirect(job_url);
 };

@@ -1,8 +1,7 @@
-export default function About() {
+export default function Help() {
     return (
-        <p className="prose">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto amet iure temporibus vero dignissimos, dolorem adipisci ipsam suscipit nemo enim a magni ad ipsum. Sint iure itaque assumenda expedita debitis.
-        </p>
-
+        <main>
+            <a href="https://www.bonvinlab.org/haddock3/">Haddock3 command line documentation</a>
+        </main>
     )
 }
