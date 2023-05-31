@@ -20,8 +20,8 @@ export function ListReportFiles({
     analyisRoot.children
       .filter((module) => module.children !== undefined)
       .forEach((module) => {
-        const html = module.children?.find((file) =>
-          file.name.endsWith("report.html")
+        const html = module.children?.find(
+          (file) => file.name === "report.html"
         );
         if (html !== undefined) {
           result.set(module.name, html.path);
