@@ -1,11 +1,11 @@
-import {
-    useWorkflow,
-  } from "@i-vresse/wb-core/dist/store";
+import { useWorkflow } from "@i-vresse/wb-core/dist/store";
 
 export const WorkflowDownloadButton = (): JSX.Element => {
-  const { save } = useWorkflow()
+  const { save } = useWorkflow();
 
   return (
-    <button className='btn btn-light' onClick={save}>Download archive</button>
-  )
-}
+    <button className="btn-light btn" onClick={save}>
+      Download archive
+    </button>
+  );
+};

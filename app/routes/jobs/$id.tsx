@@ -39,7 +39,7 @@ export default function JobPage() {
           {/* TODO allow to read input files when job is not completed */}
           <div>
             <h2 className="text-xl">Input</h2>
-            <ul className="list-disc list-inside">
+            <ul className="list-inside list-disc">
               <li>
                 <a
                   target="_blank"
@@ -58,7 +58,7 @@ export default function JobPage() {
               files={outputFiles!}
               prefix={`/jobs/${job.id}/files/`}
             />
-            <ul className="list-disc list-inside">
+            <ul className="list-inside list-disc">
               <li>
                 <a
                   target="_blank"

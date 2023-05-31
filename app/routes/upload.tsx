@@ -5,17 +5,20 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Form } from "@remix-run/react";
-import { getAccessToken } from "~/token.server";
 
 import { submitJob } from "~/models/applicaton.server";
-import { checkAuthenticated, getLevel, isSubmitAllowed } from "~/models/user.server";
+import {
+  checkAuthenticated,
+  getLevel,
+  isSubmitAllowed,
+} from "~/models/user.server";
 import { getSession } from "~/session.server";
 import { WORKFLOW_CONFIG_FILENAME } from "~/models/constants";
 
 export const loader = async ({ request }: LoaderArgs) => {
   const session = await getSession(request);
   checkAuthenticated(session.data.bartenderToken);
-  const level = await getLevel(session.data.roles)
+  const level = await getLevel(session.data.roles);
   if (!isSubmitAllowed(level)) {
     throw new Error("Forbidden");
   }
@@ -29,10 +32,10 @@ export const action = async ({ request }: ActionArgs) => {
   if (typeof upload === "string" || upload === null) {
     throw new Error("Bad upload");
   }
-  const session = await getSession(request)
-  const accessToken = session.data.bartenderToken
+  const session = await getSession(request);
+  const accessToken = session.data.bartenderToken;
   checkAuthenticated(accessToken);
-  const level = await getLevel(session.data.roles)
+  const level = await getLevel(session.data.roles);
   if (!isSubmitAllowed(level)) {
     throw new Error("Forbidden");
   }
@@ -45,7 +48,10 @@ export default function ApplicationSlug() {
   return (
     <main className="mx-auto max-w-4xl">
       <h1 className="my-6 text-3xl">Upload haddock3 archive</h1>
-      <p>Archive should contain workfow configuration file called {WORKFLOW_CONFIG_FILENAME}.</p>
+      <p>
+        Archive should contain workfow configuration file called{" "}
+        {WORKFLOW_CONFIG_FILENAME}.
+      </p>
       <Form method="post" encType="multipart/form-data">
         <div className="form-control">
           <label className="label">

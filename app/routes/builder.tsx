@@ -6,7 +6,11 @@ import { getCatalog } from "~/catalogs/index.server";
 import { Haddock3WorkflowBuilder } from "~/components/Haddock3/Form.client";
 import { haddock3Styles } from "~/components/Haddock3/styles";
 import { submitJob } from "~/models/applicaton.server";
-import { checkAuthenticated, getLevel, isSubmitAllowed } from "~/models/user.server";
+import {
+  checkAuthenticated,
+  getLevel,
+  isSubmitAllowed,
+} from "~/models/user.server";
 import { getSession } from "~/session.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -27,10 +31,10 @@ export const action = async ({ request }: ActionArgs) => {
   if (typeof upload === "string" || upload === null) {
     throw new Error("Bad upload");
   }
-  const session = await getSession(request)
-  const accessToken = session.data.bartenderToken
+  const session = await getSession(request);
+  const accessToken = session.data.bartenderToken;
   checkAuthenticated(accessToken);
-  const level = await getLevel(session.data.roles)
+  const level = await getLevel(session.data.roles);
   if (!isSubmitAllowed(level)) {
     throw new Error("Forbidden");
   }

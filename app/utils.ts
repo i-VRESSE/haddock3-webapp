@@ -1,1 +1,1 @@
-export const CompletedJobs = new Set(['ok', 'error'])
+export const CompletedJobs = new Set(["ok", "error"]);

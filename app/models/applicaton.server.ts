@@ -1,24 +1,29 @@
-import JSZip from 'jszip'
+import JSZip from "jszip";
 import { stringify, parse } from "@ltd/j-toml";
 
 import { ApplicationApi } from "~/bartender-client/apis/ApplicationApi";
 import type { JobModelDTO } from "~/bartender-client/models/JobModelDTO";
 import { buildConfig } from "./config.server";
-import { BARTENDER_APPLICATION_NAME, JOB_OUTPUT_DIR, WORKFLOW_CONFIG_FILENAME } from './constants';
+import {
+  BARTENDER_APPLICATION_NAME,
+  JOB_OUTPUT_DIR,
+  WORKFLOW_CONFIG_FILENAME,
+} from "./constants";
 
 function buildApplicationApi(accessToken: string = "") {
   return new ApplicationApi(buildConfig(accessToken));
 }
 
-export async function submitJob(
-  upload: File,
-  accessToken: string
-) {
+export async function submitJob(upload: File, accessToken: string) {
   const api = buildApplicationApi(accessToken);
-  const rewritten_upload = new File([await rewriteConfigInArchive(upload)], upload.name, {
-    type: upload.type,
-    lastModified: upload.lastModified,
-  });
+  const rewritten_upload = new File(
+    [await rewriteConfigInArchive(upload)],
+    upload.name,
+    {
+      type: upload.type,
+      lastModified: upload.lastModified,
+    }
+  );
   const response = await api.uploadJobRaw({
     application: BARTENDER_APPLICATION_NAME,
     upload: rewritten_upload,
@@ -41,7 +46,7 @@ export async function submitJob(
  * @returns The rewritten config file
  */
 async function rewriteConfig(config_body: string) {
-  const { dedupWorkflow } = await import('@i-vresse/wb-core/dist/toml.js');
+  const { dedupWorkflow } = await import("@i-vresse/wb-core/dist/toml.js");
   const table = parse(dedupWorkflow(config_body), { bigint: false });
   table.run_dir = JOB_OUTPUT_DIR;
   table.mode = "local";
@@ -66,18 +71,18 @@ export async function rewriteConfigInArchive(upload: Blob) {
   // Tried to give upload blob directly to loadAsync, but failed with
   // Error: Can't read the data of 'the loaded zip file'. Is it in a supported JavaScript type (String, Blob, ArrayBuffer, etc) ?
   // however converting to array buffer works.
-  await zip.loadAsync(await upload.arrayBuffer())
-  const config_file = zip.file(WORKFLOW_CONFIG_FILENAME)
+  await zip.loadAsync(await upload.arrayBuffer());
+  const config_file = zip.file(WORKFLOW_CONFIG_FILENAME);
   if (config_file === null) {
     throw new Error(`Unable to find ${WORKFLOW_CONFIG_FILENAME} in archive`);
   }
-  const config_body = await config_file.async("string")
-  zip.file(`${WORKFLOW_CONFIG_FILENAME}.orig`, config_body)
+  const config_body = await config_file.async("string");
+  zip.file(`${WORKFLOW_CONFIG_FILENAME}.orig`, config_body);
 
   // TODO validate config using catalog and ajv
 
   const new_config = await rewriteConfig(config_body);
 
   zip.file(WORKFLOW_CONFIG_FILENAME, new_config);
-  return await zip.generateAsync({type: "blob"});
+  return await zip.generateAsync({ type: "blob" });
 }

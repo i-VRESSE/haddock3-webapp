@@ -23,7 +23,7 @@ const App = () => {
 
   return (
     <div>
-      <div className="grid h-full w-full gap-2 p-4 page">
+      <div className="page grid h-full w-full gap-2 p-4">
         <div>
           <CatalogPanel></CatalogPanel>
         </div>
@@ -36,7 +36,7 @@ const App = () => {
           <NodePanel />
         </div>
       </div>
-      <div className="grid page sticky inset-x-0 bottom-0 h-14">
+      <div className="page sticky inset-x-0 bottom-0 grid h-14">
         <div></div>
         <div role="group" className="btn-group">
           <WorkflowSubmitButton submitAllowed={submitAllowed} />

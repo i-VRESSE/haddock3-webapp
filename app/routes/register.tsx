@@ -5,8 +5,8 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
-import { getCurrentUser, localLogin, register } from "~/models/user.server";
-import { getSession, commitSession, setSession } from "~/session.server";
+import { localLogin, register } from "~/models/user.server";
+import { commitSession, setSession } from "~/session.server";
 
 export async function loader({ request }: LoaderArgs) {
   // TODO check already logged in

@@ -31,7 +31,7 @@ export function ListReportFiles({
   }, [files]);
 
   return (
-    <ul className="list-disc list-inside">
+    <ul className="list-inside list-disc">
       {Array.from(reportFiles).map(([module, report]) => (
         <li key={module}>
           <a target="_blank" rel="noreferrer" href={`${prefix}${report}`}>
