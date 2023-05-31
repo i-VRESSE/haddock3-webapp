@@ -1,29 +1,44 @@
 import { useMemo } from "react";
 import type { DirectoryItem } from "~/bartender-client";
 
-export function ListReportFiles({ files, prefix }: { files: DirectoryItem, prefix: string }) {
-  const htmlFiles: [string, DirectoryItem[]][] = useMemo(() => {
+export function ListReportFiles({
+  files,
+  prefix,
+}: {
+  files: DirectoryItem;
+  prefix: string;
+}) {
+  const reportFiles = useMemo(() => {
+    const result = new Map<string, string>();
     if (!files.children) {
-      return [];
+      return result;
     }
     const analyisRoot = files.children.find((i) => i.name === "analysis");
-    if (!analyisRoot|| !analyisRoot.children) {
-      return [];
+    if (!analyisRoot || !analyisRoot.children) {
+      return result;
     }
-    return analyisRoot.children.map((module) => {
-      if (!module.children) {
-        return [module.name, []]
-      }
-      const htmls = module.children.filter((file) => file.name.endsWith("report.html"))
-        .map((file) => file);
-      return [module.name, htmls];
-    });
+    analyisRoot.children
+      .filter((module) => module.children !== undefined)
+      .forEach((module) => {
+        const html = module.children?.find((file) =>
+          file.name.endsWith("report.html")
+        );
+        if (html !== undefined) {
+          result.set(module.name, html.path);
+        }
+      });
+    return result;
   }, [files]);
+
   return (
     <ul className="list-disc list-inside">
-      {htmlFiles.map(([module, htmls]) => {
-        return <li key={module}><a target="_blank" rel="noreferrer" href={`${prefix}${htmls[0].path}`}>{module}</a></li>;
-      })}
+      {Array.from(reportFiles).map(([module, report]) => (
+        <li key={module}>
+          <a target="_blank" rel="noreferrer" href={`${prefix}${report}`}>
+            {module}
+          </a>
+        </li>
+      ))}
     </ul>
   );
 }
