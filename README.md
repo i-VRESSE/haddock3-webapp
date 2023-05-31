@@ -51,7 +51,10 @@ npm run typecheck
 To run unit tests (`app/**/*.test.ts`) with [Vitest](https://vitest.dev) use
 
 ```sh
+# In watch mode
 npm run test
+# or in single run mode with coverage
+npm run test -- run --coverage
 ```
 
 ## Deployment
