@@ -1,5 +1,7 @@
 # Web application for haddock3
 
+[![Research Software Directory Badge](https://img.shields.io/badge/rsd-bartended_haddock3-00a3e3.svg)](https://research-software-directory.org/software/bartended-haddock3)
+
 Uses
 
 - [bartender](https://github.com/i-VRESSE/bartender) for user and job management.
