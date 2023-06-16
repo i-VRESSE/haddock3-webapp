@@ -48,18 +48,18 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <div className="flex flex-col min-h-screen">
+        <div className="flex min-h-screen flex-col">
           <header>
-            <div className="h-64 flex flex-col bg-cover bg-[url('https://www.bonvinlab.org/images/pages/banner_home-mini.jpg')]">
+            <div className="flex h-64 flex-col bg-[url('https://www.bonvinlab.org/images/pages/banner_home-mini.jpg')] bg-cover">
               <div className="flex-grow" />{" "}
               {/* Push the navbar to the bottom of the banner */}
               <Navbar />
             </div>
           </header>
-          <div className="grow m-6">
+          <div className="m-6 grow">
             <Outlet />
           </div>
-          <footer className="bg-primary text-center p-1">
+          <footer className="bg-primary p-1 text-center">
             <p className="text-sm">
               This work is co-funded by the Horizon 2020 projects EOSC-hub and
               EGI-ACE (grant numbers 777536 and 101017567), BioExcel (grant

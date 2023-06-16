@@ -16,12 +16,14 @@ export default function JobPage() {
   const { jobs } = useLoaderData<typeof loader>();
   return (
     <main>
-      <table>
+      <table className="table w-full">
         <thead>
           <tr>
             <th>ID</th>
             <th>Status</th>
             <th>Name</th>
+            <th>Created on</th>
+            <th>Updated on</th>
           </tr>
         </thead>
         <tbody>
@@ -30,8 +32,18 @@ export default function JobPage() {
               <td>
                 <Link to={`/jobs/${job.id}`}>{job.id}</Link>
               </td>
-              <td>{job.state}</td>
-              <td>{job.name}</td>
+              <td>
+                <Link to={`/jobs/${job.id}`}>{job.state}</Link>
+              </td>
+              <td>
+                <Link to={`/jobs/${job.id}`}>{job.name}</Link>
+              </td>
+              <td>
+                <Link to={`/jobs/${job.id}`}>{job.createdOn}</Link>
+              </td>
+              <td>
+                <Link to={`/jobs/${job.id}`}>{job.updatedOn}</Link>
+              </td>
             </tr>
           ))}
         </tbody>

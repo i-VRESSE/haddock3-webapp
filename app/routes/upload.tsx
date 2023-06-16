@@ -4,49 +4,54 @@ import {
   type LoaderArgs,
   redirect,
 } from "@remix-run/node";
-import { Form, useLoaderData } from "@remix-run/react";
-import { getAccessToken } from "~/token.server";
+import { Form } from "@remix-run/react";
 
-import { applicationByName, submitJob } from "~/models/applicaton.server";
-import { checkAuthenticated, getLevel, isSubmitAllowed } from "~/models/user.server";
+import { submitJob } from "~/models/applicaton.server";
+import {
+  checkAuthenticated,
+  getLevel,
+  isSubmitAllowed,
+} from "~/models/user.server";
 import { getSession } from "~/session.server";
+import { WORKFLOW_CONFIG_FILENAME } from "~/models/constants";
 
 export const loader = async ({ request }: LoaderArgs) => {
-  const name = "haddock3";
-  const app = await applicationByName(name);
   const session = await getSession(request);
   checkAuthenticated(session.data.bartenderToken);
-  const level = await getLevel(session.data.roles)
+  const level = await getLevel(session.data.roles);
   if (!isSubmitAllowed(level)) {
     throw new Error("Forbidden");
   }
-  return json({ name, ...app });
+  return json({ level });
 };
 
 export const action = async ({ request }: ActionArgs) => {
-  const name = "haddock3";
   const formData = await request.formData();
   const upload = formData.get("upload");
 
   if (typeof upload === "string" || upload === null) {
     throw new Error("Bad upload");
   }
-  const access_token = await getAccessToken(request);
-  if (access_token === undefined) {
-    throw new Error("Unauthenticated");
+  const session = await getSession(request);
+  const accessToken = session.data.bartenderToken;
+  checkAuthenticated(accessToken);
+  const level = await getLevel(session.data.roles);
+  if (!isSubmitAllowed(level)) {
+    throw new Error("Forbidden");
   }
-
-  const job = await submitJob(name, upload, access_token);
+  const job = await submitJob(upload, accessToken!);
   const job_url = `/jobs/${job.id}`;
   return redirect(job_url);
 };
 
 export default function ApplicationSlug() {
-  const { config } = useLoaderData<typeof loader>();
   return (
     <main className="mx-auto max-w-4xl">
       <h1 className="my-6 text-3xl">Upload haddock3 archive</h1>
-      <p>Archive should contain workfow configuration file called {config}.</p>
+      <p>
+        Archive should contain workfow configuration file called{" "}
+        {WORKFLOW_CONFIG_FILENAME}.
+      </p>
       <Form method="post" encType="multipart/form-data">
         <div className="form-control">
           <label className="label">

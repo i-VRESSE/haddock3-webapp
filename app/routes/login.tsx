@@ -30,7 +30,6 @@ export async function action({ request }: ActionArgs) {
   });
 }
 
-
 export default function LoginPage() {
   // Shared style between login and register. Extract if we use it more often?
   const centeredColumn = "flex flex-col items-center gap-4";
@@ -80,7 +79,7 @@ export default function LoginPage() {
       <h2 className="text-lg font-semibold">Other login methods</h2>
       {/* TODO only show buttons for enabled providers
           by checking http://localhost:8000/api/openapi.json */}
-      <div className="flex space-evenly gap-4">
+      <div className="space-evenly flex gap-4">
         <form method="post" action="/auth/github/authorize">
           <button type="submit" className="btn h-auto">
             <img

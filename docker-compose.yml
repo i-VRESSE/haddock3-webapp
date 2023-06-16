@@ -1,20 +1,18 @@
-
-
-version: '3.9'
+version: "3.9"
 
 services:
   webapp:
     image: i-vresse/bartended-haddock3
-    build: 
+    build:
       context: .
     restart: always
     depends_on:
       bartender:
         condition: service_started
     ports:
-      - '8080:8080'
+      - "8080:8080"
     environment:
-      BARTENDER_API_URL: 'http://bartender:8000'
+      BARTENDER_API_URL: "http://bartender:8000"
 
   bartender:
     build:
@@ -23,7 +21,7 @@ services:
     image: bartender:${BARTENDER_VERSION:-latest}
     restart: always
     env_file:
-    - ../bartender/.env
+      - ../bartender/.env
     volumes:
       - type: bind
         source: ../bartender/config.yaml
@@ -50,7 +48,7 @@ services:
       POSTGRES_USER: "bartender"
       POSTGRES_DB: "bartender"
     volumes:
-    - bartender-db-data:/var/lib/postgresql/data
+      - bartender-db-data:/var/lib/postgresql/data
     restart: always
     healthcheck:
       test: pg_isready -U bartender

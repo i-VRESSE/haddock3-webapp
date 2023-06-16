@@ -1,9 +1,14 @@
 # Web application for haddock3
 
-Uses 
-* [bartender](https://github.com/i-VRESSE/bartender) for user and job management.
-* [workflow-builder](https://github.com/i-VRESSE/workflow-builder) to construct a Haddock3 workflow config file.
-* [haddock3](https://github.com/haddocking/haddock3) to compute
+[![Research Software Directory Badge](https://img.shields.io/badge/rsd-bartended_haddock3-00a3e3.svg)](https://research-software-directory.org/software/bartended-haddock3)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7990850.svg)](https://doi.org/10.5281/zenodo.7990850)
+[![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu)
+
+Uses
+
+- [bartender](https://github.com/i-VRESSE/bartender) for user and job management.
+- [workflow-builder](https://github.com/i-VRESSE/workflow-builder) to construct a Haddock3 workflow config file.
+- [haddock3](https://github.com/haddocking/haddock3) to compute
 
 ```mermaid
 sequenceDiagram
@@ -26,6 +31,35 @@ npm run dev
 ```
 
 This starts your app in development mode, rebuilding assets on file changes.
+
+To format according to [prettier](https://prettier.io) run
+
+```sh
+npm run format
+```
+
+It's recommended to install an editor plugin (like the [VSCode Prettier plugin](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)) to get auto-formatting on save.
+
+To lint according [eslint](https://eslint.org) run
+
+```sh
+npm run lint
+```
+
+To check the Typescript types run
+
+```sh
+npm run typecheck
+```
+
+To run unit tests (`app/**/*.test.ts`) with [Vitest](https://vitest.dev) use
+
+```sh
+# In watch mode
+npm run test
+# or in single run mode with coverage
+npm run test -- run --coverage
+```
 
 ## Deployment
 
@@ -57,6 +91,7 @@ Make sure to deploy the output of `remix build`
 The web application can be run inside a Docker container.
 
 Requirements:
+
 1. [bartender repo](https://github.com/i-VRESSE/bartender) to be cloned in `../bartender` directory.
 2. bartender repo should have [.env file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#environment-variables)
 3. bartender repo should have a [config.yaml file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#configuration-file)
@@ -68,6 +103,7 @@ docker compose build
 ```
 
 Run with
+
 ```sh
 docker compose up
 ```
@@ -98,6 +134,7 @@ The client can be (re-)generated with
 ```shell
 npm run generate-client
 ```
+
 (This command requires that the bartender webservice is running at http://localhost:8000)
 
 ## Bartender web service configuration
@@ -131,13 +168,13 @@ This web app expects that the following application is registered in bartender w
 
 ```yaml
 applications:
-    haddock3:
-        command: haddock3 $config
-        config: workflow.cfg
-        allowed_roles:
-            - easy
-            - expert
-            - guru
+  haddock3:
+    command: haddock3 $config
+    config: workflow.cfg
+    allowed_roles:
+      - easy
+      - expert
+      - guru
 ```
 
 This allows the archive generated with the workflow builder to be submitted.

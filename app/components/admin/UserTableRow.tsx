@@ -12,7 +12,6 @@ export const UserTableRow = ({ user, roles, onUpdate, submitting }: IProps) => {
     <tr>
       <td>{user.email}</td>
       <td>
-        
         <input
           type="checkbox"
           checked={user.isSuperuser}
@@ -31,24 +30,24 @@ export const UserTableRow = ({ user, roles, onUpdate, submitting }: IProps) => {
             return (
               <li key={role}>
                 <div className="form-control">
-                <label className="label cursor-pointer">
-                  <span className="label-text">{role}</span> 
-                  <input
-                    type="checkbox"
-                    checked={user.roles.includes(role)}
-                    className="checkbox ml-2"
-                    disabled={submitting}
-                    onChange={() => {
-                      const data = new FormData();
-                      data.set(
-                        role,
-                        user.roles.includes(role) ? "false" : "true"
-                      );
-                      onUpdate(data);
-                    }}
-                  />
-                </label>
-              </div>
+                  <label className="label cursor-pointer">
+                    <span className="label-text">{role}</span>
+                    <input
+                      type="checkbox"
+                      checked={user.roles.includes(role)}
+                      className="checkbox ml-2"
+                      disabled={submitting}
+                      onChange={() => {
+                        const data = new FormData();
+                        data.set(
+                          role,
+                          user.roles.includes(role) ? "false" : "true"
+                        );
+                        onUpdate(data);
+                      }}
+                    />
+                  </label>
+                </div>
               </li>
             );
           })}

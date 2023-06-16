@@ -90,7 +90,9 @@ export default function AdminUsersPage() {
           })}
         </tbody>
       </table>
-      <p>When roles or super is changed then the user should logout and login.</p>
+      <p>
+        When roles or super is changed then the user should logout and login.
+      </p>
     </main>
   );
 }
