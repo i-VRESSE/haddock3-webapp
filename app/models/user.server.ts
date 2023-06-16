@@ -43,7 +43,6 @@ export async function getProfile(accessToken: string) {
 export async function oauthAuthorize(provider: string) {
   const api = buildAuthApi();
   let url: string;
-  console.log("provider", JSON.stringify(provider));
   switch (provider) {
     case "github":
       url = (await api.oauthGithubRemoteAuthorize()).authorizationUrl;
@@ -71,7 +70,7 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
     state: search.get("state") || undefined,
     error: search.get("error") || undefined,
   };
-  let response: ApiResponse<any>;
+  let response: string;
   switch (provider) {
     case "github":
       response = await api.oauthGithubRemoteCallback(request);
@@ -88,7 +87,7 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
     default:
       throw new Error("Unknown provider");
   }
-  const body = await response.raw.json();
+  const body = JSON.parse(response);
   return body.access_token;
 }
 
