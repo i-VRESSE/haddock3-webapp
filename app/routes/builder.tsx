@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
 import { type ActionArgs, type LoaderArgs, redirect } from "@remix-run/node";
 
 import { getCatalog } from "~/catalogs/index.server";
@@ -12,6 +10,7 @@ import {
   isSubmitAllowed,
 } from "~/models/user.server";
 import { getSession } from "~/session.server";
+import { ClientOnly } from "remix-utils";
 
 export const loader = async ({ request }: LoaderArgs) => {
   const session = await getSession(request);
@@ -44,34 +43,6 @@ export const action = async ({ request }: ActionArgs) => {
 };
 
 export const links = () => [...haddock3Styles()];
-
-// remix-utils gave import error on remix v1.15.0 so I copied the ClientOnly code from
-// https://github.com/sergiodxa/remix-utils/blob/main/src/react/use-hydrated.ts
-let hydrating = true;
-
-function useHydrated() {
-  let [hydrated, setHydrated] = useState(() => !hydrating);
-
-  useEffect(function hydrate() {
-    hydrating = false;
-    setHydrated(true);
-  }, []);
-
-  return hydrated;
-}
-
-type Props = {
-  /**
-   * You are encouraged to add a fallback that is the same dimensions
-   * as the client rendered children. This will avoid content layout
-   * shift which is disgusting
-   */
-  children(): ReactNode;
-  fallback?: ReactNode;
-};
-function ClientOnly({ children, fallback = null }: Props) {
-  return useHydrated() ? <>{children()}</> : <>{fallback}</>;
-}
 
 export default function Builder() {
   // TODO replace ClientOnly with Suspense,
