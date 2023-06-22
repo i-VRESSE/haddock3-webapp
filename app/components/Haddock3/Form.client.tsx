@@ -5,7 +5,7 @@ import {
   WorkflowUploadButton,
   Wrapper,
 } from "@i-vresse/wb-core";
-import { useSetCatalog } from "@i-vresse/wb-core/dist/store";
+import { useCatalog, useSetCatalog, useWorkflow } from "@i-vresse/wb-core/dist/store";
 import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog";
 import { useEffect } from "react";
 import { WorkflowSubmitButton } from "./SubmitButton";
@@ -15,11 +15,20 @@ import { WorkflowDownloadButton } from "./DownloadButton";
 import { FormActions } from "./FormActions";
 
 const App = () => {
-  const { catalog, submitAllowed } = useLoaderData<typeof loader>();
+  const { catalog, submitAllowed, archive } = useLoaderData<typeof loader>();
   const setCatalog = useSetCatalog();
+  const activetCatalog = useCatalog()
+  const { loadWorkflowArchive } = useWorkflow();
   useEffect(() => {
     setCatalog(prepareCatalog(catalog)); // On mount configure catalog
-  }, [catalog, setCatalog]);
+  }, [catalog]);
+
+  useEffect(() => {
+    if (archive !== undefined && activetCatalog.title !== '') {
+      // Only load archive once active catalog is set
+      loadWorkflowArchive(archive)
+    }
+  }, [archive, activetCatalog]);
 
   return (
     <div>

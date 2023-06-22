@@ -11,8 +11,15 @@ import {
 } from "~/models/user.server";
 import { getSession } from "~/session.server";
 import { ClientOnly } from "remix-utils";
+import { ICatalog } from "@i-vresse/wb-core/dist/types";
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({
+  request,
+}: LoaderArgs): Promise<{
+  catalog: ICatalog;
+  submitAllowed: boolean;
+  archive: string | undefined;
+}> => {
   const session = await getSession(request);
   const level = await getLevel(session.data.roles);
   // When user does not have a level he/she
@@ -20,7 +27,7 @@ export const loader = async ({ request }: LoaderArgs) => {
   // but cannot submit only download
   const catalogLevel = level === "" ? "easy" : level;
   const catalog = await getCatalog(catalogLevel);
-  return { catalog, submitAllowed: isSubmitAllowed(level) };
+  return { catalog, submitAllowed: isSubmitAllowed(level), archive: undefined };
 };
 
 export const action = async ({ request }: ActionArgs) => {
