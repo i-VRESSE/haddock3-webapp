@@ -10,8 +10,8 @@ import {
   isSubmitAllowed,
 } from "~/models/user.server";
 import { getSession } from "~/session.server";
-import { ClientOnly } from "remix-utils";
 import { type ICatalog } from "@i-vresse/wb-core/dist/types";
+import { ClientOnly } from "~/components/ClientOnly";
 
 export const loader = async ({
   request,

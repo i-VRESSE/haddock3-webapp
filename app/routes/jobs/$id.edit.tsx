@@ -5,9 +5,9 @@ import { Haddock3WorkflowBuilder } from "~/components/Haddock3/Form.client";
 import { haddock3Styles } from "~/components/Haddock3/styles";
 import { getLevel, isSubmitAllowed } from "~/models/user.server";
 import { getSession } from "~/session.server";
-import { ClientOnly } from "remix-utils";
 import { action } from "~/routes/builder";
 import { useLoaderData } from "@remix-run/react";
+import { ClientOnly } from "~/components/ClientOnly";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const job_id = params.id || "";
