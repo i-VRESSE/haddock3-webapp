@@ -67,7 +67,8 @@ export async function getInputArchive(jobid: number, accessToken: string) {
   const response = await api.retrieveJobDirectoryAsArchiveRaw({
     jobid,
     exclude,
-    excludeDirs
+    excludeDirs,
+    archiveFormat: '.zip',
   })
   return response.raw;
 }
@@ -77,6 +78,7 @@ export async function getOutputArchive(jobid: number, accessToken: string) {
   const response = await api.retrieveJobSubdirectoryAsArchiveRaw({
     jobid,
     path: JOB_OUTPUT_DIR,
+    archiveFormat: '.zip',
   })
   return response.raw;
 }
