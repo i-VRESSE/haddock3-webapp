@@ -51,6 +51,7 @@ export default function JobPage() {
               </li>
               {/* TODO list files mentioned in workflow config */}
             </ul>
+            <a href={`/jobs/${job.id}/input.zip`}>Download archive</a>
           </div>
           <div>
             <h2 className="text-xl">Output</h2>
@@ -87,6 +88,7 @@ export default function JobPage() {
                 </a>
               </li>
             </ul>
+            <a href={`/jobs/${job.id}/output.zip`}>Download archive</a>
           </div>
         </>
       )}

@@ -73,7 +73,7 @@ function ClientOnly({ children, fallback = null }: Props) {
   return useHydrated() ? <>{children()}</> : <>{fallback}</>;
 }
 
-export default function ApplicationSlug() {
+export default function Builder() {
   // TODO replace ClientOnly with Suspense,
   // see https://github.com/sergiodxa/remix-utils#clientonly
   return (

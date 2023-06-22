@@ -57,6 +57,26 @@ export async function listOutputFiles(jobid: number, accessToken: string) {
     path: JOB_OUTPUT_DIR,
     maxDepth: 3,
   });
-  // Filter on html files
   return items;
+}
+
+export async function getInputArchive(jobid: number, accessToken: string) {
+  const api = buildJobApi(accessToken);
+  const exclude = ['stderr.txt', 'stdout.txt', 'meta', 'returncode']
+  const excludeDirs = [JOB_OUTPUT_DIR];
+  const response = await api.retrieveJobDirectoryAsArchiveRaw({
+    jobid,
+    exclude,
+    excludeDirs
+  })
+  return response.raw;
+}
+
+export async function getOutputArchive(jobid: number, accessToken: string) {
+  const api = buildJobApi(accessToken);
+  const response = await api.retrieveJobSubdirectoryAsArchiveRaw({
+    jobid,
+    path: JOB_OUTPUT_DIR,
+  })
+  return response.raw;
 }
