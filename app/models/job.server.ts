@@ -64,21 +64,21 @@ export async function getOArchive(jobid: number, accessToken: string) {
   const api = buildJobApi(accessToken);
   const response = await api.retrieveJobDirectoryAsArchiveRaw({
     jobid,
-    archiveFormat: '.zip',
-  })
+    archiveFormat: ".zip",
+  });
   return response.raw;
 }
 
 export async function getInputArchive(jobid: number, accessToken: string) {
   const api = buildJobApi(accessToken);
-  const exclude = ['stderr.txt', 'stdout.txt', 'meta', 'returncode']
+  const exclude = ["stderr.txt", "stdout.txt", "meta", "returncode"];
   const excludeDirs = [JOB_OUTPUT_DIR];
   const response = await api.retrieveJobDirectoryAsArchiveRaw({
     jobid,
     exclude,
     excludeDirs,
-    archiveFormat: '.zip',
-  })
+    archiveFormat: ".zip",
+  });
   return response.raw;
 }
 
@@ -87,7 +87,7 @@ export async function getOutputArchive(jobid: number, accessToken: string) {
   const response = await api.retrieveJobSubdirectoryAsArchiveRaw({
     jobid,
     path: JOB_OUTPUT_DIR,
-    archiveFormat: '.zip',
-  })
+    archiveFormat: ".zip",
+  });
   return response.raw;
 }

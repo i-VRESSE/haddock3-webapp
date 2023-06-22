@@ -5,7 +5,11 @@ import {
   WorkflowUploadButton,
   Wrapper,
 } from "@i-vresse/wb-core";
-import { useCatalog, useSetCatalog, useWorkflow } from "@i-vresse/wb-core/dist/store";
+import {
+  useCatalog,
+  useSetCatalog,
+  useWorkflow,
+} from "@i-vresse/wb-core/dist/store";
 import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog";
 import { useEffect } from "react";
 import { WorkflowSubmitButton } from "./SubmitButton";
@@ -17,18 +21,18 @@ import { FormActions } from "./FormActions";
 const App = () => {
   const { catalog, submitAllowed, archive } = useLoaderData<typeof loader>();
   const setCatalog = useSetCatalog();
-  const activetCatalog = useCatalog()
+  const activetCatalog = useCatalog();
   const { loadWorkflowArchive } = useWorkflow();
   useEffect(() => {
     setCatalog(prepareCatalog(catalog)); // On mount configure catalog
-  }, [catalog]);
+  }, [catalog]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (archive !== undefined && activetCatalog.title !== '') {
+    if (archive !== undefined && activetCatalog.title !== "") {
       // Only load archive once active catalog is set
-      loadWorkflowArchive(archive)
+      loadWorkflowArchive(archive);
     }
-  }, [archive, activetCatalog]);
+  }, [archive, activetCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div>
