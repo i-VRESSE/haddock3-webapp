@@ -77,6 +77,8 @@ export default function LoginPage() {
 
       {/* Social buttons */}
       <h2 className="text-lg font-semibold">Other login methods</h2>
+      {/* TODO only show buttons for enabled providers
+          by checking http://localhost:8000/api/openapi.json */}
       <div className="space-evenly flex gap-4">
         <form method="post" action="/auth/github/authorize">
           <button type="submit" className="btn h-auto">
@@ -99,6 +101,12 @@ export default function LoginPage() {
           <button type="submit" className="btn h-auto">
             <img height="32" width="32" src="orcid.png" alt="ORCID logo" />
             <p className="px-2">ORCID</p>
+          </button>
+        </form>
+        <form method="post" action="/auth/egi/authorize">
+          <button type="submit" className="btn h-auto">
+            <img height="32" width="32" src="egi.svg" alt="EGI Check-in logo" />
+            <p className="px-2">EGI Check-in</p>
           </button>
         </form>
       </div>

@@ -87,14 +87,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      // oauth required
-      headerParameters["Authorization"] = await this.configuration.accessToken(
-        "OAuth2PasswordBearer",
-        []
-      );
-    }
-
-    if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("HTTPBearer", []);
 
@@ -102,6 +94,14 @@ export class JobApi extends runtime.BaseAPI {
         headerParameters["Authorization"] = `Bearer ${tokenString}`;
       }
     }
+    if (this.configuration && this.configuration.accessToken) {
+      // oauth required
+      headerParameters["Authorization"] = await this.configuration.accessToken(
+        "OAuth2PasswordBearer",
+        []
+      );
+    }
+
     const response = await this.request(
       {
         path: `/api/job/{jobid}`.replace(
@@ -162,14 +162,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      // oauth required
-      headerParameters["Authorization"] = await this.configuration.accessToken(
-        "OAuth2PasswordBearer",
-        []
-      );
-    }
-
-    if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("HTTPBearer", []);
 
@@ -177,6 +169,14 @@ export class JobApi extends runtime.BaseAPI {
         headerParameters["Authorization"] = `Bearer ${tokenString}`;
       }
     }
+    if (this.configuration && this.configuration.accessToken) {
+      // oauth required
+      headerParameters["Authorization"] = await this.configuration.accessToken(
+        "OAuth2PasswordBearer",
+        []
+      );
+    }
+
     const response = await this.request(
       {
         path: `/api/job/{jobid}/directories`.replace(
@@ -247,14 +247,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      // oauth required
-      headerParameters["Authorization"] = await this.configuration.accessToken(
-        "OAuth2PasswordBearer",
-        []
-      );
-    }
-
-    if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("HTTPBearer", []);
 
@@ -262,6 +254,14 @@ export class JobApi extends runtime.BaseAPI {
         headerParameters["Authorization"] = `Bearer ${tokenString}`;
       }
     }
+    if (this.configuration && this.configuration.accessToken) {
+      // oauth required
+      headerParameters["Authorization"] = await this.configuration.accessToken(
+        "OAuth2PasswordBearer",
+        []
+      );
+    }
+
     const response = await this.request(
       {
         path: `/api/job/{jobid}/directories/{path}`
@@ -333,14 +333,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      // oauth required
-      headerParameters["Authorization"] = await this.configuration.accessToken(
-        "OAuth2PasswordBearer",
-        []
-      );
-    }
-
-    if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("HTTPBearer", []);
 
@@ -348,6 +340,14 @@ export class JobApi extends runtime.BaseAPI {
         headerParameters["Authorization"] = `Bearer ${tokenString}`;
       }
     }
+    if (this.configuration && this.configuration.accessToken) {
+      // oauth required
+      headerParameters["Authorization"] = await this.configuration.accessToken(
+        "OAuth2PasswordBearer",
+        []
+      );
+    }
+
     const response = await this.request(
       {
         path: `/api/job/{jobid}/files/{path}`
@@ -366,11 +366,7 @@ export class JobApi extends runtime.BaseAPI {
       initOverrides
     );
 
-    if (this.isJsonMime(response.headers.get("content-type"))) {
-      return new runtime.JSONApiResponse<any>(response);
-    } else {
-      return new runtime.TextApiResponse(response) as any;
-    }
+    return new runtime.TextApiResponse(response) as any;
   }
 
   /**
@@ -411,14 +407,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      // oauth required
-      headerParameters["Authorization"] = await this.configuration.accessToken(
-        "OAuth2PasswordBearer",
-        []
-      );
-    }
-
-    if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("HTTPBearer", []);
 
@@ -426,6 +414,14 @@ export class JobApi extends runtime.BaseAPI {
         headerParameters["Authorization"] = `Bearer ${tokenString}`;
       }
     }
+    if (this.configuration && this.configuration.accessToken) {
+      // oauth required
+      headerParameters["Authorization"] = await this.configuration.accessToken(
+        "OAuth2PasswordBearer",
+        []
+      );
+    }
+
     const response = await this.request(
       {
         path: `/api/job/{jobid}/stderr`.replace(
@@ -439,11 +435,7 @@ export class JobApi extends runtime.BaseAPI {
       initOverrides
     );
 
-    if (this.isJsonMime(response.headers.get("content-type"))) {
-      return new runtime.JSONApiResponse<any>(response);
-    } else {
-      return new runtime.TextApiResponse(response) as any;
-    }
+    return new runtime.TextApiResponse(response) as any;
   }
 
   /**
@@ -484,14 +476,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      // oauth required
-      headerParameters["Authorization"] = await this.configuration.accessToken(
-        "OAuth2PasswordBearer",
-        []
-      );
-    }
-
-    if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("HTTPBearer", []);
 
@@ -499,6 +483,14 @@ export class JobApi extends runtime.BaseAPI {
         headerParameters["Authorization"] = `Bearer ${tokenString}`;
       }
     }
+    if (this.configuration && this.configuration.accessToken) {
+      // oauth required
+      headerParameters["Authorization"] = await this.configuration.accessToken(
+        "OAuth2PasswordBearer",
+        []
+      );
+    }
+
     const response = await this.request(
       {
         path: `/api/job/{jobid}/stdout`.replace(
@@ -512,11 +504,7 @@ export class JobApi extends runtime.BaseAPI {
       initOverrides
     );
 
-    if (this.isJsonMime(response.headers.get("content-type"))) {
-      return new runtime.JSONApiResponse<any>(response);
-    } else {
-      return new runtime.TextApiResponse(response) as any;
-    }
+    return new runtime.TextApiResponse(response) as any;
   }
 
   /**
@@ -555,14 +543,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      // oauth required
-      headerParameters["Authorization"] = await this.configuration.accessToken(
-        "OAuth2PasswordBearer",
-        []
-      );
-    }
-
-    if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("HTTPBearer", []);
 
@@ -570,6 +550,14 @@ export class JobApi extends runtime.BaseAPI {
         headerParameters["Authorization"] = `Bearer ${tokenString}`;
       }
     }
+    if (this.configuration && this.configuration.accessToken) {
+      // oauth required
+      headerParameters["Authorization"] = await this.configuration.accessToken(
+        "OAuth2PasswordBearer",
+        []
+      );
+    }
+
     const response = await this.request(
       {
         path: `/api/job/`,

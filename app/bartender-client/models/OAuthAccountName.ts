@@ -14,7 +14,7 @@
 
 import { exists, mapValues } from "../runtime";
 /**
- * DTO for social provider name (OAuth account from GithHub or Orcid) of a user.
+ * DTO for social providers name of a user.
  * @export
  * @interface OAuthAccountName
  */

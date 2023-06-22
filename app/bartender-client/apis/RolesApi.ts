@@ -66,14 +66,6 @@ export class RolesApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      // oauth required
-      headerParameters["Authorization"] = await this.configuration.accessToken(
-        "OAuth2PasswordBearer",
-        []
-      );
-    }
-
-    if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("HTTPBearer", []);
 
@@ -81,6 +73,14 @@ export class RolesApi extends runtime.BaseAPI {
         headerParameters["Authorization"] = `Bearer ${tokenString}`;
       }
     }
+    if (this.configuration && this.configuration.accessToken) {
+      // oauth required
+      headerParameters["Authorization"] = await this.configuration.accessToken(
+        "OAuth2PasswordBearer",
+        []
+      );
+    }
+
     const response = await this.request(
       {
         path: `/api/roles/{role_id}/{user_id}`
@@ -129,14 +129,6 @@ export class RolesApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      // oauth required
-      headerParameters["Authorization"] = await this.configuration.accessToken(
-        "OAuth2PasswordBearer",
-        []
-      );
-    }
-
-    if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("HTTPBearer", []);
 
@@ -144,6 +136,14 @@ export class RolesApi extends runtime.BaseAPI {
         headerParameters["Authorization"] = `Bearer ${tokenString}`;
       }
     }
+    if (this.configuration && this.configuration.accessToken) {
+      // oauth required
+      headerParameters["Authorization"] = await this.configuration.accessToken(
+        "OAuth2PasswordBearer",
+        []
+      );
+    }
+
     const response = await this.request(
       {
         path: `/api/roles/`,
@@ -201,14 +201,6 @@ export class RolesApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      // oauth required
-      headerParameters["Authorization"] = await this.configuration.accessToken(
-        "OAuth2PasswordBearer",
-        []
-      );
-    }
-
-    if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("HTTPBearer", []);
 
@@ -216,6 +208,14 @@ export class RolesApi extends runtime.BaseAPI {
         headerParameters["Authorization"] = `Bearer ${tokenString}`;
       }
     }
+    if (this.configuration && this.configuration.accessToken) {
+      // oauth required
+      headerParameters["Authorization"] = await this.configuration.accessToken(
+        "OAuth2PasswordBearer",
+        []
+      );
+    }
+
     const response = await this.request(
       {
         path: `/api/roles/{role_id}/{user_id}`

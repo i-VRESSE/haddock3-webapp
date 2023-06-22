@@ -53,6 +53,9 @@ export async function oauthAuthorize(provider: string) {
     case "orcidsandbox":
       url = (await api.oauthSandboxOrcidOrgRemoteAuthorize()).authorizationUrl;
       break;
+    case "egi":
+      url = (await api.oauthEGICheckInRemoteAuthorize()).authorizationUrl;
+      break;
     default:
       throw new Error("Unknown provider");
   }
@@ -67,7 +70,7 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
     state: search.get("state") || undefined,
     error: search.get("error") || undefined,
   };
-  let response: ApiResponse<any>;
+  let response: string;
   switch (provider) {
     case "github":
       response = await api.oauthGithubRemoteCallback(request);
@@ -78,10 +81,13 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
     case "orcidsandbox":
       response = await api.oauthSandboxOrcidOrgRemoteCallback(request);
       break;
+    case "egi":
+      response = await api.oauthEGICheckInRemoteCallback(request);
+      break;
     default:
       throw new Error("Unknown provider");
   }
-  const body = await response.raw.json();
+  const body = JSON.parse(response);
   return body.access_token;
 }
 

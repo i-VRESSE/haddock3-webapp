@@ -157,14 +157,6 @@ export class ApplicationApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      // oauth required
-      headerParameters["Authorization"] = await this.configuration.accessToken(
-        "OAuth2PasswordBearer",
-        []
-      );
-    }
-
-    if (this.configuration && this.configuration.accessToken) {
       const token = this.configuration.accessToken;
       const tokenString = await token("HTTPBearer", []);
 
@@ -172,6 +164,14 @@ export class ApplicationApi extends runtime.BaseAPI {
         headerParameters["Authorization"] = `Bearer ${tokenString}`;
       }
     }
+    if (this.configuration && this.configuration.accessToken) {
+      // oauth required
+      headerParameters["Authorization"] = await this.configuration.accessToken(
+        "OAuth2PasswordBearer",
+        []
+      );
+    }
+
     const consumes: runtime.Consume[] = [
       { contentType: "multipart/form-data" },
     ];
