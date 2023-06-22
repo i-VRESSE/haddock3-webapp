@@ -60,6 +60,15 @@ export async function listOutputFiles(jobid: number, accessToken: string) {
   return items;
 }
 
+export async function getOArchive(jobid: number, accessToken: string) {
+  const api = buildJobApi(accessToken);
+  const response = await api.retrieveJobDirectoryAsArchiveRaw({
+    jobid,
+    archiveFormat: '.zip',
+  })
+  return response.raw;
+}
+
 export async function getInputArchive(jobid: number, accessToken: string) {
   const api = buildJobApi(accessToken);
   const exclude = ['stderr.txt', 'stdout.txt', 'meta', 'returncode']

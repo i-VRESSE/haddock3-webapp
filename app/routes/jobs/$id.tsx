@@ -33,6 +33,7 @@ export default function JobPage() {
         </p>
         <p>Created on: {job.createdOn}</p>
         <p>Updated on: {job.updatedOn}</p>
+        <a href={`/jobs/${job.id}/zip`}>Download archive</a>
       </div>
       {CompletedJobs.has(job.state) && (
         <>
