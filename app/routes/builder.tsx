@@ -11,7 +11,7 @@ import {
 } from "~/models/user.server";
 import { getSession } from "~/session.server";
 import { ClientOnly } from "remix-utils";
-import { ICatalog } from "@i-vresse/wb-core/dist/types";
+import { type ICatalog } from "@i-vresse/wb-core/dist/types";
 
 export const loader = async ({
   request,
