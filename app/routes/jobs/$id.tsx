@@ -7,6 +7,8 @@ import { CompletedJobs } from "~/utils";
 import { checkAuthenticated } from "~/models/user.server";
 import type { DirectoryItem } from "~/bartender-client";
 import { ListReportFiles } from "~/components/ListReportFiles";
+import { ListStepDirectories } from "~/components/ListStepDirectories";
+import { ListDataDirectories } from "~/components/ListDataDirectories";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = parseInt(params.id || "");
@@ -33,7 +35,7 @@ export default function JobPage() {
         </p>
         <p>Created on: {job.createdOn}</p>
         <p>Updated on: {job.updatedOn}</p>
-        <a href={`/jobs/${job.id}/zip`}>Download archive</a>
+        <a href={`/jobs/${job.id}/zip`}>&#128230;  Download archive</a>
       </div>
       {CompletedJobs.has(job.state) && (
         <>
@@ -53,18 +55,43 @@ export default function JobPage() {
               {/* TODO list files mentioned in workflow config */}
             </ul>
             <p>
-              <a href={`/jobs/${job.id}/input.zip`}>Download archive</a>
+              <a href={`/jobs/${job.id}/input.zip`}>&#128230; Download archive</a>
             </p>
             <p>
-              <a href={`/jobs/${job.id}/edit`}>Edit</a>
+              <a href={`/jobs/${job.id}/edit`}>&#128393; Edit</a>
             </p>
           </div>
           <div>
             <h2 className="text-xl">Output</h2>
-            <ListReportFiles
-              files={outputFiles!}
-              prefix={`/jobs/${job.id}/files/`}
-            />
+            <ul>
+              <li>
+                <details>
+                  <summary>Steps</summary>
+                  <ListStepDirectories
+                    files={outputFiles!}
+                    prefix={`/jobs/${job.id}/archive/`}
+                  />
+                </details>
+              </li>
+              <li>
+                <details>
+                  <summary>Data</summary>
+                  <ListDataDirectories
+                    files={outputFiles!}
+                    prefix={`/jobs/${job.id}/files/`}
+                  />
+                </details>
+              </li>
+              <li>
+                <details open>
+                  <summary>Analysis</summary>
+                  <ListReportFiles
+                    files={outputFiles!}
+                    prefix={`/jobs/${job.id}/files/`}
+                  />
+                </details>
+              </li>
+            </ul>
             <ul className="list-inside list-disc">
               <li>
                 <a
@@ -94,7 +121,7 @@ export default function JobPage() {
                 </a>
               </li>
             </ul>
-            <a href={`/jobs/${job.id}/output.zip`}>Download archive</a>
+            <a href={`/jobs/${job.id}/output.zip`}>&#128230; Download archive</a>
           </div>
         </>
       )}

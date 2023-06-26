@@ -122,11 +122,19 @@ export async function getInputArchive(jobid: number, accessToken: string) {
 }
 
 export async function getOutputArchive(jobid: number, accessToken: string) {
+  return await getSubDirectoryAsArchive(
+    jobid,
+    JOB_OUTPUT_DIR,
+    accessToken
+  )
+}
+
+export async function getSubDirectoryAsArchive(jobid: number, path: string, accessToken: string) {
   const api = buildJobApi(accessToken);
   try {
     const response = await api.retrieveJobSubdirectoryAsArchiveRaw({
       jobid,
-      path: JOB_OUTPUT_DIR,
+      path,
       archiveFormat: ".zip",
     });
     return response.raw;
