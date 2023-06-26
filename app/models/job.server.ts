@@ -1,6 +1,7 @@
 import { JobApi } from "~/bartender-client/apis/JobApi";
 import { buildConfig } from "./config.server";
 import { JOB_OUTPUT_DIR } from "./constants";
+import { ResponseError } from "~/bartender-client";
 
 function buildJobApi(accessToken: string = "") {
   return new JobApi(buildConfig(accessToken));
@@ -14,27 +15,49 @@ export async function getJobs(accessToken: string, limit = 10, offset = 0) {
   });
 }
 
+function handleResponseError(error: unknown): never {
+  if (error instanceof ResponseError) {
+    throw new Response(null, {
+      status: error.response.status,
+      statusText: error.response.statusText,
+    });
+  }
+  throw error;
+}
+
 export async function getJobById(jobid: number, accessToken: string) {
   const api = buildJobApi(accessToken);
-  return await api.retrieveJob({
-    jobid,
-  });
+  try {
+    return await api.retrieveJob({
+      jobid,
+    });
+  } catch (error) {
+    handleResponseError(error);
+  }
 }
 
 export async function getJobStdout(jobid: number, accessToken: string) {
   const api = buildJobApi(accessToken);
-  const response = await api.retrieveJobStdoutRaw({
-    jobid,
-  });
-  return response.raw;
+  try {
+    const response = await api.retrieveJobStdoutRaw({
+      jobid,
+    });
+    return response.raw;
+  } catch (error) {
+    handleResponseError(error);
+  }
 }
 
 export async function getJobStderr(jobid: number, accessToken: string) {
   const api = buildJobApi(accessToken);
-  const response = await api.retrieveJobStderrRaw({
-    jobid,
-  });
-  return response.raw;
+  try {
+    const response = await api.retrieveJobStderrRaw({
+      jobid,
+    });
+    return response.raw;
+  } catch (error) {
+    handleResponseError(error);
+  }
 }
 
 export async function getJobfile(
@@ -43,51 +66,71 @@ export async function getJobfile(
   accessToken: string
 ) {
   const api = buildJobApi(accessToken);
-  const response = await api.retrieveJobFilesRaw({
-    jobid,
-    path,
-  });
-  return response.raw;
+  try {
+    const response = await api.retrieveJobFilesRaw({
+      jobid,
+      path,
+    });
+    return response.raw;
+  } catch (error) {
+    handleResponseError(error);
+  }
 }
 
 export async function listOutputFiles(jobid: number, accessToken: string) {
   const api = buildJobApi(accessToken);
-  const items = await api.retrieveJobDirectoriesFromPath({
-    jobid,
-    path: JOB_OUTPUT_DIR,
-    maxDepth: 3,
-  });
-  return items;
+  try {
+    const items = await api.retrieveJobDirectoriesFromPath({
+      jobid,
+      path: JOB_OUTPUT_DIR,
+      maxDepth: 3,
+    });
+    return items;
+  } catch (error) {
+    handleResponseError(error);
+  }
 }
 
 export async function getArchive(jobid: number, accessToken: string) {
   const api = buildJobApi(accessToken);
-  const response = await api.retrieveJobDirectoryAsArchiveRaw({
-    jobid,
-    archiveFormat: ".zip",
-  });
-  return response.raw;
+  try {
+    const response = await api.retrieveJobDirectoryAsArchiveRaw({
+      jobid,
+      archiveFormat: ".zip",
+    });
+    return response.raw;
+  } catch (error) {
+    handleResponseError(error);
+  }
 }
 
 export async function getInputArchive(jobid: number, accessToken: string) {
   const api = buildJobApi(accessToken);
   const exclude = ["stderr.txt", "stdout.txt", "meta", "returncode"];
   const excludeDirs = [JOB_OUTPUT_DIR];
-  const response = await api.retrieveJobDirectoryAsArchiveRaw({
-    jobid,
-    exclude,
-    excludeDirs,
-    archiveFormat: ".zip",
-  });
-  return response.raw;
+  try {
+    const response = await api.retrieveJobDirectoryAsArchiveRaw({
+      jobid,
+      exclude,
+      excludeDirs,
+      archiveFormat: ".zip",
+    });
+    return response.raw;
+  } catch (error) {
+    handleResponseError(error);
+  }
 }
 
 export async function getOutputArchive(jobid: number, accessToken: string) {
   const api = buildJobApi(accessToken);
-  const response = await api.retrieveJobSubdirectoryAsArchiveRaw({
-    jobid,
-    path: JOB_OUTPUT_DIR,
-    archiveFormat: ".zip",
-  });
-  return response.raw;
+  try {
+    const response = await api.retrieveJobSubdirectoryAsArchiveRaw({
+      jobid,
+      path: JOB_OUTPUT_DIR,
+      archiveFormat: ".zip",
+    });
+    return response.raw;
+  } catch (error) {
+    handleResponseError(error);
+  }
 }
