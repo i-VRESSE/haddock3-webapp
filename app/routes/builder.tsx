@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
 import { type ActionArgs, type LoaderArgs, redirect } from "@remix-run/node";
 
 import { getCatalog } from "~/catalogs/index.server";
@@ -12,8 +10,16 @@ import {
   isSubmitAllowed,
 } from "~/models/user.server";
 import { getSession } from "~/session.server";
+import { type ICatalog } from "@i-vresse/wb-core/dist/types";
+import { ClientOnly } from "~/components/ClientOnly";
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({
+  request,
+}: LoaderArgs): Promise<{
+  catalog: ICatalog;
+  submitAllowed: boolean;
+  archive: string | undefined;
+}> => {
   const session = await getSession(request);
   const level = await getLevel(session.data.roles);
   // When user does not have a level he/she
@@ -21,7 +27,7 @@ export const loader = async ({ request }: LoaderArgs) => {
   // but cannot submit only download
   const catalogLevel = level === "" ? "easy" : level;
   const catalog = await getCatalog(catalogLevel);
-  return { catalog, submitAllowed: isSubmitAllowed(level) };
+  return { catalog, submitAllowed: isSubmitAllowed(level), archive: undefined };
 };
 
 export const action = async ({ request }: ActionArgs) => {
@@ -45,35 +51,7 @@ export const action = async ({ request }: ActionArgs) => {
 
 export const links = () => [...haddock3Styles()];
 
-// remix-utils gave import error on remix v1.15.0 so I copied the ClientOnly code from
-// https://github.com/sergiodxa/remix-utils/blob/main/src/react/use-hydrated.ts
-let hydrating = true;
-
-function useHydrated() {
-  let [hydrated, setHydrated] = useState(() => !hydrating);
-
-  useEffect(function hydrate() {
-    hydrating = false;
-    setHydrated(true);
-  }, []);
-
-  return hydrated;
-}
-
-type Props = {
-  /**
-   * You are encouraged to add a fallback that is the same dimensions
-   * as the client rendered children. This will avoid content layout
-   * shift which is disgusting
-   */
-  children(): ReactNode;
-  fallback?: ReactNode;
-};
-function ClientOnly({ children, fallback = null }: Props) {
-  return useHydrated() ? <>{children()}</> : <>{fallback}</>;
-}
-
-export default function ApplicationSlug() {
+export default function Builder() {
   // TODO replace ClientOnly with Suspense,
   // see https://github.com/sergiodxa/remix-utils#clientonly
   return (

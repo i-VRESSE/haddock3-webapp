@@ -42,6 +42,13 @@ export interface RetrieveJobDirectoriesFromPathRequest {
   maxDepth?: number;
 }
 
+export interface RetrieveJobDirectoryAsArchiveRequest {
+  jobid: number;
+  archiveFormat?: RetrieveJobDirectoryAsArchiveArchiveFormatEnum;
+  exclude?: Array<string>;
+  excludeDirs?: Array<string>;
+}
+
 export interface RetrieveJobFilesRequest {
   path: string;
   jobid: number;
@@ -53,6 +60,14 @@ export interface RetrieveJobStderrRequest {
 
 export interface RetrieveJobStdoutRequest {
   jobid: number;
+}
+
+export interface RetrieveJobSubdirectoryAsArchiveRequest {
+  path: string;
+  jobid: number;
+  archiveFormat?: RetrieveJobSubdirectoryAsArchiveArchiveFormatEnum;
+  exclude?: Array<string>;
+  excludeDirs?: Array<string>;
 }
 
 export interface RetrieveJobsRequest {
@@ -87,14 +102,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -102,6 +109,14 @@ export class JobApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/api/job/{jobid}`.replace(
@@ -162,14 +177,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -177,6 +184,14 @@ export class JobApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/api/job/{jobid}/directories`.replace(
@@ -211,7 +226,7 @@ export class JobApi extends runtime.BaseAPI {
   }
 
   /**
-   * List directory contents of a job.  Args:     path: Sub directory inside job directory to start from.     max_depth: Number of directories to traverse into.     job_dir: The job directory.  Raises:     HTTPException: When path is not found or is outside job directory.  Returns:     DirectoryItem: Listing of files and directories.
+   * List directory contents of a job.  Args:     path: Sub directory inside job directory to start from.     max_depth: Number of directories to traverse into.     job_dir: The job directory.  Returns:     DirectoryItem: Listing of files and directories.
    * Retrieve Job Directories From Path
    */
   async retrieveJobDirectoriesFromPathRaw(
@@ -247,14 +262,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -262,6 +269,14 @@ export class JobApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/api/job/{jobid}/directories/{path}`
@@ -286,7 +301,7 @@ export class JobApi extends runtime.BaseAPI {
   }
 
   /**
-   * List directory contents of a job.  Args:     path: Sub directory inside job directory to start from.     max_depth: Number of directories to traverse into.     job_dir: The job directory.  Raises:     HTTPException: When path is not found or is outside job directory.  Returns:     DirectoryItem: Listing of files and directories.
+   * List directory contents of a job.  Args:     path: Sub directory inside job directory to start from.     max_depth: Number of directories to traverse into.     job_dir: The job directory.  Returns:     DirectoryItem: Listing of files and directories.
    * Retrieve Job Directories From Path
    */
   async retrieveJobDirectoriesFromPath(
@@ -294,6 +309,91 @@ export class JobApi extends runtime.BaseAPI {
     initOverrides?: RequestInit | runtime.InitOverrideFunction
   ): Promise<DirectoryItem> {
     const response = await this.retrieveJobDirectoriesFromPathRaw(
+      requestParameters,
+      initOverrides
+    );
+    return await response.value();
+  }
+
+  /**
+   * Download contents of job directory as archive.  Args:     job_dir: The job directory.     background_tasks: FastAPI mechanism for post-processing tasks     archive_format: Format to use for archive. Supported formats are \'.zip\', \'.tar\',         \'.tar.xz\', \'.tar.gz\', \'.tar.bz2\'     exclude: list of filename patterns that should be excluded from archive.     exclude_dirs: list of directory patterns that should be excluded from archive.  Returns:     FileResponse: Archive containing the content of job_dir
+   * Retrieve Job Directory As Archive
+   */
+  async retrieveJobDirectoryAsArchiveRaw(
+    requestParameters: RetrieveJobDirectoryAsArchiveRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction
+  ): Promise<runtime.ApiResponse<any>> {
+    if (
+      requestParameters.jobid === null ||
+      requestParameters.jobid === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "jobid",
+        "Required parameter requestParameters.jobid was null or undefined when calling retrieveJobDirectoryAsArchive."
+      );
+    }
+
+    const queryParameters: any = {};
+
+    if (requestParameters.archiveFormat !== undefined) {
+      queryParameters["archive_format"] = requestParameters.archiveFormat;
+    }
+
+    if (requestParameters.exclude) {
+      queryParameters["exclude"] = requestParameters.exclude;
+    }
+
+    if (requestParameters.excludeDirs) {
+      queryParameters["exclude_dirs"] = requestParameters.excludeDirs;
+    }
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      // oauth required
+      headerParameters["Authorization"] = await this.configuration.accessToken(
+        "OAuth2PasswordBearer",
+        []
+      );
+    }
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/api/job/{jobid}/archive`.replace(
+          `{${"jobid"}}`,
+          encodeURIComponent(String(requestParameters.jobid))
+        ),
+        method: "GET",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides
+    );
+
+    if (this.isJsonMime(response.headers.get("content-type"))) {
+      return new runtime.JSONApiResponse<any>(response);
+    } else {
+      return new runtime.TextApiResponse(response) as any;
+    }
+  }
+
+  /**
+   * Download contents of job directory as archive.  Args:     job_dir: The job directory.     background_tasks: FastAPI mechanism for post-processing tasks     archive_format: Format to use for archive. Supported formats are \'.zip\', \'.tar\',         \'.tar.xz\', \'.tar.gz\', \'.tar.bz2\'     exclude: list of filename patterns that should be excluded from archive.     exclude_dirs: list of directory patterns that should be excluded from archive.  Returns:     FileResponse: Archive containing the content of job_dir
+   * Retrieve Job Directory As Archive
+   */
+  async retrieveJobDirectoryAsArchive(
+    requestParameters: RetrieveJobDirectoryAsArchiveRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction
+  ): Promise<any> {
+    const response = await this.retrieveJobDirectoryAsArchiveRaw(
       requestParameters,
       initOverrides
     );
@@ -333,14 +433,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -348,6 +440,14 @@ export class JobApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/api/job/{jobid}/files/{path}`
@@ -366,7 +466,11 @@ export class JobApi extends runtime.BaseAPI {
       initOverrides
     );
 
-    return new runtime.TextApiResponse(response) as any;
+    if (this.isJsonMime(response.headers.get("content-type"))) {
+      return new runtime.JSONApiResponse<any>(response);
+    } else {
+      return new runtime.TextApiResponse(response) as any;
+    }
   }
 
   /**
@@ -385,13 +489,13 @@ export class JobApi extends runtime.BaseAPI {
   }
 
   /**
-   * Retrieve the jobs standard error.  Args:     job_dir: Directory with job output files.  Returns:     Content of standard error.
+   * Retrieve the jobs standard error.  Args:     logs: The standard output and error of a completed job.  Returns:     Content of standard error.
    * Retrieve Job Stderr
    */
   async retrieveJobStderrRaw(
     requestParameters: RetrieveJobStderrRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
-  ): Promise<runtime.ApiResponse<any>> {
+  ): Promise<runtime.ApiResponse<string>> {
     if (
       requestParameters.jobid === null ||
       requestParameters.jobid === undefined
@@ -407,14 +511,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -422,6 +518,14 @@ export class JobApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/api/job/{jobid}/stderr`.replace(
@@ -435,17 +539,21 @@ export class JobApi extends runtime.BaseAPI {
       initOverrides
     );
 
-    return new runtime.TextApiResponse(response) as any;
+    if (this.isJsonMime(response.headers.get("content-type"))) {
+      return new runtime.JSONApiResponse<string>(response);
+    } else {
+      return new runtime.TextApiResponse(response) as any;
+    }
   }
 
   /**
-   * Retrieve the jobs standard error.  Args:     job_dir: Directory with job output files.  Returns:     Content of standard error.
+   * Retrieve the jobs standard error.  Args:     logs: The standard output and error of a completed job.  Returns:     Content of standard error.
    * Retrieve Job Stderr
    */
   async retrieveJobStderr(
     requestParameters: RetrieveJobStderrRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
-  ): Promise<any> {
+  ): Promise<string> {
     const response = await this.retrieveJobStderrRaw(
       requestParameters,
       initOverrides
@@ -454,13 +562,13 @@ export class JobApi extends runtime.BaseAPI {
   }
 
   /**
-   * Retrieve the jobs standard output.  Args:     job_dir: Directory with job output files.  Returns:     Content of standard output.
+   * Retrieve the jobs standard output.  Args:     logs: The standard output and error of a completed job.  Returns:     Content of standard output.
    * Retrieve Job Stdout
    */
   async retrieveJobStdoutRaw(
     requestParameters: RetrieveJobStdoutRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
-  ): Promise<runtime.ApiResponse<any>> {
+  ): Promise<runtime.ApiResponse<string>> {
     if (
       requestParameters.jobid === null ||
       requestParameters.jobid === undefined
@@ -476,14 +584,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -491,6 +591,14 @@ export class JobApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/api/job/{jobid}/stdout`.replace(
@@ -504,18 +612,122 @@ export class JobApi extends runtime.BaseAPI {
       initOverrides
     );
 
-    return new runtime.TextApiResponse(response) as any;
+    if (this.isJsonMime(response.headers.get("content-type"))) {
+      return new runtime.JSONApiResponse<string>(response);
+    } else {
+      return new runtime.TextApiResponse(response) as any;
+    }
   }
 
   /**
-   * Retrieve the jobs standard output.  Args:     job_dir: Directory with job output files.  Returns:     Content of standard output.
+   * Retrieve the jobs standard output.  Args:     logs: The standard output and error of a completed job.  Returns:     Content of standard output.
    * Retrieve Job Stdout
    */
   async retrieveJobStdout(
     requestParameters: RetrieveJobStdoutRequest,
     initOverrides?: RequestInit | runtime.InitOverrideFunction
-  ): Promise<any> {
+  ): Promise<string> {
     const response = await this.retrieveJobStdoutRaw(
+      requestParameters,
+      initOverrides
+    );
+    return await response.value();
+  }
+
+  /**
+   * Download job output as archive.  Args:     path: Sub directory inside job directory to start from.     job_dir: The job directory.     background_tasks: FastAPI mechanism for post-processing tasks     archive_format: Format to use for archive. Supported formats are \'.zip\',         \'.tar\', \'.tar.xz\', \'.tar.gz\', \'.tar.bz2\'     exclude: list of filename patterns that should be excluded from archive.     exclude_dirs: list of directory patterns that should be excluded from archive.  Returns:     FileResponse: Archive containing the output of job_dir
+   * Retrieve Job Subdirectory As Archive
+   */
+  async retrieveJobSubdirectoryAsArchiveRaw(
+    requestParameters: RetrieveJobSubdirectoryAsArchiveRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction
+  ): Promise<runtime.ApiResponse<any>> {
+    if (
+      requestParameters.path === null ||
+      requestParameters.path === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "path",
+        "Required parameter requestParameters.path was null or undefined when calling retrieveJobSubdirectoryAsArchive."
+      );
+    }
+
+    if (
+      requestParameters.jobid === null ||
+      requestParameters.jobid === undefined
+    ) {
+      throw new runtime.RequiredError(
+        "jobid",
+        "Required parameter requestParameters.jobid was null or undefined when calling retrieveJobSubdirectoryAsArchive."
+      );
+    }
+
+    const queryParameters: any = {};
+
+    if (requestParameters.archiveFormat !== undefined) {
+      queryParameters["archive_format"] = requestParameters.archiveFormat;
+    }
+
+    if (requestParameters.exclude) {
+      queryParameters["exclude"] = requestParameters.exclude;
+    }
+
+    if (requestParameters.excludeDirs) {
+      queryParameters["exclude_dirs"] = requestParameters.excludeDirs;
+    }
+
+    const headerParameters: runtime.HTTPHeaders = {};
+
+    if (this.configuration && this.configuration.accessToken) {
+      // oauth required
+      headerParameters["Authorization"] = await this.configuration.accessToken(
+        "OAuth2PasswordBearer",
+        []
+      );
+    }
+
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
+    const response = await this.request(
+      {
+        path: `/api/job/{jobid}/archive/{path}`
+          .replace(
+            `{${"path"}}`,
+            encodeURIComponent(String(requestParameters.path))
+          )
+          .replace(
+            `{${"jobid"}}`,
+            encodeURIComponent(String(requestParameters.jobid))
+          ),
+        method: "GET",
+        headers: headerParameters,
+        query: queryParameters,
+      },
+      initOverrides
+    );
+
+    if (this.isJsonMime(response.headers.get("content-type"))) {
+      return new runtime.JSONApiResponse<any>(response);
+    } else {
+      return new runtime.TextApiResponse(response) as any;
+    }
+  }
+
+  /**
+   * Download job output as archive.  Args:     path: Sub directory inside job directory to start from.     job_dir: The job directory.     background_tasks: FastAPI mechanism for post-processing tasks     archive_format: Format to use for archive. Supported formats are \'.zip\',         \'.tar\', \'.tar.xz\', \'.tar.gz\', \'.tar.bz2\'     exclude: list of filename patterns that should be excluded from archive.     exclude_dirs: list of directory patterns that should be excluded from archive.  Returns:     FileResponse: Archive containing the output of job_dir
+   * Retrieve Job Subdirectory As Archive
+   */
+  async retrieveJobSubdirectoryAsArchive(
+    requestParameters: RetrieveJobSubdirectoryAsArchiveRequest,
+    initOverrides?: RequestInit | runtime.InitOverrideFunction
+  ): Promise<any> {
+    const response = await this.retrieveJobSubdirectoryAsArchiveRaw(
       requestParameters,
       initOverrides
     );
@@ -543,14 +755,6 @@ export class JobApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -558,6 +762,14 @@ export class JobApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/api/job/`,
@@ -588,3 +800,28 @@ export class JobApi extends runtime.BaseAPI {
     return await response.value();
   }
 }
+
+/**
+ * @export
+ */
+export const RetrieveJobDirectoryAsArchiveArchiveFormatEnum = {
+  Zip: ".zip",
+  Tar: ".tar",
+  TarXz: ".tar.xz",
+  TarGz: ".tar.gz",
+  TarBz2: ".tar.bz2",
+} as const;
+export type RetrieveJobDirectoryAsArchiveArchiveFormatEnum =
+  (typeof RetrieveJobDirectoryAsArchiveArchiveFormatEnum)[keyof typeof RetrieveJobDirectoryAsArchiveArchiveFormatEnum];
+/**
+ * @export
+ */
+export const RetrieveJobSubdirectoryAsArchiveArchiveFormatEnum = {
+  Zip: ".zip",
+  Tar: ".tar",
+  TarXz: ".tar.xz",
+  TarGz: ".tar.gz",
+  TarBz2: ".tar.bz2",
+} as const;
+export type RetrieveJobSubdirectoryAsArchiveArchiveFormatEnum =
+  (typeof RetrieveJobSubdirectoryAsArchiveArchiveFormatEnum)[keyof typeof RetrieveJobSubdirectoryAsArchiveArchiveFormatEnum];

@@ -251,14 +251,6 @@ export class AuthApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -266,6 +258,14 @@ export class AuthApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/auth/jwt/logout`,
@@ -276,7 +276,11 @@ export class AuthApi extends runtime.BaseAPI {
       initOverrides
     );
 
-    return new runtime.TextApiResponse(response) as any;
+    if (this.isJsonMime(response.headers.get("content-type"))) {
+      return new runtime.JSONApiResponse<any>(response);
+    } else {
+      return new runtime.TextApiResponse(response) as any;
+    }
   }
 
   /**
@@ -305,14 +309,6 @@ export class AuthApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -320,6 +316,14 @@ export class AuthApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/auth/associate/egi/authorize`,
@@ -378,14 +382,6 @@ export class AuthApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -393,6 +389,14 @@ export class AuthApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/auth/associate/egi/callback`,
@@ -439,14 +443,6 @@ export class AuthApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -454,6 +450,14 @@ export class AuthApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/auth/associate/github/authorize`,
@@ -512,14 +516,6 @@ export class AuthApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -527,6 +523,14 @@ export class AuthApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/auth/associate/github/callback`,
@@ -573,14 +577,6 @@ export class AuthApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -588,6 +584,14 @@ export class AuthApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/auth/associate/orcid/authorize`,
@@ -646,14 +650,6 @@ export class AuthApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -661,6 +657,14 @@ export class AuthApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/auth/associate/orcid/callback`,
@@ -707,14 +711,6 @@ export class AuthApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -722,6 +718,14 @@ export class AuthApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/auth/associate/orcidsandbox/authorize`,
@@ -780,14 +784,6 @@ export class AuthApi extends runtime.BaseAPI {
     const headerParameters: runtime.HTTPHeaders = {};
 
     if (this.configuration && this.configuration.accessToken) {
-      const token = this.configuration.accessToken;
-      const tokenString = await token("HTTPBearer", []);
-
-      if (tokenString) {
-        headerParameters["Authorization"] = `Bearer ${tokenString}`;
-      }
-    }
-    if (this.configuration && this.configuration.accessToken) {
       // oauth required
       headerParameters["Authorization"] = await this.configuration.accessToken(
         "OAuth2PasswordBearer",
@@ -795,6 +791,14 @@ export class AuthApi extends runtime.BaseAPI {
       );
     }
 
+    if (this.configuration && this.configuration.accessToken) {
+      const token = this.configuration.accessToken;
+      const tokenString = await token("HTTPBearer", []);
+
+      if (tokenString) {
+        headerParameters["Authorization"] = `Bearer ${tokenString}`;
+      }
+    }
     const response = await this.request(
       {
         path: `/auth/associate/orcidsandbox/callback`,
@@ -907,7 +911,11 @@ export class AuthApi extends runtime.BaseAPI {
       initOverrides
     );
 
-    return new runtime.TextApiResponse(response) as any;
+    if (this.isJsonMime(response.headers.get("content-type"))) {
+      return new runtime.JSONApiResponse<any>(response);
+    } else {
+      return new runtime.TextApiResponse(response) as any;
+    }
   }
 
   /**
@@ -1007,7 +1015,11 @@ export class AuthApi extends runtime.BaseAPI {
       initOverrides
     );
 
-    return new runtime.TextApiResponse(response) as any;
+    if (this.isJsonMime(response.headers.get("content-type"))) {
+      return new runtime.JSONApiResponse<any>(response);
+    } else {
+      return new runtime.TextApiResponse(response) as any;
+    }
   }
 
   /**
@@ -1107,7 +1119,11 @@ export class AuthApi extends runtime.BaseAPI {
       initOverrides
     );
 
-    return new runtime.TextApiResponse(response) as any;
+    if (this.isJsonMime(response.headers.get("content-type"))) {
+      return new runtime.JSONApiResponse<any>(response);
+    } else {
+      return new runtime.TextApiResponse(response) as any;
+    }
   }
 
   /**
@@ -1207,7 +1223,11 @@ export class AuthApi extends runtime.BaseAPI {
       initOverrides
     );
 
-    return new runtime.TextApiResponse(response) as any;
+    if (this.isJsonMime(response.headers.get("content-type"))) {
+      return new runtime.JSONApiResponse<any>(response);
+    } else {
+      return new runtime.TextApiResponse(response) as any;
+    }
   }
 
   /**

@@ -33,6 +33,7 @@ export default function JobPage() {
         </p>
         <p>Created on: {job.createdOn}</p>
         <p>Updated on: {job.updatedOn}</p>
+        <a href={`/jobs/${job.id}/zip`}>Download archive</a>
       </div>
       {CompletedJobs.has(job.state) && (
         <>
@@ -51,6 +52,12 @@ export default function JobPage() {
               </li>
               {/* TODO list files mentioned in workflow config */}
             </ul>
+            <p>
+              <a href={`/jobs/${job.id}/input.zip`}>Download archive</a>
+            </p>
+            <p>
+              <a href={`/jobs/${job.id}/edit`}>Edit</a>
+            </p>
           </div>
           <div>
             <h2 className="text-xl">Output</h2>
@@ -87,6 +94,7 @@ export default function JobPage() {
                 </a>
               </li>
             </ul>
+            <a href={`/jobs/${job.id}/output.zip`}>Download archive</a>
           </div>
         </>
       )}

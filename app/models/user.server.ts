@@ -1,4 +1,3 @@
-import type { ApiResponse } from "~/bartender-client";
 import { RolesApi } from "~/bartender-client";
 import { UsersApi } from "~/bartender-client";
 import { AuthApi } from "~/bartender-client/apis/AuthApi";
