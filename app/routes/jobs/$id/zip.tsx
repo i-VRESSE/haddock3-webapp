@@ -1,5 +1,5 @@
 import { type LoaderArgs } from "@remix-run/node";
-import { getOArchive } from "~/models/job.server";
+import { getArchive } from "~/models/job.server";
 import { getAccessToken } from "~/token.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
@@ -8,5 +8,5 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   if (access_token === undefined) {
     throw new Error("Unauthenticated");
   }
-  return await getOArchive(parseInt(job_id), access_token);
+  return await getArchive(parseInt(job_id), access_token);
 };
