@@ -8,21 +8,25 @@ import { getSession } from "~/session.server";
 import { action } from "~/routes/builder";
 import { useLoaderData } from "@remix-run/react";
 import { ClientOnly } from "~/components/ClientOnly";
+import { getJobById } from "~/models/job.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
-  const job_id = params.id || "";
+  const jobId = params.id || "";
   const session = await getSession(request);
   const level = await getLevel(session.data.roles);
   if (level === "") {
     throw new Error("Unauthenticated");
   }
   const catalog = await getCatalog(level);
+  const accessToken = session.data.bartenderToken;
+  // Check that user can see job, otherwise throw 404
+  await getJobById(parseInt(jobId), accessToken!);
   // return same shape as loader in ~/routes/builder.tsx
   return {
     catalog,
     submitAllowed: isSubmitAllowed(level),
-    archive: `/jobs/${job_id}/input.zip`,
-    job_id,
+    archive: `/jobs/${jobId}/input.zip`,
+    job_id: jobId,
   };
 };
 
