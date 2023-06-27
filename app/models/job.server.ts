@@ -1,7 +1,9 @@
 import { JobApi } from "~/bartender-client/apis/JobApi";
 import { buildConfig } from "./config.server";
-import { JOB_OUTPUT_DIR } from "./constants";
+import { BOOKKEEPINGFILES, JOB_OUTPUT_DIR } from "./constants";
 import { ResponseError } from "~/bartender-client";
+
+
 
 function buildJobApi(accessToken: string = "") {
   return new JobApi(buildConfig(accessToken));
@@ -77,6 +79,22 @@ export async function listOutputFiles(jobid: number, accessToken: string) {
   });
 }
 
+export async function listInputFiles(jobid: number, accessToken: string) {
+  return await safeApi(accessToken, async (api) => {
+    const items = await api.retrieveJobDirectories({
+      jobid,
+      maxDepth: 3,
+    });
+    const nonInputFiles = new Set([
+      ...BOOKKEEPINGFILES,
+      JOB_OUTPUT_DIR,
+    ]);
+    // TODO instead of filtering here add exclude parameter to bartender endpoint.
+    items.children = items.children?.filter((c) => !nonInputFiles.has(c.name));
+    return items;
+  });
+}
+
 export async function getArchive(jobid: number, accessToken: string) {
   return await safeApi(accessToken, async (api) => {
     const response = await api.retrieveJobDirectoryAsArchiveRaw({
@@ -88,13 +106,11 @@ export async function getArchive(jobid: number, accessToken: string) {
 }
 
 export async function getInputArchive(jobid: number, accessToken: string) {
-  const exclude = ["stderr.txt", "stdout.txt", "meta", "returncode"];
-  const excludeDirs = [JOB_OUTPUT_DIR];
   return await safeApi(accessToken, async (api) => {
     const response = await api.retrieveJobDirectoryAsArchiveRaw({
       jobid,
-      exclude,
-      excludeDirs,
+      exclude: BOOKKEEPINGFILES,
+      excludeDirs: [JOB_OUTPUT_DIR],
       archiveFormat: ".zip",
     });
     return response.raw;
