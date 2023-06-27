@@ -1,7 +1,7 @@
 import type { DirectoryItem } from "~/bartender-client";
 
 const ListItem = ({ jobid, item }: { jobid: number; item: DirectoryItem }) => {
-  if (item.children) {
+  if (item.isDir) {
     return <ListDir jobid={jobid} dir={item} />;
   } else {
     return <ListFile jobid={jobid} file={item} />;
@@ -14,7 +14,6 @@ const ListFile = ({ jobid, file }: { jobid: number; file: DirectoryItem }) => (
     <a
       target="_blank"
       rel="noreferrer"
-      title="Archive of module"
       href={`/jobs/${jobid}/files/${file.path}`}
     >
       {file.name}
@@ -34,7 +33,7 @@ const ListDir = ({ jobid, dir }: { jobid: number; dir: DirectoryItem }) => (
   </details>
 );
 
-export const ListInputFiles = ({
+export const ListFiles = ({
   jobid,
   files,
 }: {

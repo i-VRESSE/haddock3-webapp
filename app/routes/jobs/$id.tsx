@@ -11,7 +11,7 @@ import { checkAuthenticated } from "~/models/user.server";
 import type { DirectoryItem } from "~/bartender-client";
 import { ListLogFiles } from "~/components/ListLogFiles";
 import { OutputReport } from "~/components/OutputReport";
-import { ListInputFiles } from "~/components/ListInputFiles";
+import { ListFiles } from "~/components/ListFiles";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = parseInt(params.id || "");
@@ -53,7 +53,7 @@ export default function JobPage() {
           {/* TODO allow to read input files when job is not completed */}
           <div>
             <h2 className="text-xl">Input</h2>
-            <ListInputFiles files={inputFiles!} jobid={job.id} />
+            <ListFiles files={inputFiles!} jobid={job.id} />
             <p>
               <a href={`/jobs/${job.id}/input.zip`}>
                 &#128230; Download archive

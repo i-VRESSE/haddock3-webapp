@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { DirectoryItem } from "~/bartender-client";
+import { ListFiles } from "./ListFiles";
 
 export function files2modules(files: DirectoryItem) {
   if (!files.children) {
@@ -63,8 +64,12 @@ export const OutputReport = ({
                   &#128230;
                 </a>
               </div>
-              {/* TODO do we want to show individual files for example output/15_caprieval/capri_clt.tsv? */}
             </div>
+            <details>
+              <summary>Files</summary>
+              {/* TODO should we hide io.json and params.cfg? */}
+              <ListFiles files={module.output} jobid={jobid} />
+            </details>
           </li>
         ))}
       </ul>

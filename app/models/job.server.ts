@@ -71,6 +71,9 @@ export async function listOutputFiles(jobid: number, accessToken: string) {
     const items = await api.retrieveJobDirectoriesFromPath({
       jobid,
       path: JOB_OUTPUT_DIR,
+      // user might have supplied deeper directory structure
+      // so can not browse past maxDepth,
+      // but can download archive with files at any depth
       maxDepth: 3,
     });
     return items;
