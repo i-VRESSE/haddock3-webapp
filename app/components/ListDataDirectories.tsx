@@ -16,20 +16,22 @@ export function ListDataDirectories({
     if (!dataRoot || !dataRoot.children) {
       return;
     }
-    return dataRoot.children
+    return dataRoot.children;
   }, [files]);
   return (
     <ul className="list-inside list-disc">
       {dataDirs?.map((d) => (
         <li key={d.path}>
-            <span>{d.name}</span>
-            <ul className="list-inside list-disc">
+          <span>{d.name}</span>
+          <ul className="list-inside list-disc">
             {d.children?.map((c) => (
-                <li className="ml-4" key={c.path}>
-                    <a target="_blank" rel="noreferrer" href={`${prefix}${c.path}`}>{c.name}</a>
-                </li>
+              <li className="ml-4" key={c.path}>
+                <a target="_blank" rel="noreferrer" href={`${prefix}${c.path}`}>
+                  {c.name}
+                </a>
+              </li>
             ))}
-            </ul>
+          </ul>
         </li>
       ))}
     </ul>

@@ -10,9 +10,5 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     throw new Error("Unauthenticated");
   }
 
-  return await getSubDirectoryAsArchive(
-    parseInt(job_id),
-    path,
-    accessToken
-  );
+  return await getSubDirectoryAsArchive(parseInt(job_id), path, accessToken);
 };

@@ -13,14 +13,15 @@ export function ListStepDirectories({
       return [];
     }
     const nonSteps = new Set(["analysis", "data", "log"]);
-    return files.children
-      .filter((i) => !nonSteps.has(i.name))
+    return files.children.filter((i) => !nonSteps.has(i.name));
   }, [files]);
   return (
     <ul className="list-inside list-disc">
       {steps.map((step) => (
         <li key={step.path}>
-          <a target="_blank" rel="noreferrer" href={`${prefix}${step.path}`}>&#128230; {step.name}</a>
+          <a target="_blank" rel="noreferrer" href={`${prefix}${step.path}`}>
+            &#128230; {step.name}
+          </a>
         </li>
       ))}
     </ul>

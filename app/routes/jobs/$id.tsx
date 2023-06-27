@@ -35,7 +35,7 @@ export default function JobPage() {
         </p>
         <p>Created on: {job.createdOn}</p>
         <p>Updated on: {job.updatedOn}</p>
-        <a href={`/jobs/${job.id}/zip`}>&#128230;  Download archive</a>
+        <a href={`/jobs/${job.id}/zip`}>&#128230; Download archive</a>
       </div>
       {CompletedJobs.has(job.state) && (
         <>
@@ -55,7 +55,9 @@ export default function JobPage() {
               {/* TODO list files mentioned in workflow config */}
             </ul>
             <p>
-              <a href={`/jobs/${job.id}/input.zip`}>&#128230; Download archive</a>
+              <a href={`/jobs/${job.id}/input.zip`}>
+                &#128230; Download archive
+              </a>
             </p>
             <p>
               <a href={`/jobs/${job.id}/edit`}>&#128393; Edit</a>
@@ -121,7 +123,9 @@ export default function JobPage() {
                 </a>
               </li>
             </ul>
-            <a href={`/jobs/${job.id}/output.zip`}>&#128230; Download archive</a>
+            <a href={`/jobs/${job.id}/output.zip`}>
+              &#128230; Download archive
+            </a>
           </div>
         </>
       )}
