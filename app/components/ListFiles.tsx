@@ -23,7 +23,7 @@ const ListFile = ({ jobid, file }: { jobid: number; file: DirectoryItem }) => (
 
 const ListDir = ({ jobid, dir }: { jobid: number; dir: DirectoryItem }) => (
   <details className="ml-2">
-    <summary>{dir.name}/</summary>
+    <summary className="cursor-pointer">{dir.name}/</summary>
     <ul className="list-inside list-disc">
       {dir.children &&
         dir.children.map((f) => {

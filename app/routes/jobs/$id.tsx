@@ -42,8 +42,8 @@ export default function JobPage() {
         <p>Updated on: {job.updatedOn}</p>
         <a href={`/jobs/${job.id}/zip`}>&#128230; Download archive</a>
         {CompletedJobs.has(job.state) && (
-          <details className="cursor-pointer">
-            <summary>Logs</summary>
+          <details>
+            <summary className="cursor-pointer">Logs</summary>
             <ListLogFiles jobid={job.id} />
           </details>
         )}
