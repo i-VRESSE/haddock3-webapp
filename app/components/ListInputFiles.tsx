@@ -11,10 +11,11 @@ const ListItem = ({ jobid, item }: { jobid: number; item: DirectoryItem }) => {
 
 const ListFile = ({ jobid, file }: { jobid: number; file: DirectoryItem }) => (
   <li className="ml-2">
+    {/* TODO pdb files could be displayed in a viewer like ngl */}
     <a
       target="_blank"
       rel="noreferrer"
-      title="Archive of step"
+      title="Archive of module"
       href={`/jobs/${jobid}/archive/${file.path}`}
     >
       {file.name}
