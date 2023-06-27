@@ -3,8 +3,6 @@ import { buildConfig } from "./config.server";
 import { BOOKKEEPINGFILES, JOB_OUTPUT_DIR } from "./constants";
 import { ResponseError } from "~/bartender-client";
 
-
-
 function buildJobApi(accessToken: string = "") {
   return new JobApi(buildConfig(accessToken));
 }
@@ -85,10 +83,7 @@ export async function listInputFiles(jobid: number, accessToken: string) {
       jobid,
       maxDepth: 3,
     });
-    const nonInputFiles = new Set([
-      ...BOOKKEEPINGFILES,
-      JOB_OUTPUT_DIR,
-    ]);
+    const nonInputFiles = new Set([...BOOKKEEPINGFILES, JOB_OUTPUT_DIR]);
     // TODO instead of filtering here add exclude parameter to bartender endpoint.
     items.children = items.children?.filter((c) => !nonInputFiles.has(c.name));
     return items;

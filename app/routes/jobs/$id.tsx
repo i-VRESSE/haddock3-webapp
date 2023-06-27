@@ -1,8 +1,11 @@
 import { json, type LoaderArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getAccessToken } from "~/token.server";
-import { WORKFLOW_CONFIG_FILENAME } from "~/models/constants";
-import { listOutputFiles, getJobById, listInputFiles } from "~/models/job.server";
+import {
+  listOutputFiles,
+  getJobById,
+  listInputFiles,
+} from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
 import { checkAuthenticated } from "~/models/user.server";
 import type { DirectoryItem } from "~/bartender-client";
@@ -50,7 +53,7 @@ export default function JobPage() {
           {/* TODO allow to read input files when job is not completed */}
           <div>
             <h2 className="text-xl">Input</h2>
-            <ListInputFiles files={inputFiles!} jobid={job.id}/>
+            <ListInputFiles files={inputFiles!} jobid={job.id} />
             <p>
               <a href={`/jobs/${job.id}/input.zip`}>
                 &#128230; Download archive

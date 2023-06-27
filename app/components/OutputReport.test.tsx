@@ -15,9 +15,7 @@ describe("files2modules", () => {
     expect(files2modules(item)).toEqual([]);
   });
 
-  it.each(
-    [["analysis"], ["data"], ["log"]],
-  )(
+  it.each([["analysis"], ["data"], ["log"]])(
     "should ignore %s as module",
     (thing: string) => {
       const item: DirectoryItem = {
