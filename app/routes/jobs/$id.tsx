@@ -1,12 +1,17 @@
 import { json, type LoaderArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getAccessToken } from "~/token.server";
-import { WORKFLOW_CONFIG_FILENAME } from "~/models/constants";
-import { listOutputFiles, getJobById } from "~/models/job.server";
+import {
+  listOutputFiles,
+  getJobById,
+  listInputFiles,
+} from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
 import { checkAuthenticated } from "~/models/user.server";
 import type { DirectoryItem } from "~/bartender-client";
-import { ListReportFiles } from "~/components/ListReportFiles";
+import { ListLogFiles } from "~/components/ListLogFiles";
+import { OutputReport } from "~/components/OutputReport";
+import { ListFiles } from "~/components/ListFiles";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = parseInt(params.id || "");
@@ -14,15 +19,17 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   checkAuthenticated(accessToken);
   const job = await getJobById(jobId, accessToken!);
   // TODO check if job belongs to user
+  let inputFiles: DirectoryItem | undefined = undefined;
   let outputFiles: DirectoryItem | undefined = undefined;
   if (CompletedJobs.has(job.state)) {
+    inputFiles = await listInputFiles(jobId, accessToken!);
     outputFiles = await listOutputFiles(jobId, accessToken!);
   }
-  return json({ job, outputFiles });
+  return json({ job, inputFiles, outputFiles });
 };
 
 export default function JobPage() {
-  const { job, outputFiles } = useLoaderData<typeof loader>();
+  const { job, outputFiles, inputFiles } = useLoaderData<typeof loader>();
   return (
     <main className="flex gap-16">
       <div>
@@ -33,68 +40,35 @@ export default function JobPage() {
         </p>
         <p>Created on: {job.createdOn}</p>
         <p>Updated on: {job.updatedOn}</p>
-        <a href={`/jobs/${job.id}/zip`}>Download archive</a>
+        <a href={`/jobs/${job.id}/zip`}>&#128230; Download archive</a>
+        {CompletedJobs.has(job.state) && (
+          <details>
+            <summary className="cursor-pointer">Logs</summary>
+            <ListLogFiles jobid={job.id} />
+          </details>
+        )}
       </div>
       {CompletedJobs.has(job.state) && (
         <>
           {/* TODO allow to read input files when job is not completed */}
           <div>
             <h2 className="text-xl">Input</h2>
-            <ul className="list-inside list-disc">
-              <li>
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`/jobs/${job.id}/files/${WORKFLOW_CONFIG_FILENAME}`}
-                >
-                  {WORKFLOW_CONFIG_FILENAME}
-                </a>
-              </li>
-              {/* TODO list files mentioned in workflow config */}
-            </ul>
+            <ListFiles files={inputFiles!} jobid={job.id} />
             <p>
-              <a href={`/jobs/${job.id}/input.zip`}>Download archive</a>
+              <a href={`/jobs/${job.id}/input.zip`}>
+                &#128230; Download archive
+              </a>
             </p>
             <p>
-              <a href={`/jobs/${job.id}/edit`}>Edit</a>
+              <a href={`/jobs/${job.id}/edit`}>&#128393; Edit</a>
             </p>
           </div>
           <div>
             <h2 className="text-xl">Output</h2>
-            <ListReportFiles
-              files={outputFiles!}
-              prefix={`/jobs/${job.id}/files/`}
-            />
-            <ul className="list-inside list-disc">
-              <li>
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`/jobs/${job.id}/stdout`}
-                >
-                  Stdout
-                </a>
-              </li>
-              <li>
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`/jobs/${job.id}/stderr`}
-                >
-                  Stderr
-                </a>
-              </li>
-              <li>
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`/jobs/${job.id}/files/output/log`}
-                >
-                  Haddock3 log
-                </a>
-              </li>
-            </ul>
-            <a href={`/jobs/${job.id}/output.zip`}>Download archive</a>
+            <OutputReport files={outputFiles!} jobid={job.id} />
+            <a href={`/jobs/${job.id}/output.zip`}>
+              &#128230; Download archive
+            </a>
           </div>
         </>
       )}
