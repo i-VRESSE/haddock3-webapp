@@ -16,7 +16,7 @@ const ListFile = ({ jobid, file }: { jobid: number; file: DirectoryItem }) => (
       target="_blank"
       rel="noreferrer"
       title="Archive of module"
-      href={`/jobs/${jobid}/archive/${file.path}`}
+      href={`/jobs/${jobid}/files/${file.path}`}
     >
       {file.name}
     </a>
