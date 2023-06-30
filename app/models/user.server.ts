@@ -69,7 +69,7 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
     state: search.get("state") || undefined,
     error: search.get("error") || undefined,
   };
-  let response: string;
+  let response: any;
   switch (provider) {
     case "github":
       response = await api.oauthGithubRemoteCallback(request);
@@ -86,8 +86,7 @@ export async function oauthCallback(provider: string, search: URLSearchParams) {
     default:
       throw new Error("Unknown provider");
   }
-  const body = JSON.parse(response);
-  return body.access_token;
+  return response.access_token;
 }
 
 export async function getLevel(
