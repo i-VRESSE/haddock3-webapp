@@ -1,33 +1,23 @@
-import { type ActionArgs, json, redirect } from "@remix-run/node";
+import type { LoaderArgs, ActionArgs } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
-import { localLogin } from "~/models/user.server";
-import { commitSession, setSession } from "~/session.server";
+import { authenticator } from "~/auth.server";
+
+// Finally, we can export a loader function where we check if the user is
+// authenticated with `authenticator.isAuthenticated` and redirect to the
+// dashboard if it is or return null if it's not
+export async function loader({ request }: LoaderArgs) {
+  // If the user is already authenticated redirect to /dashboard directly
+  const r= await authenticator.isAuthenticated(request, {
+    successRedirect: "/",
+  });
+  console.log(r)
+  return r
+};
 
 export async function action({ request }: ActionArgs) {
-  const formData = await request.formData();
-  const username = formData.get("username");
-  const password = formData.get("password");
-
-  if (typeof username !== "string" || typeof password !== "string") {
-    return json(
-      {
-        errors: {
-          username: "Email is required",
-          password: "Password is required",
-        },
-      },
-      { status: 400 }
-    );
-  }
-
-  const access_token = await localLogin(username, password);
-  const session = await setSession(access_token, request);
-
-  return redirect("/", {
-    headers: {
-      "Set-Cookie": await commitSession(session),
-    },
-  });
+  const r = await authenticator.authenticate("user-pass", request);
+  console.log(r)
+  return r
 }
 
 export default function LoginPage() {
@@ -47,11 +37,12 @@ export default function LoginPage() {
         <label>
           <p>Email</p>
           <input
-            id="username"
-            name="username"
+            id="email"
+            name="email"
             type="email"
             autoComplete="email"
             className={inputStyle}
+            required
           />
         </label>
         <label>
@@ -62,6 +53,7 @@ export default function LoginPage() {
             type="password"
             autoComplete="current-password"
             className={inputStyle}
+            required
           />
         </label>
         <button type="submit" className={buttonStyle}>

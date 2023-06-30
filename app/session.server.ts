@@ -23,7 +23,7 @@ const sessionCookie = createCookie(COOKIE_NAME, {
   secure: process.env.NODE_ENV === "production",
 });
 
-const sessionStorage = createFileSessionStorage<SessionData, SessionFlashData>({
+export const sessionStorage = createFileSessionStorage<SessionData, SessionFlashData>({
   cookie: sessionCookie,
   dir: "./sessions",
 });
