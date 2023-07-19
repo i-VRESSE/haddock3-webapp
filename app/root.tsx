@@ -1,6 +1,5 @@
 import {
   json,
-  redirect,
   type LinksFunction,
   type LoaderArgs,
   type MetaFunction,
@@ -15,9 +14,8 @@ import {
 } from "@remix-run/react";
 
 import { Navbar } from "~/components/Navbar";
-import { getSession } from "./session.server";
-import { isExpired } from "./token.server";
 import styles from "./tailwind.css";
+import { authenticator } from "./auth.server";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -28,15 +26,10 @@ export const meta: MetaFunction = () => ({
 });
 
 export async function loader({ request }: LoaderArgs) {
-  const session = await getSession(request);
-
-  const accessToken = session.data.bartenderToken;
-  if (isExpired(accessToken) && new URL(request.url).pathname !== "/login") {
-    return redirect("/login");
-  }
+  const user = await authenticator.isAuthenticated(request);
   return json({
-    isAuthenticated: accessToken !== undefined,
-    isSuperUser: session.data.isSuperUser,
+    isAuthenticated: user !== null,
+    isSuperUser: true, // TODO store this in db
   });
 }
 

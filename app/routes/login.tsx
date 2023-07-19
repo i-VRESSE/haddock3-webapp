@@ -7,17 +7,16 @@ import { authenticator } from "~/auth.server";
 // dashboard if it is or return null if it's not
 export async function loader({ request }: LoaderArgs) {
   // If the user is already authenticated redirect to /dashboard directly
-  const r= await authenticator.isAuthenticated(request, {
+  return await authenticator.isAuthenticated(request, {
     successRedirect: "/",
   });
-  console.log(r)
-  return r
 };
 
 export async function action({ request }: ActionArgs) {
-  const r = await authenticator.authenticate("user-pass", request);
-  console.log(r)
-  return r
+  return await authenticator.authenticate("user-pass", request, {
+    successRedirect: "/",
+    failureRedirect: "/login",
+  });
 }
 
 export default function LoginPage() {
