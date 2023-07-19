@@ -2,6 +2,8 @@ import { RolesApi } from "~/bartender-client";
 import { UsersApi } from "~/bartender-client";
 import { AuthApi } from "~/bartender-client/apis/AuthApi";
 import { buildConfig } from "./config.server";
+import { db } from "~/utils/db.server";
+import { compare, hash } from "bcryptjs";
 
 function buildAuthApi(accessToken: string = "") {
   return new AuthApi(buildConfig(accessToken));
@@ -16,22 +18,36 @@ function buildRolesApi(accessToken: string) {
 }
 
 export async function register(email: string, password: string) {
-  const api = buildAuthApi();
-  return await api.registerRegister({
-    userCreate: {
-      email,
-      password,
+  const passwordHash = await hash(password, 10);
+  return db.user.create({
+    data: {
+      email,      
+      passwordHash,
     },
+    select: {
+      id: true,
+      email: true,
+    }
   });
 }
 
-export async function localLogin(username: string, password: string) {
-  const api = buildAuthApi();
-  const response = await api.authLocalLogin({
-    username,
-    password,
+export async function localLogin(email: string, password: string) {
+  const user = await db.user.findUnique({
+    where: {
+      email: email,
+    },
   });
-  return response.accessToken;
+  if (!user) {
+    throw new Error("User not found");
+  }
+  const isValid = await compare(password, user.passwordHash);
+  if (!isValid) {
+    throw new Error("Wrong password");
+  }
+  return {
+    id: user.id,
+    email: user.email,
+  }
 }
 
 export async function getProfile(accessToken: string) {

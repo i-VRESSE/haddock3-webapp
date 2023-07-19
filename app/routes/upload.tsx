@@ -14,10 +14,14 @@ import {
 } from "~/models/user.server";
 import { getSession } from "~/session.server";
 import { WORKFLOW_CONFIG_FILENAME } from "~/models/constants";
+import { authenticator } from "~/auth.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
-  const session = await getSession(request);
-  checkAuthenticated(session.data.bartenderToken);
+  let user = await authenticator.isAuthenticated(request);
+  if (!user) {
+    return redirect("/login");
+  }
+  // TODO get roles of current user
   const level = await getLevel(session.data.roles);
   if (!isSubmitAllowed(level)) {
     throw new Error("Forbidden");
@@ -33,6 +37,7 @@ export const action = async ({ request }: ActionArgs) => {
     throw new Error("Bad upload");
   }
   const session = await getSession(request);
+  // TODO fetch token for user
   const accessToken = session.data.bartenderToken;
   checkAuthenticated(accessToken);
   const level = await getLevel(session.data.roles);

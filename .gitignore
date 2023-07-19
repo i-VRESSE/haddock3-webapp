@@ -11,3 +11,5 @@ node_modules
 
 /sessions
 /coverage
+
+/prisma/dev.db

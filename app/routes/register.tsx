@@ -5,8 +5,9 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
+import { authenticator } from "~/auth.server";
 import { localLogin, register } from "~/models/user.server";
-import { commitSession, setSession } from "~/session.server";
+import { commitSession, getSession, setSession } from "~/session.server";
 
 export async function loader({ request }: LoaderArgs) {
   // TODO check already logged in
@@ -28,16 +29,12 @@ export async function action({ request }: ActionArgs) {
       { status: 400 }
     );
   }
-  await register(username, password);
-
-  const access_token = await localLogin(username, password);
-  const session = await setSession(access_token, request);
-
-  return redirect("/", {
-    headers: {
-      "Set-Cookie": await commitSession(session),
-    },
-  });
+  const user = await register(username, password);
+  // Make just registered user logged in
+  const session = await getSession(request.headers.get("cookie"));
+  session.set(authenticator.sessionKey, user);
+  let headers = new Headers({ "Set-Cookie": await commitSession(session) });
+  return redirect("/", { headers });
 }
 
 export default function RegisterPage() {
@@ -74,6 +71,7 @@ export default function RegisterPage() {
             className={inputStyle}
           />
         </label>
+        {/* TODO add password confirmation */}
         <button type="submit" className={buttonStyle}>
           Register
         </button>
