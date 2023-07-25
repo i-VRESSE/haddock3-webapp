@@ -40,7 +40,7 @@ export async function localLogin(email: string, password: string) {
   if (!user) {
     throw new Error("User not found");
   }
-  const isValid = await compare(password, user.passwordHash);
+  const isValid = await compare(password, user.passwordHash || '');
   if (!isValid) {
     throw new Error("Wrong password");
   }
