@@ -16,6 +16,7 @@ import {
 import { Navbar } from "~/components/Navbar";
 import styles from "./tailwind.css";
 import { authenticator } from "./auth.server";
+import { getUserById } from "./models/user.server";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -26,11 +27,12 @@ export const meta: MetaFunction = () => ({
 });
 
 export async function loader({ request }: LoaderArgs) {
-  const user = await authenticator.isAuthenticated(request);
-  return json({
-    isAuthenticated: user !== null,
-    isSuperUser: true, // TODO store this in db
-  });
+  const userId = await authenticator.isAuthenticated(request);
+  if (userId === null) {
+    return json({ user: null });
+  }
+  const user = await getUserById(userId);
+  return json({ user });
 }
 
 export default function App() {

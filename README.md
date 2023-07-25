@@ -22,6 +22,17 @@ sequenceDiagram
 
 - [Remix Docs](https://remix.run/docs)
 
+## Setup
+
+```shell
+npm install
+cp .env.example .env
+npx prisma db push
+npx prisma db seed
+```
+
+First user that registers is a admin user.
+
 ## Development
 
 From your terminal:
@@ -151,16 +162,17 @@ npm start
 
 ### Social login
 
-To enable GitHub or Orcid or EGI Check-in login the bartender web service needs following environment variables.
+To enable GitHub or Orcid or EGI Check-in login the web apps needs following environment variables.
 
 ```shell
-BARTENDER_GITHUB_REDIRECT_URL="http://localhost:3000/auth/github/callback"
-BARTENDER_ORCIDSANDBOX_REDIRECT_URL="http://localhost:3000/auth/orcidsandbox/callback"
-BARTENDER_ORCID_REDIRECT_URL="http://localhost:3000/auth/orcid/callback"
-BARTENDER_EGI_REDIRECT_URL="http://localhost:3000/auth/egi/callback"
+HADDOCK3WEBAPP_GITHUB_CLIENT_ID=...
+HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET=...
+HADDOCK3WEBAPP_GITHUB_CALLBACK_URL=http://localhost:3000/auth/github/callback
 ```
 
-Where `http://localhost:3000` is the URL where the Remix run app is running.
+The environment variables can also be stored in a `.env` file.
+
+Only use social logins where the email address has been verified.
 
 ## Haddock3 application
 

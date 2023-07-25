@@ -1,29 +1,17 @@
-import type { UserAsListItem } from "~/bartender-client";
+import type { User } from "~/models/user.server";
 
 interface IProps {
-  user: UserAsListItem;
+  user: User;
   roles: string[];
   onUpdate: (data: FormData) => void;
   submitting: boolean;
 }
 
 export const UserTableRow = ({ user, roles, onUpdate, submitting }: IProps) => {
+  const userRoles = user.roles.map((r) => r.name);
   return (
     <tr>
       <td>{user.email}</td>
-      <td>
-        <input
-          type="checkbox"
-          checked={user.isSuperuser}
-          className="checkbox"
-          disabled={submitting}
-          onChange={() => {
-            const data = new FormData();
-            data.set("isSuperuser", user.isSuperuser ? "false" : "true");
-            onUpdate(data);
-          }}
-        />
-      </td>
       <td>
         <ul className="flex">
           {roles.map((role) => {
@@ -34,14 +22,14 @@ export const UserTableRow = ({ user, roles, onUpdate, submitting }: IProps) => {
                     <span className="label-text">{role}</span>
                     <input
                       type="checkbox"
-                      checked={user.roles.includes(role)}
+                      checked={userRoles.includes(role)}
                       className="checkbox ml-2"
                       disabled={submitting}
                       onChange={() => {
                         const data = new FormData();
                         data.set(
                           role,
-                          user.roles.includes(role) ? "false" : "true"
+                          userRoles.includes(role) ? "false" : "true"
                         );
                         onUpdate(data);
                       }}

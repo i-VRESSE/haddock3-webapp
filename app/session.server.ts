@@ -1,11 +1,8 @@
-import {
-  createCookieSessionStorage,
-} from "@remix-run/node";
+import { createCookieSessionStorage } from "@remix-run/node";
 
 const COOKIE_NAME = "haddock3_webapp_session";
 
 export const sessionStorage = createCookieSessionStorage({
-  // TODO add secret + domain + path
   cookie: {
     name: COOKIE_NAME,
     httpOnly: true,

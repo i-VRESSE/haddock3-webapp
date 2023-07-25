@@ -9,16 +9,15 @@ import { action } from "~/routes/builder";
 import { useLoaderData } from "@remix-run/react";
 import { ClientOnly } from "~/components/ClientOnly";
 import { getJobById } from "~/models/job.server";
+import { getUser } from "~/auth.server";
+import { getAccessToken } from "~/bartender_token.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = params.id || "";
-  const session = await getSession(request);
-  const level = await getLevel(session.data.roles);
-  if (level === "") {
-    throw new Error("Unauthenticated");
-  }
+  const user = await getUser(request);
+  const level = await getLevel(user ? user.roles.map(r => r.name) : undefined);
   const catalog = await getCatalog(level);
-  const accessToken = session.data.bartenderToken;
+  const accessToken = await getAccessToken(request)
   // Check that user can see job, otherwise throw 404
   await getJobById(parseInt(jobId), accessToken!);
   // return same shape as loader in ~/routes/builder.tsx

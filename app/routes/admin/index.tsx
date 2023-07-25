@@ -1,16 +1,10 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";
-import { checkAuthenticated } from "~/models/user.server";
-import { getSession } from "~/session.server";
+import { mustBeAdmin } from "~/auth.server";
 
 export async function loader({ request }: LoaderArgs) {
-  const session = await getSession(request);
-  const accessToken = session.data.bartenderToken;
-  checkAuthenticated(accessToken);
-  if (!session.data.isSuperUser) {
-    throw new Error("Forbidden");
-  }
+  await mustBeAdmin(request);
   return json({});
 }
 

@@ -1,5 +1,5 @@
 import { type LoaderArgs } from "@remix-run/node";
-import { getAccessToken } from "~/token.server";
+import { getAccessToken } from "~/bartender_token.server";
 import { getSubDirectoryAsArchive } from "~/models/job.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {

@@ -1,8 +1,10 @@
-* [ ] store private key for making bartender tokens
-* [ ] use remix auth for local users with remix-auth-form
-* [ ] use remix-auth-oauth2 for
-    * [ ] github
-    * [ ] orcid sandbox
-    * [ ] orcid prod
-    * [ ] egi-checkin
-* [ ] associate local user with oauth account aka mail matching
+- [ ] store private key for making bartender tokens
+- [x] use remix auth for local users with remix-auth-form
+- [ ] use remix-auth-oauth2 for
+  - [x] github
+  - [ ] orcid sandbox
+  - [ ] orcid prod
+  - [ ] egi-checkin
+- [x] associate local user with oauth account aka mail matching
+- [ ] dont generate bartender token every time, but store/fetch from db
+- [ ] store users in postgresql instead of sqlite

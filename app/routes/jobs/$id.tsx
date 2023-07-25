@@ -1,6 +1,6 @@
 import { json, type LoaderArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { getAccessToken } from "~/token.server";
+import { getAccessToken } from "~/bartender_token.server";
 import {
   listOutputFiles,
   getJobById,

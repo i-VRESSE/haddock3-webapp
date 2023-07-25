@@ -1,16 +1,21 @@
-import type { LoaderArgs, ActionArgs } from "@remix-run/node";
-import { Form, Link } from "@remix-run/react";
-import { authenticator } from "~/auth.server";
+import {
+  type LoaderArgs,
+  type ActionArgs,
+  redirect,
+  json,
+} from "@remix-run/node";
+import { Form, Link, useLoaderData } from "@remix-run/react";
+import { availableSocialLogins } from "~/auth";
+import { authenticator, getUser } from "~/auth.server";
 
-// Finally, we can export a loader function where we check if the user is
-// authenticated with `authenticator.isAuthenticated` and redirect to the
-// dashboard if it is or return null if it's not
 export async function loader({ request }: LoaderArgs) {
-  // If the user is already authenticated redirect to /dashboard directly
-  return await authenticator.isAuthenticated(request, {
-    successRedirect: "/",
-  });
-};
+  const user = await getUser(request);
+  if (user) {
+    return redirect("/");
+  }
+  const socials = availableSocialLogins();
+  return json({ socials });
+}
 
 export async function action({ request }: ActionArgs) {
   return await authenticator.authenticate("user-pass", request, {
@@ -20,6 +25,7 @@ export async function action({ request }: ActionArgs) {
 }
 
 export default function LoginPage() {
+  const { socials } = useLoaderData<typeof loader>();
   // Shared style between login and register. Extract if we use it more often?
   const centeredColumn = "flex flex-col items-center gap-4";
   const formStyle =
@@ -68,38 +74,41 @@ export default function LoginPage() {
 
       {/* Social buttons */}
       <h2 className="text-lg font-semibold">Other login methods</h2>
-      {/* TODO only show buttons for enabled providers
-          by checking http://localhost:8000/api/openapi.json */}
       <div className="space-evenly flex gap-4">
-        <form method="post" action="/auth/github/authorize">
-          <button type="submit" className="btn h-auto">
-            <img
-              height="32"
-              width="32"
-              src="github-fill.svg"
-              alt="GitHub logo"
-            />
-            <p className="px-2">GitHub</p>
-          </button>
-        </form>
-        <form method="post" action="/auth/orcidsandbox/authorize">
-          <button type="submit" className="btn h-auto">
-            <img height="32" width="32" src="orcid.png" alt="ORCID logo" />
-            <p className="px-2">ORCID sandbox</p>
-          </button>
-        </form>
-        <form method="post" action="/auth/orcid/authorize">
-          <button type="submit" className="btn h-auto">
-            <img height="32" width="32" src="orcid.png" alt="ORCID logo" />
-            <p className="px-2">ORCID</p>
-          </button>
-        </form>
-        <form method="post" action="/auth/egi/authorize">
-          <button type="submit" className="btn h-auto">
-            <img height="32" width="32" src="egi.svg" alt="EGI Check-in logo" />
-            <p className="px-2">EGI Check-in</p>
-          </button>
-        </form>
+        {socials.includes("github") && (
+          <form method="post" action="/auth/github/authorize">
+            <button type="submit" className="btn h-auto">
+              <img
+                height="32"
+                width="32"
+                src="github-fill.svg"
+                alt="GitHub logo"
+              />
+              <p className="px-2">GitHub</p>
+            </button>
+          </form>
+        )}
+        {socials.includes("orcid") && (
+          <form method="post" action="/auth/orcid/authorize">
+            <button type="submit" className="btn h-auto">
+              <img height="32" width="32" src="orcid.png" alt="ORCID logo" />
+              <p className="px-2">ORCID</p>
+            </button>
+          </form>
+        )}
+        {socials.includes("egi") && (
+          <form method="post" action="/auth/egi/authorize">
+            <button type="submit" className="btn h-auto">
+              <img
+                height="32"
+                width="32"
+                src="egi.svg"
+                alt="EGI Check-in logo"
+              />
+              <p className="px-2">EGI Check-in</p>
+            </button>
+          </form>
+        )}
       </div>
     </main>
   );

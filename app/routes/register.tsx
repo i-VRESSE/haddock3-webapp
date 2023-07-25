@@ -6,8 +6,8 @@ import {
 } from "@remix-run/node";
 import { Form, Link } from "@remix-run/react";
 import { authenticator } from "~/auth.server";
-import { localLogin, register } from "~/models/user.server";
-import { commitSession, getSession, setSession } from "~/session.server";
+import { register } from "~/models/user.server";
+import { commitSession, getSession } from "~/session.server";
 
 export async function loader({ request }: LoaderArgs) {
   // TODO check already logged in
@@ -32,7 +32,7 @@ export async function action({ request }: ActionArgs) {
   const user = await register(username, password);
   // Make just registered user logged in
   const session = await getSession(request.headers.get("cookie"));
-  session.set(authenticator.sessionKey, user);
+  session.set(authenticator.sessionKey, user.id);
   let headers = new Headers({ "Set-Cookie": await commitSession(session) });
   return redirect("/", { headers });
 }

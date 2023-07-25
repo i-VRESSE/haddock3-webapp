@@ -1,34 +1,32 @@
 import { json, type LoaderArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
-import { getTokenPayload } from "~/token.server";
-import { checkAuthenticated, getLevel, getProfile } from "~/models/user.server";
-import { getSession } from "~/session.server";
+import { Link } from "@remix-run/react";
 import { authenticator } from "~/auth.server";
+import { useUser } from "~/auth";
 
 export const loader = async ({ request }: LoaderArgs) => {
-  let user = await authenticator.isAuthenticated(request, {
+  await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
-  return json({ user });
+  return json({});
 };
 
 export default function JobPage() {
-  const { user } = useLoaderData<typeof loader>();
+  const user = useUser();
   return (
     <main>
       <p>Email: {user.email}</p>
-      {/* <p>Expertise level: {level}</p>
       <p>
-        OAuth accounts:
-        <ul>
-          {profile.oauthAccounts.map((a) => (
-            <li key={a.accountId}>
-              {a.oauthName}: {a.accountEmail}
-            </li>
-          ))}
-        </ul>
+        Roles:&nbsp;
+        {user.roles.length ? (
+          <ul className="list-inside list-disc">
+            {user.roles.map((role) => (
+              <li key={role.name}>{role.name}</li>
+            ))}
+          </ul>
+        ) : (
+          <span>None</span>
+        )}
       </p>
-      <p>Login expires: {new Date(expireDate).toISOString()}</p> */}
       <Link role="button" className="btn btn-sm" to="/logout">
         Logout
       </Link>

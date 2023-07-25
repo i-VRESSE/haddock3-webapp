@@ -1,34 +1,49 @@
-import { RolesApi } from "~/bartender-client";
-import { UsersApi } from "~/bartender-client";
-import { AuthApi } from "~/bartender-client/apis/AuthApi";
-import { buildConfig } from "./config.server";
 import { db } from "~/utils/db.server";
 import { compare, hash } from "bcryptjs";
 
-function buildAuthApi(accessToken: string = "") {
-  return new AuthApi(buildConfig(accessToken));
+export interface User {
+  readonly id: string;
+  readonly email: string;
+  readonly roles: {
+    readonly name: string;
+  }[];
 }
 
-function buildUsersApi(accessToken: string) {
-  return new UsersApi(buildConfig(accessToken));
-}
-
-function buildRolesApi(accessToken: string) {
-  return new RolesApi(buildConfig(accessToken));
-}
+const userSelect = {
+  id: true,
+  email: true,
+  roles: {
+    select: {
+      name: true,
+    },
+  },
+} as const;
 
 export async function register(email: string, password: string) {
+  const roles = await firstUserShouldBeAdmin();
   const passwordHash = await hash(password, 10);
-  return db.user.create({
+  const user = await db.user.create({
     data: {
-      email,      
+      email,
+      roles,
       passwordHash,
     },
-    select: {
-      id: true,
-      email: true,
-    }
+    select: userSelect,
   });
+  return user;
+}
+
+async function firstUserShouldBeAdmin() {
+  const userCount = await db.user.count();
+  const roles =
+    userCount === 0
+      ? {
+          connect: {
+            name: "admin",
+          },
+        }
+      : undefined;
+  return roles;
 }
 
 export async function localLogin(email: string, password: string) {
@@ -36,73 +51,79 @@ export async function localLogin(email: string, password: string) {
     where: {
       email: email,
     },
+    select: {
+      ...userSelect,
+      passwordHash: true,
+    },
   });
   if (!user) {
     throw new Error("User not found");
   }
-  const isValid = await compare(password, user.passwordHash || '');
+  const { passwordHash, ...userWithoutPasswordHash } = user;
+  const isValid = await compare(password, user.passwordHash || "");
   if (!isValid) {
     throw new Error("Wrong password");
   }
-  return {
-    id: user.id,
-    email: user.email,
-  }
+
+  return userWithoutPasswordHash;
 }
 
-export async function getProfile(accessToken: string) {
-  const api = buildUsersApi(accessToken);
-  return await api.profile();
+export async function oauthregister(email: string) {
+  const roles = await firstUserShouldBeAdmin();
+  const user = await db.user.upsert({
+    where: {
+      email: email,
+    },
+    create: {
+      email: email,
+      roles,
+    },
+    update: {},
+    select: {
+      id: true,
+    },
+  });
+  return user.id;
 }
 
-export async function oauthAuthorize(provider: string) {
-  const api = buildAuthApi();
-  let url: string;
-  switch (provider) {
-    case "github":
-      url = (await api.oauthGithubRemoteAuthorize()).authorizationUrl;
-      break;
-    case "orcid":
-      url = (await api.oauthOrcidOrgRemoteAuthorize()).authorizationUrl;
-      break;
-    case "orcidsandbox":
-      url = (await api.oauthSandboxOrcidOrgRemoteAuthorize()).authorizationUrl;
-      break;
-    case "egi":
-      url = (await api.oauthEGICheckInRemoteAuthorize()).authorizationUrl;
-      break;
-    default:
-      throw new Error("Unknown provider");
+export async function getUserById(userId: string) {
+  const user = await db.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: userSelect,
+  });
+  if (!user) {
+    throw new Error("User not found");
   }
-  return url;
+  return user;
 }
 
-export async function oauthCallback(provider: string, search: URLSearchParams) {
-  const api = buildAuthApi();
-  const request = {
-    code: search.get("code") || undefined,
-    codeVerifier: search.get("code_verifier") || undefined,
-    state: search.get("state") || undefined,
-    error: search.get("error") || undefined,
-  };
-  let response: any;
-  switch (provider) {
-    case "github":
-      response = await api.oauthGithubRemoteCallback(request);
-      break;
-    case "orcid":
-      response = await api.oauthOrcidOrgRemoteCallback(request);
-      break;
-    case "orcidsandbox":
-      response = await api.oauthSandboxOrcidOrgRemoteCallback(request);
-      break;
-    case "egi":
-      response = await api.oauthEGICheckInRemoteCallback(request);
-      break;
-    default:
-      throw new Error("Unknown provider");
+export async function getUserByEmail(email: string) {
+  const user = await db.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: userSelect,
+  });
+  if (!user) {
+    throw new Error("User not found");
   }
-  return response.access_token;
+  return user;
+}
+
+export async function verifyIsAdmin(userId: string) {
+  const result = await db.user.findUnique({
+    where: {
+      id: userId,
+      roles: {
+        some: {
+          name: "admin",
+        },
+      },
+    },
+  });
+  return !!result;
 }
 
 export async function getLevel(
@@ -132,55 +153,59 @@ export function isSubmitAllowed(level: string) {
   return level !== "";
 }
 
-export async function getCurrentUser(accessToken: string) {
-  const api = buildUsersApi(accessToken);
-  return await api.usersCurrentUser();
+export async function listUsers(limit = 100, offset = 0) {
+  const users = await db.user.findMany({
+    select: userSelect,
+    take: limit,
+    skip: offset,
+  });
+  return users;
 }
 
-export async function listUsers(accessToken: string, limit = 100, offset = 0) {
-  const api = buildUsersApi(accessToken);
-  return await api.listUsers({ limit, offset });
+export async function listRoles() {
+  const roles = await db.role.findMany({
+    select: {
+      name: true,
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+  return roles.map((role) => role.name);
 }
 
-export async function listRoles(accessToken: string) {
-  const api = buildRolesApi(accessToken);
-  return await api.listRoles();
-}
-
-export async function setSuperUser(
-  accessToken: string,
-  userId: string,
-  checked: boolean
-) {
-  const api = buildUsersApi(accessToken);
-  return await api.usersPatchUser({
-    id: userId,
-    userUpdate: {
-      isSuperuser: checked,
+export async function assignRole(userId: string, roleId: string) {
+  await db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      roles: {
+        connect: {
+          name: roleId,
+        },
+      },
+    },
+    select: {
+      id: true,
     },
   });
 }
 
-export async function assignRole(
-  accessToken: string,
-  userId: string,
-  roleId: string
-) {
-  const api = buildRolesApi(accessToken);
-  api.assignRoleToUser({
-    userId,
-    roleId,
-  });
-}
-
-export async function unassignRole(
-  accessToken: string,
-  userId: string,
-  roleId: string
-) {
-  const api = buildRolesApi(accessToken);
-  api.unassignRoleFromUser({
-    userId,
-    roleId,
+export async function unassignRole(userId: string, roleId: string) {
+  await db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      roles: {
+        disconnect: {
+          name: roleId,
+        },
+      },
+    },
+    select: {
+      id: true,
+    },
   });
 }
