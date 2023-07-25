@@ -1,13 +1,10 @@
-import { type ActionArgs, type LoaderArgs, redirect, json } from "@remix-run/node";
+import { type ActionArgs, type LoaderArgs, redirect } from "@remix-run/node";
 
 import { getCatalog } from "~/catalogs/index.server";
 import { Haddock3WorkflowBuilder } from "~/components/Haddock3/Form.client";
 import { haddock3Styles } from "~/components/Haddock3/styles";
 import { submitJob } from "~/models/applicaton.server";
-import {
-  getLevel,
-  isSubmitAllowed,
-} from "~/models/user.server";
+import { getLevel, isSubmitAllowed } from "~/models/user.server";
 import { type ICatalog } from "@i-vresse/wb-core/dist/types";
 import { ClientOnly } from "~/components/ClientOnly";
 import { getUser } from "~/auth.server";
@@ -21,7 +18,9 @@ export const loader = async ({
   archive: string | undefined;
 }> => {
   const user = await getUser(request);
-  const level = await getLevel(user ? user.roles.map(r => r.name) : undefined);
+  const level = await getLevel(
+    user ? user.roles.map((r) => r.name) : undefined
+  );
   // When user does not have a level he/she
   // can still use builder with easy level
   // but cannot submit only download
@@ -37,7 +36,7 @@ export const action = async ({ request }: ActionArgs) => {
     throw new Error("Bad upload");
   }
 
-  const accessToken = await getAccessToken(request)
+  const accessToken = await getAccessToken(request);
   const job = await submitJob(upload, accessToken!);
   const job_url = `/jobs/${job.id}`;
   return redirect(job_url);
