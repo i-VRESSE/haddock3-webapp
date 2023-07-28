@@ -1,4 +1,4 @@
-import { Authenticator } from "remix-auth";
+import { Authenticator, StrategyVerifyCallback } from "remix-auth";
 import {
   type GitHubEmails,
   GitHubStrategy,
@@ -14,6 +14,8 @@ import {
   localLogin,
   oauthregister,
 } from "./models/user.server";
+import { OAuth2Profile, OAuth2Strategy, OAuth2StrategyVerifyParams } from "remix-auth-oauth2";
+import { KeycloakExtraParams, KeycloakProfile, KeycloakStrategy } from "remix-auth-keycloak";
 
 // Create an instance of the authenticator, pass a generic with what
 // strategies will return and will store in the session
@@ -76,7 +78,7 @@ if (
   process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID &&
   process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET
 ) {
-  let gitHubStrategy = new GitHubStrategyWithVerifiedEmail(
+  const gitHubStrategy = new GitHubStrategyWithVerifiedEmail(
     {
       clientID: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID,
       clientSecret: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET!,
@@ -95,6 +97,153 @@ if (
 
   authenticator.use(gitHubStrategy);
 }
+
+if (
+  process.env.HADDOCK3WEBAPP_ORCID_CLIENT_ID &&
+  process.env.HADDOCK3WEBAPP_ORCID_CLIENT_SECRET
+) {
+
+
+  interface OrcidOptions {
+    clientID: string;
+    clientSecret: string;
+    callbackURL: string;
+    isSandBox: boolean;
+  }
+
+  class OrcidStrategy<User> extends OAuth2Strategy<User, OAuth2Profile> {
+    name = 'orcid'
+    private profileEndpoint: string;
+    private emailsEndpoint: string;
+    constructor(
+      options: OrcidOptions,
+      verify: StrategyVerifyCallback<
+        User,
+        OAuth2StrategyVerifyParams<OAuth2Profile>
+      >
+    ) {
+      const domain = options.isSandBox ? "sandbox.oexid.org" : "orcid.org"
+      const AUTHORIZE_ENDPOINT = `https://${domain}/oauth/authorize`
+      const ACCESS_TOKEN_ENDPOINT = `https://${domain}/oauth/token`
+      const PROFILE_ENDPOINT = `https://${domain}/oauth/userinfo`
+      const EMAILS_ENDPOINT = `https://pub.${domain}/v3.0/{id}/email`
+      super({
+        clientID: options.clientID,
+        clientSecret: options.clientSecret,
+        callbackURL: options.callbackURL,
+        authorizationURL: AUTHORIZE_ENDPOINT,
+        tokenURL: ACCESS_TOKEN_ENDPOINT,
+
+      }, verify);
+      this.profileEndpoint = PROFILE_ENDPOINT;
+      this.emailsEndpoint = EMAILS_ENDPOINT;
+    }
+
+    protected authorizationParams() {
+      return new URLSearchParams({
+        scope: 'openid',
+      });
+    }
+
+    protected async userEmails(orcid: string) {
+      const emailsResponse = await fetch(
+        this.emailsEndpoint.replace('{id}', orcid),
+        {
+          headers: {
+            Accept: "application/orcid+json",
+          }
+        }
+      )
+      const emails: { email: { email: string }[] } = await emailsResponse.json()
+      if (!emails.email) {
+        throw new Error('No public email found.')
+      }
+      return emails.email.map(e => ({ value: e.email }))
+    }
+
+    protected async userProfile(accessToken: string): Promise<OAuth2Profile> {
+      const headers = {
+        Authorization: `Bearer ${accessToken}`,
+      }
+      const profileResponse = await fetch(this.profileEndpoint, { headers })
+      const profile = await profileResponse.json()
+      const emails = await this.userEmails(profile.sub)
+      return {
+        ...profile,
+        emails
+      }
+    }
+  }
+
+  const orcidStrategy = new OrcidStrategy({
+    clientID: process.env.HADDOCK3WEBAPP_ORCID_CLIENT_ID,
+    clientSecret: process.env.HADDOCK3WEBAPP_ORCID_CLIENT_SECRET!,
+    callbackURL: process.env.HADDOCK3WEBAPP_ORCID_CALLBACK_URL || "http://localhost:3000/auth/orcid/callback",
+    isSandBox: !!process.env.HADDOCK3WEBAPP_ORCID_SANDBOX,
+  }, async ({ profile }) => {
+    const primaryEmail = profile.emails![0].value;
+    const userId = await oauthregister(primaryEmail);
+    return userId;
+  })
+
+  authenticator.use(orcidStrategy);
+}
+
+if (
+  process.env.HADDOCK3WEBAPP_EGI_CLIENT_ID &&
+  process.env.HADDOCK3WEBAPP_EGI_CLIENT_SECRET
+) {
+  interface EgiOptions {
+    clientID: string;
+    clientSecret: string;
+    callbackURL: string;
+    environment: 'production' | 'development' | 'demo'
+  }
+
+  class EgiStrategy<User> extends KeycloakStrategy<User> {
+    name = 'egi'
+
+    constructor(
+      options: EgiOptions,
+      verify: StrategyVerifyCallback<
+        User,
+        OAuth2StrategyVerifyParams<KeycloakProfile, KeycloakExtraParams>
+      >
+    ) {
+
+      const domain = {
+        production: 'aai.egi.eu',
+        development: 'aai-dev.egi.eu',
+        demo: 'aai-demoegi.eu',
+      }[options.environment]
+      super({
+        clientID: options.clientID,
+        clientSecret: options.clientSecret,
+        callbackURL: options.callbackURL,
+        domain,
+        realm: 'egi',
+        useSSL: true,
+      }, verify);
+    }
+  }
+
+  const egiStrategy = new EgiStrategy(
+    {
+      clientID: process.env.HADDOCK3WEBAPP_EGI_CLIENT_ID,
+      clientSecret: process.env.HADDOCK3WEBAPP_EGI_CLIENT_SECRET!,
+      callbackURL: process.env.HADDOCK3WEBAPP_EGI_CALLBACK_URL || "http://localhost:3000/auth/egi/callback",
+      environment: (process.env.HADDOCK3WEBAPP_EGI_ENVIRONMENT as 'development' | 'production' | 'demo') || 'production',
+    }
+    , async ({ profile }) => {
+      const primaryEmail = profile.emails![0].value;
+      const userId = await oauthregister(primaryEmail);
+      return userId;
+    }
+  )
+
+  authenticator.use(egiStrategy)
+}
+
 
 export async function mustBeAuthenticated(request: Request) {
   const userId = await authenticator.isAuthenticated(request);
