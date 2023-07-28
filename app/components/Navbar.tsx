@@ -37,7 +37,7 @@ export const Navbar = () => {
   const loggedIn = useIsLoggedIn();
 
   return (
-    <div className="to-primary/100] navbar bg-gradient-to-r from-primary via-primary/90">
+    <div className="navbar bg-primary">
       <div>
         <NavLink to="/" className="btn btn-ghost text-xl normal-case">
           Haddock3
