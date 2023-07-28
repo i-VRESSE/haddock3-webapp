@@ -4,11 +4,11 @@ import { getCatalog } from "~/catalogs/index.server";
 import { Haddock3WorkflowBuilder } from "~/components/Haddock3/Form.client";
 import { haddock3Styles } from "~/components/Haddock3/styles";
 import { submitJob } from "~/models/applicaton.server";
-import { getLevel, isSubmitAllowed } from "~/models/user.server";
+import { isSubmitAllowed } from "~/models/user.server";
 import { type ICatalog } from "@i-vresse/wb-core/dist/types";
 import { ClientOnly } from "~/components/ClientOnly";
-import { getUser } from "~/auth.server";
-import { getAccessToken } from "~/bartender_token.server";
+import { getOptionalUser, mustBeAllowedToSubmit } from "~/auth.server";
+import { getBartenderTokenByUser } from "~/bartender_token.server";
 
 export const loader = async ({
   request,
@@ -17,10 +17,8 @@ export const loader = async ({
   submitAllowed: boolean;
   archive: string | undefined;
 }> => {
-  const user = await getUser(request);
-  const level = await getLevel(
-    user ? user.roles.map((r) => r.name) : undefined
-  );
+  const user = await getOptionalUser(request);
+  const level = user ? user.preferredExpertiseLevel : "";
   // When user does not have a level he/she
   // can still use builder with easy level
   // but cannot submit only download
@@ -36,7 +34,8 @@ export const action = async ({ request }: ActionArgs) => {
     throw new Error("Bad upload");
   }
 
-  const accessToken = await getAccessToken(request);
+  const user = await mustBeAllowedToSubmit(request);
+  const accessToken = await getBartenderTokenByUser(user);
   const job = await submitJob(upload, accessToken!);
   const job_url = `/jobs/${job.id}`;
   return redirect(job_url);

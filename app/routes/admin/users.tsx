@@ -6,6 +6,7 @@ import {
   assignExpertiseLevel,
   listExpertiseLevels,
   listUsers,
+  setIsAdmin,
   unassignExpertiseLevel,
 } from "~/models/user.server";
 import { mustBeAdmin } from "~/auth.server";
@@ -13,28 +14,32 @@ import { mustBeAdmin } from "~/auth.server";
 export async function loader({ request }: LoaderArgs) {
   await mustBeAdmin(request);
   const users = await listUsers();
-  const roles = await listExpertiseLevels();
+  const expertiseLevels = await listExpertiseLevels();
   return json({
     users,
-    roles,
+    expertiseLevels,
   });
 }
 
 export async function action({ request }: ActionArgs) {
-  await mustBeAdmin(request); // TODO is this needed?
+  await mustBeAdmin(request);
   const formData = await request.formData();
   const userId = formData.get("userId");
   if (userId === null || typeof userId !== "string") {
     throw json({ error: "Unknown user" }, { status: 400 });
   }
-  const roles = await listExpertiseLevels();
-  for (const role of roles) {
-    const roleState = formData.get(role);
-    if (roleState !== null) {
-      if (roleState === "true") {
-        await assignExpertiseLevel(userId, role);
+  const isAdmin = formData.get("isAdmin");
+  if (isAdmin !== null) {
+    await setIsAdmin(userId, isAdmin === "true");
+  }
+  const levels = await listExpertiseLevels();
+  for (const level of levels) {
+    const levelState = formData.get(level);
+    if (levelState !== null) {
+      if (levelState === "true") {
+        await assignExpertiseLevel(userId, level);
       } else {
-        await unassignExpertiseLevel(userId, role);
+        await unassignExpertiseLevel(userId, level);
       }
     }
   }
@@ -42,7 +47,7 @@ export async function action({ request }: ActionArgs) {
 }
 
 export default function AdminUsersPage() {
-  const { users, roles } = useLoaderData<typeof loader>();
+  const { users, expertiseLevels } = useLoaderData<typeof loader>();
   const { submit, state } = useFetcher();
   return (
     <main>
@@ -50,8 +55,11 @@ export default function AdminUsersPage() {
       <table className="table w-full">
         <thead>
           <tr>
+            <th></th>
             <th>Email</th>
-            <th>Roles</th>
+            <th>Administrator?</th>
+            <th>Expertise levels</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -68,7 +76,7 @@ export default function AdminUsersPage() {
                 submitting={state === "submitting"}
                 onUpdate={update}
                 user={user}
-                roles={roles}
+                expertiseLevels={expertiseLevels}
               />
             );
           })}

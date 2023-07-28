@@ -8,10 +8,15 @@ export interface User {
     readonly name: string;
   }[];
   readonly isAdmin: boolean;
-  readonly preferredExpertiseLevel: string | null;
+  readonly preferredExpertiseLevel: string;
   readonly bartenderToken: string | null;
-  readonly bartenderTokenExpiresAt: Date | null;
+  readonly bartenderTokenExpiresAt: number;
 }
+
+export type TokenLessUser = Omit<
+  User,
+  "bartenderToken" | "bartenderTokenExpiresAt"
+>;
 
 const userSelect = {
   id: true,
@@ -43,7 +48,7 @@ export async function register(email: string, password: string) {
 
 async function firstUserShouldBeAdmin() {
   const userCount = await db.user.count();
-  return userCount === 0
+  return userCount === 0;
 }
 
 export async function localLogin(email: string, password: string) {
@@ -112,16 +117,6 @@ export async function getUserByEmail(email: string) {
   return user;
 }
 
-export async function verifyIsAdmin(id: string) {
-  const result = await db.user.findUnique({
-    where: {
-      id,
-      isAdmin: true,
-    },
-  });
-  return !!result;
-}
-
 export async function getLevel(
   userRoles: string[] | undefined
 ): Promise<string> {
@@ -137,12 +132,6 @@ export async function getLevel(
     return "easy";
   }
   return "";
-}
-
-export function checkAuthenticated(accessToken: string | undefined) {
-  if (accessToken === undefined) {
-    throw new Error("Unauthenticated");
-  }
 }
 
 export function isSubmitAllowed(level: string) {
@@ -171,11 +160,18 @@ export async function listExpertiseLevels() {
 }
 
 export async function assignExpertiseLevel(userId: string, level: string) {
+  // set preferred level to the assigned level if no preferred level is set
+  const user = await getUserById(userId);
+  const preferredExpertiseLevel = user.preferredExpertiseLevel
+    ? user.preferredExpertiseLevel
+    : level;
+
   await db.user.update({
     where: {
       id: userId,
     },
     data: {
+      preferredExpertiseLevel,
       expertiseLevels: {
         connect: {
           name: level,
@@ -189,11 +185,22 @@ export async function assignExpertiseLevel(userId: string, level: string) {
 }
 
 export async function unassignExpertiseLevel(userId: string, level: string) {
+  // set preferred level to the first remaining level if the preferred level is the one being removed
+  const user = await getUserById(userId);
+  let preferredExpertiseLevel = user.preferredExpertiseLevel;
+  if (preferredExpertiseLevel === level) {
+    const remainingLevels = user
+      .expertiseLevels!.map((level) => level.name)
+      .filter((name) => name !== level);
+    preferredExpertiseLevel = remainingLevels[0] || "";
+  }
+
   await db.user.update({
     where: {
       id: userId,
     },
     data: {
+      preferredExpertiseLevel,
       expertiseLevels: {
         disconnect: {
           name: level,
@@ -206,7 +213,29 @@ export async function unassignExpertiseLevel(userId: string, level: string) {
   });
 }
 
-export async function setPreferredExpertiseLevel(userId: string, level: string) {
+export async function setPreferredExpertiseLevel(
+  userId: string,
+  level: string
+) {
+  const user = await db.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      expertiseLevels: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+  if (!user) {
+    throw new Error("User not found");
+  }
+  const levels = user.expertiseLevels.map((level) => level.name);
+  if (!levels.includes(level)) {
+    throw new Error("User does not have this expertise level");
+  }
   await db.user.update({
     where: {
       id: userId,
@@ -234,7 +263,11 @@ export async function setIsAdmin(userId: string, isAdmin: boolean) {
   });
 }
 
-export async function setBartenderToken(userId: string, token: string, expireAt: Date) {
+export async function setBartenderToken(
+  userId: string,
+  token: string,
+  expireAt: number
+) {
   await db.user.update({
     where: {
       id: userId,

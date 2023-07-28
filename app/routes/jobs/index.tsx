@@ -1,19 +1,17 @@
 import { json, type LoaderArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { getAccessToken } from "~/bartender_token.server";
+import { getBartenderToken } from "~/bartender_token.server";
 import { getJobs } from "~/models/job.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
-  const access_token = await getAccessToken(request);
-  if (access_token === undefined) {
-    throw new Error("Unauthenticated");
-  }
-  const jobs = await getJobs(access_token);
+  const token = await getBartenderToken(request);
+  const jobs = await getJobs(token);
   return json({ jobs });
 };
 
 export default function JobPage() {
   const { jobs } = useLoaderData<typeof loader>();
+  // TODO add pagination
   return (
     <main>
       <table className="table w-full">

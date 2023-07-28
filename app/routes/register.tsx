@@ -10,7 +10,9 @@ import { register } from "~/models/user.server";
 import { commitSession, getSession } from "~/session.server";
 
 export async function loader({ request }: LoaderArgs) {
-  // TODO check already logged in
+  await authenticator.isAuthenticated(request, {
+    successRedirect: "/",
+  });
   return json({});
 }
 

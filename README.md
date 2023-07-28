@@ -6,13 +6,13 @@
 
 Uses
 
-- [bartender](https://github.com/i-VRESSE/bartender) for user and job management.
+- [bartender](https://github.com/i-VRESSE/bartender) for job execution.
 - [workflow-builder](https://github.com/i-VRESSE/workflow-builder) to construct a Haddock3 workflow config file.
 - [haddock3](https://github.com/haddocking/haddock3) to compute
 
 ```mermaid
 sequenceDiagram
-    Web app->>+Bartender: Login
+    Web app->>+Web app: Login
     Web app->>+Builder: Construct workflow config
     Builder->>+Bartender: Submit job
     Bartender->>+haddock3: Run
@@ -29,9 +29,11 @@ npm install
 cp .env.example .env
 npx prisma db push
 npx prisma db seed
+# Create rsa key pair for signing & verifying JWT tokens for bartender web service
+openssl genpkey -algorithm RSA -out private_key.pem \
+    -pkeyopt rsa_keygen_bits:2048
+openssl rsa -pubout -in private_key.pem -out public_key.pem
 ```
-
-First user that registers is a admin user.
 
 ## Development
 
@@ -121,43 +123,16 @@ docker compose up
 
 Web application running at http://localhost:8080 .
 
-Create super user with
+## Authentication & authorization
 
-```sh
-# First register user in web application
-docker compose exec bartender bartender super <email>
-```
+A user can only submit jobs when he/she is logged in and has at least one expertise level.
+A super user should assign an expertise level to the user at http://localhost:3000/admin/users.
+A super user can be made through the admin page or by being the first registered user.
 
-## Sessions
-
-Making the login session secure requires a session secret.
-The session secret can be configured by setting the `SESSION_SECRET` environment variable.
-If not set, a hardcoded secret is used, which should not be used in production.
-
-The data of the login sessions in stored in the `./sessions` directory.
-
-## Bartender web service client
-
-This web app uses a client to consume the bartender web service.
-
-The client can be (re-)generated with
+The sessions will be encrypted with a secret key from an environment variable.
 
 ```shell
-npm run generate-client
-```
-
-(This command requires that the bartender webservice is running at http://localhost:8000)
-
-## Bartender web service configuration
-
-### Bartender
-
-The web application needs to know where the [Bartender web service](https://github.com/i-VRESSE/bartender) is running.
-Configure bartender location with `BARTENDER_API_URL` environment variable.
-
-```sh
-export BARTENDER_API_URL='http://127.0.0.1:8000'
-npm start
+SESSION_SECRET=...
 ```
 
 ### Social login
@@ -174,6 +149,42 @@ The environment variables can also be stored in a `.env` file.
 
 Only use social logins where the email address has been verified.
 
+## Bartender web service client
+
+This web app uses a client to consume the bartender web service.
+
+The client can be (re-)generated with
+
+```shell
+npm run generate-client
+```
+
+(This command requires that the bartender webservice is running at http://localhost:8000)
+
+## Bartender web service configuration
+
+The haddock3 web application needs to know where the [Bartender web service](https://github.com/i-VRESSE/bartender) is running.
+Configure bartender location with `BARTENDER_API_URL` environment variable.
+
+```sh
+BARTENDER_API_URL=http://localhost:8000
+```
+
+The haddock3 web application must be trusted by the bartender web service using a JWT token.
+An RSA private key is used by the haddock3 web application to sign the JWT token.
+To tell the bartender web service where to find the private key, use the `BARTENDER_PRIVATE_KEY` environment variable.
+
+```sh
+BARTENDER_PRIVATE_KEY=private_key.pem
+```
+
+An RSA public key is used by the bartender web service to verify the JWT token.
+To tell the bartender web service where to find the public key, use the `BARTENDER_PUBLIC_KEY` environment variable.
+
+```sh
+BARTENDER_PUBLIC_KEY=public_key.pem
+```
+
 ## Haddock3 application
 
 This web app expects that the following application is registered in bartender web service.
@@ -183,17 +194,9 @@ applications:
   haddock3:
     command: haddock3 $config
     config: workflow.cfg
-    allowed_roles:
-      - easy
-      - expert
-      - guru
 ```
 
 This allows the archive generated with the workflow builder to be submitted.
-
-The user can only submit jobs when he/she has any of these allowed roles.
-A super user should assign a role to the user at http://localhost:3000/admin/users.
-A super user can be made through the admin page or by running `bartender super <email>` on the server
 
 ## Catalogs
 

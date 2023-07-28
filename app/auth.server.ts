@@ -1,14 +1,16 @@
 import { Authenticator } from "remix-auth";
 import { GitHubStrategy } from "remix-auth-github";
 import { FormStrategy } from "remix-auth-form";
+import { json } from "@remix-run/node";
+
 import { sessionStorage } from "./session.server";
 import {
+  type TokenLessUser,
   getUserById,
+  isSubmitAllowed,
   localLogin,
   oauthregister,
-  verifyIsAdmin,
 } from "./models/user.server";
-import { json } from "@remix-run/node";
 
 // Create an instance of the authenticator, pass a generic with what
 // strategies will return and will store in the session
@@ -50,6 +52,7 @@ if (
     },
     async ({ profile }) => {
       // TODO store photo or avatar so it can be displayed in NavBar
+      // TODO fetch verified email not just first email
       const primaryEmail = profile.emails[0].value;
       const userId = await oauthregister(primaryEmail);
       return userId;
@@ -59,22 +62,52 @@ if (
   authenticator.use(gitHubStrategy);
 }
 
-export async function getUser(request: Request) {
+export async function mustBeAuthenticated(request: Request) {
+  const userId = await authenticator.isAuthenticated(request);
+  if (userId === null) {
+    throw json({ error: "Unauthorized" }, { status: 401 });
+  }
+  return userId;
+}
+
+export async function getOptionalUser(request: Request) {
   const userId = await authenticator.isAuthenticated(request);
   if (userId === null) {
     return null;
   }
-  const user = await getUserById(userId);
+  return await getUserById(userId);
+}
+
+export async function getUser(request: Request) {
+  const user = await getOptionalUser(request);
+  if (!user) {
+    throw json({ error: "Unauthorized" }, { status: 401 });
+  }
   return user;
 }
 
+export async function getOptionalClientUser(
+  request: Request
+): Promise<null | TokenLessUser> {
+  const user = await getOptionalUser(request);
+  if (!user) {
+    return null;
+  }
+  const { bartenderToken, bartenderTokenExpiresAt, ...tokenLessUser } = user;
+  return tokenLessUser;
+}
+
 export async function mustBeAdmin(request: Request) {
-  const userId = await authenticator.isAuthenticated(request);
-  if (userId === null) {
-    throw json("Unauthorized", { status: 401 });
+  const user = await getUser(request);
+  if (!user.isAdmin) {
+    throw json("Forbidden, not admin", { status: 403 });
   }
-  const isAdmin = await verifyIsAdmin(userId);
-  if (!isAdmin) {
-    throw json("Forbidden", { status: 403 });
+}
+
+export async function mustBeAllowedToSubmit(request: Request) {
+  const user = await getUser(request);
+  if (!isSubmitAllowed(user.preferredExpertiseLevel)) {
+    throw json({ error: "Submit not allowed" }, { status: 403 });
   }
+  return user;
 }

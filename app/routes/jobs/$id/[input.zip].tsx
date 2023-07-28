@@ -1,12 +1,9 @@
 import { type LoaderArgs } from "@remix-run/node";
-import { getInputArchive } from "~/models/job.server";
-import { getAccessToken } from "~/bartender_token.server";
+import { getInputArchive, jobIdFromParams } from "~/models/job.server";
+import { getBartenderToken } from "~/bartender_token.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
-  const job_id = params.id || "";
-  const access_token = await getAccessToken(request);
-  if (access_token === undefined) {
-    throw new Error("Unauthenticated");
-  }
-  return await getInputArchive(parseInt(job_id), access_token);
+  const id = jobIdFromParams(params);
+  const token = await getBartenderToken(request);
+  return await getInputArchive(id, token);
 };

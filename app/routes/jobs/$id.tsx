@@ -1,29 +1,28 @@
 import { json, type LoaderArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { getAccessToken } from "~/bartender_token.server";
+import { getBartenderToken } from "~/bartender_token.server";
 import {
   listOutputFiles,
   getJobById,
   listInputFiles,
+  jobIdFromParams,
 } from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
-import { checkAuthenticated } from "~/models/user.server";
 import type { DirectoryItem } from "~/bartender-client";
 import { ListLogFiles } from "~/components/ListLogFiles";
 import { OutputReport } from "~/components/OutputReport";
 import { ListFiles } from "~/components/ListFiles";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
-  const jobId = parseInt(params.id || "");
-  const accessToken = await getAccessToken(request);
-  checkAuthenticated(accessToken);
-  const job = await getJobById(jobId, accessToken!);
+  const jobId = jobIdFromParams(params);
+  const token = await getBartenderToken(request);
+  const job = await getJobById(jobId, token!);
   // TODO check if job belongs to user
   let inputFiles: DirectoryItem | undefined = undefined;
   let outputFiles: DirectoryItem | undefined = undefined;
   if (CompletedJobs.has(job.state)) {
-    inputFiles = await listInputFiles(jobId, accessToken!);
-    outputFiles = await listOutputFiles(jobId, accessToken!);
+    inputFiles = await listInputFiles(jobId, token!);
+    outputFiles = await listOutputFiles(jobId, token!);
   }
   return json({ job, inputFiles, outputFiles });
 };

@@ -2,20 +2,27 @@
  * Functions dealing with access token of bartender web service.
  */
 import { readFile } from "fs/promises";
-import { type KeyLike, SignJWT, importPKCS8 } from "jose";
+import { type KeyLike, SignJWT, importPKCS8, decodeJwt } from "jose";
+
 import { getUser } from "./auth.server";
-import { json } from "@remix-run/node";
-import { getLevel, isSubmitAllowed } from "./models/user.server";
+import type { User } from "./models/user.server";
+import { setBartenderToken } from "./models/user.server";
 
 const alg = "RS256";
 
-class TokenGenerator {
+export class TokenGenerator {
   private privateKeyFilename: string;
   private issuer: string;
+  private lifeSpan: string;
   private privateKey: KeyLike | undefined = undefined;
-  constructor(privateKeyFilename: string, issuer: string = "bartender") {
+  constructor(
+    privateKeyFilename: string,
+    issuer: string = "bartender",
+    lifespan = "8h"
+  ) {
     this.privateKeyFilename = privateKeyFilename;
     this.issuer = issuer;
+    this.lifeSpan = lifespan;
   }
 
   async init() {
@@ -27,16 +34,17 @@ class TokenGenerator {
     this.privateKey = privateKey;
   }
 
-  async generate(sub: string, email: string, roles: string[]) {
+  async generate(sub: string, email: string) {
     if (!this.privateKey) {
       throw new Error("private key not initialized");
     }
+    // If bartender has been  configured with allowed_roles for an application,
+    // then the a role claim should be in the JWT.
     const jwt = await new SignJWT({
       email: email,
-      roles: roles,
     })
       .setIssuer(this.issuer)
-      .setExpirationTime("30d")
+      .setExpirationTime(this.lifeSpan)
       .setIssuedAt()
       .setSubject(sub)
       .setProtectedHeader({ alg })
@@ -46,21 +54,24 @@ class TokenGenerator {
 }
 const privateKeyFilename =
   process.env.BARTENDER_PRIVATE_KEY || "private_key.pem";
-// TODO only use singleton if reading private key is slow
 const generator = new TokenGenerator(privateKeyFilename);
 
-export async function getAccessToken(request: Request) {
+export async function getBartenderToken(request: Request) {
   const user = await getUser(request);
-  if (!user) {
-    throw json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const roles = user.roles.map((r) => r.name);
-  const level = await getLevel(roles);
-  if (!isSubmitAllowed(level)) {
-    throw json({ error: "Forbidden" }, { status: 403 });
-  }
+  return getBartenderTokenByUser(user);
+}
 
-  // TODO fetch non-expired token from database
-  await generator.init();
-  return await generator.generate(user.id, user.email, roles);
+export async function getBartenderTokenByUser(user: User) {
+  // if token expires in less than 2 minutes, refresh it
+  const leeway = 120;
+  const nowInSeconds = new Date().getTime() / 1000;
+  const tokenIsExpired = user.bartenderTokenExpiresAt < nowInSeconds + leeway;
+  if (tokenIsExpired || !user.bartenderToken) {
+    await generator.init();
+    const token = await generator.generate(user.id, user.email);
+    const { exp } = decodeJwt(token);
+    await setBartenderToken(user.id, token, exp!);
+    return token;
+  }
+  return user.bartenderToken;
 }

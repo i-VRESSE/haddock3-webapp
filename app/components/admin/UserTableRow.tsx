@@ -2,34 +2,57 @@ import type { User } from "~/models/user.server";
 
 interface IProps {
   user: User;
-  roles: string[];
+  expertiseLevels: string[];
   onUpdate: (data: FormData) => void;
   submitting: boolean;
 }
 
-export const UserTableRow = ({ user, roles, onUpdate, submitting }: IProps) => {
-  const userRoles = user.roles.map((r) => r.name);
+export const UserTableRow = ({
+  user,
+  expertiseLevels,
+  onUpdate,
+  submitting,
+}: IProps) => {
+  const usersExpertiseLevels = user.expertiseLevels.map((r) => r.name);
   return (
     <tr>
+      <td>
+        <input type="checkbox" disabled />
+      </td>
       <td>{user.email}</td>
       <td>
+        <input
+          type="checkbox"
+          checked={user.isAdmin}
+          className="checkbox"
+          disabled={submitting}
+          onChange={() => {
+            const data = new FormData();
+            data.set("isAdmin", user.isAdmin ? "false" : "true");
+            onUpdate(data);
+          }}
+        />
+      </td>
+      <td>
         <ul className="flex">
-          {roles.map((role) => {
+          {expertiseLevels.map((expertiseLevel) => {
             return (
-              <li key={role}>
+              <li key={expertiseLevel}>
                 <div className="form-control">
                   <label className="label cursor-pointer">
-                    <span className="label-text">{role}</span>
+                    <span className="label-text">{expertiseLevel}</span>
                     <input
                       type="checkbox"
-                      checked={userRoles.includes(role)}
+                      checked={usersExpertiseLevels.includes(expertiseLevel)}
                       className="checkbox ml-2"
                       disabled={submitting}
                       onChange={() => {
                         const data = new FormData();
                         data.set(
-                          role,
-                          userRoles.includes(role) ? "false" : "true"
+                          expertiseLevel,
+                          usersExpertiseLevels.includes(expertiseLevel)
+                            ? "false"
+                            : "true"
                         );
                         onUpdate(data);
                       }}
@@ -40,6 +63,11 @@ export const UserTableRow = ({ user, roles, onUpdate, submitting }: IProps) => {
             );
           })}
         </ul>
+      </td>
+      <td>
+        <button className="btn-sm btn" disabled>
+          Change password
+        </button>
       </td>
     </tr>
   );

@@ -6,10 +6,10 @@ import {
 } from "@remix-run/node";
 import { Form, Link, useLoaderData } from "@remix-run/react";
 import { availableSocialLogins } from "~/auth";
-import { authenticator, getUser } from "~/auth.server";
+import { authenticator, getOptionalUser } from "~/auth.server";
 
 export async function loader({ request }: LoaderArgs) {
-  const user = await getUser(request);
+  const user = await getOptionalUser(request);
   if (user) {
     return redirect("/");
   }

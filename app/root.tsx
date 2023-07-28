@@ -14,9 +14,8 @@ import {
 } from "@remix-run/react";
 
 import { Navbar } from "~/components/Navbar";
+import { getOptionalClientUser } from "./auth.server";
 import styles from "./tailwind.css";
-import { authenticator } from "./auth.server";
-import { getUserById } from "./models/user.server";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -27,14 +26,8 @@ export const meta: MetaFunction = () => ({
 });
 
 export async function loader({ request }: LoaderArgs) {
-  const userId = await authenticator.isAuthenticated(request);
-  if (userId === null) {
-    return json({ user: null });
-  }
-  const user = await getUserById(userId);
-  // Client should not have access to the bartender token
-  const { bartenderToken, ...tokenLessUser } = user;
-  return json({ user: tokenLessUser });
+  const user = await getOptionalClientUser(request);
+  return json({ user });
 }
 
 export default function App() {
