@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@ltd/j-toml": "^1.38.0",
-    "@openapitools/openapi-generator-cli": "^2.5.2",
+    "@openapitools/openapi-generator-cli": "^2.7.0",
     "@remix-run/dev": "^1.16.1",
     "@remix-run/eslint-config": "^1.16.1",
     "@tailwindcss/forms": "^0.5.3",
