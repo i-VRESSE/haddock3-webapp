@@ -4,28 +4,36 @@ import { compare, hash } from "bcryptjs";
 export interface User {
   readonly id: string;
   readonly email: string;
-  readonly roles: {
+  readonly expertiseLevels: {
     readonly name: string;
   }[];
+  readonly isAdmin: boolean;
+  readonly preferredExpertiseLevel: string | null;
+  readonly bartenderToken: string | null;
+  readonly bartenderTokenExpiresAt: Date | null;
 }
 
 const userSelect = {
   id: true,
   email: true,
-  roles: {
+  expertiseLevels: {
     select: {
       name: true,
     },
   },
+  isAdmin: true,
+  preferredExpertiseLevel: true,
+  bartenderToken: true,
+  bartenderTokenExpiresAt: true,
 } as const;
 
 export async function register(email: string, password: string) {
-  const roles = await firstUserShouldBeAdmin();
+  const isAdmin = await firstUserShouldBeAdmin();
   const passwordHash = await hash(password, 10);
   const user = await db.user.create({
     data: {
       email,
-      roles,
+      isAdmin,
       passwordHash,
     },
     select: userSelect,
@@ -35,15 +43,7 @@ export async function register(email: string, password: string) {
 
 async function firstUserShouldBeAdmin() {
   const userCount = await db.user.count();
-  const roles =
-    userCount === 0
-      ? {
-          connect: {
-            name: "admin",
-          },
-        }
-      : undefined;
-  return roles;
+  return userCount === 0
 }
 
 export async function localLogin(email: string, password: string) {
@@ -69,14 +69,14 @@ export async function localLogin(email: string, password: string) {
 }
 
 export async function oauthregister(email: string) {
-  const roles = await firstUserShouldBeAdmin();
+  const isAdmin = await firstUserShouldBeAdmin();
   const user = await db.user.upsert({
     where: {
-      email: email,
+      email,
     },
     create: {
-      email: email,
-      roles,
+      email,
+      isAdmin,
     },
     update: {},
     select: {
@@ -112,15 +112,11 @@ export async function getUserByEmail(email: string) {
   return user;
 }
 
-export async function verifyIsAdmin(userId: string) {
+export async function verifyIsAdmin(id: string) {
   const result = await db.user.findUnique({
     where: {
-      id: userId,
-      roles: {
-        some: {
-          name: "admin",
-        },
-      },
+      id,
+      isAdmin: true,
     },
   });
   return !!result;
@@ -162,8 +158,8 @@ export async function listUsers(limit = 100, offset = 0) {
   return users;
 }
 
-export async function listRoles() {
-  const roles = await db.role.findMany({
+export async function listExpertiseLevels() {
+  const levels = await db.expertiseLevel.findMany({
     select: {
       name: true,
     },
@@ -171,18 +167,18 @@ export async function listRoles() {
       name: "asc",
     },
   });
-  return roles.map((role) => role.name);
+  return levels.map((level) => level.name);
 }
 
-export async function assignRole(userId: string, roleId: string) {
+export async function assignExpertiseLevel(userId: string, level: string) {
   await db.user.update({
     where: {
       id: userId,
     },
     data: {
-      roles: {
+      expertiseLevels: {
         connect: {
-          name: roleId,
+          name: level,
         },
       },
     },
@@ -192,17 +188,60 @@ export async function assignRole(userId: string, roleId: string) {
   });
 }
 
-export async function unassignRole(userId: string, roleId: string) {
+export async function unassignExpertiseLevel(userId: string, level: string) {
   await db.user.update({
     where: {
       id: userId,
     },
     data: {
-      roles: {
+      expertiseLevels: {
         disconnect: {
-          name: roleId,
+          name: level,
         },
       },
+    },
+    select: {
+      id: true,
+    },
+  });
+}
+
+export async function setPreferredExpertiseLevel(userId: string, level: string) {
+  await db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      preferredExpertiseLevel: level,
+    },
+    select: {
+      id: true,
+    },
+  });
+}
+
+export async function setIsAdmin(userId: string, isAdmin: boolean) {
+  await db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      isAdmin,
+    },
+    select: {
+      id: true,
+    },
+  });
+}
+
+export async function setBartenderToken(userId: string, token: string, expireAt: Date) {
+  await db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      bartenderToken: token,
+      bartenderTokenExpiresAt: expireAt,
     },
     select: {
       id: true,

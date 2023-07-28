@@ -4,10 +4,10 @@ const db = new PrismaClient();
 async function seed() {
   await Promise.all(
     // TODO use createMany when postgresql is used
-    getRoles().map(async (role) => {
-      return db.role.create({
+    getExpertiseLevels().map(async (name) => {
+      return db.expertiseLevel.create({
         data: {
-          name: role,
+          name,
         },
       });
     })
@@ -16,6 +16,6 @@ async function seed() {
 
 seed();
 
-function getRoles() {
-  return ["admin", "guru", "expert", "easy"];
+function getExpertiseLevels() {
+  return ["guru", "expert", "easy"];
 }

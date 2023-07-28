@@ -3,17 +3,17 @@ import { json } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { UserTableRow } from "~/components/admin/UserTableRow";
 import {
-  assignRole,
-  listRoles,
+  assignExpertiseLevel,
+  listExpertiseLevels,
   listUsers,
-  unassignRole,
+  unassignExpertiseLevel,
 } from "~/models/user.server";
 import { mustBeAdmin } from "~/auth.server";
 
 export async function loader({ request }: LoaderArgs) {
   await mustBeAdmin(request);
   const users = await listUsers();
-  const roles = await listRoles();
+  const roles = await listExpertiseLevels();
   return json({
     users,
     roles,
@@ -27,14 +27,14 @@ export async function action({ request }: ActionArgs) {
   if (userId === null || typeof userId !== "string") {
     throw json({ error: "Unknown user" }, { status: 400 });
   }
-  const roles = await listRoles();
+  const roles = await listExpertiseLevels();
   for (const role of roles) {
     const roleState = formData.get(role);
     if (roleState !== null) {
       if (roleState === "true") {
-        await assignRole(userId, role);
+        await assignExpertiseLevel(userId, role);
       } else {
-        await unassignRole(userId, role);
+        await unassignExpertiseLevel(userId, role);
       }
     }
   }

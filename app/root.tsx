@@ -32,7 +32,9 @@ export async function loader({ request }: LoaderArgs) {
     return json({ user: null });
   }
   const user = await getUserById(userId);
-  return json({ user });
+  // Client should not have access to the bartender token
+  const { bartenderToken, ...tokenLessUser } = user;
+  return json({ user: tokenLessUser });
 }
 
 export default function App() {
