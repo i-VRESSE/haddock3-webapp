@@ -125,37 +125,7 @@ Web application running at http://localhost:8080 .
 
 ## Authentication & authorization
 
-A user can only submit jobs when he/she is logged in and has at least one expertise level.
-A super user should assign an expertise level to the user at http://localhost:3000/admin/users.
-A super user can be made through the admin page or by being the first registered user.
-
-The sessions will be encrypted with a secret key from an environment variable.
-
-```shell
-SESSION_SECRET=...
-```
-
-### Social login
-
-To enable GitHub or Orcid or EGI Check-in login the web apps needs following environment variables.
-
-```shell
-HADDOCK3WEBAPP_GITHUB_CLIENT_ID=...
-HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET=...
-HADDOCK3WEBAPP_GITHUB_CALLBACK_URL=http://localhost:3000/auth/github/callback
-HADDOCK3WEBAPP_ORCID_CLIENT_ID=...
-HADDOCK3WEBAPP_ORCID_CLIENT_SECRET=...
-HADDOCK3WEBAPP_ORCID_CALLBACK_URL=http://localhost:3000/auth/orcid/callback
-HADDOCK3WEBAPP_ORCID_SANDBOX='something'  # When env var is set then sandbox is used instead of production
-HADDOCK3WEBAPP_EGI_CLIENT_ID=...
-HADDOCK3WEBAPP_EGI_CLIENT_SECRET=...
-HADDOCK3WEBAPP_EGI_CALLBACK_URL=http://localhost:3000/auth/egi/callback
-HADDOCK3WEBAPP_EGI_ENVIRONMENT=production  # could also be 'development' or 'demo'
-```
-
-The environment variables can also be stored in a `.env` file.
-
-Only use social logins where the email address has been verified.
+See [docs/auth.md](docs/auth.md).
 
 ## Bartender web service client
 

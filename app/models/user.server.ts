@@ -117,23 +117,6 @@ export async function getUserByEmail(email: string) {
   return user;
 }
 
-export async function getLevel(
-  userRoles: string[] | undefined
-): Promise<string> {
-  if (!userRoles) {
-    return "";
-  }
-  const roles = new Set(userRoles);
-  if (roles.has("guru")) {
-    return "guru";
-  } else if (roles.has("expert")) {
-    return "expert";
-  } else if (roles.has("easy")) {
-    return "easy";
-  }
-  return "";
-}
-
 export function isSubmitAllowed(level: string) {
   return level !== "";
 }
