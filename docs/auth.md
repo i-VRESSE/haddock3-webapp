@@ -57,17 +57,17 @@ To enable perform following steps:
    4. Check `Request user authorization (OAuth) during installation`
    5. In Webhook section
 
-      * Uncheck `Active`
+      - Uncheck `Active`
 
    6. In User permissions section
 
-      * Set `Email addresses` to `Read-only`
+      - Set `Email addresses` to `Read-only`
 
    7. Press `Create GitHub App` button
    8. After creation
 
-      * Generate a new client secret
-      * (Optionally) Restrict app to certain IP addresses
+      - Generate a new client secret
+      - (Optionally) Restrict app to certain IP addresses
 
 2. Append GitHub app credentials to `.env` file
 
@@ -105,21 +105,21 @@ To enable perform following steps:
    [https://sandbox.orcid.org/developer-tools](https://sandbox.orcid.org/developer-tools)
    to register app.
 
-   * Only one app can be registered per orcid account, so use alternate account
+   - Only one app can be registered per orcid account, so use alternate account
      when primary account already has an registered app.
 
-   * Your website URL does not allow localhost URL, so use
+   - Your website URL does not allow localhost URL, so use
      `https://github.com/i-VRESSE/bartended-haddock3`
 
-   * Redirect URI: for dev deployments set to
+   - Redirect URI: for dev deployments set to
      `http://127.0.0.1:8000/auth/orcid/callback`.
 
 3. Append Orcid sandbox app credentials to `.env` file
 
    1. Add `HADDOCK3WEBAPP_ORCID_SANDBOX=1` to use Orcid sandbox, if not set then uses Orcid production.
    1. Add `HADDOCK3WEBAPP_ORCID_CLIENT_ID=<Client id of Orcid sandbox app>`
-   2. Add `HADDOCK3WEBAPP_ORCID_CLIENT_SECRET=<Client secret of Orcid sandbox app>`
-   3. Add
+   1. Add `HADDOCK3WEBAPP_ORCID_CLIENT_SECRET=<Client secret of Orcid sandbox app>`
+   1. Add
       `HADDOCK3WEBAPP_ORCID_CALLBACK_URL=http://127.0.0.1:8000/auth/orcid/callback`, URL where Orcid should redirect to after login.
 
 Orcid sandbox does not like `localhost`, use `127.0.0.1` as hostname instead.
@@ -131,9 +131,9 @@ account.
 
 Steps are similar to [Orcid sandbox login](#orcid-sandbox-login), but
 
-* Unset `HADDOCK3WEBAPP_ORCID_SANDBOX` environment variable
-* Callback URL must use **https** scheme
-* Account emails don't have to be have be from `@mailinator.com` domain.
+- Unset `HADDOCK3WEBAPP_ORCID_SANDBOX` environment variable
+- Callback URL must use **https** scheme
+- Account emails don't have to be have be from `@mailinator.com` domain.
 
 To host web app with https use a revserse proxy like [caddyserver](https://caddyserver.com/)
 
@@ -147,7 +147,7 @@ To host web app with https use a revserse proxy like [caddyserver](https://caddy
 
 reverse_proxy 127.0.0.1:3000
 
-# If your hostname is not public then use issuer internal, 
+# If your hostname is not public then use issuer internal,
 # otherwise remove tls block.
 tls {
 	issuer internal
@@ -169,17 +169,17 @@ account.
 To enable perform following steps:
 
 1. This web service needs to be [registered as a service provider in EGI Check-in](https://docs.egi.eu/providers/check-in/sp/).
-   * Select protocol: OIDC Service
-   * Callback should end with `/auth/egi/callback`
-   * Callback should for non-developement environments use https
-   * Disable PKCE, as the
+   - Select protocol: OIDC Service
+   - Callback should end with `/auth/egi/callback`
+   - Callback should for non-developement environments use https
+   - Disable PKCE, as the
      [library](https://github.com/sergiodxa/remix-auth-oauth2/issues/24)
      used for authentication does support PKCE
 2. Append EGI SP credentials to `.env` file
-    1. Add `HADDOCK3WEBAPP_EGI_CLIENT_ID=<Client id of EGI SP>`
-    2. Add `HADDOCK3WEBAPP_EGI_CLIENT_SECRET=<Client secret of EGI SP>`
-    3. (Optionally) Add which integration environment the SP is using,
-        `HADDOCK3WEBAPP_EGI_ENVIRONMENT=<production|development|demo>`,
-        defaults to `production`
-    4. (Optionally) Add external URL of app
-        `HADDOCK3WEBAPP_EGI_REDIRECT_URL=<URL>`
+   1. Add `HADDOCK3WEBAPP_EGI_CLIENT_ID=<Client id of EGI SP>`
+   2. Add `HADDOCK3WEBAPP_EGI_CLIENT_SECRET=<Client secret of EGI SP>`
+   3. (Optionally) Add which integration environment the SP is using,
+      `HADDOCK3WEBAPP_EGI_ENVIRONMENT=<production|development|demo>`,
+      defaults to `production`
+   4. (Optionally) Add external URL of app
+      `HADDOCK3WEBAPP_EGI_REDIRECT_URL=<URL>`
