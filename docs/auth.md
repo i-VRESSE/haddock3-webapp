@@ -1,8 +1,14 @@
 # Authentication & authorization
 
+- [Authentication \& authorization](#authentication--authorization)
+  - [GitHub login](#github-login)
+  - [Orcid sandbox login](#orcid-sandbox-login)
+  - [Orcid login](#orcid-login)
+  - [EGI Check-in login](#egi-check-in-login)
+
 A user can only submit jobs when he/she is logged in and has at least one expertise level.
 A super user can assign an expertise level to users at http://localhost:3000/admin/users.
-A super user can be made through the admin page or by being the first registered user.
+A super user can be made through the admin page (`/admin/users`) or by being the first registered user.
 
 The sessions will be encrypted with a secret key from an environment variable.
 
@@ -10,15 +16,15 @@ The sessions will be encrypted with a secret key from an environment variable.
 SESSION_SECRET=...
 ```
 
-The environment variables can also be stored in a `.env` file.
+The environment variables can be stored in a `.env` file.
 
-Use `.env.example` as a template:
+Use [.env.example](../.env.example) as a template:
 
 ```shell
 cp .env.example .env
 ```
 
-To enable GitHub or Orcid or EGI Check-in login the web apps needs following environment variables.
+To enable GitHub or Orcid or EGI Check-in login the web app needs following environment variables.
 
 ```shell
 HADDOCK3WEBAPP_GITHUB_CLIENT_ID=...
@@ -27,7 +33,7 @@ HADDOCK3WEBAPP_GITHUB_CALLBACK_URL=http://localhost:3000/auth/github/callback
 HADDOCK3WEBAPP_ORCID_CLIENT_ID=...
 HADDOCK3WEBAPP_ORCID_CLIENT_SECRET=...
 HADDOCK3WEBAPP_ORCID_CALLBACK_URL=http://localhost:3000/auth/orcid/callback
-HADDOCK3WEBAPP_ORCID_SANDBOX='something'  # When env var is set then sandbox is used instead of production
+HADDOCK3WEBAPP_ORCID_SANDBOX=1 # optional, if unset uses Orcid production
 HADDOCK3WEBAPP_EGI_CLIENT_ID=...
 HADDOCK3WEBAPP_EGI_CLIENT_SECRET=...
 HADDOCK3WEBAPP_EGI_CALLBACK_URL=http://localhost:3000/auth/egi/callback
@@ -36,7 +42,7 @@ HADDOCK3WEBAPP_EGI_ENVIRONMENT=production  # could also be 'development' or 'dem
 
 Only use social logins where the email address has been verified.
 
-### GitHub
+## GitHub login
 
 The web app can be configured to login with your
 [GitHub](https://gibhub.com) account.
@@ -67,8 +73,7 @@ To enable perform following steps:
 
    1. Add `HADDOCK3WEBAPP_GITHUB_CLIENT_ID=<Client id of GitHub app>`
    2. Add `HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET=<Client secret of GitHub app>`
-   3. (Optionally) Add external URL of app
-      `HADDOCK3WEBAPP_GITHUB_REDIRECT_URL=<URL>`
+   3. (Optionally) Add `HADDOCK3WEBAPP_GITHUB_CALLBACK_URL=<URL>`, URL where GitHub should redirect to after login.
 
 ## Orcid sandbox login
 
@@ -107,18 +112,17 @@ To enable perform following steps:
      `https://github.com/i-VRESSE/bartended-haddock3`
 
    * Redirect URI: for dev deployments set to
-     `http://localhost:8000/auth/orcidsandbox/callback`
+     `http://127.0.0.1:8000/auth/orcid/callback`.
 
 3. Append Orcid sandbox app credentials to `.env` file
 
-   1. Add `HADDOCK3WEBAPP_ORCIDSANDBOX_CLIENT_ID=<Client id of Orcid sandbox app>`
-   2. Add `HADDOCK3WEBAPP_ORCIDSANDBOX_CLIENT_SECRET=<Client secret of Orcid sandbox
-      app>`
-   3. (Optionally) Add external URL of app
-      `HADDOCK3WEBAPP_ORCIDSANDBOX_REDIRECT_URL=<URL>`
+   1. Add `HADDOCK3WEBAPP_ORCID_SANDBOX=1` to use Orcid sandbox, if not set then uses Orcid production.
+   1. Add `HADDOCK3WEBAPP_ORCID_CLIENT_ID=<Client id of Orcid sandbox app>`
+   2. Add `HADDOCK3WEBAPP_ORCID_CLIENT_SECRET=<Client secret of Orcid sandbox app>`
+   3. Add
+      `HADDOCK3WEBAPP_ORCID_CALLBACK_URL=http://127.0.0.1:8000/auth/orcid/callback`, URL where Orcid should redirect to after login.
 
-The `GET /api/users/profile` route will return the Orcid ID in
-`oauth_accounts[oauth_name=sandbox.orcid.org].account_id`.
+Orcid sandbox does not like `localhost`, use `127.0.0.1` as hostname instead.
 
 ## Orcid login
 
@@ -127,13 +131,35 @@ account.
 
 Steps are similar to [Orcid sandbox login](#orcid-sandbox-login), but
 
+* Unset `HADDOCK3WEBAPP_ORCID_SANDBOX` environment variable
 * Callback URL must use **https** scheme
 * Account emails don't have to be have be from `@mailinator.com` domain.
-* In steps
 
-  * Replace `https://sandbox.orcid.org/` with `https://orcid.org/`
-  * In redirect URL replace `orcidsandbox` with `orcid`.
-  * In `.env` replace `_ORCIDSANDBOX_` with `_ORCID_`
+To host web app with https use a revserse proxy like [caddyserver](https://caddyserver.com/)
+
+```
+# Save as file called Caddyfile
+{
+  http_port 8081
+}
+
+<your hostname>:8443
+
+reverse_proxy 127.0.0.1:3000
+
+# If your hostname is not public then use issuer internal, 
+# otherwise remove tls block.
+tls {
+	issuer internal
+}
+```
+
+```shell
+caddy run
+```
+
+This will make app available on `https://<your hostname>:8443`.
+In Orcid site set the redirect URL to `https://<your hostname>:8443/auth/callback/orcid`.
 
 ## EGI Check-in login
 
@@ -147,12 +173,13 @@ To enable perform following steps:
    * Callback should end with `/auth/egi/callback`
    * Callback should for non-developement environments use https
    * Disable PKCE, as the
-     [Python library](https://github.com/fastapi-users/fastapi-users)
+     [library](https://github.com/sergiodxa/remix-auth-oauth2/issues/24)
      used for authentication does support PKCE
 2. Append EGI SP credentials to `.env` file
     1. Add `HADDOCK3WEBAPP_EGI_CLIENT_ID=<Client id of EGI SP>`
     2. Add `HADDOCK3WEBAPP_EGI_CLIENT_SECRET=<Client secret of EGI SP>`
     3. (Optionally) Add which integration environment the SP is using,
-        `HADDOCK3WEBAPP_EGI_ENVIRONMENT=<production|development|demo>`
+        `HADDOCK3WEBAPP_EGI_ENVIRONMENT=<production|development|demo>`,
+        defaults to `production`
     4. (Optionally) Add external URL of app
         `HADDOCK3WEBAPP_EGI_REDIRECT_URL=<URL>`

@@ -125,7 +125,7 @@ if (
         OAuth2StrategyVerifyParams<OAuth2Profile>
       >
     ) {
-      const domain = options.isSandBox ? "sandbox.oexid.org" : "orcid.org";
+      const domain = options.isSandBox ? "sandbox.orcid.org" : "orcid.org";
       const AUTHORIZE_ENDPOINT = `https://${domain}/oauth/authorize`;
       const ACCESS_TOKEN_ENDPOINT = `https://${domain}/oauth/token`;
       const PROFILE_ENDPOINT = `https://${domain}/oauth/userinfo`;
@@ -222,9 +222,9 @@ if (
       >
     ) {
       const domain = {
-        production: "aai.egi.eu",
-        development: "aai-dev.egi.eu",
-        demo: "aai-demoegi.eu",
+        production: "aai.egi.eu/auth",
+        development: "aai-dev.egi.eu/auth",
+        demo: "aai-demoegi.eu/auth",
       }[options.environment];
       super(
         {
