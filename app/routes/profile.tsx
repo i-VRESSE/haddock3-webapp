@@ -2,7 +2,10 @@ import { type ActionArgs, json, type LoaderArgs } from "@remix-run/node";
 import { Form, Link, useSubmit } from "@remix-run/react";
 import { mustBeAuthenticated } from "~/auth.server";
 import { useUser } from "~/auth";
-import { listExpertiseLevels, setPreferredExpertiseLevel } from "~/models/user.server";
+import {
+  listExpertiseLevels,
+  setPreferredExpertiseLevel,
+} from "~/models/user.server";
 import { enumType, object, safeParse } from "valibot";
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -10,22 +13,24 @@ export const loader = async ({ request }: LoaderArgs) => {
   return json({});
 };
 
-
 export const action = async ({ request }: ActionArgs) => {
   const userId = await mustBeAuthenticated(request);
   const formData = await request.formData();
   const ActionSchema = object({
-    preferredExpertiseLevel: enumType(listExpertiseLevels())
+    preferredExpertiseLevel: enumType(listExpertiseLevels()),
   });
   const result = safeParse(ActionSchema, Object.fromEntries(formData));
   if (result.success) {
-    await setPreferredExpertiseLevel(userId, result.data.preferredExpertiseLevel);
+    await setPreferredExpertiseLevel(
+      userId,
+      result.data.preferredExpertiseLevel
+    );
   } else {
     const errors = result.error;
     console.error(errors);
     return json({ errors }, { status: 400 });
   }
-  return null
+  return null;
 };
 
 export default function Page() {
@@ -53,9 +58,7 @@ export default function Page() {
                       className="radio"
                       name="preferredExpertiseLevel"
                       value={level}
-                      defaultChecked={
-                        user.preferredExpertiseLevel === level
-                      }
+                      defaultChecked={user.preferredExpertiseLevel === level}
                     />{" "}
                     {level}
                   </label>

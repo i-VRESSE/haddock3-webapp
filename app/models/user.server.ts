@@ -1,7 +1,7 @@
 import { db } from "~/utils/db.server";
 import { compare, hash } from "bcryptjs";
 
-import { ExpertiseLevel } from '@prisma/client'
+import { ExpertiseLevel } from "@prisma/client";
 
 export interface User {
   readonly id: string;
@@ -135,7 +135,10 @@ export function listExpertiseLevels() {
   return array as [ExpertiseLevel, ...ExpertiseLevel[]];
 }
 
-export async function assignExpertiseLevel(userId: string, level: ExpertiseLevel) {
+export async function assignExpertiseLevel(
+  userId: string,
+  level: ExpertiseLevel
+) {
   // set preferred level to the assigned level if no preferred level is set
   const user = await getUserById(userId);
   const preferredExpertiseLevel = user.preferredExpertiseLevel
@@ -149,7 +152,7 @@ export async function assignExpertiseLevel(userId: string, level: ExpertiseLevel
     data: {
       preferredExpertiseLevel,
       expertiseLevels: {
-        push: level
+        push: level,
       },
     },
     select: {
@@ -158,12 +161,15 @@ export async function assignExpertiseLevel(userId: string, level: ExpertiseLevel
   });
 }
 
-export async function unassignExpertiseLevel(userId: string, level: ExpertiseLevel) {
+export async function unassignExpertiseLevel(
+  userId: string,
+  level: ExpertiseLevel
+) {
   // set preferred level to the first remaining level if the preferred level is the one being removed
   const user = await getUserById(userId);
-  const remainingLevels = user
-  .expertiseLevels.map((level) => level)
-  .filter((name) => name !== level);
+  const remainingLevels = user.expertiseLevels
+    .map((level) => level)
+    .filter((name) => name !== level);
   let preferredExpertiseLevel = user.preferredExpertiseLevel;
   if (preferredExpertiseLevel === level) {
     preferredExpertiseLevel = remainingLevels[0] || null;

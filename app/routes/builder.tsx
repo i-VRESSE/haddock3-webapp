@@ -24,7 +24,11 @@ export const loader = async ({
   // but cannot submit only download
   const catalogLevel = level === "" ? "easy" : level;
   const catalog = await getCatalog(catalogLevel);
-  return { catalog, submitAllowed: isSubmitAllowed(level ?? ''), archive: undefined };
+  return {
+    catalog,
+    submitAllowed: isSubmitAllowed(level ?? ""),
+    archive: undefined,
+  };
 };
 
 export const action = async ({ request }: ActionArgs) => {

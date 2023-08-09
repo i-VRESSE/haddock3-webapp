@@ -18,7 +18,7 @@ services:
     environment:
       BARTENDER_API_URL: "http://bartender:8000"
       DATABASE_URL: postgresql://postgres:postgres@webappdb:5432/postgres
-    volumes:         
+    volumes:
       - type: bind
         source: ./public_key.pem
         target: /app/src/public_key.pem

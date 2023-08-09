@@ -9,7 +9,7 @@
     "catalogs:guru": "curl -L https://github.com/i-VRESSE/workflow-builder/raw/main/packages/haddock3_catalog/public/catalog/haddock3.guru.yaml  | npx js-yaml > app/catalogs/haddock3.guru.json",
     "catalogs": "npm run catalogs:easy && npm run catalogs:expert && npm run catalogs:guru",
     "dev": "remix dev",
-    "format": "prettier --write .",
+    "format": "prettier --write . '!postgres-data'",
     "generate-client": "openapi-generator-cli generate -g typescript-fetch -i http://localhost:8000/api/openapi.json -o app/bartender-client",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve build",
@@ -17,8 +17,7 @@
     "typecheck": "tsc",
     "setup": "prisma generate && prisma migrate deploy && prisma db seed",
     "docker:dev": "docker compose -f docker-compose.dev.yml up",
-    "psql:dev": "docker compose -f docker-compose.dev.yml exec userdb psql -U postgres -d postgres",
-    "docker:all": "docker compose -f docker-compose.dev.yml up"
+    "psql:dev": "docker compose -f docker-compose.dev.yml exec userdb psql -U postgres -d postgres"
   },
   "prettier": {},
   "eslintIgnore": [

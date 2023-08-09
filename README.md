@@ -27,9 +27,6 @@ sequenceDiagram
 ```shell
 npm install
 cp .env.example .env
-# Start postgres database in docker container
-npm run docker:dev
-npm run setup
 # Create rsa key pair for signing & verifying JWT tokens for bartender web service
 openssl genpkey -algorithm RSA -out private_key.pem \
     -pkeyopt rsa_keygen_bits:2048
@@ -37,6 +34,21 @@ openssl rsa -pubout -in private_key.pem -out public_key.pem
 ```
 
 ## Development
+
+You need to have a Postgres database running. The easiest way is to use Docker:
+
+```sh
+npm run docker:dev
+```
+
+(Stores data in `./postgres-data`)
+(You can get a psql shell with `npm run psql:dev`)
+
+The database can be initialized with
+
+```sh
+npm run setup
+```
 
 From your terminal:
 
@@ -111,7 +123,7 @@ Requirements:
 3. [bartender repo](https://github.com/i-VRESSE/bartender) to be cloned in `../bartender` directory.
 4. bartender repo should have [.env file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#environment-variables)
 5. bartender repo should have a [config.yaml file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#configuration-file)
-    1. The `job_root_dir` key should be set to `/tmp/jobs`
+   1. The `job_root_dir` key should be set to `/tmp/jobs`
 
 Build with
 

@@ -1,5 +1,5 @@
 import type { User } from "~/models/user.server";
-import type { ExpertiseLevel } from '@prisma/client'
+import type { ExpertiseLevel } from "@prisma/client";
 
 interface IProps {
   user: User;
