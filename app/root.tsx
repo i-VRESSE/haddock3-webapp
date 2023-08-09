@@ -1,8 +1,9 @@
+import { cssBundleHref } from "@remix-run/css-bundle";
 import {
   json,
   type LinksFunction,
   type LoaderArgs,
-  type MetaFunction,
+  type V2_MetaFunction,
 } from "@remix-run/node";
 import {
   Links,
@@ -17,13 +18,14 @@ import { Navbar } from "~/components/Navbar";
 import { getOptionalClientUser } from "./auth.server";
 import styles from "./tailwind.css";
 
-export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
+export const links: LinksFunction = () => [
+  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+  { rel: "stylesheet", href: styles },
+];
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Haddock3",
-  viewport: "width=device-width,initial-scale=1",
-});
+export const meta: V2_MetaFunction = () => {
+  return [{ title: "Haddock3" }];
+};
 
 export async function loader({ request }: LoaderArgs) {
   const user = await getOptionalClientUser(request);
@@ -34,6 +36,8 @@ export default function App() {
   return (
     <html lang="en" data-theme="bonvinlab">
       <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
       </head>
