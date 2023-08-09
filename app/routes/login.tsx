@@ -4,9 +4,13 @@ import {
   redirect,
   json,
 } from "@remix-run/node";
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
+import { type FlatErrors, ValiError, flatten } from "valibot";
 import { availableSocialLogins } from "~/auth";
+import { AuthorizationError } from "remix-auth";
 import { authenticator, getOptionalUser } from "~/auth.server";
+import { ErrorMessages } from "~/components/ErrorMessages";
+import { UserNotFoundError, WrongPasswordError } from "~/models/user.server";
 
 export async function loader({ request }: LoaderArgs) {
   const user = await getOptionalUser(request);
@@ -18,13 +22,34 @@ export async function loader({ request }: LoaderArgs) {
 }
 
 export async function action({ request }: ActionArgs) {
-  return await authenticator.authenticate("user-pass", request, {
-    successRedirect: "/",
-    failureRedirect: "/login",
-  });
+  try {
+    await authenticator.authenticate("user-pass", request);
+    return redirect("/");
+  } catch (error) {
+    if (error instanceof AuthorizationError && error.cause) {
+      let errors: FlatErrors;
+      if (error.cause instanceof WrongPasswordError) {
+        errors = {
+          nested: { password: [error.message] },
+        };
+      } else if (error.cause instanceof UserNotFoundError) {
+        errors = {
+          nested: { email: [error.message] },
+        };
+      } else if (error.cause instanceof ValiError) {
+        errors = flatten(error.cause);
+      } else {
+        throw error;
+      }
+      return json({ errors }, { status: 400 });
+    }
+
+    throw error;
+  }
 }
 
 export default function LoginPage() {
+  const actionData = useActionData<typeof action>();
   const { socials } = useLoaderData<typeof loader>();
   // Shared style between login and register. Extract if we use it more often?
   const centeredColumn = "flex flex-col items-center gap-4";
@@ -39,28 +64,35 @@ export default function LoginPage() {
     <main className={centeredColumn}>
       <Form method="post" className={formStyle}>
         <h2 className={headerStyle}>Log in with username and password</h2>
-        <label>
-          <p>Email</p>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="username"
-            className={inputStyle}
-            required
-          />
-        </label>
-        <label>
-          <p>Password</p>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            className={inputStyle}
-            required
-          />
-        </label>
+        <div>
+          <label>
+            <p>Email</p>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="username"
+              className={inputStyle}
+              required
+            />
+          </label>
+          <ErrorMessages path="email" errors={actionData?.errors} />
+        </div>
+        <div>
+          <label>
+            <p>Password</p>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              minLength={8}
+              autoComplete="current-password"
+              className={inputStyle}
+              required
+            />
+          </label>
+          <ErrorMessages path="password" errors={actionData?.errors} />
+        </div>
         <button type="submit" className={buttonStyle}>
           Log in
         </button>

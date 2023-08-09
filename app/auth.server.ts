@@ -21,27 +21,26 @@ import {
   localLogin,
   oauthregister,
 } from "./models/user.server";
+import { email, minLength, object, parse, string } from "valibot";
 
 // Create an instance of the authenticator, pass a generic with what
 // strategies will return and will store in the session
-export let authenticator = new Authenticator<string>(sessionStorage, {
+export const authenticator = new Authenticator<string>(sessionStorage, {
   throwOnError: true,
+});
+
+const CredentialsSchema = object({
+  email: string([email()]),
+  password: string([minLength(8)]),
 });
 
 // Tell the Authenticator to use the form strategy
 authenticator.use(
   new FormStrategy(async ({ form }) => {
-    let email = form.get("email");
-    let password = form.get("password");
-    if (
-      email === null ||
-      password == null ||
-      typeof email !== "string" ||
-      typeof password !== "string"
-    ) {
-      // TODO use zod for validation
-      throw new Error("Email and password must be filled.");
-    }
+    const { email, password } = parse(
+      CredentialsSchema,
+      Object.fromEntries(form)
+    );
     const user = await localLogin(email, password);
     return user.id;
   }),
@@ -58,7 +57,7 @@ class GitHubStrategyWithVerifiedEmail extends GitHubStrategy<string> {
     // url & agent are private to super class so we have to copy them here
     const userEmailsURL = "https://api.github.com/user/emails";
     const userAgent = "Haddock3WebApp";
-    let response = await fetch(userEmailsURL, {
+    const response = await fetch(userEmailsURL, {
       headers: {
         Accept: "application/vnd.github.v3+json",
         Authorization: `token ${accessToken}`,
@@ -66,13 +65,13 @@ class GitHubStrategyWithVerifiedEmail extends GitHubStrategy<string> {
       },
     });
 
-    let data: {
+    const data: {
       email: string;
       verified: boolean;
       primary: boolean;
       visibility: string;
     }[] = await response.json();
-    let emails: GitHubEmails = data
+    const emails: GitHubEmails = data
       .filter((e) => e.verified)
       .map(({ email }) => ({ value: email }));
     return emails;
@@ -86,7 +85,7 @@ if (
   const gitHubStrategy = new GitHubStrategyWithVerifiedEmail(
     {
       clientID: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID,
-      clientSecret: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET!,
+      clientSecret: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET,
       callbackURL:
         process.env.HADDOCK3WEBAPP_GITHUB_CALLBACK_URL ||
         "http://localhost:3000/auth/github/callback",
@@ -184,7 +183,7 @@ if (
   const orcidStrategy = new OrcidStrategy(
     {
       clientID: process.env.HADDOCK3WEBAPP_ORCID_CLIENT_ID,
-      clientSecret: process.env.HADDOCK3WEBAPP_ORCID_CLIENT_SECRET!,
+      clientSecret: process.env.HADDOCK3WEBAPP_ORCID_CLIENT_SECRET,
       callbackURL:
         process.env.HADDOCK3WEBAPP_ORCID_CALLBACK_URL ||
         "http://localhost:3000/auth/orcid/callback",
@@ -243,7 +242,7 @@ if (
   const egiStrategy = new EgiStrategy(
     {
       clientID: process.env.HADDOCK3WEBAPP_EGI_CLIENT_ID,
-      clientSecret: process.env.HADDOCK3WEBAPP_EGI_CLIENT_SECRET!,
+      clientSecret: process.env.HADDOCK3WEBAPP_EGI_CLIENT_SECRET,
       callbackURL:
         process.env.HADDOCK3WEBAPP_EGI_CALLBACK_URL ||
         "http://localhost:3000/auth/egi/callback",

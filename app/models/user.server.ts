@@ -47,6 +47,18 @@ async function firstUserShouldBeAdmin() {
   return userCount === 0;
 }
 
+export class UserNotFoundError extends Error {
+  constructor() {
+    super("User not found");
+  }
+}
+
+export class WrongPasswordError extends Error {
+  constructor() {
+    super("Wrong password");
+  }
+}
+
 export async function localLogin(email: string, password: string) {
   const user = await db.user.findUnique({
     where: {
@@ -58,12 +70,12 @@ export async function localLogin(email: string, password: string) {
     },
   });
   if (!user) {
-    throw new Error("User not found");
+    throw new UserNotFoundError();
   }
   const { passwordHash, ...userWithoutPasswordHash } = user;
   const isValid = await compare(password, user.passwordHash || "");
   if (!isValid) {
-    throw new Error("Wrong password");
+    throw new WrongPasswordError();
   }
 
   return userWithoutPasswordHash;
