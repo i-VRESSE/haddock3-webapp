@@ -10,7 +10,7 @@ import {
   WORKFLOW_CONFIG_FILENAME,
 } from "./constants";
 
-function buildApplicationApi(accessToken: string = "") {
+function buildApplicationApi(accessToken = "") {
   return new ApplicationApi(buildConfig(accessToken));
 }
 
@@ -80,6 +80,7 @@ export async function rewriteConfigInArchive(upload: Blob) {
   zip.file(`${WORKFLOW_CONFIG_FILENAME}.orig`, config_body);
 
   // TODO validate config using catalog and ajv
+  // now have to wait for job to run before its validated
 
   const new_config = await rewriteConfig(config_body);
 

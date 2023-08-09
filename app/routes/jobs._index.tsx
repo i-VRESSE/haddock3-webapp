@@ -11,7 +11,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 
 export default function JobPage() {
   const { jobs } = useLoaderData<typeof loader>();
-  // TODO add pagination
+  // TODO add pagination, usefull for large number of jobs
   return (
     <main>
       <table className="table w-full">

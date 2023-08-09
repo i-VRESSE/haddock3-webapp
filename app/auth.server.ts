@@ -93,6 +93,7 @@ if (
     },
     async ({ profile }) => {
       // TODO store photo or avatar so it can be displayed in NavBar
+      // TODO store users display name in database for more personal greeting
       const primaryEmail = profile.emails[0].value;
       const userId = await oauthregister(primaryEmail);
       return userId;
@@ -173,6 +174,7 @@ if (
       const profileResponse = await fetch(this.profileEndpoint, { headers });
       const profile = await profileResponse.json();
       const emails = await this.userEmails(profile.sub);
+      // TODO store Orcid id into database
       return {
         ...profile,
         emails,
@@ -255,6 +257,8 @@ if (
     async ({ profile }) => {
       const primaryEmail = profile.emails![0].value;
       const userId = await oauthregister(primaryEmail);
+      // TODO store egi fields like orcid, eduperson or voperson into database
+      // in far future could be used to submit job on GRID with users credentials
       return userId;
     }
   );

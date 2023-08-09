@@ -16,13 +16,12 @@ import { ListFiles } from "~/components/ListFiles";
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
   const token = await getBartenderToken(request);
-  const job = await getJobById(jobId, token!);
-  // TODO check if job belongs to user
+  const job = await getJobById(jobId, token);
   let inputFiles: DirectoryItem | undefined = undefined;
   let outputFiles: DirectoryItem | undefined = undefined;
   if (CompletedJobs.has(job.state)) {
-    inputFiles = await listInputFiles(jobId, token!);
-    outputFiles = await listOutputFiles(jobId, token!);
+    inputFiles = await listInputFiles(jobId, token);
+    outputFiles = await listOutputFiles(jobId, token);
   }
   return json({ job, inputFiles, outputFiles });
 };

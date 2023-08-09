@@ -12,7 +12,7 @@ const BOOK_KEEPING_FILES = [
   "workflow.cfg.orig",
 ];
 
-function buildJobApi(bartenderToken: string = "") {
+function buildJobApi(bartenderToken = "") {
   return new JobApi(buildConfig(bartenderToken));
 }
 
