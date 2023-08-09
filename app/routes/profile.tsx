@@ -27,7 +27,6 @@ export const action = async ({ request }: ActionArgs) => {
     );
   } else {
     const errors = result.error;
-    console.error(errors);
     return json({ errors }, { status: 400 });
   }
   return null;
