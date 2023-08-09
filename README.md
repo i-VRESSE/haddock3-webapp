@@ -185,3 +185,7 @@ To fetch the latest catalogs run
 ```shell
 npm run catalogs
 ```
+
+## Stack
+
+The tech stack is explained in [docs/stack.md](docs/stack.md).

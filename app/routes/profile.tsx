@@ -1,5 +1,4 @@
-import type { ActionArgs } from "@remix-run/node";
-import { json, type LoaderArgs } from "@remix-run/node";
+import { type ActionArgs, json, type LoaderArgs } from "@remix-run/node";
 import { Form, Link, useSubmit } from "@remix-run/react";
 import { mustBeAuthenticated } from "~/auth.server";
 import { useUser } from "~/auth";
