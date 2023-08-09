@@ -307,7 +307,7 @@ export async function mustBeAdmin(request: Request) {
 
 export async function mustBeAllowedToSubmit(request: Request) {
   const user = await getUser(request);
-  if (!isSubmitAllowed(user.preferredExpertiseLevel)) {
+  if (!isSubmitAllowed(user.preferredExpertiseLevel ?? '')) {
     throw json({ error: "Submit not allowed" }, { status: 403 });
   }
   return user;

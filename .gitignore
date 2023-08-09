@@ -18,3 +18,5 @@ node_modules
 /public_key.pem
 
 Caddyfile
+
+postgres-data

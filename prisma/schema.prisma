@@ -6,11 +6,18 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+enum ExpertiseLevel {
+  guru
+  expert
+  easy
+}
+
 model User {
+  
   id                      String           @id @default(uuid())
   createdAt               DateTime         @default(now())
   updatedAt               DateTime         @updatedAt
@@ -20,12 +27,6 @@ model User {
   isAdmin                 Boolean          @default(false)
   bartenderToken          String           @default("")
   bartenderTokenExpiresAt Int              @default(0)
-  expertiseLevels         ExpertiseLevel[]
-  // TODO preferred level should be one of the expertise levels of the user
-  preferredExpertiseLevel String           @default("")
-}
-
-model ExpertiseLevel {
-  name  String @id
-  users User[]
+  expertiseLevels         ExpertiseLevel[] @default([])
+  preferredExpertiseLevel ExpertiseLevel?
 }

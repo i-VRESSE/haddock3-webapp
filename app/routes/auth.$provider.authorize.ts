@@ -10,6 +10,8 @@ export async function loader() {
 export const action = async ({ params, request }: ActionArgs) => {
   const provider = params.provider || "";
   const socials = availableSocialLogins();
+  console.log("socials", socials);
+  console.log("provider", provider);
   if (!socials.includes(provider)) {
     throw json("Not found", { status: 404 });
   }

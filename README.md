@@ -27,8 +27,9 @@ sequenceDiagram
 ```shell
 npm install
 cp .env.example .env
-npx prisma db push
-npx prisma db seed
+# Start postgres database in docker container
+npm run docker:dev
+npm run setup
 # Create rsa key pair for signing & verifying JWT tokens for bartender web service
 openssl genpkey -algorithm RSA -out private_key.pem \
     -pkeyopt rsa_keygen_bits:2048
@@ -101,13 +102,16 @@ Make sure to deploy the output of `remix build`
 
 ### Docker
 
-The web application can be run inside a Docker container.
+The web application can be run inside a Docker container together with all its dependent containers.
 
 Requirements:
 
-1. [bartender repo](https://github.com/i-VRESSE/bartender) to be cloned in `../bartender` directory.
-2. bartender repo should have [.env file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#environment-variables)
-3. bartender repo should have a [config.yaml file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#configuration-file)
+1. Private key `./private_key.pem` and public key `./public_key.pem`.
+2. `./.env` file for haddock3 web application.
+3. [bartender repo](https://github.com/i-VRESSE/bartender) to be cloned in `../bartender` directory.
+4. bartender repo should have [.env file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#environment-variables)
+5. bartender repo should have a [config.yaml file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#configuration-file)
+    1. The `job_root_dir` key should be set to `/tmp/jobs`
 
 Build with
 

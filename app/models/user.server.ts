@@ -1,14 +1,14 @@
 import { db } from "~/utils/db.server";
 import { compare, hash } from "bcryptjs";
 
+import { ExpertiseLevel } from '@prisma/client'
+
 export interface User {
   readonly id: string;
   readonly email: string;
-  readonly expertiseLevels: {
-    readonly name: string;
-  }[];
+  readonly expertiseLevels: ExpertiseLevel[];
   readonly isAdmin: boolean;
-  readonly preferredExpertiseLevel: string;
+  readonly preferredExpertiseLevel: ExpertiseLevel | null;
   readonly bartenderToken: string | null;
   readonly bartenderTokenExpiresAt: number;
 }
@@ -21,11 +21,7 @@ export type TokenLessUser = Omit<
 const userSelect = {
   id: true,
   email: true,
-  expertiseLevels: {
-    select: {
-      name: true,
-    },
-  },
+  expertiseLevels: true,
   isAdmin: true,
   preferredExpertiseLevel: true,
   bartenderToken: true,
@@ -130,19 +126,16 @@ export async function listUsers(limit = 100, offset = 0) {
   return users;
 }
 
-export async function listExpertiseLevels() {
-  const levels = await db.expertiseLevel.findMany({
-    select: {
-      name: true,
-    },
-    orderBy: {
-      name: "asc",
-    },
-  });
-  return levels.map((level) => level.name);
+export function listExpertiseLevels() {
+  const array = Array.from(Object.values(ExpertiseLevel));
+  if (array.length === 0) {
+    throw new Error("No expertise levels found");
+  }
+  // cast needed for valibot.enumpType
+  return array as [ExpertiseLevel, ...ExpertiseLevel[]];
 }
 
-export async function assignExpertiseLevel(userId: string, level: string) {
+export async function assignExpertiseLevel(userId: string, level: ExpertiseLevel) {
   // set preferred level to the assigned level if no preferred level is set
   const user = await getUserById(userId);
   const preferredExpertiseLevel = user.preferredExpertiseLevel
@@ -156,9 +149,7 @@ export async function assignExpertiseLevel(userId: string, level: string) {
     data: {
       preferredExpertiseLevel,
       expertiseLevels: {
-        connect: {
-          name: level,
-        },
+        push: level
       },
     },
     select: {
@@ -167,15 +158,15 @@ export async function assignExpertiseLevel(userId: string, level: string) {
   });
 }
 
-export async function unassignExpertiseLevel(userId: string, level: string) {
+export async function unassignExpertiseLevel(userId: string, level: ExpertiseLevel) {
   // set preferred level to the first remaining level if the preferred level is the one being removed
   const user = await getUserById(userId);
+  const remainingLevels = user
+  .expertiseLevels.map((level) => level)
+  .filter((name) => name !== level);
   let preferredExpertiseLevel = user.preferredExpertiseLevel;
   if (preferredExpertiseLevel === level) {
-    const remainingLevels = user
-      .expertiseLevels!.map((level) => level.name)
-      .filter((name) => name !== level);
-    preferredExpertiseLevel = remainingLevels[0] || "";
+    preferredExpertiseLevel = remainingLevels[0] || null;
   }
 
   await db.user.update({
@@ -185,9 +176,7 @@ export async function unassignExpertiseLevel(userId: string, level: string) {
     data: {
       preferredExpertiseLevel,
       expertiseLevels: {
-        disconnect: {
-          name: level,
-        },
+        set: remainingLevels,
       },
     },
     select: {
@@ -198,33 +187,25 @@ export async function unassignExpertiseLevel(userId: string, level: string) {
 
 export async function setPreferredExpertiseLevel(
   userId: string,
-  level: string
+  preferredExpertiseLevel: ExpertiseLevel
 ) {
   const user = await db.user.findUnique({
     where: {
       id: userId,
     },
     select: {
-      expertiseLevels: {
-        select: {
-          name: true,
-        },
-      },
+      expertiseLevels: true,
     },
   });
   if (!user) {
     throw new Error("User not found");
-  }
-  const levels = user.expertiseLevels.map((level) => level.name);
-  if (!levels.includes(level)) {
-    throw new Error("User does not have this expertise level");
   }
   await db.user.update({
     where: {
       id: userId,
     },
     data: {
-      preferredExpertiseLevel: level,
+      preferredExpertiseLevel,
     },
     select: {
       id: true,

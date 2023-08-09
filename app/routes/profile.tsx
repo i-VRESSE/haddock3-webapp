@@ -2,24 +2,30 @@ import { type ActionArgs, json, type LoaderArgs } from "@remix-run/node";
 import { Form, Link, useSubmit } from "@remix-run/react";
 import { mustBeAuthenticated } from "~/auth.server";
 import { useUser } from "~/auth";
-import { setPreferredExpertiseLevel } from "~/models/user.server";
+import { listExpertiseLevels, setPreferredExpertiseLevel } from "~/models/user.server";
+import { enumType, object, safeParse } from "valibot";
 
 export const loader = async ({ request }: LoaderArgs) => {
   await mustBeAuthenticated(request);
   return json({});
 };
 
+
 export const action = async ({ request }: ActionArgs) => {
   const userId = await mustBeAuthenticated(request);
   const formData = await request.formData();
-  const preferredExpertiseLevel = formData.get("preferredExpertiseLevel");
-  if (
-    preferredExpertiseLevel !== null &&
-    typeof preferredExpertiseLevel === "string"
-  ) {
-    await setPreferredExpertiseLevel(userId, preferredExpertiseLevel);
+  const ActionSchema = object({
+    preferredExpertiseLevel: enumType(listExpertiseLevels())
+  });
+  const result = safeParse(ActionSchema, Object.fromEntries(formData));
+  if (result.success) {
+    await setPreferredExpertiseLevel(userId, result.data.preferredExpertiseLevel);
+  } else {
+    const errors = result.error;
+    console.error(errors);
+    return json({ errors }, { status: 400 });
   }
-  return null;
+  return null
 };
 
 export default function Page() {
@@ -39,19 +45,19 @@ export default function Page() {
           <Form method="post" onChange={handleChangePreferredExpertiseLevel}>
             <ul className="list-inside">
               {user.expertiseLevels.map((level) => (
-                <li key={level.name}>
+                <li key={level}>
                   <label>
                     <input
                       title="Preferred"
                       type="radio"
                       className="radio"
                       name="preferredExpertiseLevel"
-                      value={level.name}
+                      value={level}
                       defaultChecked={
-                        user.preferredExpertiseLevel === level.name
+                        user.preferredExpertiseLevel === level
                       }
                     />{" "}
-                    {level.name}
+                    {level}
                   </label>
                 </li>
               ))}

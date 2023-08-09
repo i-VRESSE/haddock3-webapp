@@ -1,21 +1,16 @@
 import { PrismaClient } from "@prisma/client";
-const db = new PrismaClient();
+
+const prisma = new PrismaClient();
 
 async function seed() {
-  await Promise.all(
-    // TODO use createMany when postgresql is used
-    getExpertiseLevels().map(async (name) => {
-      return db.expertiseLevel.create({
-        data: {
-          name,
-        },
-      });
-    })
-  );
+  console.log(`Database has been seeded. 🌱`);
 }
 
-seed();
-
-function getExpertiseLevels() {
-  return ["guru", "expert", "easy"];
-}
+seed()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

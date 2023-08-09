@@ -3,8 +3,9 @@ import type { ICatalog } from "@i-vresse/wb-core/dist/types";
 import easy from "./haddock3.easy.json";
 import expert from "./haddock3.expert.json";
 import guru from "./haddock3.guru.json";
+import type { ExpertiseLevel } from "@prisma/client";
 
-export async function getCatalog(level: string) {
+export async function getCatalog(level: ExpertiseLevel) {
   // Tried serverDependenciesToBundle in remix.config.js but it didn't work
   // Fallback to using dynamic import
   const { prepareCatalog } = await import("@i-vresse/wb-core/dist/catalog.js");

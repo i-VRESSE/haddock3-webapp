@@ -25,7 +25,7 @@ export const action = async ({ request }: ActionArgs) => {
   }
 
   const token = await getBartenderToken(request);
-  const job = await submitJob(upload, token!);
+  const job = await submitJob(upload, token);
   const job_url = `/jobs/${job.id}`;
   return redirect(job_url);
 };

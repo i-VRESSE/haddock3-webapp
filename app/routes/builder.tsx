@@ -18,13 +18,13 @@ export const loader = async ({
   archive: string | undefined;
 }> => {
   const user = await getOptionalUser(request);
-  const level = user ? user.preferredExpertiseLevel : "";
+  const level = user ? user.preferredExpertiseLevel ?? "" : "";
   // When user does not have a level he/she
   // can still use builder with easy level
   // but cannot submit only download
   const catalogLevel = level === "" ? "easy" : level;
   const catalog = await getCatalog(catalogLevel);
-  return { catalog, submitAllowed: isSubmitAllowed(level), archive: undefined };
+  return { catalog, submitAllowed: isSubmitAllowed(level ?? ''), archive: undefined };
 };
 
 export const action = async ({ request }: ActionArgs) => {
@@ -36,7 +36,7 @@ export const action = async ({ request }: ActionArgs) => {
 
   const user = await mustBeAllowedToSubmit(request);
   const accessToken = await getBartenderTokenByUser(user);
-  const job = await submitJob(upload, accessToken!);
+  const job = await submitJob(upload, accessToken);
   const job_url = `/jobs/${job.id}`;
   return redirect(job_url);
 };

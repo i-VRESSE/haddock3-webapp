@@ -14,7 +14,7 @@ import { mustBeAdmin } from "~/auth.server";
 export async function loader({ request }: LoaderArgs) {
   await mustBeAdmin(request);
   const users = await listUsers();
-  const expertiseLevels = await listExpertiseLevels();
+  const expertiseLevels = listExpertiseLevels();
   return json({
     users,
     expertiseLevels,
@@ -32,7 +32,7 @@ export async function action({ request }: ActionArgs) {
   if (isAdmin !== null) {
     await setIsAdmin(userId, isAdmin === "true");
   }
-  const levels = await listExpertiseLevels();
+  const levels = listExpertiseLevels();
   for (const level of levels) {
     const levelState = formData.get(level);
     if (levelState !== null) {
@@ -55,7 +55,7 @@ export default function AdminUsersPage() {
       <table className="table w-full">
         <thead>
           <tr>
-            <th></th>
+            <th>Batch</th>
             <th>Email</th>
             <th>Administrator?</th>
             <th>Expertise levels</th>

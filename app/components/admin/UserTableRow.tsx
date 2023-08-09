@@ -1,8 +1,9 @@
 import type { User } from "~/models/user.server";
+import type { ExpertiseLevel } from '@prisma/client'
 
 interface IProps {
   user: User;
-  expertiseLevels: string[];
+  expertiseLevels: ExpertiseLevel[];
   onUpdate: (data: FormData) => void;
   submitting: boolean;
 }
@@ -13,7 +14,7 @@ export const UserTableRow = ({
   onUpdate,
   submitting,
 }: IProps) => {
-  const usersExpertiseLevels = user.expertiseLevels.map((r) => r.name);
+  const usersExpertiseLevels = user.expertiseLevels;
   return (
     <tr>
       <td>
