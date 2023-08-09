@@ -65,8 +65,7 @@ services:
       - type: bind
         source: ./private_key.pem
         target: /app/src/private_key.pem
-      # TODO use mount instead of Docker volume
-      # so job root dir can be on a NFS share
+      # to store jobs on NFS share replace line below with bind mount
       - bartender-job-data:/tmp/jobs
     depends_on:
       bartenderdb:
