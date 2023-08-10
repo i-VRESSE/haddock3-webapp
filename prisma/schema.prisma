@@ -29,4 +29,5 @@ model User {
   bartenderTokenExpiresAt Int              @default(0)
   expertiseLevels         ExpertiseLevel[] @default([])
   preferredExpertiseLevel ExpertiseLevel?
+  photo                   String
 }

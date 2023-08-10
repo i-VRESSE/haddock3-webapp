@@ -166,7 +166,7 @@ BARTENDER_API_URL=http://localhost:8000
 
 The haddock3 web application must be trusted by the bartender web service using a JWT token.
 An RSA private key is used by the haddock3 web application to sign the JWT token.
-To tell the bartender web service where to find the private key, use the `BARTENDER_PRIVATE_KEY` environment variable.
+To tell the haddock3 web application where to find the private key, use the `BARTENDER_PRIVATE_KEY` environment variable.
 
 ```sh
 BARTENDER_PRIVATE_KEY=private_key.pem

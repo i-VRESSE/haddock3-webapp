@@ -23,8 +23,8 @@ export async function loader({ request }: LoaderArgs) {
 
 export async function action({ request }: ActionArgs) {
   try {
-    await authenticator.authenticate("user-pass", request);
-    return redirect("/");
+    return await authenticator.authenticate("user-pass", request, {
+      successRedirect: "/"});
   } catch (error) {
     if (error instanceof AuthorizationError && error.cause) {
       let errors: FlatErrors;

@@ -13,6 +13,7 @@ CREATE TABLE "User" (
     "bartenderTokenExpiresAt" INTEGER NOT NULL DEFAULT 0,
     "expertiseLevels" "ExpertiseLevel"[] DEFAULT ARRAY[]::"ExpertiseLevel"[],
     "preferredExpertiseLevel" "ExpertiseLevel",
+    "photo" TEXT NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );

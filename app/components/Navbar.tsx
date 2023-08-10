@@ -1,23 +1,14 @@
 import { Link, NavLink } from "@remix-run/react";
-import md5Hex from "md5-hex";
-import { useMemo } from "react";
 import { useIsAdmin, useIsLoggedIn, useUser } from "~/auth";
 
 const LoggedInButton = () => {
   const user = useUser();
-  const gravatarHash = useMemo(
-    () => md5Hex(user.email.toLowerCase().trim()),
-    [user]
-  );
   const isAdmin = useIsAdmin();
   return (
     <div className="dropdown-end dropdown">
       <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
         <div className="w-10 rounded-full">
-          <img
-            alt="gravatar"
-            src={`https://www.gravatar.com/avatar/${gravatarHash}`}
-          />{" "}
+          <img alt="gravatar" src={user.photo} />{" "}
         </div>
       </label>
       <ul

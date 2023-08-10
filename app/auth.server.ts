@@ -92,10 +92,10 @@ if (
       userAgent: "Haddock3WebApp",
     },
     async ({ profile }) => {
-      // TODO store photo or avatar so it can be displayed in NavBar
       // TODO store users display name in database for more personal greeting
       const primaryEmail = profile.emails[0].value;
-      const userId = await oauthregister(primaryEmail);
+      const photo = profile.photos[0].value ?? undefined;
+      const userId = await oauthregister(primaryEmail, photo);
       return userId;
     }
   );
@@ -193,7 +193,8 @@ if (
     },
     async ({ profile }) => {
       const primaryEmail = profile.emails![0].value;
-      const userId = await oauthregister(primaryEmail);
+      const photo = profile.photos![0].value ?? undefined;
+      const userId = await oauthregister(primaryEmail, photo);
       return userId;
     }
   );
@@ -256,7 +257,11 @@ if (
     },
     async ({ profile }) => {
       const primaryEmail = profile.emails![0].value;
-      const userId = await oauthregister(primaryEmail);
+      if (!profile._json.email_verified) {
+        throw new Error("Email not verified");
+      }
+      const photo = profile.photos![0].value ?? undefined;
+      const userId = await oauthregister(primaryEmail, photo);
       // TODO store egi fields like orcid, eduperson or voperson into database
       // in far future could be used to submit job on GRID with users credentials
       return userId;

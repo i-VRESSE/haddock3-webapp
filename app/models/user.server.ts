@@ -1,7 +1,9 @@
+import { createHash } from "node:crypto";
 import { db } from "~/utils/db.server";
 import { compare, hash } from "bcryptjs";
 
 import { ExpertiseLevel } from "@prisma/client";
+import { generatePhoto } from "./generatePhoto";
 
 export interface User {
   readonly id: string;
@@ -11,6 +13,7 @@ export interface User {
   readonly preferredExpertiseLevel: ExpertiseLevel | null;
   readonly bartenderToken: string | null;
   readonly bartenderTokenExpiresAt: number;
+  readonly photo: string;
 }
 
 export type TokenLessUser = Omit<
@@ -26,24 +29,35 @@ const userSelect = {
   preferredExpertiseLevel: true,
   bartenderToken: true,
   bartenderTokenExpiresAt: true,
+  photo: true,
 } as const;
 
 export async function register(email: string, password: string) {
   const isAdmin = await firstUserShouldBeAdmin();
   const passwordHash = await hash(password, 10);
+  const photo = generatePhoto(email);
   const user = await db.user.create({
     data: {
       email,
       isAdmin,
       passwordHash,
+      photo,
     },
     select: userSelect,
   });
   return user;
 }
 
+let USER_COUNT_CACHE = 0;
+
 async function firstUserShouldBeAdmin() {
+  if (USER_COUNT_CACHE > 0) {
+    return false;
+  }
   const userCount = await db.user.count();
+  if (userCount > 0) {
+    USER_COUNT_CACHE = 1;
+  }
   return userCount === 0;
 }
 
@@ -81,7 +95,7 @@ export async function localLogin(email: string, password: string) {
   return userWithoutPasswordHash;
 }
 
-export async function oauthregister(email: string) {
+export async function oauthregister(email: string, photo?: string) {
   const isAdmin = await firstUserShouldBeAdmin();
   const user = await db.user.upsert({
     where: {
@@ -90,6 +104,7 @@ export async function oauthregister(email: string) {
     create: {
       email,
       isAdmin,
+      photo: photo ?? generatePhoto(email),
     },
     update: {},
     select: {
