@@ -24,7 +24,8 @@ export async function loader({ request }: LoaderArgs) {
 export async function action({ request }: ActionArgs) {
   try {
     return await authenticator.authenticate("user-pass", request, {
-      successRedirect: "/"});
+      successRedirect: "/",
+    });
   } catch (error) {
     if (error instanceof AuthorizationError && error.cause) {
       let errors: FlatErrors;
@@ -49,7 +50,7 @@ export async function action({ request }: ActionArgs) {
 }
 
 export default function LoginPage() {
-  const actionData = useActionData<{ errors: FlatErrors} | undefined>();
+  const actionData = useActionData<{ errors: FlatErrors } | undefined>();
   const { socials } = useLoaderData<typeof loader>();
   // Shared style between login and register. Extract if we use it more often?
   const centeredColumn = "flex flex-col items-center gap-4";

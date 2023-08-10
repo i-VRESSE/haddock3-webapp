@@ -4,7 +4,11 @@ function generateInitials(email: string): string {
   return initials.join("");
 }
 
-export function generatePhoto(email: string, bg = '#F2F3F9', fg = '#4177C1'): string {
+export function generatePhoto(
+  email: string,
+  bg = "#F2F3F9",
+  fg = "#4177C1"
+): string {
   // Default foreground and background colors are from tailwind.config.js
   const initials = generateInitials(email);
   const svg = `
