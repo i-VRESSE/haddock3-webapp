@@ -49,7 +49,7 @@ export async function action({ request }: ActionArgs) {
 }
 
 export default function LoginPage() {
-  const actionData = useActionData<typeof action>();
+  const actionData = useActionData<{ errors: FlatErrors} | undefined>();
   const { socials } = useLoaderData<typeof loader>();
   // Shared style between login and register. Extract if we use it more often?
   const centeredColumn = "flex flex-col items-center gap-4";
