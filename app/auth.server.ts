@@ -193,7 +193,7 @@ if (
     },
     async ({ profile }) => {
       const primaryEmail = profile.emails![0].value;
-      const photo = profile.photos![0].value ?? undefined;
+      const photo = profile.photos ? profile.photos![0].value : undefined;
       const userId = await oauthregister(primaryEmail, photo);
       return userId;
     }
@@ -260,7 +260,7 @@ if (
       if (!profile._json.email_verified) {
         throw new Error("Email not verified");
       }
-      const photo = profile.photos![0].value ?? undefined;
+      const photo = profile.photos ? profile.photos![0].value : undefined;
       const userId = await oauthregister(primaryEmail, photo);
       // TODO store egi fields like orcid, eduperson or voperson into database
       // in far future could be used to submit job on GRID with users credentials

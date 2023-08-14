@@ -7,4 +7,5 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     successRedirect: "/",
     failureRedirect: "/login",
   });
+  // TODO when auth fails, show message to user
 };
