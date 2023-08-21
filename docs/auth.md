@@ -21,6 +21,7 @@ The sessions will be encrypted with a secret key from an environment variable.
 ```shell
 SESSION_SECRET=...
 ```
+
 A random secret string can be generated with `openssl rand -base64 32`.
 
 ## Social logins
@@ -41,7 +42,7 @@ HADDOCK3WEBAPP_EGI_CALLBACK_URL=http://localhost:3000/auth/egi/callback
 HADDOCK3WEBAPP_EGI_ENVIRONMENT=production  # could also be 'development' or 'demo'
 ```
 
-Only use social logins where the email address has been verified. 
+Only use social logins where the email address has been verified.
 Otherwise someone could create an social account with your email address and impersonate you.
 
 ## GitHub login

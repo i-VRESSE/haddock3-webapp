@@ -71,11 +71,13 @@ The database can be initialized with
 npm run setup
 # This will generate prisma client, create tables and insert seed data
 ```
+
 (You can reset database with `npx prisma migrate reset`.)
 
-The database setup should be run only once for a fresh database. 
-Whenever you change the `prisma/schema.prisma` file you need to 
-1. Use [prisma migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate) to generate a migration and to update the database. 
+The database setup should be run only once for a fresh database.
+Whenever you change the `prisma/schema.prisma` file you need to
+
+1. Use [prisma migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate) to generate a migration and to update the database.
 2. Run `npx prisma generate` to generate the prisma client.
 
 Start [remix](https://remix.run) development server from your terminal with:
