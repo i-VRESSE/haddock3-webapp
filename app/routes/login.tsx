@@ -86,7 +86,6 @@ export default function LoginPage() {
               id="password"
               name="password"
               type="password"
-              minLength={8}
               autoComplete="current-password"
               className={inputStyle}
               required

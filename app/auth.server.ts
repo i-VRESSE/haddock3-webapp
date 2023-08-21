@@ -21,7 +21,7 @@ import {
   localLogin,
   oauthregister,
 } from "./models/user.server";
-import { email, minLength, object, parse, string } from "valibot";
+import { email, object, parse, string } from "valibot";
 
 // Create an instance of the authenticator, pass a generic with what
 // strategies will return and will store in the session
@@ -31,7 +31,7 @@ export const authenticator = new Authenticator<string>(sessionStorage, {
 
 const CredentialsSchema = object({
   email: string([email()]),
-  password: string([minLength(8)]),
+  password: string(),
 });
 
 // Tell the Authenticator to use the form strategy
