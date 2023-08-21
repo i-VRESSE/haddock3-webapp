@@ -1,47 +1,59 @@
-import type { UserAsListItem } from "~/bartender-client";
+import type { User } from "~/models/user.server";
+import type { ExpertiseLevel } from "@prisma/client";
 
 interface IProps {
-  user: UserAsListItem;
-  roles: string[];
+  user: User;
+  expertiseLevels: ExpertiseLevel[];
   onUpdate: (data: FormData) => void;
   submitting: boolean;
 }
 
-export const UserTableRow = ({ user, roles, onUpdate, submitting }: IProps) => {
+export const UserTableRow = ({
+  user,
+  expertiseLevels,
+  onUpdate,
+  submitting,
+}: IProps) => {
+  const usersExpertiseLevels = user.expertiseLevels;
   return (
     <tr>
       <td>{user.email}</td>
       <td>
         <input
           type="checkbox"
-          checked={user.isSuperuser}
+          checked={user.isAdmin}
           className="checkbox"
           disabled={submitting}
           onChange={() => {
+            if (window.confirm("Are you sure?") === false) {
+              return;
+            }
             const data = new FormData();
-            data.set("isSuperuser", user.isSuperuser ? "false" : "true");
+            data.set("isAdmin", user.isAdmin ? "false" : "true");
             onUpdate(data);
           }}
         />
       </td>
       <td>
         <ul className="flex">
-          {roles.map((role) => {
+          {expertiseLevels.map((expertiseLevel) => {
             return (
-              <li key={role}>
+              <li key={expertiseLevel}>
                 <div className="form-control">
                   <label className="label cursor-pointer">
-                    <span className="label-text">{role}</span>
+                    <span className="label-text">{expertiseLevel}</span>
                     <input
                       type="checkbox"
-                      checked={user.roles.includes(role)}
+                      checked={usersExpertiseLevels.includes(expertiseLevel)}
                       className="checkbox ml-2"
                       disabled={submitting}
                       onChange={() => {
                         const data = new FormData();
                         data.set(
-                          role,
-                          user.roles.includes(role) ? "false" : "true"
+                          expertiseLevel,
+                          usersExpertiseLevels.includes(expertiseLevel)
+                            ? "false"
+                            : "true"
                         );
                         onUpdate(data);
                       }}

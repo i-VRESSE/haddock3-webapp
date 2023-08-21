@@ -1,170 +1,282 @@
-import { RolesApi } from "~/bartender-client";
-import { UsersApi } from "~/bartender-client";
-import { AuthApi } from "~/bartender-client/apis/AuthApi";
-import { buildConfig } from "./config.server";
+import { db } from "~/utils/db.server";
+import { compare, hash } from "bcryptjs";
 
-function buildAuthApi(accessToken: string = "") {
-  return new AuthApi(buildConfig(accessToken));
+import { ExpertiseLevel } from "@prisma/client";
+import { generatePhoto } from "./generatePhoto";
+
+export interface User {
+  readonly id: string;
+  readonly email: string;
+  readonly expertiseLevels: ExpertiseLevel[];
+  readonly isAdmin: boolean;
+  readonly preferredExpertiseLevel: ExpertiseLevel | null;
+  readonly bartenderToken: string | null;
+  readonly bartenderTokenExpiresAt: number;
+  readonly photo: string;
 }
 
-function buildUsersApi(accessToken: string) {
-  return new UsersApi(buildConfig(accessToken));
-}
+export type TokenLessUser = Omit<
+  User,
+  "bartenderToken" | "bartenderTokenExpiresAt"
+>;
 
-function buildRolesApi(accessToken: string) {
-  return new RolesApi(buildConfig(accessToken));
-}
+const userSelect = {
+  id: true,
+  email: true,
+  expertiseLevels: true,
+  isAdmin: true,
+  preferredExpertiseLevel: true,
+  bartenderToken: true,
+  bartenderTokenExpiresAt: true,
+  photo: true,
+} as const;
 
 export async function register(email: string, password: string) {
-  const api = buildAuthApi();
-  return await api.registerRegister({
-    userCreate: {
+  const isAdmin = await firstUserShouldBeAdmin();
+  const passwordHash = await hash(password, 10);
+  const photo = generatePhoto(email);
+  const user = await db.user.create({
+    data: {
       email,
-      password,
+      isAdmin,
+      passwordHash,
+      photo,
+    },
+    select: userSelect,
+  });
+  return user;
+}
+
+let USER_COUNT_CACHE = 0;
+
+async function firstUserShouldBeAdmin() {
+  if (USER_COUNT_CACHE > 0) {
+    return false;
+  }
+  const userCount = await db.user.count();
+  if (userCount > 0) {
+    USER_COUNT_CACHE = 1;
+  }
+  return userCount === 0;
+}
+
+export class UserNotFoundError extends Error {
+  constructor() {
+    super("User not found");
+  }
+}
+
+export class WrongPasswordError extends Error {
+  constructor() {
+    super("Wrong password");
+  }
+}
+
+export async function localLogin(email: string, password: string) {
+  const user = await db.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: {
+      ...userSelect,
+      passwordHash: true,
     },
   });
+  if (!user) {
+    throw new UserNotFoundError();
+  }
+  const { passwordHash, ...userWithoutPasswordHash } = user;
+  if (!passwordHash) {
+    throw new WrongPasswordError();
+  }
+  const isValid = await compare(password, passwordHash);
+  if (!isValid) {
+    throw new WrongPasswordError();
+  }
+
+  return userWithoutPasswordHash;
 }
 
-export async function localLogin(username: string, password: string) {
-  const api = buildAuthApi();
-  const response = await api.authLocalLogin({
-    username,
-    password,
+export async function oauthregister(email: string, photo?: string) {
+  const isAdmin = await firstUserShouldBeAdmin();
+  const user = await db.user.upsert({
+    where: {
+      email,
+    },
+    create: {
+      email,
+      isAdmin,
+      photo: photo ?? generatePhoto(email),
+    },
+    update: {},
+    select: {
+      id: true,
+    },
   });
-  return response.accessToken;
+  return user.id;
 }
 
-export async function getProfile(accessToken: string) {
-  const api = buildUsersApi(accessToken);
-  return await api.profile();
+export async function getUserById(userId: string) {
+  const user = await db.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: userSelect,
+  });
+  if (!user) {
+    throw new Error("User not found");
+  }
+  return user;
 }
 
-export async function oauthAuthorize(provider: string) {
-  const api = buildAuthApi();
-  let url: string;
-  switch (provider) {
-    case "github":
-      url = (await api.oauthGithubRemoteAuthorize()).authorizationUrl;
-      break;
-    case "orcid":
-      url = (await api.oauthOrcidOrgRemoteAuthorize()).authorizationUrl;
-      break;
-    case "orcidsandbox":
-      url = (await api.oauthSandboxOrcidOrgRemoteAuthorize()).authorizationUrl;
-      break;
-    case "egi":
-      url = (await api.oauthEGICheckInRemoteAuthorize()).authorizationUrl;
-      break;
-    default:
-      throw new Error("Unknown provider");
+export async function getUserByEmail(email: string) {
+  const user = await db.user.findUnique({
+    where: {
+      email: email,
+    },
+    select: userSelect,
+  });
+  if (!user) {
+    throw new Error("User not found");
   }
-  return url;
-}
-
-export async function oauthCallback(provider: string, search: URLSearchParams) {
-  const api = buildAuthApi();
-  const request = {
-    code: search.get("code") || undefined,
-    codeVerifier: search.get("code_verifier") || undefined,
-    state: search.get("state") || undefined,
-    error: search.get("error") || undefined,
-  };
-  let response: any;
-  switch (provider) {
-    case "github":
-      response = await api.oauthGithubRemoteCallback(request);
-      break;
-    case "orcid":
-      response = await api.oauthOrcidOrgRemoteCallback(request);
-      break;
-    case "orcidsandbox":
-      response = await api.oauthSandboxOrcidOrgRemoteCallback(request);
-      break;
-    case "egi":
-      response = await api.oauthEGICheckInRemoteCallback(request);
-      break;
-    default:
-      throw new Error("Unknown provider");
-  }
-  return response.access_token;
-}
-
-export async function getLevel(
-  userRoles: string[] | undefined
-): Promise<string> {
-  if (!userRoles) {
-    return "";
-  }
-  const roles = new Set(userRoles);
-  if (roles.has("guru")) {
-    return "guru";
-  } else if (roles.has("expert")) {
-    return "expert";
-  } else if (roles.has("easy")) {
-    return "easy";
-  }
-  return "";
-}
-
-export function checkAuthenticated(accessToken: string | undefined) {
-  if (accessToken === undefined) {
-    throw new Error("Unauthenticated");
-  }
+  return user;
 }
 
 export function isSubmitAllowed(level: string) {
   return level !== "";
 }
 
-export async function getCurrentUser(accessToken: string) {
-  const api = buildUsersApi(accessToken);
-  return await api.usersCurrentUser();
+export async function listUsers(limit = 100, offset = 0) {
+  const users = await db.user.findMany({
+    select: userSelect,
+    take: limit,
+    skip: offset,
+  });
+  return users;
 }
 
-export async function listUsers(accessToken: string, limit = 100, offset = 0) {
-  const api = buildUsersApi(accessToken);
-  return await api.listUsers({ limit, offset });
+export function listExpertiseLevels() {
+  const array = Array.from(Object.values(ExpertiseLevel));
+  if (array.length === 0) {
+    throw new Error("No expertise levels found");
+  }
+  // cast needed for valibot.enumpType
+  return array as [ExpertiseLevel, ...ExpertiseLevel[]];
 }
 
-export async function listRoles(accessToken: string) {
-  const api = buildRolesApi(accessToken);
-  return await api.listRoles();
-}
-
-export async function setSuperUser(
-  accessToken: string,
+export async function assignExpertiseLevel(
   userId: string,
-  checked: boolean
+  level: ExpertiseLevel
 ) {
-  const api = buildUsersApi(accessToken);
-  return await api.usersPatchUser({
-    id: userId,
-    userUpdate: {
-      isSuperuser: checked,
+  // set preferred level to the assigned level if no preferred level is set
+  const user = await getUserById(userId);
+  const preferredExpertiseLevel = user.preferredExpertiseLevel
+    ? user.preferredExpertiseLevel
+    : level;
+
+  await db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      preferredExpertiseLevel,
+      expertiseLevels: {
+        push: level,
+      },
+    },
+    select: {
+      id: true,
     },
   });
 }
 
-export async function assignRole(
-  accessToken: string,
+export async function unassignExpertiseLevel(
   userId: string,
-  roleId: string
+  level: ExpertiseLevel
 ) {
-  const api = buildRolesApi(accessToken);
-  api.assignRoleToUser({
-    userId,
-    roleId,
+  // set preferred level to the first remaining level if the preferred level is the one being removed
+  const user = await getUserById(userId);
+  const remainingLevels = user.expertiseLevels
+    .map((level) => level)
+    .filter((name) => name !== level);
+  let preferredExpertiseLevel = user.preferredExpertiseLevel;
+  if (preferredExpertiseLevel === level) {
+    preferredExpertiseLevel = remainingLevels[0] || null;
+  }
+
+  await db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      preferredExpertiseLevel,
+      expertiseLevels: {
+        set: remainingLevels,
+      },
+    },
+    select: {
+      id: true,
+    },
   });
 }
 
-export async function unassignRole(
-  accessToken: string,
+export async function setPreferredExpertiseLevel(
   userId: string,
-  roleId: string
+  preferredExpertiseLevel: ExpertiseLevel
 ) {
-  const api = buildRolesApi(accessToken);
-  api.unassignRoleFromUser({
-    userId,
-    roleId,
+  const user = await db.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      expertiseLevels: true,
+    },
+  });
+  if (!user) {
+    throw new Error("User not found");
+  }
+  await db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      preferredExpertiseLevel,
+    },
+    select: {
+      id: true,
+    },
+  });
+}
+
+export async function setIsAdmin(userId: string, isAdmin: boolean) {
+  await db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      isAdmin,
+    },
+    select: {
+      id: true,
+    },
+  });
+}
+
+export async function setBartenderToken(
+  userId: string,
+  token: string,
+  expireAt: number
+) {
+  await db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      bartenderToken: token,
+      bartenderTokenExpiresAt: expireAt,
+    },
+    select: {
+      id: true,
+    },
   });
 }

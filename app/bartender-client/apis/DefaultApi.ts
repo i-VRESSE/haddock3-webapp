@@ -19,7 +19,7 @@ import * as runtime from "../runtime";
  */
 export class DefaultApi extends runtime.BaseAPI {
   /**
-   * Checks the health of a project.  It returns 200 if the project is healthy.
+   * Checks the health of a project.  It returns 200 if the project is healthy.  Args:     session: SQLAlchemy session.
    * Health Check
    */
   async healthCheckRaw(
@@ -47,7 +47,7 @@ export class DefaultApi extends runtime.BaseAPI {
   }
 
   /**
-   * Checks the health of a project.  It returns 200 if the project is healthy.
+   * Checks the health of a project.  It returns 200 if the project is healthy.  Args:     session: SQLAlchemy session.
    * Health Check
    */
   async healthCheck(

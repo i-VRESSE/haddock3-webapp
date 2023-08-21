@@ -1,9 +1,9 @@
+import { cssBundleHref } from "@remix-run/css-bundle";
 import {
   json,
-  redirect,
   type LinksFunction,
   type LoaderArgs,
-  type MetaFunction,
+  type V2_MetaFunction,
 } from "@remix-run/node";
 import {
   Links,
@@ -15,35 +15,29 @@ import {
 } from "@remix-run/react";
 
 import { Navbar } from "~/components/Navbar";
-import { getSession } from "./session.server";
-import { isExpired } from "./token.server";
+import { getOptionalClientUser } from "./auth.server";
 import styles from "./tailwind.css";
 
-export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
+export const links: LinksFunction = () => [
+  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
+  { rel: "stylesheet", href: styles },
+];
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Haddock3",
-  viewport: "width=device-width,initial-scale=1",
-});
+export const meta: V2_MetaFunction = () => {
+  return [{ title: "Haddock3" }];
+};
 
 export async function loader({ request }: LoaderArgs) {
-  const session = await getSession(request);
-
-  const accessToken = session.data.bartenderToken;
-  if (isExpired(accessToken) && new URL(request.url).pathname !== "/login") {
-    return redirect("/login");
-  }
-  return json({
-    isAuthenticated: accessToken !== undefined,
-    isSuperUser: session.data.isSuperUser,
-  });
+  const user = await getOptionalClientUser(request);
+  return json({ user });
 }
 
 export default function App() {
   return (
     <html lang="en" data-theme="bonvinlab">
       <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
       </head>

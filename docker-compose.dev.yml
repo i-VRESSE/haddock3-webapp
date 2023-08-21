@@ -1,0 +1,15 @@
+version: "3.7"
+services:
+  userdb:
+    image: postgres:15.2-bullseye
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      # Expose on port 5433 instead of 5432
+      # as it is used by the bartender database container.
+      - "5433:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data

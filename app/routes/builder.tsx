@@ -4,14 +4,11 @@ import { getCatalog } from "~/catalogs/index.server";
 import { Haddock3WorkflowBuilder } from "~/components/Haddock3/Form.client";
 import { haddock3Styles } from "~/components/Haddock3/styles";
 import { submitJob } from "~/models/applicaton.server";
-import {
-  checkAuthenticated,
-  getLevel,
-  isSubmitAllowed,
-} from "~/models/user.server";
-import { getSession } from "~/session.server";
+import { isSubmitAllowed } from "~/models/user.server";
 import { type ICatalog } from "@i-vresse/wb-core/dist/types";
 import { ClientOnly } from "~/components/ClientOnly";
+import { getOptionalUser, mustBeAllowedToSubmit } from "~/auth.server";
+import { getBartenderTokenByUser } from "~/bartender_token.server";
 
 export const loader = async ({
   request,
@@ -20,31 +17,30 @@ export const loader = async ({
   submitAllowed: boolean;
   archive: string | undefined;
 }> => {
-  const session = await getSession(request);
-  const level = await getLevel(session.data.roles);
+  const user = await getOptionalUser(request);
+  const level = user ? user.preferredExpertiseLevel ?? "" : "";
   // When user does not have a level he/she
   // can still use builder with easy level
   // but cannot submit only download
   const catalogLevel = level === "" ? "easy" : level;
   const catalog = await getCatalog(catalogLevel);
-  return { catalog, submitAllowed: isSubmitAllowed(level), archive: undefined };
+  return {
+    catalog,
+    submitAllowed: isSubmitAllowed(level ?? ""),
+    archive: undefined,
+  };
 };
 
 export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData();
   const upload = formData.get("upload");
-
   if (typeof upload === "string" || upload === null) {
     throw new Error("Bad upload");
   }
-  const session = await getSession(request);
-  const accessToken = session.data.bartenderToken;
-  checkAuthenticated(accessToken);
-  const level = await getLevel(session.data.roles);
-  if (!isSubmitAllowed(level)) {
-    throw new Error("Forbidden");
-  }
-  const job = await submitJob(upload, accessToken!);
+
+  const user = await mustBeAllowedToSubmit(request);
+  const accessToken = await getBartenderTokenByUser(user);
+  const job = await submitJob(upload, accessToken);
   const job_url = `/jobs/${job.id}`;
   return redirect(job_url);
 };

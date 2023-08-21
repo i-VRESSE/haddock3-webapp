@@ -4,15 +4,17 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7990850.svg)](https://doi.org/10.5281/zenodo.7990850)
 [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu)
 
+[Haddock3](https://github.com/haddocking/haddock3) (High Ambiguity Driven protein-protein DOCKing) is a an information-driven flexible docking approach for the modeling of biomolecular complexes. This software wraps the the haddock3 command line tool in a web application. The web application makes it easy to make a configuration file, run it and show the results.
+
 Uses
 
-- [bartender](https://github.com/i-VRESSE/bartender) for user and job management.
+- [bartender](https://github.com/i-VRESSE/bartender) for job execution.
 - [workflow-builder](https://github.com/i-VRESSE/workflow-builder) to construct a Haddock3 workflow config file.
 - [haddock3](https://github.com/haddocking/haddock3) to compute
 
 ```mermaid
 sequenceDiagram
-    Web app->>+Bartender: Login
+    Web app->>+Web app: Login
     Web app->>+Builder: Construct workflow config
     Builder->>+Bartender: Submit job
     Bartender->>+haddock3: Run
@@ -20,17 +22,73 @@ sequenceDiagram
     Web app->>+Bartender: Result of job
 ```
 
-- [Remix Docs](https://remix.run/docs)
+## Setup
+
+The web app is written in [Node.js](https://nodejs.org/) to install dependencies run:
+
+```shell
+npm install
+```
+
+Configuration of the web application is done via `.env` file or environment variables.
+For configuration of authentication & authorization see [docs/auth.md](docs/auth.md).
+For configuration of job submission see [docs/bartender.md#configuration](docs/bartender.md#configuration).
+Use [.env.example](../.env.example) as a template:
+
+```shell
+cp .env.example .env
+# Edit .env file
+```
+
+Create rsa key pair for signing & verifying JWT tokens for bartender web service with:
+
+```shell
+openssl genpkey -algorithm RSA -out private_key.pem \
+    -pkeyopt rsa_keygen_bits:2048
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+```
+
+## Bartender web service
+
+The bartender web service should be running if you want to submit jobs.
+See [docs/bartender.md](docs/bartender.md) how to set it up.
 
 ## Development
 
-From your terminal:
+You need to have a PostgreSQL database running. The easiest way is to use Docker:
+
+```sh
+npm run docker:dev
+```
+
+(Stores data in `./postgres-data`)
+(You can get a psql shell with `npm run psql:dev`)
+(On CTRL-C the database is stopped. To remove container use `docker system prune`)
+
+The database can be initialized with
+
+```sh
+npm run setup
+# This will generate prisma client, create tables and insert seed data
+```
+
+(You can reset database with `npx prisma migrate reset`.)
+
+The database setup should be run only once for a fresh database.
+Whenever you change the `prisma/schema.prisma` file you need to
+
+1. Use [prisma migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate) to generate a migration and to update the database.
+2. Run `npx prisma generate` to generate the prisma client.
+
+Start [remix](https://remix.run) development server from your terminal with:
 
 ```sh
 npm run dev
 ```
 
-This starts your app in development mode, rebuilding assets on file changes.
+This will refresh & rebuild assets on file changes.
+
+## Other development commands
 
 To format according to [prettier](https://prettier.io) run
 
@@ -75,120 +133,8 @@ Then run the app in production mode:
 npm start
 ```
 
-Now you'll need to pick a host to deploy it to.
+The web application can be run inside a Docker container together with all its dependent containers, see [docs/docker.md](docs/docker.md).
 
-### DIY
+## Stack
 
-If you're familiar with deploying node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `remix build`
-
-- `build/`
-- `public/build/`
-
-### Docker
-
-The web application can be run inside a Docker container.
-
-Requirements:
-
-1. [bartender repo](https://github.com/i-VRESSE/bartender) to be cloned in `../bartender` directory.
-2. bartender repo should have [.env file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#environment-variables)
-3. bartender repo should have a [config.yaml file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#configuration-file)
-
-Build with
-
-```sh
-docker compose build
-```
-
-Run with
-
-```sh
-docker compose up
-```
-
-Web application running at http://localhost:8080 .
-
-Create super user with
-
-```sh
-# First register user in web application
-docker compose exec bartender bartender super <email>
-```
-
-## Sessions
-
-Making the login session secure requires a session secret.
-The session secret can be configured by setting the `SESSION_SECRET` environment variable.
-If not set, a hardcoded secret is used, which should not be used in production.
-
-The data of the login sessions in stored in the `./sessions` directory.
-
-## Bartender web service client
-
-This web app uses a client to consume the bartender web service.
-
-The client can be (re-)generated with
-
-```shell
-npm run generate-client
-```
-
-(This command requires that the bartender webservice is running at http://localhost:8000)
-
-## Bartender web service configuration
-
-### Bartender
-
-The web application needs to know where the [Bartender web service](https://github.com/i-VRESSE/bartender) is running.
-Configure bartender location with `BARTENDER_API_URL` environment variable.
-
-```sh
-export BARTENDER_API_URL='http://127.0.0.1:8000'
-npm start
-```
-
-### Social login
-
-To enable GitHub or Orcid or EGI Check-in login the bartender web service needs following environment variables.
-
-```shell
-BARTENDER_GITHUB_REDIRECT_URL="http://localhost:3000/auth/github/callback"
-BARTENDER_ORCIDSANDBOX_REDIRECT_URL="http://localhost:3000/auth/orcidsandbox/callback"
-BARTENDER_ORCID_REDIRECT_URL="http://localhost:3000/auth/orcid/callback"
-BARTENDER_EGI_REDIRECT_URL="http://localhost:3000/auth/egi/callback"
-```
-
-Where `http://localhost:3000` is the URL where the Remix run app is running.
-
-## Haddock3 application
-
-This web app expects that the following application is registered in bartender web service.
-
-```yaml
-applications:
-  haddock3:
-    command: haddock3 $config
-    config: workflow.cfg
-    allowed_roles:
-      - easy
-      - expert
-      - guru
-```
-
-This allows the archive generated with the workflow builder to be submitted.
-
-The user can only submit jobs when he/she has any of these allowed roles.
-A super user should assign a role to the user at http://localhost:3000/admin/users.
-A super user can be made through the admin page or by running `bartender super <email>` on the server
-
-## Catalogs
-
-This repo has a copy (`./app/catalogs/*.yaml`) of the [haddock3 workflow build catalogs](https://github.com/i-VRESSE/workflow-builder/tree/main/packages/haddock3_catalog/public/catalog).
-
-To fetch the latest catalogs run
-
-```shell
-npm run catalogs
-```
+The tech stack is explained in [docs/stack.md](docs/stack.md).

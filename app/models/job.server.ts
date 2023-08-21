@@ -1,3 +1,4 @@
+import type { Params } from "@remix-run/react";
 import { JobApi } from "~/bartender-client/apis/JobApi";
 import { buildConfig } from "./config.server";
 import { JOB_OUTPUT_DIR } from "./constants";
@@ -11,12 +12,20 @@ const BOOK_KEEPING_FILES = [
   "workflow.cfg.orig",
 ];
 
-function buildJobApi(accessToken: string = "") {
-  return new JobApi(buildConfig(accessToken));
+function buildJobApi(bartenderToken: string) {
+  return new JobApi(buildConfig(bartenderToken));
 }
 
-export async function getJobs(accessToken: string, limit = 10, offset = 0) {
-  const api = buildJobApi(accessToken);
+export function jobIdFromParams(params: Params) {
+  const jobId = params.id;
+  if (jobId == null) {
+    throw new Error("job id not given");
+  }
+  return parseInt(jobId);
+}
+
+export async function getJobs(bartenderToken: string, limit = 10, offset = 0) {
+  const api = buildJobApi(bartenderToken);
   return await api.retrieveJobs({
     limit,
     offset,
@@ -34,10 +43,10 @@ function handleApiError(error: unknown): never {
 }
 
 async function safeApi<R>(
-  accessToken: string,
+  bartenderToken: string,
   fn: (api: JobApi) => Promise<R>
 ): Promise<R> {
-  const api = buildJobApi(accessToken);
+  const api = buildJobApi(bartenderToken);
   try {
     return await fn(api);
   } catch (error) {
@@ -45,19 +54,19 @@ async function safeApi<R>(
   }
 }
 
-export async function getJobById(jobid: number, accessToken: string) {
-  return await safeApi(accessToken, (api) => api.retrieveJob({ jobid }));
+export async function getJobById(jobid: number, bartenderToken: string) {
+  return await safeApi(bartenderToken, (api) => api.retrieveJob({ jobid }));
 }
 
-export async function getJobStdout(jobid: number, accessToken: string) {
-  return await safeApi(accessToken, async (api) => {
+export async function getJobStdout(jobid: number, bartenderToken: string) {
+  return await safeApi(bartenderToken, async (api) => {
     const response = await api.retrieveJobStdoutRaw({ jobid });
     return response.raw;
   });
 }
 
-export async function getJobStderr(jobid: number, accessToken: string) {
-  return await safeApi(accessToken, async (api) => {
+export async function getJobStderr(jobid: number, bartenderToken: string) {
+  return await safeApi(bartenderToken, async (api) => {
     const response = await api.retrieveJobStderrRaw({ jobid });
     return response.raw;
   });
@@ -66,16 +75,16 @@ export async function getJobStderr(jobid: number, accessToken: string) {
 export async function getJobfile(
   jobid: number,
   path: string,
-  accessToken: string
+  bartenderToken: string
 ) {
-  return await safeApi(accessToken, async (api) => {
+  return await safeApi(bartenderToken, async (api) => {
     const response = await api.retrieveJobFilesRaw({ jobid, path });
     return response.raw;
   });
 }
 
-export async function listOutputFiles(jobid: number, accessToken: string) {
-  return await safeApi(accessToken, async (api) => {
+export async function listOutputFiles(jobid: number, bartenderToken: string) {
+  return await safeApi(bartenderToken, async (api) => {
     const items = await api.retrieveJobDirectoriesFromPath({
       jobid,
       path: JOB_OUTPUT_DIR,
@@ -88,8 +97,8 @@ export async function listOutputFiles(jobid: number, accessToken: string) {
   });
 }
 
-export async function listInputFiles(jobid: number, accessToken: string) {
-  return await safeApi(accessToken, async (api) => {
+export async function listInputFiles(jobid: number, bartenderToken: string) {
+  return await safeApi(bartenderToken, async (api) => {
     const items = await api.retrieveJobDirectories({
       jobid,
       maxDepth: 3,
@@ -101,8 +110,8 @@ export async function listInputFiles(jobid: number, accessToken: string) {
   });
 }
 
-export async function getArchive(jobid: number, accessToken: string) {
-  return await safeApi(accessToken, async (api) => {
+export async function getArchive(jobid: number, bartenderToken: string) {
+  return await safeApi(bartenderToken, async (api) => {
     const response = await api.retrieveJobDirectoryAsArchiveRaw({
       jobid,
       archiveFormat: ".zip",
@@ -111,8 +120,8 @@ export async function getArchive(jobid: number, accessToken: string) {
   });
 }
 
-export async function getInputArchive(jobid: number, accessToken: string) {
-  return await safeApi(accessToken, async (api) => {
+export async function getInputArchive(jobid: number, bartenderToken: string) {
+  return await safeApi(bartenderToken, async (api) => {
     const response = await api.retrieveJobDirectoryAsArchiveRaw({
       jobid,
       exclude: BOOK_KEEPING_FILES,
@@ -123,16 +132,16 @@ export async function getInputArchive(jobid: number, accessToken: string) {
   });
 }
 
-export async function getOutputArchive(jobid: number, accessToken: string) {
-  return await getSubDirectoryAsArchive(jobid, JOB_OUTPUT_DIR, accessToken);
+export async function getOutputArchive(jobid: number, bartenderToken: string) {
+  return await getSubDirectoryAsArchive(jobid, JOB_OUTPUT_DIR, bartenderToken);
 }
 
 export async function getSubDirectoryAsArchive(
   jobid: number,
   path: string,
-  accessToken: string
+  bartenderToken: string
 ) {
-  return await safeApi(accessToken, async (api) => {
+  return await safeApi(bartenderToken, async (api) => {
     const response = await api.retrieveJobSubdirectoryAsArchiveRaw({
       jobid,
       path,

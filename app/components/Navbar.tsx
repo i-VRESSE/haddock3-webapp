@@ -1,14 +1,14 @@
 import { Link, NavLink } from "@remix-run/react";
-import { useIsAuthenticated, useIsSuperUser } from "~/session";
+import { useIsAdmin, useIsLoggedIn, useUser } from "~/auth";
 
 const LoggedInButton = () => {
-  const isSuperUser = useIsSuperUser();
+  const user = useUser();
+  const isAdmin = useIsAdmin();
   return (
     <div className="dropdown-end dropdown">
       <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
         <div className="w-10 rounded-full">
-          <img alt="gravatar" src="https://www.gravatar.com/avatar/HASH" />{" "}
-          {/* TODO: Make hash from user email */}
+          <img alt="gravatar" src={user.photo} />{" "}
         </div>
       </label>
       <ul
@@ -18,7 +18,7 @@ const LoggedInButton = () => {
         <li>
           <Link to="/profile">Profile</Link>
         </li>
-        {isSuperUser && (
+        {isAdmin && (
           <li>
             <Link to="/admin">Admin</Link>
           </li>
@@ -34,10 +34,10 @@ const LoggedInButton = () => {
 const LoginButton = () => <Link to="/login">Login</Link>;
 
 export const Navbar = () => {
-  const isAuthenticated = useIsAuthenticated();
+  const loggedIn = useIsLoggedIn();
 
   return (
-    <div className="to-primary/100] navbar bg-gradient-to-r from-primary via-primary/90">
+    <div className="navbar bg-primary">
       <div>
         <NavLink to="/" className="btn btn-ghost text-xl normal-case">
           Haddock3
@@ -63,7 +63,7 @@ export const Navbar = () => {
         </ul>
       </div>
       <div className="navbar-end">
-        {isAuthenticated ? <LoggedInButton /> : <LoginButton />}
+        {loggedIn ? <LoggedInButton /> : <LoginButton />}
       </div>
     </div>
   );

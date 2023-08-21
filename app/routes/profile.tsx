@@ -1,39 +1,81 @@
-import { json, type LoaderArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
-import { getTokenPayload } from "~/token.server";
-import { checkAuthenticated, getLevel, getProfile } from "~/models/user.server";
-import { getSession } from "~/session.server";
+import { type ActionArgs, json, type LoaderArgs } from "@remix-run/node";
+import { Form, Link, useSubmit } from "@remix-run/react";
+import { mustBeAuthenticated } from "~/auth.server";
+import { useUser } from "~/auth";
+import {
+  listExpertiseLevels,
+  setPreferredExpertiseLevel,
+} from "~/models/user.server";
+import { enumType, object, safeParse } from "valibot";
 
 export const loader = async ({ request }: LoaderArgs) => {
-  const session = await getSession(request);
-  const accessToken = session.data.bartenderToken;
-  checkAuthenticated(accessToken);
-  const profile = await getProfile(accessToken!);
-  const tokenPayload = getTokenPayload(accessToken);
-  const expireDate =
-    tokenPayload.exp === undefined ? Date.now() : tokenPayload.exp * 1000;
-  const level = await getLevel(session.data.roles);
-  return json({ profile, expireDate, level });
+  await mustBeAuthenticated(request);
+  return json({});
 };
 
-export default function JobPage() {
-  const { profile, expireDate, level } = useLoaderData<typeof loader>();
+export const action = async ({ request }: ActionArgs) => {
+  const userId = await mustBeAuthenticated(request);
+  const formData = await request.formData();
+  const ActionSchema = object({
+    preferredExpertiseLevel: enumType(listExpertiseLevels()),
+  });
+  const result = safeParse(ActionSchema, Object.fromEntries(formData));
+  if (result.success) {
+    await setPreferredExpertiseLevel(
+      userId,
+      result.data.preferredExpertiseLevel
+    );
+  } else {
+    const errors = result.error;
+    return json({ errors }, { status: 400 });
+  }
+  return null;
+};
+
+export default function Page() {
+  const user = useUser();
+  const submit = useSubmit();
+  const handleChangePreferredExpertiseLevel = (
+    event: React.ChangeEvent<HTMLFormElement>
+  ) => {
+    submit(event.currentTarget);
+  };
   return (
     <main>
-      <p>Email: {profile.email}</p>
-      <p>Expertise level: {level}</p>
-      <p>
-        OAuth accounts:
-        <ul>
-          {profile.oauthAccounts.map((a) => (
-            <li key={a.accountId}>
-              {a.oauthName}: {a.accountEmail}
-            </li>
-          ))}
-        </ul>
-      </p>
-      <p>Login expires: {new Date(expireDate).toISOString()}</p>
-      <Link role="button" className="btn btn-sm" to="/logout">
+      <p>Email: {user.email}</p>
+      <fieldset>
+        <legend>Expertise levels</legend>
+        {user.expertiseLevels.length ? (
+          <Form method="post" onChange={handleChangePreferredExpertiseLevel}>
+            <ul className="list-inside">
+              {user.expertiseLevels.map((level) => (
+                <li key={level}>
+                  <label>
+                    <input
+                      title="Preferred"
+                      type="radio"
+                      className="radio"
+                      name="preferredExpertiseLevel"
+                      value={level}
+                      defaultChecked={user.preferredExpertiseLevel === level}
+                    />{" "}
+                    {level}
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </Form>
+        ) : (
+          <span>
+            None assigned. If you just registered wait for administrator to
+            assign a level to you. If you still don't have a level please
+            context administrator.
+          </span>
+        )}
+      </fieldset>
+
+      {/* TODO add change password form if user is not authenticated with a social login */}
+      <Link role="button" className="btn btn-sm m-2" to="/logout">
         Logout
       </Link>
     </main>

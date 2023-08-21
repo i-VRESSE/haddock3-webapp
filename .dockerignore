@@ -1,0 +1,4 @@
+/postgres-data
+/node_modules
+/public/build
+.git

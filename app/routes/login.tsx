@@ -1,36 +1,57 @@
-import { type ActionArgs, json, redirect } from "@remix-run/node";
-import { Form, Link } from "@remix-run/react";
-import { localLogin } from "~/models/user.server";
-import { commitSession, setSession } from "~/session.server";
+import {
+  type LoaderArgs,
+  type ActionArgs,
+  redirect,
+  json,
+} from "@remix-run/node";
+import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
+import { type FlatErrors, ValiError, flatten } from "valibot";
+import { availableSocialLogins } from "~/auth";
+import { AuthorizationError } from "remix-auth";
+import { authenticator, getOptionalUser } from "~/auth.server";
+import { ErrorMessages } from "~/components/ErrorMessages";
+import { UserNotFoundError, WrongPasswordError } from "~/models/user.server";
+
+export async function loader({ request }: LoaderArgs) {
+  const user = await getOptionalUser(request);
+  if (user) {
+    return redirect("/");
+  }
+  const socials = availableSocialLogins();
+  return json({ socials });
+}
 
 export async function action({ request }: ActionArgs) {
-  const formData = await request.formData();
-  const username = formData.get("username");
-  const password = formData.get("password");
+  try {
+    return await authenticator.authenticate("user-pass", request, {
+      successRedirect: "/",
+    });
+  } catch (error) {
+    if (error instanceof AuthorizationError && error.cause) {
+      let errors: FlatErrors;
+      if (error.cause instanceof WrongPasswordError) {
+        errors = {
+          nested: { password: [error.message] },
+        };
+      } else if (error.cause instanceof UserNotFoundError) {
+        errors = {
+          nested: { email: [error.message] },
+        };
+      } else if (error.cause instanceof ValiError) {
+        errors = flatten(error.cause);
+      } else {
+        throw error;
+      }
+      return json({ errors }, { status: 400 });
+    }
 
-  if (typeof username !== "string" || typeof password !== "string") {
-    return json(
-      {
-        errors: {
-          username: "Email is required",
-          password: "Password is required",
-        },
-      },
-      { status: 400 }
-    );
+    throw error;
   }
-
-  const access_token = await localLogin(username, password);
-  const session = await setSession(access_token, request);
-
-  return redirect("/", {
-    headers: {
-      "Set-Cookie": await commitSession(session),
-    },
-  });
 }
 
 export default function LoginPage() {
+  const actionData = useActionData<{ errors: FlatErrors } | undefined>();
+  const { socials } = useLoaderData<typeof loader>();
   // Shared style between login and register. Extract if we use it more often?
   const centeredColumn = "flex flex-col items-center gap-4";
   const formStyle =
@@ -44,26 +65,34 @@ export default function LoginPage() {
     <main className={centeredColumn}>
       <Form method="post" className={formStyle}>
         <h2 className={headerStyle}>Log in with username and password</h2>
-        <label>
-          <p>Email</p>
-          <input
-            id="username"
-            name="username"
-            type="email"
-            autoComplete="email"
-            className={inputStyle}
-          />
-        </label>
-        <label>
-          <p>Password</p>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            className={inputStyle}
-          />
-        </label>
+        <div>
+          <label>
+            <p>Email</p>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="username"
+              className={inputStyle}
+              required
+            />
+          </label>
+          <ErrorMessages path="email" errors={actionData?.errors} />
+        </div>
+        <div>
+          <label>
+            <p>Password</p>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              className={inputStyle}
+              required
+            />
+          </label>
+          <ErrorMessages path="password" errors={actionData?.errors} />
+        </div>
         <button type="submit" className={buttonStyle}>
           Log in
         </button>
@@ -77,38 +106,41 @@ export default function LoginPage() {
 
       {/* Social buttons */}
       <h2 className="text-lg font-semibold">Other login methods</h2>
-      {/* TODO only show buttons for enabled providers
-          by checking http://localhost:8000/api/openapi.json */}
       <div className="space-evenly flex gap-4">
-        <form method="post" action="/auth/github/authorize">
-          <button type="submit" className="btn h-auto">
-            <img
-              height="32"
-              width="32"
-              src="github-fill.svg"
-              alt="GitHub logo"
-            />
-            <p className="px-2">GitHub</p>
-          </button>
-        </form>
-        <form method="post" action="/auth/orcidsandbox/authorize">
-          <button type="submit" className="btn h-auto">
-            <img height="32" width="32" src="orcid.png" alt="ORCID logo" />
-            <p className="px-2">ORCID sandbox</p>
-          </button>
-        </form>
-        <form method="post" action="/auth/orcid/authorize">
-          <button type="submit" className="btn h-auto">
-            <img height="32" width="32" src="orcid.png" alt="ORCID logo" />
-            <p className="px-2">ORCID</p>
-          </button>
-        </form>
-        <form method="post" action="/auth/egi/authorize">
-          <button type="submit" className="btn h-auto">
-            <img height="32" width="32" src="egi.svg" alt="EGI Check-in logo" />
-            <p className="px-2">EGI Check-in</p>
-          </button>
-        </form>
+        {socials.includes("github") && (
+          <form method="post" action="/auth/github/authorize">
+            <button type="submit" className="btn h-auto">
+              <img
+                height="32"
+                width="32"
+                src="github-fill.svg"
+                alt="GitHub logo"
+              />
+              <p className="px-2">GitHub</p>
+            </button>
+          </form>
+        )}
+        {socials.includes("orcid") && (
+          <form method="post" action="/auth/orcid/authorize">
+            <button type="submit" className="btn h-auto">
+              <img height="32" width="32" src="orcid.png" alt="ORCID logo" />
+              <p className="px-2">ORCID</p>
+            </button>
+          </form>
+        )}
+        {socials.includes("egi") && (
+          <form method="post" action="/auth/egi/authorize">
+            <button type="submit" className="btn h-auto">
+              <img
+                height="32"
+                width="32"
+                src="egi.svg"
+                alt="EGI Check-in logo"
+              />
+              <p className="px-2">EGI Check-in</p>
+            </button>
+          </form>
+        )}
       </div>
     </main>
   );

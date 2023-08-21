@@ -7,22 +7,13 @@ import {
 import { Form } from "@remix-run/react";
 
 import { submitJob } from "~/models/applicaton.server";
-import {
-  checkAuthenticated,
-  getLevel,
-  isSubmitAllowed,
-} from "~/models/user.server";
-import { getSession } from "~/session.server";
 import { WORKFLOW_CONFIG_FILENAME } from "~/models/constants";
+import { mustBeAllowedToSubmit } from "~/auth.server";
+import { getBartenderToken } from "~/bartender_token.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
-  const session = await getSession(request);
-  checkAuthenticated(session.data.bartenderToken);
-  const level = await getLevel(session.data.roles);
-  if (!isSubmitAllowed(level)) {
-    throw new Error("Forbidden");
-  }
-  return json({ level });
+  await mustBeAllowedToSubmit(request);
+  return json({});
 };
 
 export const action = async ({ request }: ActionArgs) => {
@@ -32,14 +23,9 @@ export const action = async ({ request }: ActionArgs) => {
   if (typeof upload === "string" || upload === null) {
     throw new Error("Bad upload");
   }
-  const session = await getSession(request);
-  const accessToken = session.data.bartenderToken;
-  checkAuthenticated(accessToken);
-  const level = await getLevel(session.data.roles);
-  if (!isSubmitAllowed(level)) {
-    throw new Error("Forbidden");
-  }
-  const job = await submitJob(upload, accessToken!);
+
+  const token = await getBartenderToken(request);
+  const job = await submitJob(upload, token);
   const job_url = `/jobs/${job.id}`;
   return redirect(job_url);
 };
