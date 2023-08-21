@@ -25,7 +25,7 @@ services:
         target: /app/src/private_key.pem
 
   webappdb:
-    image: postgres:15.2-bullseye
+    image: postgres:15.4-bullseye
     restart: always
     environment:
       - POSTGRES_USER=postgres
@@ -84,7 +84,7 @@ services:
   # TODO user same database for webapp and bartender
   # the tables do not overlap
   bartenderdb:
-    image: postgres:13.6-bullseye
+    image: postgres:15.4-bullseye
     hostname: bartender-db
     environment:
       POSTGRES_PASSWORD: "bartender"
