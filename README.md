@@ -30,11 +30,14 @@ The web app is written in [Node.js](https://nodejs.org/) to install dependencies
 npm install
 ```
 
-Configuration of the web application is done via `.env` file or environment variables. 
-See [docs/auth.md](docs/auth.md) and [docs/bartender.md] for details.
+Configuration of the web application is done via `.env` file or environment variables.
+For configuration of authentication & authorization see [docs/auth.md](docs/auth.md).
+For configuration of job submission see [docs/bartender.md#configuration](docs/bartender.md#configuration).
+Use [.env.example](../.env.example) as a template:
 
 ```shell
 cp .env.example .env
+# Edit .env file
 ```
 
 Create rsa key pair for signing & verifying JWT tokens for bartender web service with:
@@ -48,12 +51,7 @@ openssl rsa -pubout -in private_key.pem -out public_key.pem
 ## Bartender web service
 
 The bartender web service should be running if you want to submit jobs.
-See [docs/bartender.md](docs/bartender.md) how to configure.
-
-## Authentication & authorization
-
-The web application comes with its own user management and social logins
-See [docs/auth.md](docs/auth.md) how to configure.
+See [docs/bartender.md](docs/bartender.md) how to set it up.
 
 ## Development
 

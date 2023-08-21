@@ -14,20 +14,14 @@ A super user can be made through the admin page (`/admin/users`) or by being the
 
 ## Session
 
+Sessions are used to remember when a user is logged in.
+
 The sessions will be encrypted with a secret key from an environment variable.
 
 ```shell
 SESSION_SECRET=...
 ```
-(A random string can be generated with `openssl rand -base64 32`)
-
-The environment variables can be stored in a `.env` file.
-
-Use [.env.example](../.env.example) as a template:
-
-```shell
-cp .env.example .env
-```
+A random secret string can be generated with `openssl rand -base64 32`.
 
 ## Social logins
 
