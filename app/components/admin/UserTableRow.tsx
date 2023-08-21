@@ -17,9 +17,6 @@ export const UserTableRow = ({
   const usersExpertiseLevels = user.expertiseLevels;
   return (
     <tr>
-      <td>
-        <input type="checkbox" disabled />
-      </td>
       <td>{user.email}</td>
       <td>
         <input
@@ -64,11 +61,6 @@ export const UserTableRow = ({
             );
           })}
         </ul>
-      </td>
-      <td>
-        <button className="btn-sm btn" disabled>
-          Change password
-        </button>
       </td>
     </tr>
   );

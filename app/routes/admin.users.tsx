@@ -55,11 +55,9 @@ export default function AdminUsersPage() {
       <table className="table w-full">
         <thead>
           <tr>
-            <th>Batch</th>
             <th>Email</th>
             <th>Administrator?</th>
             <th>Expertise levels</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
