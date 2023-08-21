@@ -38,8 +38,6 @@ export class TokenGenerator {
     if (!this.privateKey) {
       throw new Error("private key not initialized");
     }
-    // If bartender has been  configured with allowed_roles for an application,
-    // then the a role claim should be in the JWT.
     const jwt = await new SignJWT({
       email: email,
     })

@@ -56,6 +56,8 @@ applications:
 
 This allows the archive generated with the workflow builder to be submitted.
 
+The application should not have `allowed_roles` configured as the haddock3 web application will only allow users to submit jobs that have an expertise level and generate a bartender token without roles.
+
 ## Haddock3 catalogs
 
 To show which modules and parameters are available in the workflow builder, the haddock3 web application uses the catalogs from the [workflow builder](https://github.com/i-VRESSE/workflow-builder/tree/main/packages/haddock3_catalog/public/catalog).
