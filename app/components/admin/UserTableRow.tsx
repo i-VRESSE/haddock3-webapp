@@ -25,6 +25,9 @@ export const UserTableRow = ({
           className="checkbox"
           disabled={submitting}
           onChange={() => {
+            if (window.confirm("Are you sure?") === false) {
+              return;
+            }
             const data = new FormData();
             data.set("isAdmin", user.isAdmin ? "false" : "true");
             onUpdate(data);
