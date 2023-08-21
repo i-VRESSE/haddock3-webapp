@@ -86,7 +86,10 @@ export async function localLogin(email: string, password: string) {
     throw new UserNotFoundError();
   }
   const { passwordHash, ...userWithoutPasswordHash } = user;
-  const isValid = await compare(password, user.passwordHash || "");
+  if (!passwordHash) {
+    throw new WrongPasswordError();
+  }
+  const isValid = await compare(password, passwordHash);
   if (!isValid) {
     throw new WrongPasswordError();
   }
