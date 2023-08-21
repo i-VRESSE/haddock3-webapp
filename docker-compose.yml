@@ -18,10 +18,11 @@ services:
     environment:
       BARTENDER_API_URL: "http://bartender:8000"
       DATABASE_URL: postgresql://postgres:postgres@webappdb:5432/postgres
+      BARTENDER_PRIVATE_KEY: /app/src/private_key.pem
     volumes:
       - type: bind
-        source: ./public_key.pem
-        target: /app/src/public_key.pem
+        source: ./private_key.pem
+        target: /app/src/private_key.pem
 
   webappdb:
     image: postgres:15.2-bullseye
@@ -63,8 +64,8 @@ services:
         source: ../bartender/config.yaml
         target: /app/src/config.yaml
       - type: bind
-        source: ./private_key.pem
-        target: /app/src/private_key.pem
+        source: ./public_key.pem
+        target: /app/src/public_key.pem
       # to store jobs on NFS share replace line below with bind mount
       - bartender-job-data:/tmp/jobs
     depends_on:
@@ -78,6 +79,7 @@ services:
       BARTENDER_DB_PASS: bartender
       BARTENDER_DB_BASE: bartender
       BARTENDER_JOB_ROOT: /tmp/jobs
+      BARTENDER_PUBLIC_KEY: /app/src/public_key.pem
 
   # TODO user same database for webapp and bartender
   # the tables do not overlap
