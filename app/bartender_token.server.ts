@@ -17,7 +17,7 @@ export class TokenGenerator {
   private privateKey: KeyLike | undefined = undefined;
   constructor(
     privateKeyFilename: string,
-    issuer = "bartender",
+    issuer = "haddock3-webapp",
     lifespan = "8h"
   ) {
     this.privateKeyFilename = privateKeyFilename;
