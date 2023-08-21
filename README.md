@@ -63,6 +63,7 @@ npm run docker:dev
 
 (Stores data in `./postgres-data`)
 (You can get a psql shell with `npm run psql:dev`)
+(On CTRL-C the database is stopped. To remove container use `docker system prune`)
 
 The database can be initialized with
 
