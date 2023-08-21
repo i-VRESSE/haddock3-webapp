@@ -1,6 +1,8 @@
 # Authentication & authorization
 
 - [Authentication \& authorization](#authentication--authorization)
+  - [Session](#session)
+  - [Social logins](#social-logins)
   - [GitHub login](#github-login)
   - [Orcid sandbox login](#orcid-sandbox-login)
   - [Orcid login](#orcid-login)
@@ -10,11 +12,14 @@ A user can only submit jobs when he/she is logged in and has at least one expert
 A super user can assign an expertise level to users at http://localhost:3000/admin/users.
 A super user can be made through the admin page (`/admin/users`) or by being the first registered user.
 
+## Session
+
 The sessions will be encrypted with a secret key from an environment variable.
 
 ```shell
 SESSION_SECRET=...
 ```
+(A random string can be generated with `openssl rand -base64 32`)
 
 The environment variables can be stored in a `.env` file.
 
@@ -23,6 +28,8 @@ Use [.env.example](../.env.example) as a template:
 ```shell
 cp .env.example .env
 ```
+
+## Social logins
 
 To enable GitHub or Orcid or EGI Check-in login the web app needs following environment variables.
 
@@ -40,7 +47,8 @@ HADDOCK3WEBAPP_EGI_CALLBACK_URL=http://localhost:3000/auth/egi/callback
 HADDOCK3WEBAPP_EGI_ENVIRONMENT=production  # could also be 'development' or 'demo'
 ```
 
-Only use social logins where the email address has been verified.
+Only use social logins where the email address has been verified. 
+Otherwise someone could create an social account with your email address and impersonate you.
 
 ## GitHub login
 

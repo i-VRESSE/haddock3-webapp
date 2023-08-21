@@ -6,6 +6,9 @@ We want to make a haddock3 web application that uses
 - [workflow-builder](https://github.com/i-VRESSE/workflow-builder) to construct a Haddock3 workflow config file.
 - [haddock3](https://github.com/haddocking/haddock3) to compute
 
+As the workflow-builder is written in TypeScript, so we will use TypeScript for the web application.
+We are using NodeJS for runtime.
+
 ## OpenAPI client
 
 The bartender web service provides an OpenAPI specification.

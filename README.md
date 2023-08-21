@@ -4,6 +4,8 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7990850.svg)](https://doi.org/10.5281/zenodo.7990850)
 [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu)
 
+[Haddock3](https://github.com/haddocking/haddock3) (High Ambiguity Driven protein-protein DOCKing) is a an information-driven flexible docking approach for the modeling of biomolecular complexes. This software wraps the the haddock3 command line tool in a web application. The web application makes it easy to make a configuration file, run it and show the results.
+
 Uses
 
 - [bartender](https://github.com/i-VRESSE/bartender) for job execution.
@@ -20,22 +22,42 @@ sequenceDiagram
     Web app->>+Bartender: Result of job
 ```
 
-- [Remix Docs](https://remix.run/docs)
-
 ## Setup
+
+The web app is written in [Node.js](https://nodejs.org/) to install dependencies run:
 
 ```shell
 npm install
+```
+
+Configuration of the web application is done via `.env` file or environment variables. 
+See [docs/auth.md](docs/auth.md) and [docs/bartender.md] for details.
+
+```shell
 cp .env.example .env
-# Create rsa key pair for signing & verifying JWT tokens for bartender web service
+```
+
+Create rsa key pair for signing & verifying JWT tokens for bartender web service with:
+
+```shell
 openssl genpkey -algorithm RSA -out private_key.pem \
     -pkeyopt rsa_keygen_bits:2048
 openssl rsa -pubout -in private_key.pem -out public_key.pem
 ```
 
+## Bartender web service
+
+The bartender web service should be running if you want to submit jobs.
+See [docs/bartender.md](docs/bartender.md) how to configure.
+
+## Authentication & authorization
+
+The web application comes with its own user management and social logins
+See [docs/auth.md](docs/auth.md) how to configure.
+
 ## Development
 
-You need to have a Postgres database running. The easiest way is to use Docker:
+You need to have a PostgreSQL database running. The easiest way is to use Docker:
 
 ```sh
 npm run docker:dev
@@ -48,15 +70,24 @@ The database can be initialized with
 
 ```sh
 npm run setup
+# This will generate prisma client, create tables and insert seed data
 ```
+(You can reset database with `npx prisma migrate reset`.)
 
-From your terminal:
+The database setup should be run only once for a fresh database. 
+Whenever you change the `prisma/schema.prisma` file you need to 
+1. Use [prisma migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate) to generate a migration and to update the database. 
+2. Run `npx prisma generate` to generate the prisma client.
+
+Start [remix](https://remix.run) development server from your terminal with:
 
 ```sh
 npm run dev
 ```
 
-This starts your app in development mode, rebuilding assets on file changes.
+This will refresh & rebuild assets on file changes.
+
+## Other development commands
 
 To format according to [prettier](https://prettier.io) run
 
@@ -101,106 +132,7 @@ Then run the app in production mode:
 npm start
 ```
 
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `remix build`
-
-- `build/`
-- `public/build/`
-
-### Docker
-
-The web application can be run inside a Docker container together with all its dependent containers.
-
-Requirements:
-
-1. Private key `./private_key.pem` and public key `./public_key.pem`.
-2. `./.env` file for haddock3 web application.
-3. [bartender repo](https://github.com/i-VRESSE/bartender) to be cloned in `../bartender` directory.
-4. bartender repo should have [.env file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#environment-variables)
-5. bartender repo should have a [config.yaml file](https://github.com/i-VRESSE/bartender/blob/main/docs/configuration.md#configuration-file)
-   1. The `job_root_dir` key should be set to `/tmp/jobs`
-
-Build with
-
-```sh
-docker compose build
-```
-
-Run with
-
-```sh
-docker compose up
-```
-
-Web application running at http://localhost:8080 .
-
-## Authentication & authorization
-
-See [docs/auth.md](docs/auth.md).
-
-## Bartender web service client
-
-This web app uses a client to consume the bartender web service.
-
-The client can be (re-)generated with
-
-```shell
-npm run generate-client
-```
-
-(This command requires that the bartender webservice is running at http://localhost:8000)
-
-## Bartender web service configuration
-
-The haddock3 web application needs to know where the [Bartender web service](https://github.com/i-VRESSE/bartender) is running.
-Configure bartender location with `BARTENDER_API_URL` environment variable.
-
-```sh
-BARTENDER_API_URL=http://localhost:8000
-```
-
-The haddock3 web application must be trusted by the bartender web service using a JWT token.
-An RSA private key is used by the haddock3 web application to sign the JWT token.
-To tell the haddock3 web application where to find the private key, use the `BARTENDER_PRIVATE_KEY` environment variable.
-
-```sh
-BARTENDER_PRIVATE_KEY=private_key.pem
-```
-
-An RSA public key is used by the bartender web service to verify the JWT token.
-To tell the bartender web service where to find the public key, use the `BARTENDER_PUBLIC_KEY` environment variable.
-
-```sh
-BARTENDER_PUBLIC_KEY=public_key.pem
-```
-
-## Haddock3 application
-
-This web app expects that the following application is registered in bartender web service.
-
-```yaml
-applications:
-  haddock3:
-    command: haddock3 $config
-    config: workflow.cfg
-```
-
-This allows the archive generated with the workflow builder to be submitted.
-
-## Catalogs
-
-This repo has a copy (`./app/catalogs/*.yaml`) of the [haddock3 workflow build catalogs](https://github.com/i-VRESSE/workflow-builder/tree/main/packages/haddock3_catalog/public/catalog).
-
-To fetch the latest catalogs run
-
-```shell
-npm run catalogs
-```
+The web application can be run inside a Docker container together with all its dependent containers, see [docs/docker.md](docs/docker.md).
 
 ## Stack
 
