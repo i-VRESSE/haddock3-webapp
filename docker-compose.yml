@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   webapp:
-    image: i-vresse/bartended-haddock3
+    image: i-vresse/haddock3-webapp
     build:
       context: .
     restart: always

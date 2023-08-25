@@ -1,4 +1,5 @@
 {
+  "name": "haddock3-webapp",
   "private": true,
   "version": "0.1.0",
   "sideEffects": false,

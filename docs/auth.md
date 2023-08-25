@@ -112,7 +112,7 @@ To enable perform following steps:
      when primary account already has an registered app.
 
    - Your website URL does not allow localhost URL, so use
-     `https://github.com/i-VRESSE/bartended-haddock3`
+     `https://github.com/i-VRESSE/haddock3-webapp`
 
    - Redirect URI: for dev deployments set to
      `http://127.0.0.1:8000/auth/orcid/callback`.
