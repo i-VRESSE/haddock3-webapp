@@ -7,6 +7,8 @@ index.ts
 models/ApplicatonConfiguration.ts
 models/DirectoryItem.ts
 models/HTTPValidationError.ts
+models/InteractiveAppResult.ts
+models/InteractiveApplicationConfiguration.ts
 models/JobModelDTO.ts
 models/LocationInner.ts
 models/User.ts
