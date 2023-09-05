@@ -3,6 +3,7 @@ import { JobApi } from "~/bartender-client/apis/JobApi";
 import { buildConfig } from "./config.server";
 import { JOB_OUTPUT_DIR } from "./constants";
 import { ResponseError } from "~/bartender-client";
+import { object, number, Output } from "valibot";
 
 const BOOK_KEEPING_FILES = [
   "stderr.txt",
@@ -149,4 +150,74 @@ export async function getSubDirectoryAsArchive(
     });
     return response.raw;
   });
+}
+
+export const WeightsSchema = object(
+  {
+    w_elec: number(),
+    w_vdw: number(),
+    w_desolv: number(),
+    w_bsa: number(),
+    w_air: number(),
+  }
+);
+export type Weights = Output<typeof WeightsSchema>;
+
+async function getConfig(jobid: number, bartenderToken: string) {
+  const path =  'output/data/configurations/enhanced_haddock_params.json'
+  const response = await getJobfile(jobid, path, bartenderToken);
+  const body = await response.json()
+  return body
+}
+
+export function getWeightsFromConfig(config: any): Weights {
+  // Find last module with weights
+  const keys = Object.keys(config).reverse()
+  for (const key of keys) {
+    const module = config[key]
+    if ('w_elec' in module) {
+      return {
+        w_elec: module.w_elec,
+        w_vdw: module.w_vdw,
+        w_desolv: module.w_desolv,
+        w_bsa: module.w_bsa,
+        w_air: module.w_air,
+      }
+    } 
+  }
+  throw new Error('No weights found in config')
+}
+
+export async function getWeights(jobid: number, bartenderToken: string): Promise<Weights> {
+  // TODO check if rescore has been run and return those weights
+  const config = await getConfig(jobid, bartenderToken)
+  return getWeightsFromConfig(config)
+}
+
+export async function step2rescoreModule(jobid: number, bartenderToken: string): Promise<number> {
+  return -1
+}
+
+export async function getScores(jobid: number, module: number, bartenderToken: string) {
+  const files = await listOutputFiles(jobid, bartenderToken);
+  
+}
+
+export async function rescore(jobid: number, module: number, weights: Weights, bartenderToken: string) {
+  const body = {
+    module,
+    ...weights
+  }
+  const result = await safeApi(bartenderToken, async (api) => {
+    const response = await api.runInteractiveApp({
+      jobid,
+      application: "rescore",
+      body,
+    });
+    return response;
+  });
+  if (result.returncode !== 0) {
+    throw new Error(`rescore failed with return code ${result.returncode}`);
+  }
+  return await getScores(jobid, module, bartenderToken);
 }
