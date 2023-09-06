@@ -68,6 +68,14 @@ export default function JobPage() {
               &#128230; Download archive
             </a>
           </div>
+          <div>
+            <h2 className="text-xl">Interactive applications</h2>
+            <ul className="ml-4 list-inside list-disc">
+              <li>
+                <a href={`/jobs/${job.id}/rescore`}>𐄷 Rescore</a>
+              </li>
+            </ul>
+          </div>
         </>
       )}
     </main>

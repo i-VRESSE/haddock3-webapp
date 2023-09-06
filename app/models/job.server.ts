@@ -2,8 +2,10 @@ import type { Params } from "@remix-run/react";
 import { JobApi } from "~/bartender-client/apis/JobApi";
 import { buildConfig } from "./config.server";
 import { JOB_OUTPUT_DIR } from "./constants";
+import type { DirectoryItem } from "~/bartender-client";
 import { ResponseError } from "~/bartender-client";
-import { object, number, Output } from "valibot";
+import type { Output } from "valibot";
+import { object, number, coerce, finite } from "valibot";
 
 const BOOK_KEEPING_FILES = [
   "stderr.txt",
@@ -84,7 +86,11 @@ export async function getJobfile(
   });
 }
 
-export async function listOutputFiles(jobid: number, bartenderToken: string) {
+export async function listOutputFiles(
+  jobid: number,
+  bartenderToken: string,
+  maxDepth = 3
+) {
   return await safeApi(bartenderToken, async (api) => {
     const items = await api.retrieveJobDirectoriesFromPath({
       jobid,
@@ -92,7 +98,7 @@ export async function listOutputFiles(jobid: number, bartenderToken: string) {
       // user might have supplied deeper directory structure
       // so can not browse past maxDepth,
       // but can download archive with files at any depth
-      maxDepth: 3,
+      maxDepth,
     });
     return items;
   });
@@ -152,62 +158,137 @@ export async function getSubDirectoryAsArchive(
   });
 }
 
-export const WeightsSchema = object(
-  {
-    w_elec: number(),
-    w_vdw: number(),
-    w_desolv: number(),
-    w_bsa: number(),
-    w_air: number(),
-  }
-);
+export const WeightsSchema = object({
+  // could use minimum/maximum from catalog,
+  // if they had sane values instead of -9999/9999
+  w_elec: coerce(number([finite()]), Number),
+  w_vdw: coerce(number([finite()]), Number),
+  w_desolv: coerce(number([finite()]), Number),
+  w_bsa: coerce(number([finite()]), Number),
+  w_air: coerce(number([finite()]), Number),
+});
 export type Weights = Output<typeof WeightsSchema>;
 
 async function getConfig(jobid: number, bartenderToken: string) {
-  const path =  'output/data/configurations/enhanced_haddock_params.json'
+  const path = "output/data/configurations/enhanced_haddock_params.json";
   const response = await getJobfile(jobid, path, bartenderToken);
-  const body = await response.json()
-  return body
+  const body = await response.text();
+  return JSON.parse(body.replace(/\bNaN\b/g, "null"));
 }
 
 export function getWeightsFromConfig(config: any): Weights {
   // Find last module with weights
-  const keys = Object.keys(config).reverse()
+  const keys = Object.keys(config).reverse();
   for (const key of keys) {
-    const module = config[key]
-    if ('w_elec' in module) {
+    const module = config[key];
+    if ("w_elec" in module) {
       return {
         w_elec: module.w_elec,
         w_vdw: module.w_vdw,
         w_desolv: module.w_desolv,
         w_bsa: module.w_bsa,
         w_air: module.w_air,
-      }
-    } 
+      };
+    }
   }
-  throw new Error('No weights found in config')
+  throw new Error("No weights found in config");
 }
 
-export async function getWeights(jobid: number, bartenderToken: string): Promise<Weights> {
+export async function getWeights(
+  jobid: number,
+  bartenderToken: string
+): Promise<Weights> {
   // TODO check if rescore has been run and return those weights
-  const config = await getConfig(jobid, bartenderToken)
-  return getWeightsFromConfig(config)
+  const config = await getConfig(jobid, bartenderToken);
+  return getWeightsFromConfig(config);
 }
 
-export async function step2rescoreModule(jobid: number, bartenderToken: string): Promise<number> {
-  return -1
+export function getLastCaprievalModule(files: DirectoryItem): number {
+  if (!files.children) {
+    throw new Error("No modules found");
+  }
+  const modules = [...files.children].reverse();
+  for (const module of modules || []) {
+    if (module.isDir && module.name.endsWith("caprieval")) {
+      return parseInt(module.name.split("_")[0]);
+    }
+  }
+  throw new Error("No caprieval module found");
 }
 
-export async function getScores(jobid: number, module: number, bartenderToken: string) {
-  const files = await listOutputFiles(jobid, bartenderToken);
-  
+export async function step2rescoreModule(
+  jobid: number,
+  bartenderToken: string
+): Promise<number> {
+  const files = await listOutputFiles(jobid, bartenderToken, 1);
+  return getLastCaprievalModule(files);
 }
 
-export async function rescore(jobid: number, module: number, weights: Weights, bartenderToken: string) {
+export async function getScores(
+  jobid: number,
+  module: number,
+  bartenderToken: string,
+  interactivness = 0
+) {
+  // output/15_caprieval/capri_ss.tsv
+  let prefix = `output/${module}_caprieval`;
+  if (interactivness > 0) {
+    Array(interactivness).forEach(() => (prefix += "_interactive"));
+  }
+  const structures = await getStructureScores(prefix, jobid, bartenderToken);
+  const clusters = await getClusterScores(prefix, jobid, bartenderToken);
+  return { structures, clusters };
+}
+
+async function getStructureScores(
+  prefix: string,
+  jobid: number,
+  bartenderToken: string
+) {
+  const path = `${prefix}/capri_ss.tsv`;
+  const response = await getJobfile(jobid, path, bartenderToken);
+  const body = await response.text();
+  const { tsvParse } = await import("d3-dsv");
+  return tsvParse(body);
+}
+
+async function getClusterScores(
+  prefix: string,
+  jobid: number,
+  bartenderToken: string
+) {
+  const path = `${prefix}/capri_clt.tsv`;
+  const response = await getJobfile(jobid, path, bartenderToken);
+  const body = await response.text();
+  const { tsvParse } = await import("d3-dsv");
+  const commentless = removeComments(body);
+  return tsvParse(commentless);
+}
+
+function removeComments(body: string): string {
+  return body.replace(/^#.*\n/gm, "");
+}
+
+export async function getInteractiveScores(
+  jobid: number,
+  module: number,
+  bartenderToken: string
+) {
+  // Calling rescore multiple times will keep adding `_interactive` to the module name.
+  // TODO find the last one or somehow return all of them together with their weights
+  return await getScores(jobid, module, bartenderToken, 1);
+}
+
+export async function rescore(
+  jobid: number,
+  module: number,
+  weights: Weights,
+  bartenderToken: string
+) {
   const body = {
     module,
-    ...weights
-  }
+    ...weights,
+  };
   const result = await safeApi(bartenderToken, async (api) => {
     const response = await api.runInteractiveApp({
       jobid,
@@ -219,5 +300,7 @@ export async function rescore(jobid: number, module: number, weights: Weights, b
   if (result.returncode !== 0) {
     throw new Error(`rescore failed with return code ${result.returncode}`);
   }
-  return await getScores(jobid, module, bartenderToken);
+  // TODO used weights are outputed to result.stdout, need some way to store them
+  // either using https://github.com/i-VRESSE/bartender/pull/76
+  // or as part of https://github.com/haddocking/haddock3/tree/interactive_rescoring
 }
