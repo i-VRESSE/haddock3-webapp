@@ -1,5 +1,9 @@
 import { describe, test, expect } from "vitest";
-import { getLastCaprievalModule, getWeightsFromConfig, interactivenessOfModule } from "./job.server";
+import {
+  getLastCaprievalModule,
+  getWeightsFromConfig,
+  interactivenessOfModule,
+} from "./job.server";
 import type { DirectoryItem } from "~/bartender-client";
 
 describe("getWeightsFromConfig", () => {
@@ -456,7 +460,8 @@ function outputFileWtih3Interactivness(): DirectoryItem {
         path: "output/15_caprieval_interactive_interactive_interactive",
         isDir: true,
         isFile: false,
-      },      {
+      },
+      {
         name: "analysis",
         path: "output/analysis",
         isDir: true,
@@ -484,7 +489,6 @@ function outputFileWtih3Interactivness(): DirectoryItem {
   };
 }
 
-
 describe("getLastCaprievalModule", () => {
   test("should return the last caprieval module", () => {
     const files = outputFileWithoutInteractivness();
@@ -494,12 +498,12 @@ describe("getLastCaprievalModule", () => {
   });
 });
 
-describe('interactivenessOfModule', () => {
+describe("interactivenessOfModule", () => {
   test.each([
     [outputFileWithoutInteractivness(), 0],
     [outputFileWtih3Interactivness(), 3],
-  ])('should return the number of interactive modules', (files, expected) => {
+  ])("should return the number of interactive modules", (files, expected) => {
     const result = interactivenessOfModule(15, files);
     expect(result).toEqual(expected);
-  })
-})
+  });
+});
