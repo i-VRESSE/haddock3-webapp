@@ -12,7 +12,6 @@ import {
   getScores,
   step2rescoreModule,
   rescore,
-  getInteractiveScores,
 } from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
 
@@ -23,9 +22,9 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  const module = await step2rescoreModule(jobId, token);
-  const weights = await getWeights(jobId, token);
-  const scores = await getScores(jobId, module, token);
+  const [module, interactivness] = await step2rescoreModule(jobId, token);
+  const weights = await getWeights(jobId, module, interactivness, token);
+  const scores = await getScores(jobId, module, interactivness, token);
   return json({ weights, scores });
 };
 
@@ -41,9 +40,8 @@ export const action = async ({ request, params }: LoaderArgs) => {
   }
   const weights = result.data;
   const module = await step2rescoreModule(jobId, token);
-  await rescore(jobId, module, weights, token);
-  const scores = await getInteractiveScores(jobId, module, token);
-  return json({ weights, scores, errors: { nested: {} } });
+  await rescore(jobId, module[0], weights, token);
+  return json({ errors: { nested: {} } });
 };
 
 export default function RescorePage() {

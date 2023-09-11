@@ -5,7 +5,7 @@ import { JOB_OUTPUT_DIR } from "./constants";
 import type { DirectoryItem } from "~/bartender-client";
 import { ResponseError } from "~/bartender-client";
 import type { Output } from "valibot";
-import { object, number, coerce, finite } from "valibot";
+import { object, number, coerce, finite, parse } from "valibot";
 
 const BOOK_KEEPING_FILES = [
   "stderr.txt",
@@ -177,7 +177,12 @@ async function getConfig(jobid: number, bartenderToken: string) {
 }
 
 export function getWeightsFromConfig(config: any): Weights {
-  // Find last module with weights
+  // TODO instead of latest use module index
+  // but what on disk is called 15_caprieval
+  // in config is called caprieval.6
+  // with global config on same level as modules
+  // so hard to determine which module is which index
+
   const keys = Object.keys(config).reverse();
   for (const key of keys) {
     const module = config[key];
@@ -194,13 +199,77 @@ export function getWeightsFromConfig(config: any): Weights {
   throw new Error("No weights found in config");
 }
 
-export async function getWeights(
+function buildPath({
+  prefix = "output",
+  moduleIndex,
+  moduleName,
+  interactivness = 0,
+  suffix = "",
+}: {
+  prefix?: string;
+  moduleIndex: number;
+  moduleName: string;
+  interactivness?: number;
+  suffix?: string;
+}) {
+  const interactive_suffix = Array(interactivness + 1).join("_interactive");
+  return `${prefix}/${moduleIndex}_${moduleName}${interactive_suffix}/${suffix}`;
+}
+
+export async function getInteractiveWeights(
   jobid: number,
+  module: number,
+  interactivness: number,
   bartenderToken: string
 ): Promise<Weights> {
-  // TODO check if rescore has been run and return those weights
+  const path = buildPath({
+    moduleIndex: module,
+    moduleName: "caprieval",
+    interactivness,
+    suffix: "weights_params.json",
+  });
+  const response = await getJobfile(jobid, path, bartenderToken);
+  const body = await response.json();
+  return parse(WeightsSchema, body);
+}
+
+export async function getWeights(
+  jobid: number,
+  module: number,
+  interactivness: number,
+  bartenderToken: string
+): Promise<Weights> {
+  if (interactivness > 0) {
+    return await getInteractiveWeights(
+      jobid,
+      module,
+      interactivness,
+      bartenderToken
+    );
+  }
   const config = await getConfig(jobid, bartenderToken);
   return getWeightsFromConfig(config);
+}
+
+export function interactivenessOfModule(
+  module: number,
+  files: DirectoryItem
+): number {
+  if (!files.children) {
+    throw new Error("No modules found");
+  }
+  const modules = [...files.children].reverse();
+  let interactivness = 0;
+  for (const m of modules) {
+    if (
+      m.isDir &&
+      m.name.startsWith(`${module}_`) &&
+      m.name.endsWith("interactive")
+    ) {
+      interactivness += 1;
+    }
+  }
+  return interactivness;
 }
 
 export function getLastCaprievalModule(files: DirectoryItem): number {
@@ -219,22 +288,23 @@ export function getLastCaprievalModule(files: DirectoryItem): number {
 export async function step2rescoreModule(
   jobid: number,
   bartenderToken: string
-): Promise<number> {
+): Promise<[number, number]> {
   const files = await listOutputFiles(jobid, bartenderToken, 1);
-  return getLastCaprievalModule(files);
+  const module = getLastCaprievalModule(files);
+  return [module, interactivenessOfModule(module, files)];
 }
 
 export async function getScores(
   jobid: number,
   module: number,
-  bartenderToken: string,
-  interactivness = 0
+  interactivness: number,
+  bartenderToken: string
 ) {
-  // output/15_caprieval/capri_ss.tsv
-  let prefix = `output/${module}_caprieval`;
-  if (interactivness > 0) {
-    Array(interactivness).forEach(() => (prefix += "_interactive"));
-  }
+  const prefix = buildPath({
+    moduleIndex: module,
+    moduleName: "caprieval",
+    interactivness,
+  });
   const structures = await getStructureScores(prefix, jobid, bartenderToken);
   const clusters = await getClusterScores(prefix, jobid, bartenderToken);
   return { structures, clusters };
@@ -245,7 +315,7 @@ async function getStructureScores(
   jobid: number,
   bartenderToken: string
 ) {
-  const path = `${prefix}/capri_ss.tsv`;
+  const path = `${prefix}capri_ss.tsv`;
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
   const { tsvParse } = await import("d3-dsv");
@@ -257,7 +327,7 @@ async function getClusterScores(
   jobid: number,
   bartenderToken: string
 ) {
-  const path = `${prefix}/capri_clt.tsv`;
+  const path = `${prefix}capri_clt.tsv`;
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
   const { tsvParse } = await import("d3-dsv");
@@ -267,16 +337,6 @@ async function getClusterScores(
 
 function removeComments(body: string): string {
   return body.replace(/^#.*\n/gm, "");
-}
-
-export async function getInteractiveScores(
-  jobid: number,
-  module: number,
-  bartenderToken: string
-) {
-  // Calling rescore multiple times will keep adding `_interactive` to the module name.
-  // TODO find the last one or somehow return all of them together with their weights
-  return await getScores(jobid, module, bartenderToken, 1);
 }
 
 export async function rescore(
