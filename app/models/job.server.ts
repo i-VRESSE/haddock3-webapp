@@ -294,6 +294,8 @@ export async function step2rescoreModule(
   return [module, interactivenessOfModule(module, files)];
 }
 
+export type DSVRow = Record<string, string | number>;
+
 export async function getScores(
   jobid: number,
   module: number,
@@ -318,8 +320,8 @@ async function getStructureScores(
   const path = `${prefix}capri_ss.tsv`;
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
-  const { tsvParse } = await import("d3-dsv");
-  return tsvParse(body);
+  const { tsvParse, autoType } = await import("d3-dsv");
+  return tsvParse(body, autoType) as any as Promise<DSVRow[]>;
 }
 
 async function getClusterScores(
@@ -330,9 +332,9 @@ async function getClusterScores(
   const path = `${prefix}capri_clt.tsv`;
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
-  const { tsvParse } = await import("d3-dsv");
+  const { tsvParse, autoType } = await import("d3-dsv");
   const commentless = removeComments(body);
-  return tsvParse(commentless);
+  return tsvParse(commentless, autoType) as any as Promise<DSVRow[]>;
 }
 
 function removeComments(body: string): string {

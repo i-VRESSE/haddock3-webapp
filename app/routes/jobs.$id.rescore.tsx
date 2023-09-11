@@ -2,6 +2,7 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { flatten, safeParse } from "valibot";
+
 import { getBartenderToken } from "~/bartender_token.server";
 import { ErrorMessages } from "~/components/ErrorMessages";
 import {
@@ -14,6 +15,8 @@ import {
   rescore,
 } from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
+import { ClientOnly } from "~/components/ClientOnly";
+import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
@@ -47,6 +50,7 @@ export const action = async ({ request, params }: LoaderArgs) => {
 export default function RescorePage() {
   const { weights, scores } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+
   return (
     <>
       <Form method="post">
@@ -122,20 +126,15 @@ export default function RescorePage() {
           <button type="submit" className="btn btn-primary btn-sm">
             Rescore
           </button>
+          {/* TODO add reset button, that resets to weights+scores of non-interactive job. */}
           <a href=".." className=" btn-outline btn btn-sm">
             Back
           </a>
         </div>
       </Form>
-      {/* TODO replace with ClusterTable from @i-vresse/haddock3-analysis-components */}
-      <details>
-        <summary>Input</summary>
-        <pre>{JSON.stringify(scores, null, 2)}</pre>
-      </details>
-      <details>
-        <summary>Result</summary>
-        <pre>{JSON.stringify(actionData, null, 2)}</pre>
-      </details>
+      <ClientOnly fallback={<p>Loading...</p>}>
+        {() => <CaprievalReport scores={scores} prefix="files/output/" />}
+      </ClientOnly>
     </>
   );
 }

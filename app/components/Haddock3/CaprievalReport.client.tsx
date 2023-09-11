@@ -1,0 +1,138 @@
+import { ClusterTable } from "@i-vresse/haddock3-analysis-components";
+import "@i-vresse/haddock3-analysis-components/dist/style.css";
+import type {
+  Cluster,
+  ClusterID,
+} from "@i-vresse/haddock3-analysis-components/dist/components/ClusterTable";
+import { useMemo } from "react";
+import type { DSVRow } from "~/models/job.server";
+
+/*
+  Component has to be client only due 
+  to sorting and ngl structure viewer needing browser.
+  */
+
+interface Scores {
+  structures: DSVRow[];
+  clusters: DSVRow[];
+}
+
+interface CaprievalReportProps {
+  scores: Scores;
+  prefix: string;
+}
+
+const MAX_BEST = 5;
+const NR_STRUCTURE_LENGTH = Math.ceil(MAX_BEST / 10);
+const headers = {
+  rank: "Cluster Rank",
+  id: "Cluster ID",
+  size: "Cluster size",
+  "HADDOCK score [a.u.]": "HADDOCK score [a.u.]",
+  "interface RMSD [A]": "interface RMSD [A]",
+  "Fraction of Common Contacts": "Fraction of Common Contacts",
+  "ligand RMSD [A]": "ligand RMSD [A]",
+  DOCKQ: "DOCKQ",
+  "Restraints Energy": "Restraints Energy",
+  "Desolvation Energy": "Desolvation Energy",
+  "Electrostatic Energy": "Electrostatic Energy",
+  "Van der Waals Energy": "Van der Waals Energy",
+  ...Object.fromEntries(
+    Array.from({ length: MAX_BEST }, (_, i) => {
+      const index = i + 1;
+      return [
+        `Nr ${index
+          .toString()
+          .padStart(NR_STRUCTURE_LENGTH, "0")} best structure`,
+        `Nr ${index
+          .toString()
+          .padStart(NR_STRUCTURE_LENGTH, "0")} best structure`,
+      ];
+    })
+  ),
+} as const;
+
+export function scores2clusters(
+  scores: Scores,
+  prefix: string
+): Record<ClusterID, Cluster> {
+  const result = scores.clusters.map((cluster, index) => {
+    const stats = {
+      "HADDOCK score [a.u.]": {
+        mean: cluster.score, // TODO or use .total?
+        std: cluster.score_std,
+      },
+      "interface RMSD [A]": {
+        mean: cluster.irmsd,
+        std: cluster.irmsd_std,
+      },
+      "Fraction of Common Contacts": {
+        mean: cluster.fnat,
+        std: cluster.fnat_std,
+      },
+      "ligand RMSD [A]": {
+        mean: cluster.lrmsd,
+        std: cluster.lrmsd_std,
+      },
+      DOCKQ: {
+        mean: cluster.dockq,
+        std: cluster.dockq_std,
+      },
+      "Restraints Energy": {
+        mean: cluster.score, // TODO pick right column
+        std: cluster.score_std,
+      },
+      "Desolvation Energy": {
+        mean: cluster.desolv,
+        std: cluster.desolv_std,
+      },
+      "Electrostatic Energy": {
+        mean: cluster.elec,
+        std: cluster.elec_std,
+      },
+      "Van der Waals Energy": {
+        mean: cluster.vdw,
+        std: cluster.vdw_std,
+      },
+    };
+    const best = Object.fromEntries(
+      scores.structures
+        .filter((s) => s["cluster-id"] === cluster.cluster_id)
+        .slice(0, MAX_BEST)
+        .map((s, i) => {
+          const index = i + 1;
+          const path = s.model!.toString().replace("../", prefix);
+          return [
+            `Nr ${index
+              .toString()
+              .padStart(NR_STRUCTURE_LENGTH, "0")} best structure`,
+            path,
+          ];
+        })
+    );
+    return [
+      index,
+      {
+        rank:
+          cluster.cluster_rank === "-" ? "Unclustered" : cluster.cluster_rank,
+        id: cluster.cluster_id,
+        size: cluster.n,
+        stats,
+        best,
+      },
+    ];
+  });
+  return Object.fromEntries(result);
+}
+
+export const CaprievalReport = ({ scores, prefix }: CaprievalReportProps) => {
+  const clusters = useMemo(
+    () => scores2clusters(scores, prefix),
+    [scores, prefix]
+  );
+  return (
+    <div>
+      <ClusterTable headers={headers} clusters={clusters} maxbest={MAX_BEST} />
+    </div>
+  );
+};
