@@ -321,6 +321,7 @@ async function getStructureScores(
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
   const { tsvParse, autoType } = await import("d3-dsv");
+  // TODO we know what rows capri_ss.tsv has, so we could use a more specific type
   return tsvParse(body, autoType) as any as Promise<DSVRow[]>;
 }
 
@@ -334,6 +335,7 @@ async function getClusterScores(
   const body = await response.text();
   const { tsvParse, autoType } = await import("d3-dsv");
   const commentless = removeComments(body);
+  // TODO we know what rows capri_clt.tsv has, so we could use a more specific type
   return tsvParse(commentless, autoType) as any as Promise<DSVRow[]>;
 }
 
