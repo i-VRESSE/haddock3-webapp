@@ -30,7 +30,7 @@
     "/postgres-data"
   ],
   "dependencies": {
-    "@i-vresse/haddock3-analysis-components": "^0.3.0",
+    "@i-vresse/haddock3-analysis-components": "^0.3.1",
     "@i-vresse/wb-core": "^1.2.0",
     "@prisma/client": "^5.1.1",
     "@remix-run/css-bundle": "^1.19.2",
