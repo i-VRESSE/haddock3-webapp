@@ -16,6 +16,7 @@ import {
   WeightsSchema,
   rescore,
 } from "~/tools/rescore.server";
+import { ToolHistory } from "../components/ToolHistory";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
@@ -24,10 +25,12 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  const [module, interactivness] = await step2rescoreModule(jobId, token);
+  const [module, maxInteractivness] = await step2rescoreModule(jobId, token);
+  const i = new URL(request.url).searchParams.get("i");
+  const interactivness = i === null ? maxInteractivness : parseInt(i);
   const weights = await getWeights(jobId, module, interactivness, token);
   const scores = await getScores(jobId, module, interactivness, token);
-  return json({ weights, scores });
+  return json({ weights, scores, interactivness, maxInteractivness });
 };
 
 export const action = async ({ request, params }: LoaderArgs) => {
@@ -50,15 +53,18 @@ export const action = async ({ request, params }: LoaderArgs) => {
 };
 
 export default function RescorePage() {
-  const { weights, scores } = useLoaderData<typeof loader>();
+  const { weights, scores, interactivness, maxInteractivness } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
   return (
     <>
-      <Form method="post">
+      <Form method="post" action="?">
         <h2 className="text-2xl">Rescore</h2>
         <div className="flex flex-row gap-4">
-          <div>
+          {/* key is used to force React to re-render the component
+          when the weights changes */}
+          <div key={"w_elec" + weights.w_elec}>
             <label htmlFor="w_elec" className="block">
               Weight of the electrostatic component
             </label>
@@ -71,7 +77,7 @@ export default function RescorePage() {
             />
             <ErrorMessages path="w_elec" errors={actionData?.errors} />
           </div>
-          <div>
+          <div key={"w_vdw" + weights.w_vdw}>
             <label htmlFor="w_vdw" className="block">
               Weight of the van der Waals component
             </label>
@@ -84,7 +90,7 @@ export default function RescorePage() {
             />
             <ErrorMessages path="w_vdw" errors={actionData?.errors} />
           </div>
-          <div>
+          <div key={"w_desolv" + weights.w_desolv}>
             <label htmlFor="w_desolv" className="block">
               Weight of the desolvation component
             </label>
@@ -97,7 +103,7 @@ export default function RescorePage() {
             />
             <ErrorMessages path="w_desolv" errors={actionData?.errors} />
           </div>
-          <div>
+          <div key={"w_bsa" + weights.w_bsa}>
             <label htmlFor="w_bsa" className="block">
               Weight of the BSA component
             </label>
@@ -110,7 +116,7 @@ export default function RescorePage() {
             />
             <ErrorMessages path="w_bsa" errors={actionData?.errors} />
           </div>
-          <div>
+          <div key={"w_air" + weights.w_air}>
             <label htmlFor="w_air" className="block">
               Weight of the AIR component
             </label>
@@ -136,6 +142,10 @@ export default function RescorePage() {
             Back
           </a>
         </div>
+        <ToolHistory
+          interactivness={interactivness}
+          maxInteractivness={maxInteractivness}
+        />
       </Form>
       <ClientOnly fallback={<p>Loading...</p>}>
         {() => <CaprievalReport scores={scores} prefix="../files/output/" />}

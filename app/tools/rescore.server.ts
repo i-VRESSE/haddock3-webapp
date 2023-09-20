@@ -192,7 +192,4 @@ export async function rescore(
     console.error(result);
     throw new Error(`rescore failed with return code ${result.returncode}`);
   }
-  // TODO used weights are outputed to result.stdout, need some way to store them
-  // either using https://github.com/i-VRESSE/bartender/pull/76
-  // or as part of https://github.com/haddocking/haddock3/tree/interactive_rescoring
 }
