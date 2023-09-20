@@ -72,7 +72,7 @@ export default function JobPage() {
             <h2 className="text-xl">Interactive applications</h2>
             <ul className="ml-4 list-inside list-disc">
               <li>
-                <a href={`/jobs/${job.id}/rescore`}>𐄷 Rescore</a>
+                <a href={`/jobs/${job.id}/tools/rescore`}>𐄷 Rescore</a>
               </li>
             </ul>
           </div>

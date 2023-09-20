@@ -5,18 +5,17 @@ import { flatten, safeParse } from "valibot";
 
 import { getBartenderToken } from "~/bartender_token.server";
 import { ErrorMessages } from "~/components/ErrorMessages";
-import {
-  jobIdFromParams,
-  getJobById,
-  getWeights,
-  WeightsSchema,
-  getScores,
-  step2rescoreModule,
-  rescore,
-} from "~/models/job.server";
+import { jobIdFromParams, getJobById } from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
 import { ClientOnly } from "~/components/ClientOnly";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
+import {
+  step2rescoreModule,
+  getWeights,
+  getScores,
+  WeightsSchema,
+  rescore,
+} from "~/tools/rescore.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
@@ -34,9 +33,12 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 export const action = async ({ request, params }: LoaderArgs) => {
   const token = await getBartenderToken(request);
   const jobId = jobIdFromParams(params);
+  const job = await getJobById(jobId, token);
+  if (!CompletedJobs.has(job.state)) {
+    throw new Error("Job is not completed");
+  }
   const formData = await request.formData();
   const result = safeParse(WeightsSchema, Object.fromEntries(formData));
-  console.log(result);
   if (!result.success) {
     const errors = flatten(result.error);
     return json({ errors }, { status: 400 });
@@ -136,7 +138,7 @@ export default function RescorePage() {
         </div>
       </Form>
       <ClientOnly fallback={<p>Loading...</p>}>
-        {() => <CaprievalReport scores={scores} prefix="files/output/" />}
+        {() => <CaprievalReport scores={scores} prefix="../files/output/" />}
       </ClientOnly>
     </>
   );

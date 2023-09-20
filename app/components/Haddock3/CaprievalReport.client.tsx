@@ -5,7 +5,7 @@ import type {
   ClusterID,
 } from "@i-vresse/haddock3-analysis-components/dist/components/ClusterTable";
 import { useMemo } from "react";
-import type { DSVRow } from "~/models/job.server";
+import type { DSVRow } from "~/tools/rescore.server";
 
 /*
   Component has to be client only due 
@@ -57,9 +57,13 @@ export function scores2clusters(
   prefix: string
 ): Record<ClusterID, Cluster> {
   const result = scores.clusters.map((cluster, index) => {
+    // cluster has .total and .total_std fields
+    // but it is not clear what they are
+    // they are not used in the analysis
+    // TODO add total row to stats???
     const stats = {
       "HADDOCK score [a.u.]": {
-        mean: cluster.score, // TODO or use .total?
+        mean: cluster.score,
         std: cluster.score_std,
       },
       "interface RMSD [A]": {
@@ -79,8 +83,8 @@ export function scores2clusters(
         std: cluster.dockq_std,
       },
       "Restraints Energy": {
-        mean: cluster.score, // TODO pick right column
-        std: cluster.score_std,
+        mean: cluster.air,
+        std: cluster.air_std,
       },
       "Desolvation Energy": {
         mean: cluster.desolv,

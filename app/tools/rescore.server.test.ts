@@ -1,10 +1,7 @@
 import { describe, test, expect } from "vitest";
-import {
-  getLastCaprievalModule,
-  getWeightsFromConfig,
-  interactivenessOfModule,
-} from "./job.server";
 import type { DirectoryItem } from "~/bartender-client";
+import { getWeightsFromConfig, getLastCaprievalModule, interactivenessOfModule } from "./rescore.server";
+
 
 describe("getWeightsFromConfig", () => {
   test("should return the correct weights", () => {
