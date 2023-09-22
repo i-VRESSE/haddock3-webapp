@@ -34,6 +34,9 @@ const App = () => {
     }
   }, [archive, activetCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
 
+
+  // TODO remove run dir and compute options when submitting
+  // TODO upload workflow archive that was create in workflow builder fails
   return (
     <div>
       <div className="page grid h-full w-full gap-2 p-4">

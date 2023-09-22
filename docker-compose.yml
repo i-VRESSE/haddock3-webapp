@@ -2,6 +2,7 @@ version: "3.9"
 
 services:
   webapp:
+  # // TODO publish to ghcr.io
     image: i-vresse/haddock3-webapp
     build:
       context: .
@@ -43,6 +44,7 @@ services:
     build:
       context: .
       dockerfile: prisma/Dockerfile
+      # TODO use web app image or publish as seperate image to ghcr.io
     command: npm run setup
     restart: "no"
     environment:
