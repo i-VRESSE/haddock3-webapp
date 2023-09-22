@@ -161,15 +161,18 @@ export function buildPath({
   moduleName,
   interactivness = 0,
   suffix = "",
+  moduleIndexPadding = 2,
 }: {
   prefix?: string;
   moduleIndex: number;
   moduleName: string;
   interactivness?: number;
   suffix?: string;
+  moduleIndexPadding?: number;
 }) {
   const interactive_suffix = Array(interactivness + 1).join("_interactive");
-  return `${prefix}/${moduleIndex}_${moduleName}${interactive_suffix}/${suffix}`;
+  const moduleIndexPadded = moduleIndex.toString().padStart(moduleIndexPadding, "0");
+  return `${prefix}/${moduleIndexPadded}_${moduleName}${interactive_suffix}/${suffix}`;
 }
 
 export async function getEnhancedConfig(jobid: number, bartenderToken: string) {

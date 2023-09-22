@@ -60,7 +60,7 @@ export function scores2clusters(
     // cluster has .total and .total_std fields
     // but it is not clear what they are
     // they are not used in the analysis
-    // TODO add total row to stats???
+    // TODO add Total Energy aka total row to stats???
     const stats = {
       "HADDOCK score [a.u.]": {
         mean: cluster.score,

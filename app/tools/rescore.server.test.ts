@@ -5,6 +5,7 @@ import {
   getLastCaprievalModule,
   interactivenessOfModule,
 } from "./rescore.server";
+import { buildPath } from "~/models/job.server";
 
 describe("getWeightsFromConfig", () => {
   test("should return the correct weights", () => {
@@ -507,3 +508,16 @@ describe("interactivenessOfModule", () => {
     expect(result).toEqual(expected);
   });
 });
+
+describe('buildPath()', () => {
+  test.each([
+    [{ moduleIndex: 1, moduleName: 'caprieval' }, 'output/01_caprieval/'],
+    [{ moduleIndex: 15, moduleName: 'caprieval' }, 'output/15_caprieval/'],
+    [{ moduleIndex: 1, moduleName: 'caprieval', interactivness: 1 }, 'output/01_caprieval_interactive/'],
+    [{ moduleIndex: 1, moduleName: 'caprieval', interactivness: 2 }, 'output/01_caprieval_interactive_interactive/'],
+    [{ moduleIndex: 1, moduleName: 'caprieval', interactivness: 3 }, 'output/01_caprieval_interactive_interactive_interactive/'],
+  ])('should return the correct path', (input, expected) => {
+    const result = buildPath(input);
+    expect(result).toEqual(expected);
+  })
+})
