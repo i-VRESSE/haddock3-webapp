@@ -21,8 +21,11 @@ export async function getCatalog(level: ExpertiseLevel) {
   }
   catalog.examples = {};
   // Set default run_dir to JOB_OUTPUT_DIR
-  if (catalog.global.schema.properties && typeof catalog.global.schema.properties.run_dir === "object") {
-    catalog.global.schema.properties.run_dir.default = JOB_OUTPUT_DIR
+  if (
+    catalog.global.schema.properties &&
+    typeof catalog.global.schema.properties.run_dir === "object"
+  ) {
+    catalog.global.schema.properties.run_dir.default = JOB_OUTPUT_DIR;
   }
   return prepareCatalog(catalog);
 }
