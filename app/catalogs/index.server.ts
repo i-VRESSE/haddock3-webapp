@@ -4,6 +4,7 @@ import easy from "./haddock3.easy.json";
 import expert from "./haddock3.expert.json";
 import guru from "./haddock3.guru.json";
 import type { ExpertiseLevel } from "@prisma/client";
+import { JOB_OUTPUT_DIR } from "~/models/constants";
 
 export async function getCatalog(level: ExpertiseLevel) {
   // Tried serverDependenciesToBundle in remix.config.js but it didn't work
@@ -19,5 +20,10 @@ export async function getCatalog(level: ExpertiseLevel) {
     throw new Error(`No catalog found for level ${level}`);
   }
   catalog.examples = {};
+  // Set default run_dir to JOB_OUTPUT_DIR
+  if (catalog.global.schema.properties && typeof catalog.global.schema.properties.run_dir === "object") {
+    catalog.global.schema.properties.run_dir.default = JOB_OUTPUT_DIR
+  }
+  console.log()
   return prepareCatalog(catalog);
 }
