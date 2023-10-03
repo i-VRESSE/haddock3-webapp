@@ -117,8 +117,9 @@ export async function step2rescoreModule(
   bartenderToken: string
 ): Promise<[number, number]> {
   const files = await listOutputFiles(jobid, bartenderToken, 1);
-  const module = getLastCaprievalModule(files);
-  return [module, interactivenessOfModule(module, files)];
+  const moduleIndex = getLastCaprievalModule(files);
+  const interactivness = interactivenessOfModule(moduleIndex, files);
+  return [moduleIndex, interactivness]
 }
 
 export type DSVRow = Record<string, string | number>;
@@ -172,12 +173,12 @@ function removeComments(body: string): string {
 
 export async function rescore(
   jobid: number,
-  module: number,
+  capri_dir: string,
   weights: Weights,
   bartenderToken: string
 ) {
   const body = {
-    module,
+    capri_dir,
     ...weights,
   };
   const result = await safeApi(bartenderToken, async (api) => {

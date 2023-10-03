@@ -5,7 +5,7 @@ import { flatten, safeParse } from "valibot";
 
 import { getBartenderToken } from "~/bartender_token.server";
 import { ErrorMessages } from "~/components/ErrorMessages";
-import { jobIdFromParams, getJobById } from "~/models/job.server";
+import { jobIdFromParams, getJobById, buildPath } from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
 import { ClientOnly } from "~/components/ClientOnly";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
@@ -47,8 +47,13 @@ export const action = async ({ request, params }: LoaderArgs) => {
     return json({ errors }, { status: 400 });
   }
   const weights = result.data;
-  const module = await step2rescoreModule(jobId, token);
-  await rescore(jobId, module[0], weights, token);
+  const [moduleIndex, interactivness]  = await step2rescoreModule(jobId, token);
+  const capri_dir = buildPath({
+    moduleIndex,
+    moduleName: "caprieval",
+    interactivness,
+  });
+  await rescore(jobId, capri_dir, weights, token);
   return json({ errors: { nested: {} } });
 };
 
