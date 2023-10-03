@@ -6,13 +6,15 @@ import type {
 } from "@i-vresse/haddock3-analysis-components/dist/components/ClusterTable";
 import { useMemo } from "react";
 import type { DSVRow } from "~/tools/rescore.server";
+import { ScatterPlots } from "./ScatterPlots";
+import { BoxPlots } from "./BoxPlots";
 
 /*
   Component has to be client only due 
   to sorting and ngl structure viewer needing browser.
   */
 
-interface Scores {
+export interface Scores {
   structures: DSVRow[];
   clusters: DSVRow[];
 }
@@ -137,6 +139,8 @@ export const CaprievalReport = ({ scores, prefix }: CaprievalReportProps) => {
   return (
     <div>
       <ClusterTable headers={headers} clusters={clusters} maxbest={MAX_BEST} />
+      <ScatterPlots scores={scores} />
+      <BoxPlots scores={scores} />
     </div>
   );
 };
