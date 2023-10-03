@@ -119,7 +119,7 @@ export async function step2rescoreModule(
   const files = await listOutputFiles(jobid, bartenderToken, 1);
   const moduleIndex = getLastCaprievalModule(files);
   const interactivness = interactivenessOfModule(moduleIndex, files);
-  return [moduleIndex, interactivness]
+  return [moduleIndex, interactivness];
 }
 
 export type DSVRow = Record<string, string | number>;

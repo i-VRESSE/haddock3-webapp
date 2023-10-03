@@ -171,7 +171,9 @@ export function buildPath({
   moduleIndexPadding?: number;
 }) {
   const interactive_suffix = Array(interactivness + 1).join("_interactive");
-  const moduleIndexPadded = moduleIndex.toString().padStart(moduleIndexPadding, "0");
+  const moduleIndexPadded = moduleIndex
+    .toString()
+    .padStart(moduleIndexPadding, "0");
   return `${prefix}/${moduleIndexPadded}_${moduleName}${interactive_suffix}/${suffix}`;
 }
 

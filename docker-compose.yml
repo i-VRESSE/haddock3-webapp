@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   webapp:
-  # // TODO publish to ghcr.io
+    # // TODO publish to ghcr.io
     image: i-vresse/haddock3-webapp
     build:
       context: .

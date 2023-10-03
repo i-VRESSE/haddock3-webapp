@@ -34,7 +34,6 @@ const App = () => {
     }
   }, [archive, activetCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
 
-
   // TODO remove run dir and compute options when submitting
   // TODO upload workflow archive that was create in workflow builder fails
   return (

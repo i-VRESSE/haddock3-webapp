@@ -47,7 +47,7 @@ export const action = async ({ request, params }: LoaderArgs) => {
     return json({ errors }, { status: 400 });
   }
   const weights = result.data;
-  const [moduleIndex, interactivness]  = await step2rescoreModule(jobId, token);
+  const [moduleIndex, interactivness] = await step2rescoreModule(jobId, token);
   const capri_dir = buildPath({
     moduleIndex,
     moduleName: "caprieval",
