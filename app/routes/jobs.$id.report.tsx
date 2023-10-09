@@ -16,9 +16,12 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  const [module, maxInteractivness] = await step2rescoreModule(jobId, token);
+  const [module, maxInteractivness, pad] = await step2rescoreModule(
+    jobId,
+    token
+  );
   // const [module, maxInteractivness] = [5,0]
-  const scores = await getScores(jobId, module, maxInteractivness, token);
+  const scores = await getScores(jobId, module, maxInteractivness, token, pad);
   return json({ job, scores });
 };
 

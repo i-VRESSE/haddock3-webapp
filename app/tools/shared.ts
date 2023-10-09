@@ -1,4 +1,5 @@
 import type { DirectoryItem } from "~/bartender-client";
+import { getModuleIndexPadding } from "~/models/job.server";
 
 export function interactivenessOfModule(
   module: number,
@@ -9,7 +10,7 @@ export function interactivenessOfModule(
   }
   const modules = [...files.children].reverse();
   let interactivness = 0;
-  const moduleIndexPadding = 2;
+  const moduleIndexPadding = getModuleIndexPadding(files);
   const moduleIndexPadded = module.toString().padStart(moduleIndexPadding, "0");
   for (const m of modules) {
     if (

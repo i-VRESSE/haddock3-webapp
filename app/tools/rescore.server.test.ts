@@ -523,7 +523,7 @@ describe("buildPath()", () => {
       "output/01_caprieval_interactive_interactive_interactive/",
     ],
   ])("should return the correct path", (input, expected) => {
-    const result = buildPath(input);
+    const result = buildPath({ ...input, moduleIndexPadding: 2 });
     expect(result).toEqual(expected);
   });
 });

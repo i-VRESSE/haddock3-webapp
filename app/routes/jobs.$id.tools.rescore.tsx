@@ -25,11 +25,24 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  const [module, maxInteractivness] = await step2rescoreModule(jobId, token);
+  const [module, maxInteractivness, moduleIndexPadding] =
+    await step2rescoreModule(jobId, token);
   const i = new URL(request.url).searchParams.get("i");
   const interactivness = i === null ? maxInteractivness : parseInt(i);
-  const weights = await getWeights(jobId, module, interactivness, token);
-  const scores = await getScores(jobId, module, interactivness, token);
+  const weights = await getWeights(
+    jobId,
+    module,
+    interactivness,
+    token,
+    moduleIndexPadding
+  );
+  const scores = await getScores(
+    jobId,
+    module,
+    interactivness,
+    token,
+    moduleIndexPadding
+  );
   return json({ weights, scores, interactivness, maxInteractivness });
 };
 
@@ -47,11 +60,13 @@ export const action = async ({ request, params }: LoaderArgs) => {
     return json({ errors }, { status: 400 });
   }
   const weights = result.data;
-  const [moduleIndex, interactivness] = await step2rescoreModule(jobId, token);
+  const [moduleIndex, interactivness, moduleIndexPadding] =
+    await step2rescoreModule(jobId, token);
   const capriDir = buildPath({
     moduleIndex,
     moduleName: "caprieval",
     interactivness,
+    moduleIndexPadding,
   });
   await rescore(jobId, capriDir, weights, token);
   return json({ errors: { nested: {} } });

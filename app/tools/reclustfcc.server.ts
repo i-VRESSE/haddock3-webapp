@@ -1,6 +1,7 @@
 import {
   buildPath,
   getJobfile,
+  getModuleIndexPadding,
   listOutputFiles,
   safeApi,
 } from "~/models/job.server";
@@ -35,24 +36,27 @@ export async function step2reclusterModule(
   jobid: number,
   moduleIndex: number,
   bartenderToken: string
-): Promise<[string, number]> {
+): Promise<[string, number, number]> {
   const files = await listOutputFiles(jobid, bartenderToken, 1);
   const moduleName = nameOfModule(moduleIndex, files);
+  const pad = getModuleIndexPadding(files);
   const interactivness = interactivenessOfModule(moduleIndex, files);
-  return [moduleName, interactivness];
+  return [moduleName, interactivness, pad];
 }
 
 export async function getParams(
   jobid: number,
   moduleIndex: number,
   interactivness: number,
-  bartenderToken: string
+  bartenderToken: string,
+  pad: number
 ): Promise<Schema> {
   const path = buildPath({
     moduleIndex,
     moduleName: "clustfcc",
     interactivness,
     suffix: "params.cfg",
+    moduleIndexPadding: pad,
   });
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
@@ -88,13 +92,15 @@ export async function getClusters(
   jobid: number,
   moduleIndex: number,
   interactivness: number,
-  bartenderToken: string
+  bartenderToken: string,
+  pad: number
 ) {
   const path = buildPath({
     moduleIndex,
     moduleName: "clustfcc",
     interactivness,
     suffix: "clustfcc.tsv",
+    moduleIndexPadding: pad,
   });
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();

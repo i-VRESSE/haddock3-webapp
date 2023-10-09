@@ -2,7 +2,7 @@ import type { Params } from "@remix-run/react";
 import { JobApi } from "~/bartender-client/apis/JobApi";
 import { buildConfig } from "./config.server";
 import { JOB_OUTPUT_DIR } from "./constants";
-import { ResponseError } from "~/bartender-client";
+import { DirectoryItem, ResponseError } from "~/bartender-client";
 
 const BOOK_KEEPING_FILES = [
   "stderr.txt",
@@ -155,20 +155,30 @@ export async function getSubDirectoryAsArchive(
   });
 }
 
+export function getModuleIndexPadding(files: DirectoryItem) {
+  if (!files.children) {
+    throw new Error("No modules found");
+  }
+  const nrModules = files.children.filter(
+    (c) => c.isDir && c.name.includes("_")
+  ).length;
+  return Math.floor(Math.log10(nrModules));
+}
+
 export function buildPath({
   prefix = "output",
   moduleIndex,
   moduleName,
   interactivness = 0,
   suffix = "",
-  moduleIndexPadding = 2,
+  moduleIndexPadding,
 }: {
   prefix?: string;
   moduleIndex: number;
   moduleName: string;
   interactivness?: number;
   suffix?: string;
-  moduleIndexPadding?: number;
+  moduleIndexPadding: number;
 }) {
   const interactive_suffix = Array(interactivness + 1).join("_interactive");
   const moduleIndexPadded = moduleIndex

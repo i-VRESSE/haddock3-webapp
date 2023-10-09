@@ -24,20 +24,24 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  const [moduleName, maxInteractivness] = await step2reclusterModule(
-    jobId,
-    moduleIndex,
-    token
-  );
+  const [moduleName, maxInteractivness, moduleIndexPadding] =
+    await step2reclusterModule(jobId, moduleIndex, token);
   const i = new URL(request.url).searchParams.get("i");
   const interactivness = i === null ? maxInteractivness : parseInt(i);
   const defaultValues = await getParams(
     jobId,
     moduleIndex,
     interactivness,
-    token
+    token,
+    moduleIndexPadding
   );
-  const clusters = await getClusters(jobId, moduleIndex, interactivness, token);
+  const clusters = await getClusters(
+    jobId,
+    moduleIndex,
+    interactivness,
+    token,
+    moduleIndexPadding
+  );
   return json({
     moduleIndex,
     moduleName,
@@ -68,6 +72,7 @@ export const action = async ({ request, params }: LoaderArgs) => {
     moduleIndex,
     moduleName: "clustfcc",
     interactivness: interactivness[1],
+    moduleIndexPadding: interactivness[2],
   });
   await reclustfcc(jobId, clustccDir, clustfccParams, token);
   return json({ errors: { nested: {} } });

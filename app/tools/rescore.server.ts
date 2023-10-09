@@ -7,6 +7,7 @@ import {
   getEnhancedConfig,
   listOutputFiles,
   safeApi,
+  getModuleIndexPadding,
 } from "~/models/job.server";
 import { interactivenessOfModule } from "./shared";
 
@@ -48,13 +49,15 @@ export async function getInteractiveWeights(
   jobid: number,
   module: number,
   interactivness: number,
-  bartenderToken: string
+  bartenderToken: string,
+  moduleIndexPadding: number
 ): Promise<Weights> {
   const path = buildPath({
     moduleIndex: module,
     moduleName: "caprieval",
     interactivness,
     suffix: "weights_params.json",
+    moduleIndexPadding,
   });
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.json();
@@ -65,14 +68,16 @@ export async function getWeights(
   jobid: number,
   module: number,
   interactivness: number,
-  bartenderToken: string
+  bartenderToken: string,
+  pad: number
 ): Promise<Weights> {
   if (interactivness > 0) {
     return await getInteractiveWeights(
       jobid,
       module,
       interactivness,
-      bartenderToken
+      bartenderToken,
+      pad
     );
   }
   const config = await getEnhancedConfig(jobid, bartenderToken);
@@ -95,11 +100,12 @@ export function getLastCaprievalModule(files: DirectoryItem): number {
 export async function step2rescoreModule(
   jobid: number,
   bartenderToken: string
-): Promise<[number, number]> {
+): Promise<[number, number, number]> {
   const files = await listOutputFiles(jobid, bartenderToken, 1);
   const moduleIndex = getLastCaprievalModule(files);
+  const pad = getModuleIndexPadding(files);
   const interactivness = interactivenessOfModule(moduleIndex, files);
-  return [moduleIndex, interactivness];
+  return [moduleIndex, interactivness, pad];
 }
 
 export type DSVRow = Record<string, string | number>;
@@ -108,12 +114,14 @@ export async function getScores(
   jobid: number,
   module: number,
   interactivness: number,
-  bartenderToken: string
+  bartenderToken: string,
+  moduleIndexPadding: number
 ) {
   const prefix = buildPath({
     moduleIndex: module,
     moduleName: "caprieval",
     interactivness,
+    moduleIndexPadding,
   });
   const structures = await getStructureScores(prefix, jobid, bartenderToken);
   const clusters = await getClusterScores(prefix, jobid, bartenderToken);
