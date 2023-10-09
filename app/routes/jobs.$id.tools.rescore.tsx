@@ -48,12 +48,12 @@ export const action = async ({ request, params }: LoaderArgs) => {
   }
   const weights = result.data;
   const [moduleIndex, interactivness] = await step2rescoreModule(jobId, token);
-  const capri_dir = buildPath({
+  const capriDir = buildPath({
     moduleIndex,
     moduleName: "caprieval",
     interactivness,
   });
-  await rescore(jobId, capri_dir, weights, token);
+  await rescore(jobId, capriDir, weights, token);
   return json({ errors: { nested: {} } });
 };
 

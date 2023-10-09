@@ -51,6 +51,9 @@ export default function JobPage() {
       <div>
         <h2 className="text-xl">Tools</h2>
         <ul className="ml-4 list-inside list-disc">
+          {/* TODO only show tools that are applicable
+          rescore only when there is a caprieval module
+          */}
           <li>
             <a href={`/jobs/${job.id}/tools/rescore`}>𐄷 Rescore</a>
           </li>

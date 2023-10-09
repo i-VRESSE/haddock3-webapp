@@ -46,6 +46,26 @@ export const OutputReport = ({
                 {module.id}&nbsp;{module.name}
               </div>
               <div>
+                {module.name === "clustfcc" && (
+                  <a
+                    title="Recluster"
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`/jobs/${jobid}/tools/reclustfcc/${module.id}`}
+                  >
+                    🔧
+                  </a>
+                )}
+                {module.name === "clustrmsd" && (
+                  <a
+                    title="Recluster"
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`/jobs/${jobid}/tools/reclustrmsd/${module.id}`}
+                  >
+                    🔧
+                  </a>
+                )}
                 {module.report && (
                   <a
                     title="Analysis report"

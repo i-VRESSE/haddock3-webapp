@@ -8,6 +8,7 @@ import {
   listOutputFiles,
   safeApi,
 } from "~/models/job.server";
+import { interactivenessOfModule } from "./shared";
 
 export const WeightsSchema = object({
   // could use minimum/maximum from catalog,
@@ -76,27 +77,6 @@ export async function getWeights(
   }
   const config = await getEnhancedConfig(jobid, bartenderToken);
   return getWeightsFromConfig(config);
-}
-
-export function interactivenessOfModule(
-  module: number,
-  files: DirectoryItem
-): number {
-  if (!files.children) {
-    throw new Error("No modules found");
-  }
-  const modules = [...files.children].reverse();
-  let interactivness = 0;
-  for (const m of modules) {
-    if (
-      m.isDir &&
-      m.name.startsWith(`${module}_`) &&
-      m.name.endsWith("interactive")
-    ) {
-      interactivness += 1;
-    }
-  }
-  return interactivness;
 }
 
 export function getLastCaprievalModule(files: DirectoryItem): number {
@@ -173,12 +153,12 @@ function removeComments(body: string): string {
 
 export async function rescore(
   jobid: number,
-  capri_dir: string,
+  capriFir: string,
   weights: Weights,
   bartenderToken: string
 ) {
   const body = {
-    capri_dir,
+    capri_dir: capriFir,
     ...weights,
   };
   const result = await safeApi(bartenderToken, async (api) => {
