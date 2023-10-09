@@ -112,7 +112,7 @@ export default function ReclusterPage() {
             <ErrorMessages path="fraction" errors={actionData?.errors} />
           </div>
           <div
-            key={"strictness" + defaultValues.fraction}
+            key={"strictness" + defaultValues.strictness}
             title="fraction of common contacts to be considered to be part of the same cluster"
           >
             <label htmlFor="strictness" className="block">
