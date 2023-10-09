@@ -1,5 +1,7 @@
 import type { Output } from "valibot";
 import { object, coerce, number, finite } from "valibot";
+import { parse as parseTOML } from "@ltd/j-toml";
+
 import { buildPath, getJobfile, safeApi } from "~/models/job.server";
 import { parseClusterTsv } from "./shared";
 
@@ -87,7 +89,4 @@ export async function reclustrmsd(
     console.error(result);
     throw new Error(`reclustrmsd failed with return code ${result.returncode}`);
   }
-}
-function parseTOML(body: string, arg1: { bigint: boolean }): any {
-  throw new Error("Function not implemented.");
 }
