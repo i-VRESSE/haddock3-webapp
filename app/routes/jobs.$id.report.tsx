@@ -17,6 +17,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     throw new Error("Job is not completed");
   }
   const [module, maxInteractivness] = await step2rescoreModule(jobId, token);
+  // const [module, maxInteractivness] = [5,0]
   const scores = await getScores(jobId, module, maxInteractivness, token);
   return json({ job, scores });
 };
@@ -29,14 +30,26 @@ export default function RescorePage() {
       <div className="flex flex-row justify-between">
         <div>{job.name}</div>
         <div className="flex flex-row gap-1">
-          <a title="Browse" href={`/jobs/${job.id}/browse`}>
-            🗀
+          <a
+            title="Browse"
+            href={`/jobs/${job.id}/browse`}
+            className="btn-outline btn btn-sm"
+          >
+            🗀 Browse
           </a>
-          <a title="Download archive" href={`/jobs/${job.id}/zip`}>
-            &#128230;
+          <a
+            title="Download archive"
+            href={`/jobs/${job.id}/zip`}
+            className="btn-outline btn btn-sm"
+          >
+            &#128230; Download
           </a>
-          <a title="Edit" href={`/jobs/${job.id}/edit`}>
-            &#128393;
+          <a
+            title="Edit"
+            href={`/jobs/${job.id}/edit`}
+            className="btn-outline btn btn-sm"
+          >
+            &#128393; Edit
           </a>
         </div>
       </div>

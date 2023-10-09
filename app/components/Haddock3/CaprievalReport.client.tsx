@@ -137,7 +137,7 @@ export const CaprievalReport = ({ scores, prefix }: CaprievalReportProps) => {
     [scores, prefix]
   );
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       <ClusterTable headers={headers} clusters={clusters} maxbest={MAX_BEST} />
       <ScatterPlots scores={scores} />
       <BoxPlots scores={scores} />

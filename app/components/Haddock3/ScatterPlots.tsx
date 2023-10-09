@@ -3,6 +3,8 @@ import { useMemo } from "react";
 import Plot from "react-plotly.js";
 import type { Scores } from "./CaprievalReport.client";
 
+// TODO move component to https://github.com/i-VRESSE/haddock3-analysis-components
+
 const SUBPLOTS = {
   columns: ["score", "desolv", "vdw", "elec", "air"],
   rows: ["irmsd", "dockq", "lrmsd", "ilrmsd"].reverse(),
@@ -25,18 +27,19 @@ const DOMAINS = {
 };
 
 const TITLE_NAMES = {
-  "score": "HADDOCK score",
-  "irmsd": "i-RMSD",
-  "lrmsd": "l-RMSD",
-  "ilrmsd": "il-RMSD",
-  "dockq": "DOCKQ",
-  "desolv": "Edesolv",
-  "vdw": "Evdw",
-  "elec": "Eelec",
-  "air": "Eair",
-  "fnat": "FCC",
+  score: "HADDOCK score",
+  irmsd: "i-RMSD",
+  lrmsd: "l-RMSD",
+  ilrmsd: "il-RMSD",
+  dockq: "DOCKQ",
+  desolv: "Edesolv",
+  vdw: "Evdw",
+  elec: "Eelec",
+  air: "Eair",
+  fnat: "FCC",
 };
 
+// TODO dont duplicate this, but get from d3
 // Dark24 from venv/lib/python3.10/site-packages/_plotly_utils/colors/qualitative.py
 const CLUSTER_COLORS = [
   "#2E91E5",
@@ -253,9 +256,16 @@ function generatePlotAxes(
 export function ScatterPlots({ scores }: { scores: Scores }) {
   const data = useMemo(() => generateSubPlots(scores), [scores]);
   const axes = useMemo(() => generateAxes(), []);
+  // TODO add button to focus on single subplot
+  const nr_cluster = scores.clusters.length;
+  const sph = nr_cluster > 5 ? 300 : 300;
+  const spw = nr_cluster > 5 ? 350 : 350;
+  const width = spw * SUBPLOTS.columns.length;
+  const height = sph * SUBPLOTS.rows.length;
+
   const layout: Partial<Layout> = {
-    height: 800,
-    width: 1300,
+    height,
+    width,
     legend: { title: { text: "Cluster Rank" } },
     ...axes,
   };
