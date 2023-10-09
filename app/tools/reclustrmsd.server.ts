@@ -1,11 +1,11 @@
+import type { Output } from "valibot";
+import { object, coerce, number, finite } from "valibot";
 import { buildPath, getJobfile, safeApi } from "~/models/job.server";
 import { parseClusterTsv } from "./shared";
-import { object, number, coerce, finite, type Output } from "valibot";
-import { parse as parseTOML } from "@ltd/j-toml";
 
 export const Schema = object({
-  fraction: coerce(number([finite()]), Number),
-  strictness: coerce(number([finite()]), Number),
+  n_clusters: coerce(number([finite()]), Number),
+  distance: coerce(number([finite()]), Number),
   threshold: coerce(number([finite()]), Number),
 });
 export type Schema = Output<typeof Schema>;
@@ -19,7 +19,7 @@ export async function getParams(
 ): Promise<Schema> {
   const path = buildPath({
     moduleIndex,
-    moduleName: "clustfcc",
+    moduleName: "clustrmsd",
     interactivness,
     suffix: "params.cfg",
     moduleIndexPadding: pad,
@@ -27,21 +27,15 @@ export async function getParams(
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
   let config: any = parseTOML(body, { bigint: false });
-  /*
-    In params.cfg:
-    threshold = 1
-    strictness = 0.75
-    fraction = 0.3
-    */
   if (!interactivness) {
-    // non-interactive has `[clustfcc]` section
-    config = config.clustfcc;
+    // non-interactive has `[clustrmsd]` section
+    config = config.clustrmsd;
   }
   const params = {
-    // TODO haddock3-re clustfcc CLI accepts fraction while module only has fraction_cutoff
-    // use fraction_cutoff in CLI
-    fraction: interactivness ? config.fraction : config.fraction_cutoff,
-    strictness: config.strictness,
+    // TODO haddock3-re clustrmsd CLI accepts n_clusters while module only has n_clusters_cutoff
+    // use n_clusters_cutoff in CLI
+    n_clusters: config.tolerance,
+    distance: config.distance,
     threshold: config.threshold,
   };
   return params;
@@ -56,9 +50,9 @@ export async function getClusters(
 ) {
   const path = buildPath({
     moduleIndex,
-    moduleName: "clustfcc",
+    moduleName: "clustrmsd",
     interactivness,
-    suffix: "clustfcc.tsv",
+    suffix: "clustrmsd.tsv",
     moduleIndexPadding: pad,
   });
   const response = await getJobfile(jobid, path, bartenderToken);
@@ -67,26 +61,33 @@ export async function getClusters(
   return rows;
 }
 
-export async function reclustfcc(
+export async function reclustrmsd(
   jobid: number,
   clustfccDir: string,
   params: Schema,
   bartenderToken: string
 ) {
   const body = {
-    clustfcc_dir: clustfccDir,
+    clustrmsd_dir: clustfccDir,
     ...params,
   };
+  // TODO params are mutally exclusive
+  // need to make form with radio buttons
+  // need bartender to handle optional arguments
+  // https://github.com/haddocking/haddock3/blob/7e3cbbd60df5f72ce09a7f7a47f7eb9c18ddfca5/src/haddock/re/clustrmsd.py#L99-L109
   const result = await safeApi(bartenderToken, async (api) => {
     const response = await api.runInteractiveApp({
       jobid,
-      application: "reclustfcc",
+      application: "reclustrmsd",
       body,
     });
     return response;
   });
   if (result.returncode !== 0) {
     console.error(result);
-    throw new Error(`reclustfcc failed with return code ${result.returncode}`);
+    throw new Error(`reclustrmsd failed with return code ${result.returncode}`);
   }
+}
+function parseTOML(body: string, arg1: { bigint: boolean }): any {
+  throw new Error("Function not implemented.");
 }

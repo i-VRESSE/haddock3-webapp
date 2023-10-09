@@ -11,8 +11,8 @@ import {
   Schema,
   getClusters,
   getParams,
-  reclustfcc,
-} from "~/tools/reclustfcc.server";
+  reclustrmsd,
+} from "~/tools/reclustrmsd.server";
 import { moduleInfo } from "~/tools/shared";
 import { CompletedJobs } from "~/utils";
 
@@ -73,11 +73,11 @@ export const action = async ({ request, params }: LoaderArgs) => {
   const interactivness = await moduleInfo(jobId, moduleIndex, token);
   const clustccDir = buildPath({
     moduleIndex,
-    moduleName: "clustfcc",
+    moduleName: "clustrmsd",
     interactivness: interactivness[1],
     moduleIndexPadding: interactivness[2],
   });
-  await reclustfcc(jobId, clustccDir, clustfccParams, token);
+  await reclustrmsd(jobId, clustccDir, clustfccParams, token);
   return json({ errors: { nested: {} } });
 };
 
@@ -98,44 +98,38 @@ export default function ReclusterPage() {
         <div className="flex flex-row gap-4">
           {/* key is used to force React to re-render the component
           when the weights changes */}
-          <div
-            key={"fraction" + defaultValues.fraction}
-            title="fraction of common contacts to not be considered a singleton model."
-          >
-            <label htmlFor="fraction" className="block">
-              Fraction
+          <div key={"n_clusters" + defaultValues.n_clusters}>
+            <label htmlFor="n_clusters" className="block">
+              Number of clusters to generate
             </label>
             <input
               type="text"
-              name="fraction"
-              id="fraction"
-              defaultValue={defaultValues.fraction}
+              name="n_clusters"
+              id="n_clusters"
+              defaultValue={defaultValues.n_clusters}
               className="rounded border-2 p-1"
             />
-            <ErrorMessages path="fraction" errors={actionData?.errors} />
+            <ErrorMessages path="n_clusters" errors={actionData?.errors} />
           </div>
-          <div
-            key={"strictness" + defaultValues.strictness}
-            title="fraction of common contacts to be considered to be part of the same cluster"
-          >
-            <label htmlFor="strictness" className="block">
-              Strictness
+          <div key={"distance" + defaultValues.distance}>
+            <label htmlFor="distance" className="block">
+              Cutoff distance
             </label>
             <input
               type="text"
-              name="strictness"
-              id="strictness"
-              defaultValue={defaultValues.strictness}
+              name="distance"
+              id="distance"
+              defaultValue={defaultValues.distance}
               className="rounded border-2 p-1"
             />
-            <ErrorMessages path="strictness" errors={actionData?.errors} />
+            <ErrorMessages path="distance" errors={actionData?.errors} />
           </div>
           <div
             key={"threshold" + defaultValues.threshold}
             title="cluster population threshold."
           >
             <label htmlFor="threshold" className="block">
-              Threshold
+              Cluster population threshold
             </label>
             <input
               type="text"

@@ -2,7 +2,8 @@ import type { Params } from "@remix-run/react";
 import { JobApi } from "~/bartender-client/apis/JobApi";
 import { buildConfig } from "./config.server";
 import { JOB_OUTPUT_DIR } from "./constants";
-import { DirectoryItem, ResponseError } from "~/bartender-client";
+import type { DirectoryItem } from "~/bartender-client";
+import { ResponseError } from "~/bartender-client";
 
 const BOOK_KEEPING_FILES = [
   "stderr.txt",
