@@ -115,8 +115,7 @@ export async function getScores(
   module: number,
   interactivness: number,
   bartenderToken: string,
-  moduleIndexPadding: number,
-  cleaned: boolean
+  moduleIndexPadding: number
 ) {
   const prefix = buildPath({
     moduleIndex: module,
@@ -125,13 +124,6 @@ export async function getScores(
     moduleIndexPadding,
   });
   const structures = await getStructureScores(prefix, jobid, bartenderToken);
-  if (cleaned) {
-    for (const structure of structures) {
-      if (typeof structure.model === "string") {
-        structure.model = structure.model + ".gz";
-      }
-    }
-  }
   const clusters = await getClusterScores(prefix, jobid, bartenderToken);
   return { structures, clusters };
 }
@@ -146,7 +138,26 @@ async function getStructureScores(
   const body = await response.text();
   const { tsvParse, autoType } = await import("d3-dsv");
   // TODO we know what rows capri_ss.tsv has, so we could use a more specific type
-  return tsvParse(body, autoType) as any as Promise<DSVRow[]>;
+  const data = tsvParse(body, autoType) as any as DSVRow[];  
+  return await correctPaths(data, jobid, bartenderToken)
+}
+
+function isString(x: any): string {
+  if (typeof x === 'string') {
+    return x
+  }
+  throw new Error('Expected string')
+}
+
+async function correctPaths(data: DSVRow[], jobid: number, bartenderToken: string) {
+  const path = isString(data[0].model)
+  const response = await getJobfile(jobid, path, bartenderToken);
+  if (response.status === 404) {
+    for (const row of data) {
+      row.model = `${row.model}.gz`
+    }
+  }
+  return data
 }
 
 async function getClusterScores(
