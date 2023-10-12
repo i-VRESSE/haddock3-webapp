@@ -203,20 +203,18 @@ export async function isOutputCleaned(
   bartenderToken: string
 ): Promise<boolean> {
   const files = await listOutputFiles(jobid, bartenderToken);
-  const compressedExtensions = [
-    '.inp',
-    '.out',
-    '.pdb',
-    '.psf',
-    ]
+  const compressedExtensions = [".inp", ".out", ".pdb", ".psf"];
   for (const item of files.children ?? []) {
     if (item.isDir && item.name.includes("_")) {
       for (const subitem of item.children ?? []) {
-        if (!subitem.isDir && compressedExtensions.some(ext => subitem.name.includes(ext))) {
+        if (
+          !subitem.isDir &&
+          compressedExtensions.some((ext) => subitem.name.includes(ext))
+        ) {
           return subitem.name.endsWith(".gz");
         }
       }
     }
   }
-  return false
+  return false;
 }

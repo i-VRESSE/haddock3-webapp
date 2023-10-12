@@ -116,7 +116,7 @@ export async function getScores(
   interactivness: number,
   bartenderToken: string,
   moduleIndexPadding: number,
-  cleaned: boolean,
+  cleaned: boolean
 ) {
   const prefix = buildPath({
     moduleIndex: module,
@@ -126,11 +126,11 @@ export async function getScores(
   });
   const structures = await getStructureScores(prefix, jobid, bartenderToken);
   if (cleaned) {
-      for (const structure of structures) {
-          if (typeof structure.model === "string") {
-            structure.model = structure.model + '.gz';
-          }
+    for (const structure of structures) {
+      if (typeof structure.model === "string") {
+        structure.model = structure.model + ".gz";
       }
+    }
   }
   const clusters = await getClusterScores(prefix, jobid, bartenderToken);
   return { structures, clusters };

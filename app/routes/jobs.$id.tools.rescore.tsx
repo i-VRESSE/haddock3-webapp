@@ -5,7 +5,12 @@ import { flatten, safeParse } from "valibot";
 
 import { getBartenderToken } from "~/bartender_token.server";
 import { ErrorMessages } from "~/components/ErrorMessages";
-import { jobIdFromParams, getJobById, buildPath } from "~/models/job.server";
+import {
+  jobIdFromParams,
+  getJobById,
+  buildPath,
+  isOutputCleaned,
+} from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
 import { ClientOnly } from "~/components/ClientOnly";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
@@ -36,12 +41,14 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     token,
     moduleIndexPadding
   );
+  const cleaned = await isOutputCleaned(jobId, token);
   const scores = await getScores(
     jobId,
     module,
     interactivness,
     token,
-    moduleIndexPadding
+    moduleIndexPadding,
+    cleaned
   );
   return json({ weights, scores, interactivness, maxInteractivness });
 };
