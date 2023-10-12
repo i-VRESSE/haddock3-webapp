@@ -155,7 +155,7 @@ export default function ReclusterPage() {
           TODO show history, and allow to switch to old result 
           Reset button is not possible, due to write-once job dir
           */}
-          <a href=".." className=" btn-outline btn btn-sm">
+          <a href="../.." className=" btn-outline btn btn-sm">
             Back
           </a>
         </div>
