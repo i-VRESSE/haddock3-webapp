@@ -157,6 +157,7 @@ async function correctPaths(
   const path = isString(data[0].model);
   const response = await getJobfile(jobid, path, bartenderToken);
   if (response.status === 404) {
+    // When the model is not found, it is probably gzipped
     for (const row of data) {
       row.model = `${row.model}.gz`;
     }
