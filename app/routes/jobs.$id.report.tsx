@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 import { getBartenderToken } from "~/bartender_token.server";
-import { jobIdFromParams, getJobById } from "~/models/job.server";
+import { jobIdFromParams, getJobById, isOutputCleaned } from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
 import { ClientOnly } from "~/components/ClientOnly";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
@@ -21,7 +21,8 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     token
   );
   // const [module, maxInteractivness] = [5,0]
-  const scores = await getScores(jobId, module, maxInteractivness, token, pad);
+  const cleaned = isOutputCleaned(jobId, token);
+  const scores = await getScores(jobId, module, maxInteractivness, token, pad, cleaned);
   return json({ job, scores });
 };
 

@@ -197,3 +197,26 @@ export async function getEnhancedConfig(jobid: number, bartenderToken: string) {
   // so replace NaN with null
   return JSON.parse(body.replace(/\bNaN\b/g, "null"));
 }
+
+export async function isOutputCleaned(
+  jobid: number,
+  bartenderToken: string
+): Promise<boolean> {
+  const files = await listOutputFiles(jobid, bartenderToken);
+  const compressedExtensions = [
+    '.inp',
+    '.out',
+    '.pdb',
+    '.psf',
+    ]
+  for (const item of files.children ?? []) {
+    if (item.isDir && item.name.includes("_")) {
+      for (const subitem of item.children ?? []) {
+        if (!subitem.isDir && compressedExtensions.some(ext => subitem.name.includes(ext))) {
+          return subitem.name.endsWith(".gz");
+        }
+      }
+    }
+  }
+  return false
+}
