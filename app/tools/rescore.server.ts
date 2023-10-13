@@ -157,15 +157,10 @@ async function correctPaths(
 ) {
   const path = isString(data[0].model).replace("..", JOB_OUTPUT_DIR);
   try {
-    const response = await getJobfile(jobid, path, bartenderToken);
-    if (response.status === 404) {
-      // When the model is not found, it is probably gzipped
-      for (const row of data) {
-        row.model = `${row.model}.gz`;
-      }
-    }
+    await getJobfile(jobid, path, bartenderToken);
     return data;
   } catch (e) {
+    // When the model is not found, it is probably gzipped
     for (const row of data) {
       row.model = `${row.model}.gz`;
     }
