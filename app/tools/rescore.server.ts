@@ -10,6 +10,7 @@ import {
   getModuleIndexPadding,
 } from "~/models/job.server";
 import { interactivenessOfModule } from "./shared";
+import { JOB_OUTPUT_DIR } from "~/models/constants";
 
 export const WeightsSchema = object({
   // could use minimum/maximum from catalog,
@@ -154,15 +155,22 @@ async function correctPaths(
   jobid: number,
   bartenderToken: string
 ) {
-  const path = isString(data[0].model);
-  const response = await getJobfile(jobid, path, bartenderToken);
-  if (response.status === 404) {
-    // When the model is not found, it is probably gzipped
+  const path = isString(data[0].model).replace("..", JOB_OUTPUT_DIR);
+  try {
+    const response = await getJobfile(jobid, path, bartenderToken);
+    if (response.status === 404) {
+      // When the model is not found, it is probably gzipped
+      for (const row of data) {
+        row.model = `${row.model}.gz`;
+      }
+    }
+    return data;
+  } catch (e) {
     for (const row of data) {
       row.model = `${row.model}.gz`;
     }
+    return data;
   }
-  return data;
 }
 
 async function getClusterScores(
