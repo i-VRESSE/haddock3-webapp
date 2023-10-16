@@ -1,5 +1,5 @@
 import type { LoaderArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 import { getBartenderToken } from "~/bartender_token.server";
@@ -16,13 +16,29 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  const [module, maxInteractivness, pad] = await step2rescoreModule(
-    jobId,
-    token
-  );
-  // const [module, maxInteractivness] = [5,0]
-  const scores = await getScores(jobId, module, maxInteractivness, token, pad);
-  return json({ job, scores });
+  try {
+    const [module, maxInteractivness, pad] = await step2rescoreModule(
+      jobId,
+      token
+    );
+    // const [module, maxInteractivness] = [5,0]
+    const scores = await getScores(
+      jobId,
+      module,
+      maxInteractivness,
+      token,
+      pad
+    );
+    return json({ job, scores });
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "No caprieval scores found"
+    ) {
+      return redirect("browse");
+    }
+    throw error;
+  }
 };
 
 export default function RescorePage() {
