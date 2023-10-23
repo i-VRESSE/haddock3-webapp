@@ -163,7 +163,7 @@ export function getModuleIndexPadding(files: DirectoryItem) {
   const nrModules = files.children.filter(
     (c) => c.isDir && c.name.includes("_")
   ).length;
-  return Math.floor(Math.log10(nrModules));
+  return Math.ceil(Math.log10(nrModules));
 }
 
 export function buildPath({
