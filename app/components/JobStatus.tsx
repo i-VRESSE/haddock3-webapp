@@ -23,7 +23,7 @@ export function JobStatus({ job }: Props) {
           <a href={`/jobs/${job.id}/zip`}>&#128230; Download archive</a>
           <details>
             <summary className="cursor-pointer">Logs</summary>
-            <ListLogFiles jobid={job.id} />
+            <ListLogFiles jobid={job.id} ok={job.state === 'ok'} />
           </details>
         </>
       )}
