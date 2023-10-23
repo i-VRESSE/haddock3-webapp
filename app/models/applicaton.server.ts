@@ -28,6 +28,13 @@ export async function submitJob(upload: File, accessToken: string) {
     application: BARTENDER_APPLICATION_NAME,
     upload: rewritten_upload,
   });
+  if (!response.raw.ok) {
+    throw new Error(
+      `Unable to submit job: ${response.raw.status} ${
+        response.raw.statusText
+      } ${await response.raw.text()}`
+    );
+  }
   const job: JobModelDTO = await response.raw.json();
   return job;
 }
