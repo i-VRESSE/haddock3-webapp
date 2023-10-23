@@ -3,7 +3,6 @@ import { object, number, coerce, finite, parse } from "valibot";
 import {
   buildPath,
   getJobfile,
-  getEnhancedConfig,
   listOutputFiles,
   safeApi,
   getModuleIndexPadding,
@@ -22,48 +21,6 @@ export const WeightsSchema = object({
 });
 export type Weights = Output<typeof WeightsSchema>;
 
-export function getWeightsFromConfig(config: any): Weights {
-  // TODO instead of latest use module index
-  // but what on disk is called 15_caprieval
-  // in config is called caprieval.6
-  // with global config on same level as modules
-  // so hard to determine which module is which index
-
-  const keys = Object.keys(config).reverse();
-  for (const key of keys) {
-    const module = config[key];
-    if ("w_elec" in module) {
-      return {
-        w_elec: module.w_elec,
-        w_vdw: module.w_vdw,
-        w_desolv: module.w_desolv,
-        w_bsa: module.w_bsa,
-        w_air: module.w_air,
-      };
-    }
-  }
-  throw new Error("No weights found in config");
-}
-
-export async function getInteractiveWeights(
-  jobid: number,
-  module: number,
-  interactivness: number,
-  bartenderToken: string,
-  moduleIndexPadding: number
-): Promise<Weights> {
-  const path = buildPath({
-    moduleIndex: module,
-    moduleName: "caprieval",
-    interactivness,
-    suffix: "weights_params.json",
-    moduleIndexPadding,
-  });
-  const response = await getJobfile(jobid, path, bartenderToken);
-  const body = await response.json();
-  return parse(WeightsSchema, body);
-}
-
 export async function getWeights(
   jobid: number,
   module: number,
@@ -71,17 +28,16 @@ export async function getWeights(
   bartenderToken: string,
   pad: number
 ): Promise<Weights> {
-  if (interactivness > 0) {
-    return await getInteractiveWeights(
-      jobid,
-      module,
-      interactivness,
-      bartenderToken,
-      pad
-    );
-  }
-  const config = await getEnhancedConfig(jobid, bartenderToken);
-  return getWeightsFromConfig(config);
+  const path = buildPath({
+    moduleIndex: module,
+    moduleName: "caprieval",
+    interactivness,
+    suffix: "weights_params.json",
+    moduleIndexPadding: pad,
+  });
+  const response = await getJobfile(jobid, path, bartenderToken);
+  const body = await response.json();
+  return parse(WeightsSchema, body);
 }
 
 export async function step2rescoreModule(
@@ -97,8 +53,6 @@ export async function step2rescoreModule(
   const interactivness = interactivenessOfModule(moduleIndex, files);
   return [moduleIndex, interactivness, pad];
 }
-
-export type DSVRow = Record<string, string | number>;
 
 export async function getScores(
   jobid: number,
@@ -118,6 +72,37 @@ export async function getScores(
   return { structures, clusters };
 }
 
+export interface CaprievalStructureRow {
+  model: string;
+  md5: number | "-";
+  caprieval_rank: number;
+  score: number;
+  irmsd: number;
+  fnat: number;
+  lrmsd: number;
+  ilrmsd: number;
+  dockq: number;
+  "cluster-id": number | "-";
+  "cluster-ranking": number | "-";
+  "model-cluster-ranking": number | "-";
+  air: number;
+  angles: number;
+  bonds: number;
+  bsa: number;
+  cdih: number;
+  coup: number;
+  dani: number;
+  desolv: number;
+  dihe: number;
+  elec: number;
+  improper: number;
+  rdcs: number;
+  rgtotal: number;
+  vdw: number;
+  vean: number;
+  xpcs: number;
+}
+
 async function getStructureScores(
   prefix: string,
   jobid: number,
@@ -127,8 +112,7 @@ async function getStructureScores(
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
   const { tsvParse, autoType } = await import("d3-dsv");
-  // TODO we know what rows capri_ss.tsv has, so we could use a more specific type
-  const data = tsvParse(body, autoType) as any as DSVRow[];
+  const data = tsvParse(body, autoType) as any as CaprievalStructureRow[];
   return await correctPaths(data, jobid, bartenderToken);
 }
 
@@ -140,7 +124,7 @@ function isString(x: any): string {
 }
 
 async function correctPaths(
-  data: DSVRow[],
+  data: CaprievalStructureRow[],
   jobid: number,
   bartenderToken: string
 ) {
@@ -157,6 +141,36 @@ async function correctPaths(
   }
 }
 
+export interface CaprievalClusterRow {
+  cluster_rank: number | "-";
+  cluster_id: number | "-";
+  n: number;
+  under_eval: number | "-";
+  score: number;
+  score_std: number;
+  irmsd: number;
+  irmsd_std: number;
+  fnat: number;
+  fnat_std: number;
+  lrmsd: number;
+  lrmsd_std: number;
+  dockq: number;
+  dockq_std: number;
+  air: number;
+  air_std: number;
+  bsa: number;
+  bsa_std: number;
+  desolv: number;
+  desolv_std: number;
+  elec: number;
+  elec_std: number;
+  total: number;
+  total_std: number;
+  vdw: number;
+  vdw_std: number;
+  caprieval_rank: number;
+}
+
 async function getClusterScores(
   prefix: string,
   jobid: number,
@@ -167,8 +181,9 @@ async function getClusterScores(
   const body = await response.text();
   const { tsvParse, autoType } = await import("d3-dsv");
   const commentless = removeComments(body);
-  // TODO we know what rows capri_clt.tsv has, so we could use a more specific type
-  return tsvParse(commentless, autoType) as any as Promise<DSVRow[]>;
+  return tsvParse(commentless, autoType) as any as Promise<
+    CaprievalClusterRow[]
+  >;
 }
 
 function removeComments(body: string): string {

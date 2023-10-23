@@ -27,7 +27,7 @@ export interface ClusterRow {
   rank: number;
   model_name: string;
   score: number;
-  cluster_id: number;
+  cluster_id: number | "-";
 }
 export function nameOfModule(moduleIndex: number, files: DirectoryItem) {
   if (!files.children) {
@@ -35,7 +35,7 @@ export function nameOfModule(moduleIndex: number, files: DirectoryItem) {
   }
   const modules = [...files.children].reverse();
   for (const m of modules) {
-    // TODO can module name have _ in it?, if so this will break
+    // if module name has _ in it then this will break
     const module = m.name.split("_");
     if (m.isDir && parseInt(module[0]) === moduleIndex) {
       return module[1];

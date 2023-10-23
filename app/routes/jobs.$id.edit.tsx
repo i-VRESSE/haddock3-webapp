@@ -36,6 +36,7 @@ export default function EditPage() {
   const { jobId } = useLoaderData<typeof loader>();
   // TODO replace ClientOnly with Suspense,
   // see https://github.com/sergiodxa/remix-utils#clientonly
+  // might need upgrade to remix v2
   return (
     <main>
       <p>

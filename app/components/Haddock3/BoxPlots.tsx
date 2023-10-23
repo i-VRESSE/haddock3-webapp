@@ -140,7 +140,7 @@ function generateSubPlot(
         x: structures4cluster.map((s) => s["cluster-ranking"]),
         x0: " ",
         xaxis,
-        y: structures4cluster.map((s) => s[aname]),
+        y: structures4cluster.map((s) => s[aname as keyof typeof s]),
         y0: " ",
         yaxis,
         type: "box",
@@ -153,7 +153,7 @@ function generateSubPlot(
         structures4cluster.map(() => MAX_CLUSTER_TO_PLOT + 1)
       );
       other.y = (other.y as Array<string | number>).concat(
-        structures4cluster.map((s) => s[aname])
+        structures4cluster.map((s) => s[aname as keyof typeof s])
       );
     }
   }

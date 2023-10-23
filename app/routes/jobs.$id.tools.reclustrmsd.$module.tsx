@@ -7,6 +7,7 @@ import { getBartenderToken } from "~/bartender_token.server";
 import { ErrorMessages } from "~/components/ErrorMessages";
 import { ToolHistory } from "~/components/ToolHistory";
 import { jobIdFromParams, getJobById, buildPath } from "~/models/job.server";
+import { ClusterTable } from "~/tools/reclust";
 import {
   Schema,
   getClusters,
@@ -145,10 +146,6 @@ export default function ReclusterPage() {
           <button type="submit" className="btn btn-primary btn-sm">
             Recluster
           </button>
-          {/* 
-          TODO show history, and allow to switch to old result 
-          Reset button is not possible, due to write-once job dir
-          */}
           <a href="../.." className=" btn-outline btn btn-sm">
             Back
           </a>
@@ -159,27 +156,7 @@ export default function ReclusterPage() {
         />
       </Form>
       <div>
-        {/* TODO make into component and add structure viewer with contacts (*.con file) */}
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>Model</th>
-              <th>Score</th>
-              <th>Cluster id</th>
-            </tr>
-          </thead>
-          <tbody>
-            {clusters.map((cluster) => (
-              <tr key={cluster.rank}>
-                <td>{cluster.rank}</td>
-                <td>{cluster.model_name}</td>
-                <td>{cluster.score}</td>
-                <td>{cluster.cluster_id}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ClusterTable clusters={clusters} />
       </div>
     </>
   );

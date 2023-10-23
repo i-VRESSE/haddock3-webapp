@@ -38,7 +38,7 @@ const TITLE_NAMES = {
   elec: "Eelec",
   air: "Eair",
   fnat: "FCC",
-};
+} as const;
 
 // TODO dont duplicate this, but get from d3
 // Dark24 from venv/lib/python3.10/site-packages/_plotly_utils/colors/qualitative.py
@@ -128,8 +128,8 @@ function generateSubPlot(
           ? "Unclustered"
           : cluster.cluster_rank + "");
       data.push({
-        x: structures4cluster.map((s) => s[row]),
-        y: structures4cluster.map((s) => s[column]),
+        x: structures4cluster.map((s) => s[row as keyof typeof s]),
+        y: structures4cluster.map((s) => s[column as keyof typeof s]),
         name,
         legendgroup: name,
         hoverlabel: {
@@ -149,28 +149,30 @@ function generateSubPlot(
         yaxis,
       });
       // Error bars
+      const x = cluster[row as keyof typeof cluster];
+      const y = cluster[column as keyof typeof cluster];
       data.push({
         error_x: {
-          array: [cluster[row + "_std"]],
+          array: [cluster[(row + "_std") as keyof typeof cluster]],
           type: "data",
           visible: true,
         },
         error_y: {
-          array: [cluster[column + "_std"]],
+          array: [cluster[(column + "_std") as keyof typeof cluster]],
           type: "data",
           visible: true,
         },
-        x: [cluster[row]],
-        y: [cluster[column]],
+        x: [x],
+        y: [y],
         marker: { color, size: 10, symbol: "square-dot" },
         text: [
-          `Cluster ${cluster.cluster_id}<br>${column}: ${cluster[column]}<br>${row}: ${cluster[row]}`,
+          `Cluster ${cluster.cluster_id}<br>${column}: ${y}<br>${row}: ${x}`,
         ],
         hoverlabel: {
           bgcolor: color,
           font: { family: "Helvetica", size: 16 },
         },
-        hovertemplate: `<b>Cluster ${cluster.cluster_id}<br>${column}: ${cluster[column]}<br>${row}: ${cluster[row]}</b><extra></extra>`,
+        hovertemplate: `<b>Cluster ${cluster.cluster_id}<br>${column}: ${y}<br>${row}: ${x}</b><extra></extra>`,
         legendgroup: name,
         mode: "markers",
         showlegend: false,
@@ -181,10 +183,10 @@ function generateSubPlot(
     } else {
       // Fill other cluster
       other.x = (other.x as Array<string | number>).concat(
-        structures4cluster.map((s) => s[row])
+        structures4cluster.map((s) => s[row as keyof typeof s])
       );
       other.y = (other.y as Array<string | number>).concat(
-        structures4cluster.map((s) => s[column])
+        structures4cluster.map((s) => s[column as keyof typeof s])
       );
       other.text = (other.text as Array<string>).concat(
         structures4cluster.map(

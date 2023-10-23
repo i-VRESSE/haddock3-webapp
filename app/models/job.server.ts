@@ -187,13 +187,3 @@ export function buildPath({
     .padStart(moduleIndexPadding, "0");
   return `${prefix}/${moduleIndexPadded}_${moduleName}${interactive_suffix}/${suffix}`;
 }
-
-export async function getEnhancedConfig(jobid: number, bartenderToken: string) {
-  const path = "output/data/configurations/enhanced_haddock_params.json";
-  const response = await getJobfile(jobid, path, bartenderToken);
-  const body = await response.text();
-  // File was generated with Python which had allow_nan=True
-  // JS does not allow NaN in JSON
-  // so replace NaN with null
-  return JSON.parse(body.replace(/\bNaN\b/g, "null"));
-}

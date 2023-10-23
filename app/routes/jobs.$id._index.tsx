@@ -13,7 +13,6 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   const job = await getJobById(jobId, token);
   if (job.state === "ok") {
     if (user.preferredExpertiseLevel === "easy") {
-      // TODO only redirect when caprieval was run
       return redirect("report");
     } else {
       return redirect("browse");

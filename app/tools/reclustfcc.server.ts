@@ -38,8 +38,9 @@ export async function getParams(
     config = config.clustfcc;
   }
   const params = {
-    // TODO haddock3-re clustfcc CLI accepts fraction while module only has fraction_cutoff
+    // haddock3-re clustfcc CLI accepts fraction while module only has fraction_cutoff
     // use fraction_cutoff in CLI
+    // TODO check that we are using right value?
     fraction: interactivness ? config.fraction : config.fraction_cutoff,
     strictness: config.strictness,
     threshold: config.threshold,

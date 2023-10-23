@@ -5,7 +5,10 @@ import type {
   ClusterID,
 } from "@i-vresse/haddock3-analysis-components/dist/components/ClusterTable";
 import { useMemo } from "react";
-import type { DSVRow } from "~/tools/rescore.server";
+import type {
+  CaprievalClusterRow,
+  CaprievalStructureRow,
+} from "~/tools/rescore.server";
 import { ScatterPlots } from "./ScatterPlots";
 import { BoxPlots } from "./BoxPlots";
 
@@ -15,8 +18,8 @@ import { BoxPlots } from "./BoxPlots";
   */
 
 export interface Scores {
-  structures: DSVRow[];
-  clusters: DSVRow[];
+  structures: CaprievalStructureRow[];
+  clusters: CaprievalClusterRow[];
 }
 
 interface CaprievalReportProps {
@@ -139,7 +142,6 @@ export const CaprievalReport = ({ scores, prefix }: CaprievalReportProps) => {
   return (
     <div className="flex flex-col gap-4">
       <ClusterTable headers={headers} clusters={clusters} maxbest={MAX_BEST} />
-      {/* TODO add form for rescore tool here */}
       <ScatterPlots scores={scores} />
       <BoxPlots scores={scores} />
     </div>
