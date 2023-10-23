@@ -100,10 +100,13 @@ export function getLastCaprievalModule(files: DirectoryItem): number {
 
 export async function step2rescoreModule(
   jobid: number,
-  bartenderToken: string
+  bartenderToken: string,
+  moduleIndex: number = -1,
 ): Promise<[number, number, number]> {
   const files = await listOutputFiles(jobid, bartenderToken, 1);
-  const moduleIndex = getLastCaprievalModule(files);
+  if (moduleIndex === -1) {
+    moduleIndex = getLastCaprievalModule(files);
+  }
   const pad = getModuleIndexPadding(files);
   const interactivness = interactivenessOfModule(moduleIndex, files);
   return [moduleIndex, interactivness, pad];
