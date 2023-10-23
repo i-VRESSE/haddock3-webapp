@@ -52,26 +52,34 @@ export default function RescorePage() {
           <a
             title="Browse"
             href={`/jobs/${job.id}/browse`}
-            className="btn-outline btn btn-sm"
+            className="btn-outline btn-sm btn"
           >
             🗀 Browse
           </a>
           <a
             title="Download archive"
             href={`/jobs/${job.id}/zip`}
-            className="btn-outline btn btn-sm"
+            className="btn-outline btn-sm btn"
           >
             &#128230; Download
           </a>
           <a
             title="Edit"
             href={`/jobs/${job.id}/edit`}
-            className="btn-outline btn btn-sm"
+            className="btn-outline btn-sm btn"
           >
             &#128393; Edit
           </a>
         </div>
       </div>
+      <details>
+        <summary>Tools</summary>
+        <ul>
+          <li>
+            <a className="btn-outline btn-sm btn" href={`tools/rescore`}>𐄷{' '}Rescore</a>
+          </li>
+        </ul>
+      </details>
       <ClientOnly fallback={<p>Loading...</p>}>
         {() => <CaprievalReport scores={scores} prefix="files/output/" />}
       </ClientOnly>
