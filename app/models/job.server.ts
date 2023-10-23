@@ -25,7 +25,7 @@ export function jobIdFromParams(params: Params) {
   return parseInt(jobId);
 }
 
-export async function getJobs(bartenderToken: string, limit = 10, offset = 0) {
+export async function getJobs(bartenderToken: string, limit = 100, offset = 0) {
   const api = buildJobApi(bartenderToken);
   return await api.retrieveJobs({
     limit,
