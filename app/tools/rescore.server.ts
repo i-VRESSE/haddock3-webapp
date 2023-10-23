@@ -1,4 +1,3 @@
-import type { DirectoryItem } from "~/bartender-client";
 import type { Output } from "valibot";
 import { object, number, coerce, finite, parse } from "valibot";
 import {
@@ -9,7 +8,7 @@ import {
   safeApi,
   getModuleIndexPadding,
 } from "~/models/job.server";
-import { interactivenessOfModule } from "./shared";
+import { interactivenessOfModule, getLastCaprievalModule } from "./shared";
 import { JOB_OUTPUT_DIR } from "~/models/constants";
 
 export const WeightsSchema = object({
@@ -83,19 +82,6 @@ export async function getWeights(
   }
   const config = await getEnhancedConfig(jobid, bartenderToken);
   return getWeightsFromConfig(config);
-}
-
-export function getLastCaprievalModule(files: DirectoryItem): number {
-  if (!files.children) {
-    throw new Error("No modules found");
-  }
-  const modules = [...files.children].reverse();
-  for (const module of modules || []) {
-    if (module.isDir && module.name.endsWith("caprieval")) {
-      return parseInt(module.name.split("_")[0]);
-    }
-  }
-  throw new Error("No caprieval module found");
 }
 
 export async function step2rescoreModule(

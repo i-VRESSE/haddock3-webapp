@@ -72,8 +72,8 @@ export default function RescorePage() {
           </a>
         </div>
       </div>
-      <details>
-        <summary>Tools</summary>
+      <details className="pb-4">
+        <summary>🔧 Tools</summary>
         <ul>
           <li>
             <a className="btn-outline btn btn-sm" href={`tools/rescore`}>

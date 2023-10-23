@@ -70,3 +70,15 @@ export async function moduleInfo(
   const interactivness = interactivenessOfModule(moduleIndex, files);
   return [moduleName, interactivness, pad];
 }
+export function getLastCaprievalModule(files: DirectoryItem): number {
+  if (!files.children) {
+    throw new Error("No modules found");
+  }
+  const modules = [...files.children].reverse();
+  for (const module of modules || []) {
+    if (module.isDir && module.name.endsWith("caprieval")) {
+      return parseInt(module.name.split("_")[0]);
+    }
+  }
+  throw new Error("No caprieval module found");
+}

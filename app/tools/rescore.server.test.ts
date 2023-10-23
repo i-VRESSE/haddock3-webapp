@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import type { DirectoryItem } from "~/bartender-client";
-import { getWeightsFromConfig, getLastCaprievalModule } from "./rescore.server";
-import { interactivenessOfModule } from "./shared";
+import { getWeightsFromConfig } from "./rescore.server";
+import { interactivenessOfModule, getLastCaprievalModule } from "./shared";
 import { buildPath } from "~/models/job.server";
 
 describe("getWeightsFromConfig", () => {

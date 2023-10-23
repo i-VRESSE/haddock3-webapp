@@ -28,10 +28,12 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 export default function JobPage() {
   const { job, outputFiles, inputFiles } = useLoaderData<typeof loader>();
   return (
-    <main className="flex gap-16">
+    <main className="flex flex-row gap-16">
       <div>
         <JobStatus job={job} />
-        <a href={`/jobs/${job.id}/report`}>👁 Simplified report</a>
+        <a className="block pt-8" href={`/jobs/${job.id}/report`}>
+          👁 Simplified report
+        </a>
       </div>
       <div>
         <h2 className="text-xl">Input</h2>
@@ -47,17 +49,6 @@ export default function JobPage() {
         <h2 className="text-xl">Output</h2>
         <OutputReport files={outputFiles!} jobid={job.id} />
         <a href={`/jobs/${job.id}/output.zip`}>&#128230; Download archive</a>
-      </div>
-      <div>
-        <h2 className="text-xl">Tools</h2>
-        <ul className="ml-4 list-inside list-disc">
-          {/* TODO only show tools that are applicable
-          rescore only when there is a caprieval module
-          */}
-          <li>
-            <a href={`/jobs/${job.id}/tools/rescore`}>𐄷 Rescore</a>
-          </li>
-        </ul>
       </div>
     </main>
   );
