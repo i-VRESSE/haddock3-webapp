@@ -1,5 +1,6 @@
 import Card from "~/components/Card";
 
+// TODO use local images, svgs or unicode icons
 const cards = [
   {
     target: "/builder",
