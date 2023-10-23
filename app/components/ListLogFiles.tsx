@@ -1,4 +1,4 @@
-export const ListLogFiles = ({ jobid, ok }: { jobid: number, ok: boolean }) => {
+export const ListLogFiles = ({ jobid, ok }: { jobid: number; ok: boolean }) => {
   return (
     <ul className="ml-4 list-inside list-disc">
       <li>
@@ -13,15 +13,15 @@ export const ListLogFiles = ({ jobid, ok }: { jobid: number, ok: boolean }) => {
       </li>
       {ok && (
         <li>
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href={`/jobs/${jobid}/files/output/log`}
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href={`/jobs/${jobid}/files/output/log`}
           >
-          Haddock3 log
-        </a>
-      </li>
-        )}
+            Haddock3 log
+          </a>
+        </li>
+      )}
     </ul>
   );
 };

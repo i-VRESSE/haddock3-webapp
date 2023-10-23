@@ -52,21 +52,21 @@ export default function RescorePage() {
           <a
             title="Browse"
             href={`/jobs/${job.id}/browse`}
-            className="btn-outline btn-sm btn"
+            className="btn-outline btn btn-sm"
           >
             🗀 Browse
           </a>
           <a
             title="Download archive"
             href={`/jobs/${job.id}/zip`}
-            className="btn-outline btn-sm btn"
+            className="btn-outline btn btn-sm"
           >
             &#128230; Download
           </a>
           <a
             title="Edit"
             href={`/jobs/${job.id}/edit`}
-            className="btn-outline btn-sm btn"
+            className="btn-outline btn btn-sm"
           >
             &#128393; Edit
           </a>
@@ -76,7 +76,9 @@ export default function RescorePage() {
         <summary>Tools</summary>
         <ul>
           <li>
-            <a className="btn-outline btn-sm btn" href={`tools/rescore`}>𐄷{' '}Rescore</a>
+            <a className="btn-outline btn btn-sm" href={`tools/rescore`}>
+              𐄷 Rescore
+            </a>
           </li>
         </ul>
       </details>

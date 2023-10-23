@@ -17,7 +17,6 @@ import {
 } from "~/tools/rescore.server";
 import { RescoreForm } from "~/tools/rescore";
 
-
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
   const token = await getBartenderToken(request);

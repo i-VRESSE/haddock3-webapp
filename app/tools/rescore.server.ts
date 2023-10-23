@@ -101,7 +101,7 @@ export function getLastCaprievalModule(files: DirectoryItem): number {
 export async function step2rescoreModule(
   jobid: number,
   bartenderToken: string,
-  moduleIndex: number = -1,
+  moduleIndex: number = -1
 ): Promise<[number, number, number]> {
   const files = await listOutputFiles(jobid, bartenderToken, 1);
   if (moduleIndex === -1) {
