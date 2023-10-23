@@ -8,7 +8,7 @@ export function files2modules(files: DirectoryItem) {
   }
   const analyisRoot = files.children.find((i) => i.name === "analysis");
 
-  const nonmodules = new Set(["analysis", "data", "log"]);
+  const nonmodules = new Set(["analysis", "data", "log", "traceback"]);
   return files.children
     .filter((i) => !nonmodules.has(i.name))
     .filter((i) => !i.name.endsWith("_interactive"))
