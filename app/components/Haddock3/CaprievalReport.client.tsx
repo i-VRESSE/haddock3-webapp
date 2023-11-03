@@ -27,7 +27,7 @@ interface CaprievalReportProps {
   prefix: string;
 }
 
-const MAX_BEST = 4;
+const MAX_BEST = 3;
 const NR_STRUCTURE_LENGTH = Math.ceil(Math.log10(MAX_BEST));
 const headers = {
   rank: "Cluster Rank",

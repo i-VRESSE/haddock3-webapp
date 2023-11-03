@@ -71,6 +71,8 @@ export async function moduleInfo(
   return [moduleName, interactivness, pad];
 }
 export function getLastCaprievalModule(files: DirectoryItem): number {
+  // TODO rescore can be run an any caprieval not just latest
+  // TOOO add warning re* does not update next modules
   if (!files.children) {
     throw new Error("No modules found");
   }

@@ -101,6 +101,7 @@ export default function ReclusterPage() {
           when the weights changes */}
           <div key={"n_clusters" + defaultValues.n_clusters}>
             <label htmlFor="n_clusters" className="block">
+              {/* TODO fetch label and description from catalog aka defaults.yaml */}
               Number of clusters to generate
             </label>
             <input

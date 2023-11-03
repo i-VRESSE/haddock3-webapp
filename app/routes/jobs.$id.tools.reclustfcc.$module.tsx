@@ -46,6 +46,10 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     token,
     moduleIndexPadding
   );
+
+  // If caprieval was done before then interactive output will have caprieval files
+  // that can be rendered with caprieval report
+  // TODO: add caprieval report
   return json({
     moduleIndex,
     moduleName,

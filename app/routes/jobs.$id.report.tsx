@@ -72,16 +72,6 @@ export default function RescorePage() {
           </a>
         </div>
       </div>
-      <details className="pb-4">
-        <summary>🔧 Tools</summary>
-        <ul>
-          <li>
-            <a className="btn-outline btn btn-sm" href={`tools/rescore`}>
-              𐄷 Rescore
-            </a>
-          </li>
-        </ul>
-      </details>
       <ClientOnly fallback={<p>Loading...</p>}>
         {() => <CaprievalReport scores={scores} prefix="files/output/" />}
       </ClientOnly>
