@@ -102,7 +102,7 @@ export const action = async ({ request, params }: LoaderArgs) => {
   const clustccDir = buildPath({
     moduleIndex,
     moduleName: "clustfcc",
-    interactivness: interactivness[1],
+    interactivness: 0,
     moduleIndexPadding: interactivness[2],
   });
   await reclustfcc(jobId, clustccDir, clustfccParams, token);
