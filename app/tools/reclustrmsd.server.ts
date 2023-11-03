@@ -8,8 +8,8 @@ import { parseClusterTsv } from "./shared";
 export const Schema = object({
   // TODO newer valibot has picklist to constrain values, but gives tsc error, wait for next version
   criterion: string(),
-  n_clusters: useDefault(coerce(number([finite()]), Number), -1),
-  clust_cutoff: useDefault(coerce(number([finite()]), Number), -1),
+  n_clusters: useDefault(coerce(number([finite()]), Number), -1), // eslint-disable-line react-hooks/rules-of-hooks
+  clust_cutoff: useDefault(coerce(number([finite()]), Number), -1), // eslint-disable-line react-hooks/rules-of-hooks
   min_population: coerce(number([finite()]), Number),
 });
 export type Schema = Output<typeof Schema>;

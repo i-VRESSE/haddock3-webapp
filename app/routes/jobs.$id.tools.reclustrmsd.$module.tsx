@@ -1,7 +1,7 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { ChangeEvent, useState } from "react";
+import { type ChangeEvent, useState } from "react";
 import { flatten, safeParse } from "valibot";
 
 import { getBartenderToken } from "~/bartender_token.server";
