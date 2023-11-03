@@ -196,7 +196,7 @@ export default function ReclusterPage() {
           <ClusterTable clusters={clusters} />
         </details>
         {scores && (
-          <details>
+          <details open={true}>
             <summary>Capri evaluation</summary>
             <ClientOnly fallback={<p>Loading...</p>}>
               {() => (
