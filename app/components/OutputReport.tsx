@@ -49,8 +49,6 @@ export const OutputReport = ({
                 {module.name === "clustfcc" && (
                   <a
                     title="Recluster"
-                    target="_blank"
-                    rel="noreferrer"
                     href={`/jobs/${jobid}/tools/reclustfcc/${module.id}`}
                   >
                     🔧
@@ -59,8 +57,6 @@ export const OutputReport = ({
                 {module.name === "clustrmsd" && (
                   <a
                     title="Recluster"
-                    target="_blank"
-                    rel="noreferrer"
                     href={`/jobs/${jobid}/tools/reclustrmsd/${module.id}`}
                   >
                     🔧
