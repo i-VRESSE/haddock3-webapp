@@ -16,6 +16,17 @@ import {
 } from "~/tools/reclustfcc.server";
 import { moduleInfo } from "~/tools/shared";
 import { CompletedJobs } from "~/utils";
+import { getScores } from "~/tools/rescore.server";
+import { ClientOnly } from "~/components/ClientOnly";
+import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
+import { ReWarning } from "~/components/ReWarning";
+
+// TODO use the descriptions once they are filled
+// const fieldDescriptions = getModuleDescriptions(`clustfcc`, [
+//   "fraction_cutoff",
+//   "strictness",
+//   "threshold",
+// ])
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
@@ -46,10 +57,21 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     token,
     moduleIndexPadding
   );
+  let scores;
+  try {
+    scores = await getScores(
+      jobId,
+      moduleIndex,
+      interactivness,
+      token,
+      moduleIndexPadding,
+      "clustfcc"
+    );
+  } catch (error) {
+    // Scores where not found
+    scores = undefined;
+  }
 
-  // If caprieval was done before then interactive output will have caprieval files
-  // that can be rendered with caprieval report
-  // TODO: add caprieval report
   return json({
     moduleIndex,
     moduleName,
@@ -57,6 +79,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     interactivness,
     maxInteractivness,
     clusters,
+    scores,
   });
 };
 
@@ -93,6 +116,7 @@ export default function ReclusterPage() {
     interactivness,
     maxInteractivness,
     clusters,
+    scores,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
@@ -100,24 +124,25 @@ export default function ReclusterPage() {
     <>
       <Form method="post" action="?">
         <h2 className="text-2xl">Recluster of module {moduleIndex}</h2>
+        <ReWarning title="Reclustering" />
         <div className="flex flex-row gap-4">
           {/* key is used to force React to re-render the component
           when the weights changes */}
           <div
-            key={"fraction" + defaultValues.fraction}
+            key={"fraction_cutoff" + defaultValues.fraction_cutoff}
             title="fraction of common contacts to not be considered a singleton model."
           >
-            <label htmlFor="fraction" className="block">
+            <label htmlFor="fraction_cutoff" className="block">
               Fraction
             </label>
             <input
               type="text"
-              name="fraction"
-              id="fraction"
-              defaultValue={defaultValues.fraction}
+              name="fraction_cutoff"
+              id="fraction_cutoff"
+              defaultValue={defaultValues.fraction_cutoff}
               className="rounded border-2 p-1"
             />
-            <ErrorMessages path="fraction" errors={actionData?.errors} />
+            <ErrorMessages path="fraction_cutoff" errors={actionData?.errors} />
           </div>
           <div
             key={"strictness" + defaultValues.strictness}
@@ -166,7 +191,20 @@ export default function ReclusterPage() {
         />
       </Form>
       <div>
-        <ClusterTable clusters={clusters} />
+        <details open={true}>
+          <summary>Clusters</summary>
+          <ClusterTable clusters={clusters} />
+        </details>
+        {scores && (
+          <details>
+            <summary>Capri evaluation</summary>
+            <ClientOnly fallback={<p>Loading...</p>}>
+              {() => (
+                <CaprievalReport scores={scores} prefix="../files/output/" />
+              )}
+            </ClientOnly>
+          </details>
+        )}
       </div>
     </>
   );

@@ -59,11 +59,12 @@ export async function getScores(
   module: number,
   interactivness: number,
   bartenderToken: string,
-  moduleIndexPadding: number
+  moduleIndexPadding: number,
+  moduleName = "caprieval"
 ) {
   const prefix = buildPath({
     moduleIndex: module,
-    moduleName: "caprieval",
+    moduleName,
     interactivness,
     moduleIndexPadding,
   });

@@ -9,45 +9,57 @@ import { CompletedJobs } from "~/utils";
 import { ClientOnly } from "~/components/ClientOnly";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
 import {
-  step2rescoreModule,
   getWeights,
   getScores,
   WeightsSchema,
   rescore,
 } from "~/tools/rescore.server";
 import { RescoreForm } from "~/tools/rescore";
+import { moduleInfo } from "~/tools/shared";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
+  const moduleIndex = parseInt(params.module ?? "");
   const token = await getBartenderToken(request);
   const job = await getJobById(jobId, token);
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  const [module, maxInteractivness, moduleIndexPadding] =
-    await step2rescoreModule(jobId, token);
+  const [moduleName, maxInteractivness, moduleIndexPadding] = await moduleInfo(
+    jobId,
+    moduleIndex,
+    token
+  );
   const i = new URL(request.url).searchParams.get("i");
   const interactivness = i === null ? maxInteractivness : parseInt(i);
   const weights = await getWeights(
     jobId,
-    module,
+    moduleIndex,
     interactivness,
     token,
     moduleIndexPadding
   );
   const scores = await getScores(
     jobId,
-    module,
+    moduleIndex,
     interactivness,
     token,
-    moduleIndexPadding
+    moduleIndexPadding,
+    moduleName
   );
-  return json({ weights, scores, interactivness, maxInteractivness });
+  return json({
+    moduleIndex,
+    weights,
+    scores,
+    interactivness,
+    maxInteractivness,
+  });
 };
 
 export const action = async ({ request, params }: LoaderArgs) => {
   const token = await getBartenderToken(request);
   const jobId = jobIdFromParams(params);
+  const moduleIndex = parseInt(params.module ?? "");
   const job = await getJobById(jobId, token);
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
@@ -59,11 +71,16 @@ export const action = async ({ request, params }: LoaderArgs) => {
     return json({ errors }, { status: 400 });
   }
   const weights = result.data;
-  const [moduleIndex, interactivness, moduleIndexPadding] =
-    await step2rescoreModule(jobId, token);
+  const [moduleName, maxInteractivness, moduleIndexPadding] = await moduleInfo(
+    jobId,
+    moduleIndex,
+    token
+  );
+  const i = new URL(request.url).searchParams.get("i");
+  const interactivness = i === null ? maxInteractivness : parseInt(i);
   const capriDir = buildPath({
     moduleIndex,
-    moduleName: "caprieval",
+    moduleName,
     interactivness,
     moduleIndexPadding,
   });
@@ -72,7 +89,7 @@ export const action = async ({ request, params }: LoaderArgs) => {
 };
 
 export default function RescorePage() {
-  const { weights, scores, interactivness, maxInteractivness } =
+  const { moduleIndex, weights, scores, interactivness, maxInteractivness } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
@@ -82,6 +99,7 @@ export default function RescorePage() {
         weights={weights}
         interactivness={interactivness}
         maxInteractivness={maxInteractivness}
+        moduleIndex={moduleIndex}
         errors={actionData?.errors}
       />
       <ClientOnly fallback={<p>Loading...</p>}>

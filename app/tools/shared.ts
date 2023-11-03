@@ -8,6 +8,10 @@ export function interactivenessOfModule(
   if (!files.children) {
     throw new Error("No modules found");
   }
+  // in future dir name will be
+  // <module>_interactive_<nr of times re* has run>
+  // for example 12_caprieval_interactive_5
+  // TODO adapt this to new naming scheme when it is implemented in CLI
   const modules = [...files.children].reverse();
   let interactivness = 0;
   const moduleIndexPadding = getModuleIndexPadding(files);
@@ -71,8 +75,6 @@ export async function moduleInfo(
   return [moduleName, interactivness, pad];
 }
 export function getLastCaprievalModule(files: DirectoryItem): number {
-  // TODO rescore can be run an any caprieval not just latest
-  // TOOO add warning re* does not update next modules
   if (!files.children) {
     throw new Error("No modules found");
   }

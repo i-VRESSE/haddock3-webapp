@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import type { DirectoryItem } from "~/bartender-client";
 import { ListFiles } from "./ListFiles";
-import { getLastCaprievalModule } from "~/tools/shared";
 
 export function files2modules(files: DirectoryItem) {
   if (!files.children) {
@@ -10,12 +9,6 @@ export function files2modules(files: DirectoryItem) {
   const analyisRoot = files.children.find((i) => i.name === "analysis");
 
   const nonmodules = new Set(["analysis", "data", "log", "traceback"]);
-  let lastCaprievalModuleIndex = -1;
-  try {
-    lastCaprievalModuleIndex = getLastCaprievalModule(files);
-  } catch (error) {
-    // ignore
-  }
   return files.children
     .filter((i) => !nonmodules.has(i.name))
     .filter((i) => !i.name.endsWith("_interactive"))
@@ -29,7 +22,6 @@ export function files2modules(files: DirectoryItem) {
         name,
         output,
         report,
-        isLastCaprieval: parseInt(id) === lastCaprievalModuleIndex,
       };
     });
 }
@@ -74,8 +66,11 @@ export const OutputReport = ({
                     🔧
                   </a>
                 )}
-                {module.isLastCaprieval && (
-                  <a title="Rescore" href={`/jobs/${jobid}/tools/rescore`}>
+                {module.name === "caprieval" && (
+                  <a
+                    title="Rescore"
+                    href={`/jobs/${jobid}/tools/rescore/${module.id}`}
+                  >
                     🔧
                   </a>
                 )}

@@ -4,7 +4,11 @@ import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { flatten, safeParse } from "valibot";
 
 import { getBartenderToken } from "~/bartender_token.server";
+import { getModuleDescriptions } from "~/catalogs/descriptionsFromSchema";
+import { ClientOnly } from "~/components/ClientOnly";
 import { ErrorMessages } from "~/components/ErrorMessages";
+import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
+import { ReWarning } from "~/components/ReWarning";
 import { ToolHistory } from "~/components/ToolHistory";
 import { jobIdFromParams, getJobById, buildPath } from "~/models/job.server";
 import { ClusterTable } from "~/tools/reclust";
@@ -14,6 +18,7 @@ import {
   getParams,
   reclustrmsd,
 } from "~/tools/reclustrmsd.server";
+import { getScores } from "~/tools/rescore.server";
 import { moduleInfo } from "~/tools/shared";
 import { CompletedJobs } from "~/utils";
 
@@ -46,6 +51,20 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     token,
     moduleIndexPadding
   );
+  let scores;
+  try {
+    scores = await getScores(
+      jobId,
+      moduleIndex,
+      interactivness,
+      token,
+      moduleIndexPadding,
+      "clustrmsd"
+    );
+  } catch (error) {
+    // Scores where not found
+    scores = undefined;
+  }
   return json({
     moduleIndex,
     moduleName,
@@ -53,6 +72,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     interactivness,
     maxInteractivness,
     clusters,
+    scores,
   });
 };
 
@@ -82,6 +102,13 @@ export const action = async ({ request, params }: LoaderArgs) => {
   return json({ errors: { nested: {} } });
 };
 
+// TODO haddock3-re clustrmsd will get different args, adjust this
+const fieldDescriptions = getModuleDescriptions(`clustrmsd`, [
+  "criterion",
+  "tolerance",
+  "threshold",
+]);
+
 export default function ReclusterPage() {
   const {
     moduleIndex,
@@ -89,6 +116,7 @@ export default function ReclusterPage() {
     interactivness,
     maxInteractivness,
     clusters,
+    scores,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
 
@@ -96,12 +124,12 @@ export default function ReclusterPage() {
     <>
       <Form method="post" action="?">
         <h2 className="text-2xl">Recluster of module {moduleIndex}</h2>
+        <ReWarning title="Reclustering" />
         <div className="flex flex-row gap-4">
           {/* key is used to force React to re-render the component
           when the weights changes */}
           <div key={"n_clusters" + defaultValues.n_clusters}>
             <label htmlFor="n_clusters" className="block">
-              {/* TODO fetch label and description from catalog aka defaults.yaml */}
               Number of clusters to generate
             </label>
             <input
@@ -130,8 +158,12 @@ export default function ReclusterPage() {
             key={"threshold" + defaultValues.threshold}
             title="cluster population threshold."
           >
-            <label htmlFor="threshold" className="block">
-              Cluster population threshold
+            <label
+              htmlFor="threshold"
+              className="block"
+              title={fieldDescriptions.threshold.longDescription}
+            >
+              {fieldDescriptions.threshold.title}
             </label>
             <input
               type="text"
@@ -157,7 +189,20 @@ export default function ReclusterPage() {
         />
       </Form>
       <div>
-        <ClusterTable clusters={clusters} />
+        <details open={true}>
+          <summary>Clusters</summary>
+          <ClusterTable clusters={clusters} />
+        </details>
+        {scores && (
+          <details>
+            <summary>Capri evaluation</summary>
+            <ClientOnly fallback={<p>Loading...</p>}>
+              {() => (
+                <CaprievalReport scores={scores} prefix="../files/output/" />
+              )}
+            </ClientOnly>
+          </details>
+        )}
       </div>
     </>
   );

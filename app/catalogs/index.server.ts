@@ -19,5 +19,9 @@ export async function getCatalog(level: ExpertiseLevel) {
     throw new Error(`No catalog found for level ${level}`);
   }
   catalog.examples = {};
+  // TODO when user can submit then having
+  // a lot of global properties are overriden
+  // like run_dir, clean and fields in execution group
+  // and should be removed so user does not have to fill them
   return prepareCatalog(catalog);
 }

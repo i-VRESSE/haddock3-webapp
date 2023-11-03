@@ -4,7 +4,7 @@ import { object, number, coerce, finite, type Output } from "valibot";
 import { parse as parseTOML } from "@ltd/j-toml";
 
 export const Schema = object({
-  fraction: coerce(number([finite()]), Number),
+  fraction_cutoff: coerce(number([finite()]), Number),
   strictness: coerce(number([finite()]), Number),
   threshold: coerce(number([finite()]), Number),
 });
@@ -41,7 +41,7 @@ export async function getParams(
     // haddock3-re clustfcc CLI accepts fraction while module only has fraction_cutoff
     // use fraction_cutoff in CLI
     // TODO check that we are using right value?
-    fraction: interactivness ? config.fraction : config.fraction_cutoff,
+    fraction_cutoff: config.fraction_cutoff,
     strictness: config.strictness,
     threshold: config.threshold,
   };
@@ -78,6 +78,21 @@ export async function reclustfcc(
     clustfcc_dir: clustfccDir,
     ...params,
   };
+  // Second submit fails with  No such file or directory: 'output/09_clustfcc_interactive/io.json'\n
+  // workaround before second submit do `cp output/09_clustfcc/io.json output/09_clustfcc_interactive/io.json`
+  // nope still errors gives:
+  // returncode: 1,
+  // stderr: 'Traceback (most recent call last):\n' +
+  //   '  File "/home/stefanv/git/ivresse/haddock3/venv/bin/haddock3-re", line 33, in <module>\n' +
+  //   "    sys.exit(load_entry_point('haddock3', 'console_scripts', 'haddock3-re')())\n" +
+  //   '  File "/home/stefanv/git/ivresse/haddock3/src/haddock/clis/cli_re.py", line 57, in maincli\n' +
+  //   '    args.func(**cmd)\n' +
+  //   '  File "/home/stefanv/git/ivresse/haddock3/src/haddock/re/clustfcc.py", line 110, in reclustfcc\n' +
+  //   '    clustfcc_params["fraction_cutoff"] = fraction_cutoff\n' +
+  //   "TypeError: 'EmptyPath' object does not support item assignment\n",
+  // stdout: '[2023-11-03 13:11:01,180 clustfcc INFO] Reclustering output/09_clustfcc_interactive/\n' +
+  //   '[2023-11-03 13:11:02,112 clustfcc INFO] Previous clustering parameters: \n'
+
   const result = await safeApi(bartenderToken, async (api) => {
     const response = await api.runInteractiveApp({
       jobid,
