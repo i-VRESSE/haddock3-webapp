@@ -1,14 +1,16 @@
 import type { Output } from "valibot";
-import { object, coerce, number, finite } from "valibot";
+import { object, coerce, number, finite, string, useDefault } from "valibot";
 import { parse as parseTOML } from "@ltd/j-toml";
 
 import { buildPath, getJobfile, safeApi } from "~/models/job.server";
 import { parseClusterTsv } from "./shared";
 
 export const Schema = object({
-  n_clusters: coerce(number([finite()]), Number),
-  distance: coerce(number([finite()]), Number),
-  threshold: coerce(number([finite()]), Number),
+  // TODO newer valibot has picklist to constrain values, but gives tsc error, wait for next version
+  criterion: string(),
+  n_clusters: useDefault(coerce(number([finite()]), Number), -1),
+  clust_cutoff: useDefault(coerce(number([finite()]), Number), -1),
+  min_population: coerce(number([finite()]), Number),
 });
 export type Schema = Output<typeof Schema>;
 
@@ -36,10 +38,16 @@ export async function getParams(
   const params = {
     // TODO haddock3-re clustrmsd CLI accepts n_clusters while module only has n_clusters_cutoff
     // use n_clusters_cutoff in CLI
-    n_clusters: config.tolerance,
-    distance: config.distance,
-    threshold: config.threshold,
+    criterion: config.criterion,
+    min_population: config.min_population,
+    n_clusters: -1,
+    clust_cutoff: -1,
   };
+  if (config.criterion === "maxclust") {
+    params.n_clusters = config.n_clusters;
+  } else {
+    params.clust_cutoff = config.clust_cutoff;
+  }
   return params;
 }
 
@@ -69,13 +77,12 @@ export async function reclustrmsd(
   params: Schema,
   bartenderToken: string
 ) {
-  const body = {
+  const body: any = {
     clustrmsd_dir: clustfccDir,
     ...params,
   };
-  // TODO params are mutally exclusive
-  // need to make form with radio buttons
-  // need bartender to handle optional arguments
+  console.log("reclustrmsd", body);
+  // TODO need bartender to handle optional arguments
   // https://github.com/haddocking/haddock3/blob/7e3cbbd60df5f72ce09a7f7a47f7eb9c18ddfca5/src/haddock/re/clustrmsd.py#L99-L109
   const result = await safeApi(bartenderToken, async (api) => {
     const response = await api.runInteractiveApp({

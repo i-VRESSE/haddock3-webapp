@@ -1,6 +1,7 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import { ChangeEvent, useState } from "react";
 import { flatten, safeParse } from "valibot";
 
 import { getBartenderToken } from "~/bartender_token.server";
@@ -105,8 +106,9 @@ export const action = async ({ request, params }: LoaderArgs) => {
 // TODO haddock3-re clustrmsd will get different args, adjust this
 const fieldDescriptions = getModuleDescriptions(`clustrmsd`, [
   "criterion",
-  "tolerance",
-  "threshold",
+  "n_clusters",
+  "clust_cutoff",
+  "min_population",
 ]);
 
 export default function ReclusterPage() {
@@ -119,61 +121,106 @@ export default function ReclusterPage() {
     scores,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-
+  const [criterion, setCriterion] = useState(defaultValues.criterion);
+  const handleCriterionChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setCriterion(event.target.value);
+  };
   return (
     <>
       <Form method="post" action="?">
         <h2 className="text-2xl">Recluster of module {moduleIndex}</h2>
         <ReWarning title="Reclustering" />
         <div className="flex flex-row gap-4">
+          <div
+            className="flex flex-col p-2"
+            title={fieldDescriptions.criterion.longDescription}
+          >
+            <label>
+              <input
+                className="mr-2"
+                type="radio"
+                name="criterion"
+                value="maxclust"
+                checked={criterion === "maxclust"}
+                onChange={handleCriterionChange}
+              />
+              By number of desired clusters
+            </label>
+            <label>
+              <input
+                className="mr-2"
+                type="radio"
+                name="criterion"
+                value="distance"
+                checked={criterion === "distance"}
+                onChange={handleCriterionChange}
+              />
+              By distance
+            </label>
+          </div>
           {/* key is used to force React to re-render the component
           when the weights changes */}
-          <div key={"n_clusters" + defaultValues.n_clusters}>
-            <label htmlFor="n_clusters" className="block">
-              Number of clusters to generate
-            </label>
-            <input
-              type="text"
-              name="n_clusters"
-              id="n_clusters"
-              defaultValue={defaultValues.n_clusters}
-              className="rounded border-2 p-1"
-            />
-            <ErrorMessages path="n_clusters" errors={actionData?.errors} />
-          </div>
-          <div key={"distance" + defaultValues.distance}>
-            <label htmlFor="distance" className="block">
-              Cutoff distance
-            </label>
-            <input
-              type="text"
-              name="distance"
-              id="distance"
-              defaultValue={defaultValues.distance}
-              className="rounded border-2 p-1"
-            />
-            <ErrorMessages path="distance" errors={actionData?.errors} />
-          </div>
-          <div
-            key={"threshold" + defaultValues.threshold}
-            title="cluster population threshold."
-          >
-            <label
-              htmlFor="threshold"
-              className="block"
-              title={fieldDescriptions.threshold.longDescription}
-            >
-              {fieldDescriptions.threshold.title}
-            </label>
-            <input
-              type="text"
-              name="threshold"
-              id="threshold"
-              defaultValue={defaultValues.threshold}
-              className="rounded border-2 p-1"
-            />
-            <ErrorMessages path="threshold" errors={actionData?.errors} />
-          </div>
+          {criterion === "maxclust" && (
+            <div key={"n_clusters" + defaultValues.n_clusters}>
+              <label
+                htmlFor="n_clusters"
+                className="block"
+                title={fieldDescriptions.n_clusters.longDescription}
+              >
+                {fieldDescriptions.n_clusters.title}
+              </label>
+              <input
+                type="text"
+                name="n_clusters"
+                id="n_clusters"
+                defaultValue={defaultValues.n_clusters}
+                className="rounded border-2 p-1"
+              />
+              <ErrorMessages path="n_clusters" errors={actionData?.errors} />
+            </div>
+          )}
+          {criterion === "distance" && (
+            <>
+              <div key={"clust_cutoff" + defaultValues.clust_cutoff}>
+                <label
+                  htmlFor="clust_cutoff"
+                  className="block"
+                  title={fieldDescriptions.clust_cutoff.longDescription}
+                >
+                  {fieldDescriptions.clust_cutoff.title}
+                </label>
+                <input
+                  type="text"
+                  name="clust_cutoff"
+                  id="clust_cutoff"
+                  defaultValue={defaultValues.clust_cutoff}
+                  className="rounded border-2 p-1"
+                />
+                <ErrorMessages
+                  path="clust_cutoff"
+                  errors={actionData?.errors}
+                />
+              </div>
+
+              <div key={"min_population" + defaultValues.min_population}>
+                <label
+                  htmlFor="min_population"
+                  className="block"
+                  title={fieldDescriptions.min_population.longDescription}
+                >
+                  {fieldDescriptions.min_population.title}
+                </label>
+                <input
+                  type="text"
+                  name="min_population"
+                  id="min_population"
+                  defaultValue={defaultValues.min_population}
+                  className="rounded border-2 p-1"
+                />
+                <ErrorMessages path="threshold" errors={actionData?.errors} />
+              </div>
+            </>
+          )}
         </div>
         <div className="flex flex-row gap-2 p-2">
           <button type="submit" className="btn btn-primary btn-sm">

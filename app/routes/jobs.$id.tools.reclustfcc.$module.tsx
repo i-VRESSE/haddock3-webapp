@@ -129,20 +129,20 @@ export default function ReclusterPage() {
           {/* key is used to force React to re-render the component
           when the weights changes */}
           <div
-            key={"fraction_cutoff" + defaultValues.fraction_cutoff}
+            key={"clust_cutoff" + defaultValues.clust_cutoff}
             title="fraction of common contacts to not be considered a singleton model."
           >
             <label htmlFor="fraction_cutoff" className="block">
-              Fraction
+              Cluster cutoff
             </label>
             <input
               type="text"
-              name="fraction_cutoff"
-              id="fraction_cutoff"
-              defaultValue={defaultValues.fraction_cutoff}
+              name="clust_cutoff"
+              id="clust_cutoff"
+              defaultValue={defaultValues.clust_cutoff}
               className="rounded border-2 p-1"
             />
-            <ErrorMessages path="fraction_cutoff" errors={actionData?.errors} />
+            <ErrorMessages path="clust_cutoff" errors={actionData?.errors} />
           </div>
           <div
             key={"strictness" + defaultValues.strictness}
@@ -160,21 +160,18 @@ export default function ReclusterPage() {
             />
             <ErrorMessages path="strictness" errors={actionData?.errors} />
           </div>
-          <div
-            key={"threshold" + defaultValues.threshold}
-            title="cluster population threshold."
-          >
+          <div key={"min_population" + defaultValues.min_population}>
             <label htmlFor="threshold" className="block">
-              Threshold
+              Minimum cluster population
             </label>
             <input
               type="text"
-              name="threshold"
-              id="threshold"
-              defaultValue={defaultValues.threshold}
+              name="min_population"
+              id="min_population"
+              defaultValue={defaultValues.min_population}
               className="rounded border-2 p-1"
             />
-            <ErrorMessages path="threshold" errors={actionData?.errors} />
+            <ErrorMessages path="min_population" errors={actionData?.errors} />
           </div>
         </div>
         <div className="flex flex-row gap-2 p-2">

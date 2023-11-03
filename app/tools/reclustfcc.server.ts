@@ -4,9 +4,9 @@ import { object, number, coerce, finite, type Output } from "valibot";
 import { parse as parseTOML } from "@ltd/j-toml";
 
 export const Schema = object({
-  fraction_cutoff: coerce(number([finite()]), Number),
+  clust_cutoff: coerce(number([finite()]), Number),
   strictness: coerce(number([finite()]), Number),
-  threshold: coerce(number([finite()]), Number),
+  min_population: coerce(number([finite()]), Number),
 });
 export type Schema = Output<typeof Schema>;
 
@@ -27,23 +27,14 @@ export async function getParams(
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
   let config: any = parseTOML(body, { bigint: false });
-  /*
-    In params.cfg:
-    threshold = 1
-    strictness = 0.75
-    fraction = 0.3
-    */
   if (!interactivness) {
     // non-interactive has `[clustfcc]` section
     config = config.clustfcc;
   }
   const params = {
-    // haddock3-re clustfcc CLI accepts fraction while module only has fraction_cutoff
-    // use fraction_cutoff in CLI
-    // TODO check that we are using right value?
-    fraction_cutoff: config.fraction_cutoff,
+    clust_cutoff: config.clust_cutoff,
     strictness: config.strictness,
-    threshold: config.threshold,
+    min_population: config.min_population,
   };
   return params;
 }
