@@ -96,7 +96,7 @@ export const action = async ({ request, params }: LoaderArgs) => {
   const clustccDir = buildPath({
     moduleIndex,
     moduleName: "clustrmsd",
-    interactivness: interactivness[1],
+    interactivness: 0,
     moduleIndexPadding: interactivness[2],
   });
   await reclustrmsd(jobId, clustccDir, clustfccParams, token);
