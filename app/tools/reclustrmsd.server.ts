@@ -1,5 +1,5 @@
 import type { Output } from "valibot";
-import { object, coerce, number, finite, string, useDefault } from "valibot";
+import { object, coerce, number, optional, picklist } from "valibot";
 import { parse as parseTOML } from "@ltd/j-toml";
 
 import { buildPath, getJobfile, safeApi } from "~/models/job.server";
@@ -7,10 +7,10 @@ import { parseClusterTsv } from "./shared";
 
 export const Schema = object({
   // TODO newer valibot has picklist to constrain values, but gives tsc error, wait for next version
-  criterion: string(),
-  n_clusters: useDefault(coerce(number([finite()]), Number), -1), // eslint-disable-line react-hooks/rules-of-hooks
-  clust_cutoff: useDefault(coerce(number([finite()]), Number), -1), // eslint-disable-line react-hooks/rules-of-hooks
-  min_population: coerce(number([finite()]), Number),
+  criterion: optional(picklist(["maxclust", "distance"]), "maxclust"),
+  n_clusters: optional(coerce(number(), Number)),
+  clust_cutoff: optional(coerce(number(), Number)),
+  min_population: optional(coerce(number(), Number)),
 });
 export type Schema = Output<typeof Schema>;
 
@@ -35,18 +35,18 @@ export async function getParams(
     // non-interactive has `[clustrmsd]` section
     config = config.clustrmsd;
   }
-  const params = {
-    // TODO haddock3-re clustrmsd CLI accepts n_clusters while module only has n_clusters_cutoff
-    // use n_clusters_cutoff in CLI
+  // TODO use valibot to get required fields from config
+    const params: Schema = {
     criterion: config.criterion,
-    min_population: config.min_population,
-    n_clusters: -1,
-    clust_cutoff: -1,
   };
-  if (config.criterion === "maxclust") {
+  if (config.n_clusters !== undefined) {
     params.n_clusters = config.n_clusters;
-  } else {
+  }
+  if (config.clust_cutoff !== undefined) {
     params.clust_cutoff = config.clust_cutoff;
+  }
+  if (config.min_population !== undefined) {
+    params.min_population = config.min_population;
   }
   return params;
 }
@@ -82,8 +82,6 @@ export async function reclustrmsd(
     ...params,
   };
   console.log("reclustrmsd", body);
-  // TODO need bartender to handle optional arguments
-  // https://github.com/haddocking/haddock3/blob/7e3cbbd60df5f72ce09a7f7a47f7eb9c18ddfca5/src/haddock/re/clustrmsd.py#L99-L109
   const result = await safeApi(bartenderToken, async (api) => {
     const response = await api.runInteractiveApp({
       jobid,
