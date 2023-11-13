@@ -6,16 +6,17 @@ import type { Scores } from "./CaprievalReport.client";
 // TODO move component to https://github.com/i-VRESSE/haddock3-analysis-components
 
 const AXIS_NAMES = {
-  irmsd: "interface RMSD [A]",
-  lrmsd: "ligand RMSD [A]",
-  ilrmsd: "interface-ligand RMSD [A]",
-  fnat: "Fraction of Common Contacts",
-  dockq: "DOCKQ",
   score: "HADDOCK score [a.u.]",
   vdw: "Van der Waals Energy",
   elec: "Electrostatic Energy",
   air: "Restraints Energy",
   desolv: "Desolvation Energy",
+  irmsd: "interface RMSD [A]",
+  lrmsd: "ligand RMSD [A]",
+  ilrmsd: "interface-ligand RMSD [A]",
+  fnat: "Fraction of Common Contacts",
+  dockq: "DOCKQ",
+  bsa: "Buried Surface Area [A^2]",
 };
 
 // TODO dont duplicate this, but get from d3
@@ -57,8 +58,9 @@ const DOMAINS = {
     [0.848, 1.0],
   ],
   rows: [
-    [0, 0.4],
-    [0.6, 1.0],
+    [0.75,1.0],
+    [0.38,.62],
+    [0.0, 0.24],
   ],
 };
 
