@@ -11,6 +11,7 @@ import { CompletedJobs } from "~/utils";
 import { OutputReport } from "~/components/OutputReport";
 import { ListFiles } from "~/components/ListFiles";
 import { JobStatus } from "~/components/JobStatus";
+import { NonModuleOutputFiles } from "~/components/NonModuleOutputFiles";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
@@ -46,9 +47,13 @@ export default function JobPage() {
         </p>
       </div>
       <div>
-        <h2 className="text-xl">Output</h2>
+        <h2 className="text-xl">Module output</h2>
         <OutputReport files={outputFiles!} jobid={job.id} />
         <a href={`/jobs/${job.id}/output.zip`}>&#128230; Download archive</a>
+      </div>
+      <div>
+        <h2 className="text-xl">Other output files</h2>
+        <NonModuleOutputFiles files={outputFiles} jobid={job.id} />
       </div>
     </main>
   );

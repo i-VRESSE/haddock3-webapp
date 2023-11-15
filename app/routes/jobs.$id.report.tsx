@@ -46,7 +46,7 @@ export default function RescorePage() {
 
   return (
     <>
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-row justify-between pb-4">
         <div>{job.name}</div>
         <div className="flex flex-row gap-1">
           <a
