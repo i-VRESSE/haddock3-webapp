@@ -7,42 +7,19 @@ export function ToolHistory({
   interactivness: number;
   maxInteractivness: number;
 }) {
-  const interactivnessLinks = [];
-  if (maxInteractivness) {
-    interactivnessLinks.push(
-      interactivness === 0 ? (
-        <b key="orig">O, </b>
-      ) : (
-        <span key="orig">
-          <Link title="Original weights" to="?i=0">
-            O
+  return (
+    <div className="block">
+      <Link to="?i=0" className={interactivness === 0 ? "font-bold" : ""}>
+        Original
+      </Link>
+      {maxInteractivness > 0 && (
+        <>
+          {" "}
+          <Link to="?i=1" className={interactivness === 1 ? "font-bold" : ""}>
+            Re-computed
           </Link>
-          ,{" "}
-        </span>
-      )
-    );
-  }
-  // haddock3-int_rescore only creates 3 interactive dirs
-  // for example 15_caprieval_interactive_interactive_interactive
-  // subsequent rescores are written to same dir which
-  // should not happen as job dir should be write once.
-  // TODO make write once or encapsulate rescore in a new way
-  for (let index = 1; index <= maxInteractivness; index++) {
-    interactivnessLinks.push(
-      interactivness === index ? (
-        <b key={index}>
-          {index}
-          {index < maxInteractivness && ", "}
-        </b>
-      ) : (
-        <span key={index}>
-          <Link to={index === maxInteractivness ? "?" : `?i=${index}`}>
-            {index}
-          </Link>
-          {index < maxInteractivness && ", "}
-        </span>
-      )
-    );
-  }
-  return <div className="block">History: {interactivnessLinks}</div>;
+        </>
+      )}
+    </div>
+  );
 }
