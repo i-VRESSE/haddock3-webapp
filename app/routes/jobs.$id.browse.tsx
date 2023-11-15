@@ -32,7 +32,10 @@ export default function JobPage() {
     <main className="flex flex-row gap-16">
       <div>
         <JobStatus job={job} />
-        <a className="btn btn-outline btn-lg mt-8" href={`/jobs/${job.id}/report`}>
+        <a
+          className="btn-outline btn btn-lg mt-8"
+          href={`/jobs/${job.id}/report`}
+        >
           👁 Simplified report
         </a>
       </div>
