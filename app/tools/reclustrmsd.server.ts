@@ -36,7 +36,7 @@ export async function getParams(
     config = config.clustrmsd;
   }
   // TODO use valibot to get required fields from config
-    const params: Schema = {
+  const params: Schema = {
     criterion: config.criterion,
   };
   if (config.n_clusters !== undefined) {

@@ -32,12 +32,12 @@ export default function JobPage() {
     <main className="flex flex-row gap-16">
       <div>
         <JobStatus job={job} />
-        <a className="block pt-8" href={`/jobs/${job.id}/report`}>
+        <a className="btn btn-outline btn-lg mt-8" href={`/jobs/${job.id}/report`}>
           👁 Simplified report
         </a>
       </div>
       <div>
-        <h2 className="text-xl">Input</h2>
+        <h2 className="text-2xl">Input</h2>
         <ListFiles files={inputFiles!} jobid={job.id} />
         <p>
           <a href={`/jobs/${job.id}/input.zip`}>&#128230; Download archive</a>

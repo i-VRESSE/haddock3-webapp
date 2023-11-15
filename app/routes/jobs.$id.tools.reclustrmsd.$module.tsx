@@ -123,7 +123,10 @@ export default function ReclusterPage() {
   const actionData = useActionData<typeof action>();
   const [criterion, setCriterion] = useState(defaultValues.criterion);
   const handleCriterionChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.value === "maxclust" || event.target.value === "distance") {
+    if (
+      event.target.value === "maxclust" ||
+      event.target.value === "distance"
+    ) {
       setCriterion(event.target.value);
     }
   };
