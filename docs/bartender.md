@@ -16,6 +16,9 @@ npm run generate-client
 
 (This command requires that the bartender webservice is running at http://localhost:8000)
 
+The generated client code is a reflection of the bartender configuration.
+So if the bartender configuration changes, the client needs to be regenerated.
+
 ## Configuration
 
 The haddock3 web application needs to know where the bartender web service is running.
