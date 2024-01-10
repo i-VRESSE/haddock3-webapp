@@ -11,7 +11,7 @@
     "catalogs": "npm run catalogs:easy && npm run catalogs:expert && npm run catalogs:guru",
     "dev": "remix dev",
     "format": "prettier --write . '!postgres-data'",
-    "generate-client": "node app/bartender-client/generate.mjs",
+    "generate-client": "node app/bartender-client/generate.mjs && npx prettier --write app/bartender-client/bartenderschema.d.ts",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve build",
     "test": "vitest",
