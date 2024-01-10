@@ -1,7 +1,9 @@
-import type { DirectoryItem } from "~/bartender-client";
+import type { components } from "../bartender-client/bartenderschema";
+
+type DirectoryItem = components["schemas"]["DirectoryItem"];
 
 const ListItem = ({ jobid, item }: { jobid: number; item: DirectoryItem }) => {
-  if (item.isDir) {
+  if (item.is_dir) {
     return <ListDir jobid={jobid} dir={item} />;
   } else {
     return <ListFile jobid={jobid} file={item} />;

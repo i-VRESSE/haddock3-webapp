@@ -1,5 +1,7 @@
-import type { DirectoryItem } from "~/bartender-client";
+import type { components } from "~/bartender-client/bartenderschema";
 import { getModuleIndexPadding, listOutputFiles } from "~/models/job.server";
+
+type DirectoryItem = components["schemas"]["DirectoryItem"];
 
 export function interactivenessOfModule(
   module: number,
@@ -18,7 +20,7 @@ export function interactivenessOfModule(
   const moduleIndexPadded = module.toString().padStart(moduleIndexPadding, "0");
   for (const m of modules) {
     if (
-      m.isDir &&
+      m.is_dir &&
       m.name.startsWith(`${moduleIndexPadded}_`) &&
       m.name.endsWith("interactive")
     ) {
@@ -41,7 +43,7 @@ export function nameOfModule(moduleIndex: number, files: DirectoryItem) {
   for (const m of modules) {
     // if module name has _ in it then this will break
     const module = m.name.split("_");
-    if (m.isDir && parseInt(module[0]) === moduleIndex) {
+    if (m.is_dir && parseInt(module[0]) === moduleIndex) {
       return module[1];
     }
   }
@@ -80,7 +82,7 @@ export function getLastCaprievalModule(files: DirectoryItem): number {
   }
   const modules = [...files.children].reverse();
   for (const module of modules || []) {
-    if (module.isDir && module.name.endsWith("caprieval")) {
+    if (module.is_dir && module.name.endsWith("caprieval")) {
       return parseInt(module.name.split("_")[0]);
     }
   }

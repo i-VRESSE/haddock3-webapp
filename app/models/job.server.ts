@@ -1,9 +1,7 @@
 import type { Params } from "@remix-run/react";
-import { JobApi } from "~/bartender-client/apis/JobApi";
-import { buildConfig } from "./config.server";
+import { createClient } from "./config.server";
+import type { components } from "../bartender-client/bartenderschema";
 import { JOB_OUTPUT_DIR } from "./constants";
-import type { DirectoryItem } from "~/bartender-client";
-import { ResponseError } from "~/bartender-client";
 
 const BOOK_KEEPING_FILES = [
   "stderr.txt",
@@ -12,10 +10,6 @@ const BOOK_KEEPING_FILES = [
   "returncode",
   "workflow.cfg.orig",
 ];
-
-function buildJobApi(bartenderToken: string) {
-  return new JobApi(buildConfig(bartenderToken));
-}
 
 export function jobIdFromParams(params: Params) {
   const jobId = params.id;
@@ -26,51 +20,66 @@ export function jobIdFromParams(params: Params) {
 }
 
 export async function getJobs(bartenderToken: string, limit = 100, offset = 0) {
-  const api = buildJobApi(bartenderToken);
-  return await api.retrieveJobs({
-    limit,
-    offset,
+  const client = createClient(bartenderToken);
+  const { data, error } = await client.GET("/api/job/", {
+    params: {
+      query: {
+        limit,
+        offset,
+      },
+    },
   });
-}
-
-function handleApiError(error: unknown): never {
-  if (error instanceof ResponseError) {
-    throw new Response(null, {
-      status: error.response.status,
-      statusText: error.response.statusText,
-    });
+  if (error) {
+    throw error;
   }
-  throw error;
-}
-
-export async function safeApi<R>(
-  bartenderToken: string,
-  fn: (api: JobApi) => Promise<R>
-): Promise<R> {
-  const api = buildJobApi(bartenderToken);
-  try {
-    return await fn(api);
-  } catch (error) {
-    handleApiError(error);
-  }
+  return data;
 }
 
 export async function getJobById(jobid: number, bartenderToken: string) {
-  return await safeApi(bartenderToken, (api) => api.retrieveJob({ jobid }));
+  const client = createClient(bartenderToken);
+  const { data, error } = await client.GET("/api/job/{jobid}", {
+    params: {
+      path: {
+        jobid,
+      },
+    },
+  });
+  if (error) {
+    throw error;
+  }
+  return data;
 }
 
 export async function getJobStdout(jobid: number, bartenderToken: string) {
-  return await safeApi(bartenderToken, async (api) => {
-    const response = await api.retrieveJobStdoutRaw({ jobid });
-    return response.raw;
+  const client = createClient(bartenderToken);
+  const { data, error } = await client.GET("/api/job/{jobid}/stdout", {
+    params: {
+      path: {
+        jobid,
+      },
+    },
+    parseAs: "text",
   });
+  if (error) {
+    throw error;
+  }
+  return data;
 }
 
 export async function getJobStderr(jobid: number, bartenderToken: string) {
-  return await safeApi(bartenderToken, async (api) => {
-    const response = await api.retrieveJobStderrRaw({ jobid });
-    return response.raw;
+  const client = createClient(bartenderToken);
+  const { data, error } = await client.GET("/api/job/{jobid}/stderr", {
+    params: {
+      path: {
+        jobid,
+      },
+    },
+    parseAs: "text",
   });
+  if (error) {
+    throw error;
+  }
+  return data;
 }
 
 export async function getJobfile(
@@ -78,10 +87,17 @@ export async function getJobfile(
   path: string,
   bartenderToken: string
 ) {
-  return await safeApi(bartenderToken, async (api) => {
-    const response = await api.retrieveJobFilesRaw({ jobid, path });
-    return response.raw;
+  const client = createClient(bartenderToken);
+  const { response } = await client.GET("/api/job/{jobid}/files/{path}", {
+    params: {
+      path: {
+        jobid,
+        path,
+      },
+    },
+    parseAs: "stream",
   });
+  return response;
 }
 
 export async function listOutputFiles(
@@ -89,52 +105,83 @@ export async function listOutputFiles(
   bartenderToken: string,
   maxDepth = 3
 ) {
-  return await safeApi(bartenderToken, async (api) => {
-    const items = await api.retrieveJobDirectoriesFromPath({
-      jobid,
-      path: JOB_OUTPUT_DIR,
-      // user might have supplied deeper directory structure
-      // so can not browse past maxDepth,
-      // but can download archive with files at any depth
-      maxDepth,
-    });
-    return items;
-  });
+  const client = createClient(bartenderToken);
+  const { data, error } = await client.GET(
+    "/api/job/{jobid}/directories/{path}",
+    {
+      params: {
+        path: {
+          jobid,
+          path: JOB_OUTPUT_DIR,
+        },
+        query: {
+          // user might have supplied deeper directory structure
+          // so can not browse past maxDepth,
+          // but can download archive with files at any depth
+          maxDepth,
+        },
+      },
+    }
+  );
+  if (error) {
+    throw error;
+  }
+  return data;
 }
 
 export async function listInputFiles(jobid: number, bartenderToken: string) {
-  return await safeApi(bartenderToken, async (api) => {
-    const items = await api.retrieveJobDirectories({
-      jobid,
-      maxDepth: 3,
-    });
-    const nonInputFiles = new Set([...BOOK_KEEPING_FILES, JOB_OUTPUT_DIR]);
-    // TODO instead of filtering here add exclude parameter to bartender endpoint.
-    items.children = items.children?.filter((c) => !nonInputFiles.has(c.name));
-    return items;
+  const client = createClient(bartenderToken);
+  const { data, error } = await client.GET("/api/job/{jobid}/directories", {
+    params: {
+      path: {
+        jobid,
+      },
+      query: {
+        max_depth: 3,
+      },
+    },
   });
+  if (error) {
+    throw error;
+  }
+  const nonInputFiles = new Set([...BOOK_KEEPING_FILES, JOB_OUTPUT_DIR]);
+  // TODO instead of filtering here add exclude parameter to bartender endpoint.
+  data.children = data.children?.filter((c) => !nonInputFiles.has(c.name));
+  return data;
 }
 
 export async function getArchive(jobid: number, bartenderToken: string) {
-  return await safeApi(bartenderToken, async (api) => {
-    const response = await api.retrieveJobDirectoryAsArchiveRaw({
-      jobid,
-      archiveFormat: ".zip",
-    });
-    return response.raw;
+  const client = createClient(bartenderToken);
+  const { response } = await client.GET("/api/job/{jobid}/archive", {
+    params: {
+      path: {
+        jobid,
+      },
+      query: {
+        archive_format: ".zip",
+      },
+    },
+    parseAs: "stream",
   });
+  return response;
 }
 
 export async function getInputArchive(jobid: number, bartenderToken: string) {
-  return await safeApi(bartenderToken, async (api) => {
-    const response = await api.retrieveJobDirectoryAsArchiveRaw({
-      jobid,
-      exclude: BOOK_KEEPING_FILES,
-      excludeDirs: [JOB_OUTPUT_DIR],
-      archiveFormat: ".zip",
-    });
-    return response.raw;
+  const client = createClient(bartenderToken);
+  const { response } = await client.GET("/api/job/{jobid}/archive", {
+    params: {
+      path: {
+        jobid,
+      },
+      query: {
+        archive_format: ".zip",
+        exclude: BOOK_KEEPING_FILES,
+        exclude_dirs: [JOB_OUTPUT_DIR],
+      },
+    },
+    parseAs: "stream",
   });
+  return response;
 }
 
 export async function getOutputArchive(jobid: number, bartenderToken: string) {
@@ -146,22 +193,30 @@ export async function getSubDirectoryAsArchive(
   path: string,
   bartenderToken: string
 ) {
-  return await safeApi(bartenderToken, async (api) => {
-    const response = await api.retrieveJobSubdirectoryAsArchiveRaw({
-      jobid,
-      path,
-      archiveFormat: ".zip",
-    });
-    return response.raw;
+  const client = createClient(bartenderToken);
+  const { response } = await client.GET("/api/job/{jobid}/archive/{path}", {
+    params: {
+      path: {
+        jobid,
+        path,
+      },
+      query: {
+        archive_format: ".zip",
+      },
+    },
+    parseAs: "stream",
   });
+  return response;
 }
+
+type DirectoryItem = components["schemas"]["DirectoryItem"];
 
 export function getModuleIndexPadding(files: DirectoryItem) {
   if (!files.children) {
     throw new Error("No modules found");
   }
   const nrModules = files.children.filter(
-    (c) => c.isDir && c.name.includes("_")
+    (c) => c.is_dir && c.name.includes("_")
   ).length;
   return Math.ceil(Math.log10(nrModules));
 }

@@ -2,8 +2,9 @@ import type { Output } from "valibot";
 import { object, coerce, number, optional, picklist } from "valibot";
 import { parse as parseTOML } from "@ltd/j-toml";
 
-import { buildPath, getJobfile, safeApi } from "~/models/job.server";
+import { buildPath, getJobfile } from "~/models/job.server";
 import { parseClusterTsv } from "./shared";
+import { createClient } from "~/models/config.server";
 
 export const Schema = object({
   // TODO newer valibot has picklist to constrain values, but gives tsc error, wait for next version
@@ -81,17 +82,24 @@ export async function reclustrmsd(
     clustrmsd_dir: clustfccDir,
     ...params,
   };
-  console.log("reclustrmsd", body);
-  const result = await safeApi(bartenderToken, async (api) => {
-    const response = await api.runInteractiveApp({
-      jobid,
-      application: "reclustrmsd",
+
+  const client = createClient(bartenderToken);
+  const { data, error } = await client.POST(
+    "/api/job/{jobid}/interactive/reclustrmsd",
+    {
+      params: {
+        path: {
+          jobid,
+        },
+      },
       body,
-    });
-    return response;
-  });
-  if (result.returncode !== 0) {
-    console.error(result);
-    throw new Error(`reclustrmsd failed with return code ${result.returncode}`);
+    }
+  );
+  if (error) {
+    throw error;
+  }
+  if (data.returncode !== 0) {
+    console.error(data);
+    throw new Error(`reclustfcc failed with return code ${data.returncode}`);
   }
 }

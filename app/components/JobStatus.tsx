@@ -1,7 +1,9 @@
 import type { SerializeFrom } from "@remix-run/node";
-import type { JobModelDTO } from "~/bartender-client";
 import { CompletedJobs } from "~/utils";
 import { ListLogFiles } from "./ListLogFiles";
+import type { components } from "../bartender-client/bartenderschema";
+
+type JobModelDTO = components["schemas"]["JobModelDTO"];
 
 interface Props {
   job: SerializeFrom<JobModelDTO>;
@@ -16,8 +18,8 @@ export function JobStatus({ job }: Props) {
         State: <b>{job.state}</b>
       </p>
       {/* TODO nicer format datetime then iso8601 */}
-      <p>Created on: {job.createdOn}</p>
-      <p>Updated on: {job.updatedOn}</p>
+      <p>Created on: {job.created_on}</p>
+      <p>Updated on: {job.updated_on}</p>
       {CompletedJobs.has(job.state) && (
         <>
           <a href={`/jobs/${job.id}/zip`}>&#128230; Download archive</a>

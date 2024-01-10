@@ -1,7 +1,9 @@
 import { describe, it, expect } from "vitest";
 
-import type { DirectoryItem } from "~/bartender-client";
+import type { components } from "../bartender-client/bartenderschema";
 import { files2modules } from "./OutputReport";
+
+type DirectoryItem = components["schemas"]["DirectoryItem"];
 
 describe("files2modules", () => {
   it("should return empty array if no children", () => {
@@ -9,8 +11,8 @@ describe("files2modules", () => {
       name: "",
       path: "",
       children: [],
-      isDir: true,
-      isFile: false,
+      is_dir: true,
+      is_file: false,
     };
     expect(files2modules(item)).toEqual([]);
   });
@@ -26,12 +28,12 @@ describe("files2modules", () => {
             name: thing,
             path: thing,
             children: [],
-            isDir: true,
-            isFile: false,
+            is_dir: true,
+            is_file: false,
           },
         ],
-        isDir: true,
-        isFile: false,
+        is_dir: true,
+        is_file: false,
       };
       expect(files2modules(item)).toEqual([]);
     }
@@ -46,12 +48,12 @@ describe("files2modules", () => {
           name: "1_module",
           path: "1_module",
           children: [],
-          isDir: true,
-          isFile: false,
+          is_dir: true,
+          is_file: false,
         },
       ],
-      isDir: true,
-      isFile: false,
+      is_dir: true,
+      is_file: false,
     };
     const expected = [
       {
@@ -73,8 +75,8 @@ describe("files2modules", () => {
           name: "1_module",
           path: "",
           children: [],
-          isDir: true,
-          isFile: false,
+          is_dir: true,
+          is_file: false,
         },
         {
           name: "analysis",
@@ -88,20 +90,20 @@ describe("files2modules", () => {
                   name: "report.html",
                   path: "analsis/1_module_analysis/report.html",
                   children: [],
-                  isDir: false,
-                  isFile: true,
+                  is_dir: false,
+                  is_file: true,
                 },
               ],
-              isDir: true,
-              isFile: false,
+              is_dir: true,
+              is_file: false,
             },
           ],
-          isDir: true,
-          isFile: false,
+          is_dir: true,
+          is_file: false,
         },
       ],
-      isDir: true,
-      isFile: false,
+      is_dir: true,
+      is_file: false,
     };
     const expected = [
       {
@@ -112,8 +114,8 @@ describe("files2modules", () => {
           name: "report.html",
           path: "analsis/1_module_analysis/report.html",
           children: [],
-          isDir: false,
-          isFile: true,
+          is_dir: false,
+          is_file: true,
         },
       },
     ];

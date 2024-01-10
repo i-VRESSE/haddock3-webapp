@@ -1,6 +1,8 @@
-import type { DirectoryItem } from "~/bartender-client";
+import type { components } from "../bartender-client/bartenderschema";
 import { ListFiles } from "./ListFiles";
 import { useMemo } from "react";
+
+type DirectoryItem = components["schemas"]["DirectoryItem"];
 
 const nonmodules = new Set(["analysis", "data", "traceback"]);
 

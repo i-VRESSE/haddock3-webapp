@@ -1,7 +1,8 @@
-import { buildPath, getJobfile, safeApi } from "~/models/job.server";
+import { buildPath, getJobfile } from "~/models/job.server";
 import { parseClusterTsv } from "./shared";
 import { object, number, coerce, finite, type Output } from "valibot";
 import { parse as parseTOML } from "@ltd/j-toml";
+import { createClient } from "~/models/config.server";
 
 export const Schema = object({
   clust_cutoff: coerce(number([finite()]), Number),
@@ -84,16 +85,23 @@ export async function reclustfcc(
   // stdout: '[2023-11-03 13:11:01,180 clustfcc INFO] Reclustering output/09_clustfcc_interactive/\n' +
   //   '[2023-11-03 13:11:02,112 clustfcc INFO] Previous clustering parameters: \n'
 
-  const result = await safeApi(bartenderToken, async (api) => {
-    const response = await api.runInteractiveApp({
-      jobid,
-      application: "reclustfcc",
+  const client = createClient(bartenderToken);
+  const { data, error } = await client.POST(
+    "/api/job/{jobid}/interactive/reclustfcc",
+    {
+      params: {
+        path: {
+          jobid,
+        },
+      },
       body,
-    });
-    return response;
-  });
-  if (result.returncode !== 0) {
-    console.error(result);
-    throw new Error(`reclustfcc failed with return code ${result.returncode}`);
+    }
+  );
+  if (error) {
+    throw error;
+  }
+  if (data.returncode !== 0) {
+    console.error(data);
+    throw new Error(`reclustfcc failed with return code ${data.returncode}`);
   }
 }

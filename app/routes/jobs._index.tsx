@@ -37,10 +37,10 @@ export default function JobPage() {
                 <Link to={`/jobs/${job.id}`}>{job.name}</Link>
               </td>
               <td>
-                <Link to={`/jobs/${job.id}`}>{job.createdOn}</Link>
+                <Link to={`/jobs/${job.id}`}>{job.created_on}</Link>
               </td>
               <td>
-                <Link to={`/jobs/${job.id}`}>{job.updatedOn}</Link>
+                <Link to={`/jobs/${job.id}`}>{job.updated_on}</Link>
               </td>
             </tr>
           ))}

@@ -1,6 +1,9 @@
 import { useMemo } from "react";
-import type { DirectoryItem } from "~/bartender-client";
+import type { components } from "../bartender-client/bartenderschema";
+
 import { ListFiles } from "./ListFiles";
+
+type DirectoryItem = components["schemas"]["DirectoryItem"];
 
 export function files2modules(files: DirectoryItem) {
   if (!files.children) {

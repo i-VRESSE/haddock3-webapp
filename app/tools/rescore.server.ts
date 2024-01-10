@@ -4,11 +4,11 @@ import {
   buildPath,
   getJobfile,
   listOutputFiles,
-  safeApi,
   getModuleIndexPadding,
 } from "~/models/job.server";
 import { interactivenessOfModule, getLastCaprievalModule } from "./shared";
 import { JOB_OUTPUT_DIR } from "~/models/constants";
+import { createClient } from "~/models/config.server";
 
 export const WeightsSchema = object({
   // could use minimum/maximum from catalog,
@@ -201,16 +201,23 @@ export async function rescore(
     capri_dir: capriFir,
     ...weights,
   };
-  const result = await safeApi(bartenderToken, async (api) => {
-    const response = await api.runInteractiveApp({
-      jobid,
-      application: "rescore",
+  const client = createClient(bartenderToken);
+  const { data, error } = await client.POST(
+    "/api/job/{jobid}/interactive/rescore",
+    {
+      params: {
+        path: {
+          jobid,
+        },
+      },
       body,
-    });
-    return response;
-  });
-  if (result.returncode !== 0) {
-    console.error(result);
-    throw new Error(`rescore failed with return code ${result.returncode}`);
+    }
+  );
+  if (error) {
+    throw error;
+  }
+  if (data.returncode !== 0) {
+    console.error(data);
+    throw new Error(`rescore failed with return code ${data.returncode}`);
   }
 }

@@ -1,21 +1,13 @@
 import JSZip from "jszip";
 import { stringify, parse } from "@ltd/j-toml";
 
-import { ApplicationApi } from "~/bartender-client/apis/ApplicationApi";
-import type { JobModelDTO } from "~/bartender-client/models/JobModelDTO";
-import { buildConfig } from "./config.server";
-import {
-  BARTENDER_APPLICATION_NAME,
-  JOB_OUTPUT_DIR,
-  WORKFLOW_CONFIG_FILENAME,
-} from "./constants";
-
-function buildApplicationApi(accessToken = "") {
-  return new ApplicationApi(buildConfig(accessToken));
-}
+import { JOB_OUTPUT_DIR, WORKFLOW_CONFIG_FILENAME } from "./constants";
+import { createClient, multipart } from "./config.server";
+import { getJobById } from "./job.server";
 
 export async function submitJob(upload: File, accessToken: string) {
-  const api = buildApplicationApi(accessToken);
+  const client = createClient(accessToken);
+
   const rewritten_upload = new File(
     [await rewriteConfigInArchive(upload)],
     upload.name,
@@ -24,19 +16,25 @@ export async function submitJob(upload: File, accessToken: string) {
       lastModified: upload.lastModified,
     }
   );
-  const response = await api.uploadJobRaw({
-    application: BARTENDER_APPLICATION_NAME,
-    upload: rewritten_upload,
+  const body = { upload: rewritten_upload };
+  // Redirect manual is needed because authorization header is not passed
+  const { response } = await client.PUT("/api/application/haddock3", {
+    redirect: "manual",
+    body,
+    bodySerializer: multipart,
   });
-  if (!response.raw.ok) {
+  if (!response.ok && response.status !== 303) {
     throw new Error(
-      `Unable to submit job: ${response.raw.status} ${
-        response.raw.statusText
-      } ${await response.raw.text()}`
+      `Unable to submit job: ${response.status} ${
+        response.statusText
+      } ${await response.text()}`
     );
   }
-  const job: JobModelDTO = await response.raw.json();
-  return job;
+
+  const url = response.headers.get("Location");
+  // url is like /api/job/1234
+  const jobId = parseInt(url!.split("/").pop()!);
+  return getJobById(jobId, accessToken);
 }
 
 /**
