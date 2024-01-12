@@ -118,7 +118,7 @@ export async function listOutputFiles(
           // user might have supplied deeper directory structure
           // so can not browse past maxDepth,
           // but can download archive with files at any depth
-          maxDepth,
+          max_depth: maxDepth,
         },
       },
     }
