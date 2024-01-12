@@ -7,6 +7,8 @@ import { jobIdFromParams, getJobById } from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
 import { ClientOnly } from "~/components/ClientOnly";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
+// TODO rescore is not used here, so imports should not be from this module
+// move to a separate module called ~/model/modules and ~/models/caprieval
 import { step2rescoreModule, getScores } from "~/tools/rescore.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {

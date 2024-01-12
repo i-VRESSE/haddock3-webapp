@@ -12,6 +12,7 @@ import { OutputReport } from "~/components/OutputReport";
 import { ListFiles } from "~/components/ListFiles";
 import { JobStatus } from "~/components/JobStatus";
 import { NonModuleOutputFiles } from "~/components/NonModuleOutputFiles";
+import { getLastCaprievalModule } from "~/tools/shared";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
@@ -22,22 +23,31 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   }
   const inputFiles = await listInputFiles(jobId, token);
   const outputFiles = await listOutputFiles(jobId, token);
+  let hasCaprieval = true;
+  try {
+    getLastCaprievalModule(outputFiles);
+  } catch (error) {
+    hasCaprieval = false;
+  }
 
-  return json({ job, inputFiles, outputFiles });
+  return json({ job, inputFiles, outputFiles, hasCaprieval });
 };
 
 export default function JobPage() {
-  const { job, outputFiles, inputFiles } = useLoaderData<typeof loader>();
+  const { job, outputFiles, inputFiles, hasCaprieval } =
+    useLoaderData<typeof loader>();
   return (
     <main className="flex flex-row gap-16">
       <div>
         <JobStatus job={job} />
-        <a
-          className="btn-outline btn btn-lg mt-8"
-          href={`/jobs/${job.id}/report`}
-        >
-          👁 Simplified report
-        </a>
+        {hasCaprieval && (
+          <a
+            className="btn-outline btn btn-lg mt-8"
+            href={`/jobs/${job.id}/report`}
+          >
+            👁 Report
+          </a>
+        )}
       </div>
       <div>
         <h2 className="text-2xl">Input</h2>
