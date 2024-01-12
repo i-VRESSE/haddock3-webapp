@@ -5,10 +5,14 @@ import {
   getJobfile,
   listOutputFiles,
   getModuleIndexPadding,
+  buildAnalyisPath,
 } from "~/models/job.server";
 import { interactivenessOfModule, getLastCaprievalModule } from "./shared";
 import { JOB_OUTPUT_DIR } from "~/models/constants";
 import { createClient } from "~/models/config.server";
+import { load} from "cheerio";
+import type { Layout, Data } from "plotly.js";
+
 
 export const WeightsSchema = object({
   // could use minimum/maximum from catalog,
@@ -71,6 +75,35 @@ export async function getScores(
   const structures = await getStructureScores(prefix, jobid, bartenderToken);
   const clusters = await getClusterScores(prefix, jobid, bartenderToken);
   return { structures, clusters };
+}
+
+export async function getScatterPlots(
+  jobid: number,
+  module: number,
+  interactivness: number,
+  bartenderToken: string,
+  moduleIndexPadding: number,
+  moduleName = "caprieval",
+  htmlFilename = "report.html",
+  plotId = 1,
+) {
+const prefix = buildAnalyisPath({
+    moduleIndex: module,
+    moduleName,
+    interactivness,
+    moduleIndexPadding,
+  });
+  const response = await getJobfile(
+    jobid,
+    `${prefix}${htmlFilename}`,
+    bartenderToken
+  );
+  const html = await response.text()
+  const scriptTag = load(html)(`script#data${plotId}`)
+  const dataAsString = scriptTag.text()
+  return JSON.parse(dataAsString) as {
+    data: Data[], layout: Layout
+  }
 }
 
 export interface CaprievalStructureRow {
@@ -193,12 +226,14 @@ function removeComments(body: string): string {
 
 export async function rescore(
   jobid: number,
-  capriFir: string,
+  moduleIndex: number,
+  capriDir: string,
   weights: Weights,
   bartenderToken: string
 ) {
   const body = {
-    capri_dir: capriFir,
+    capri_dir: capriDir,
+    module_nr: moduleIndex,
     ...weights,
   };
   const client = createClient(bartenderToken);

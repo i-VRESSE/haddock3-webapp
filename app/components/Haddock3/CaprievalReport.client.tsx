@@ -10,7 +10,9 @@ import type {
   CaprievalStructureRow,
 } from "~/tools/rescore.server";
 import { ScatterPlots } from "./ScatterPlots";
+import Plot from "react-plotly.js";
 import { BoxPlots } from "./BoxPlots";
+import type { Data, Layout } from "plotly.js";
 
 /*
   Component has to be client only due 
@@ -25,6 +27,10 @@ export interface Scores {
 interface CaprievalReportProps {
   scores: Scores;
   prefix: string;
+  plotlyScatterPlots: {
+    data: Data[]
+    layout: Layout
+  };
 }
 
 const MAX_BEST = 3;
@@ -134,7 +140,7 @@ export function scores2clusters(
   return Object.fromEntries(result);
 }
 
-export const CaprievalReport = ({ scores, prefix }: CaprievalReportProps) => {
+export const CaprievalReport = ({ scores, prefix, plotlyScatterPlots }: CaprievalReportProps) => {
   const clusters = useMemo(
     () => scores2clusters(scores, prefix),
     [scores, prefix]
@@ -142,7 +148,10 @@ export const CaprievalReport = ({ scores, prefix }: CaprievalReportProps) => {
   return (
     <div className="flex flex-col gap-4">
       <ClusterTable headers={headers} clusters={clusters} maxbest={MAX_BEST} />
-      <ScatterPlots scores={scores} />
+      {/* <ScatterPlots scores={scores} /> */}
+      <Plot data={plotlyScatterPlots.data} layout={plotlyScatterPlots.layout} config={{
+          responsive: true,
+        }}/>
       <BoxPlots scores={scores} />
     </div>
   );

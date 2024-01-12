@@ -2,6 +2,7 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { flatten, safeParse } from "valibot";
+import Plot from "react-plotly.js";
 
 import { getBartenderToken } from "~/bartender_token.server";
 import { jobIdFromParams, getJobById, buildPath } from "~/models/job.server";
@@ -13,6 +14,7 @@ import {
   getScores,
   WeightsSchema,
   rescore,
+  getScatterPlots,
 } from "~/tools/rescore.server";
 import { RescoreForm } from "~/tools/rescore";
 import { moduleInfo } from "~/tools/shared";
@@ -47,12 +49,15 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     moduleIndexPadding,
     moduleName
   );
+  const plotlyScatterPlots = await getScatterPlots(jobId, moduleIndex, 
+    interactivness, token, moduleIndexPadding, moduleName);
   return json({
     moduleIndex,
     weights,
     scores,
     interactivness,
     maxInteractivness,
+    plotlyScatterPlots,
   });
 };
 
@@ -84,15 +89,14 @@ export const action = async ({ request, params }: LoaderArgs) => {
     interactivness,
     moduleIndexPadding,
   });
-  await rescore(jobId, capriDir, weights, token);
+  await rescore(jobId, moduleIndex, capriDir, weights, token);
   return json({ errors: { nested: {} } });
 };
 
 export default function RescorePage() {
-  const { moduleIndex, weights, scores, interactivness, maxInteractivness } =
+  const { moduleIndex, weights, scores, interactivness, maxInteractivness, plotlyScatterPlots } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-
   return (
     <>
       <RescoreForm
@@ -103,8 +107,12 @@ export default function RescorePage() {
         errors={actionData?.errors}
       />
       <ClientOnly fallback={<p>Loading...</p>}>
-        {() => <CaprievalReport scores={scores} prefix="../files/output/" />}
+        {() => <>
+          <CaprievalReport scores={scores} prefix="../files/output/" plotlyScatterPlots={plotlyScatterPlots}/>
+        </>
+        }
       </ClientOnly>
+
     </>
   );
 }

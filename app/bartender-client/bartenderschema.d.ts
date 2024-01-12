@@ -892,6 +892,7 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": {
+          module_nr: number;
           capri_dir: string;
           w_air: number;
           w_bsa: number;

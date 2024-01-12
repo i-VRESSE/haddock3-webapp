@@ -242,3 +242,27 @@ export function buildPath({
     .padStart(moduleIndexPadding, "0");
   return `${prefix}/${moduleIndexPadded}_${moduleName}${interactive_suffix}/${suffix}`;
 }
+
+// output/analysis/12_caprieval_analysis/report.html
+// output/analysis/12_caprieval_interactive_analysis/report.html
+export function buildAnalyisPath({
+  prefix = "output/analyis",
+  moduleIndex,
+  moduleName,
+  interactivness = 0,
+  suffix = "",
+  moduleIndexPadding,
+}: {
+  prefix?: string;
+  moduleIndex: number;
+  moduleName: string;
+  interactivness?: number;
+  suffix?: string;
+  moduleIndexPadding: number;
+}) {
+  const interactive_suffix = Array(interactivness + 1).join("_interactive");
+  const moduleIndexPadded = moduleIndex
+    .toString()
+    .padStart(moduleIndexPadding, "0");
+  return `${prefix}/${moduleIndexPadded}_${moduleName}${interactive_suffix}_analysis/${suffix}`;
+}
