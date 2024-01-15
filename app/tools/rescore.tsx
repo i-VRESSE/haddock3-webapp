@@ -1,4 +1,4 @@
-import { Form } from "@remix-run/react";
+import { Form, useNavigation } from "@remix-run/react";
 import type { FlatErrors } from "valibot";
 
 import { ErrorMessages } from "~/components/ErrorMessages";
@@ -29,6 +29,7 @@ export function RescoreForm({
   maxInteractivness: number;
   moduleIndex: number;
 }) {
+  const { state } = useNavigation();
   return (
     <Form method="post" action="?">
       <h2 className="text-2xl">Rescore of module {moduleIndex}</h2>
@@ -123,8 +124,12 @@ export function RescoreForm({
         </div>
       </div>
       <div className="flex flex-row gap-2 p-2">
-        <button type="submit" className="btn btn-primary btn-sm">
-          Rescore
+        <button
+          type="submit"
+          className="btn btn-primary btn-sm"
+          disabled={state !== "idle"}
+        >
+          {state !== "idle" ? "Running..." : "Rescore"}
         </button>
         <a href="../.." className=" btn-outline btn btn-sm">
           Back

@@ -1,7 +1,12 @@
 import { ClusterTable } from "~/tools/reclust";
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
 import { flatten, safeParse } from "valibot";
 
 import { getBartenderToken } from "~/bartender_token.server";
@@ -144,6 +149,7 @@ export default function ReclusterPage() {
   const actionData = useActionData<typeof action>();
   // Strip SerializeObject<UndefinedToOptional wrapper
   const plotlyPlotsStripped = plotlyPlots as CaprievalPlotlyProps;
+  const { state } = useNavigation();
   return (
     <>
       <Form method="post" action="?">
@@ -199,8 +205,12 @@ export default function ReclusterPage() {
           </div>
         </div>
         <div className="flex flex-row gap-2 p-2">
-          <button type="submit" className="btn btn-primary btn-sm">
-            Recluster
+          <button
+            type="submit"
+            className="btn btn-primary btn-sm"
+            disabled={state !== "idle"}
+          >
+            {state !== "idle" ? "Running..." : "Recluster"}
           </button>
           <a href="../.." className=" btn-outline btn btn-sm">
             Back

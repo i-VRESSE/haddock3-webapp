@@ -1,6 +1,11 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
 import { type ChangeEvent, useState } from "react";
 import { flatten, safeParse } from "valibot";
 
@@ -156,6 +161,7 @@ export default function ReclusterPage() {
       setCriterion(event.target.value);
     }
   };
+  const { state } = useNavigation();
   return (
     <>
       <Form method="post" action="?">
@@ -254,8 +260,12 @@ export default function ReclusterPage() {
           )}
         </div>
         <div className="flex flex-row gap-2 p-2">
-          <button type="submit" className="btn btn-primary btn-sm">
-            Recluster
+          <button
+            type="submit"
+            className="btn btn-primary btn-sm"
+            disabled={state !== "idle"}
+          >
+            {state !== "idle" ? "Running..." : "Recluster"}
           </button>
           <a href="../.." className=" btn-outline btn btn-sm">
             Back
