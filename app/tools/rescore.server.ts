@@ -1,5 +1,5 @@
 import type { Output } from "valibot";
-import { object, number, coerce, finite, parse } from "valibot";
+import { object, number, coerce, finite, parse, picklist } from "valibot";
 import {
   buildPath,
   getJobfile,
@@ -8,11 +8,15 @@ import {
   buildAnalyisPath,
 } from "~/models/job.server";
 import { interactivenessOfModule, getLastCaprievalModule } from "./shared";
-import { JOB_OUTPUT_DIR } from "~/models/constants";
+import {
+  CAPRIEVAL_BOXPLOT_CHOICES,
+  CAPRIEVAL_SCATTERPLOT_CHOICES,
+  JOB_OUTPUT_DIR,
+} from "~/models/constants";
 import { createClient } from "~/models/config.server";
-import { load} from "cheerio";
-import type { Layout, Data } from "plotly.js";
-
+import type { CheerioAPI } from "cheerio";
+import { load } from "cheerio";
+import type { PlotlyProps } from "~/components/PlotlyPlot";
 
 export const WeightsSchema = object({
   // could use minimum/maximum from catalog,
@@ -77,17 +81,79 @@ export async function getScores(
   return { structures, clusters };
 }
 
-export async function getScatterPlots(
+export interface CaprievalPlotlyProps {
+  scatters: PlotlyProps;
+  boxes: PlotlyProps;
+}
+
+export function getPlotSelection(url: string) {
+  const params = new URL(url).searchParams;
+  const scatterSelection = params.get("ss") || "report";
+  const boxSelection = params.get("bs") || "report";
+  const ScatterSchema = picklist(
+    Object.keys(CAPRIEVAL_SCATTERPLOT_CHOICES) as [string, ...string[]]
+  );
+  const BoxSchema = picklist(
+    Object.keys(CAPRIEVAL_BOXPLOT_CHOICES) as [string, ...string[]]
+  );
+  // TODO present nice error message
+  return {
+    scatterSelection: parse(ScatterSchema, scatterSelection),
+    boxSelection: parse(BoxSchema, boxSelection),
+  };
+}
+
+export async function getCaprievalPlots(
+  jobid: number,
+  module: number,
+  interactivness: number,
+  bartenderToken: string,
+  moduleIndexPadding: number,
+  scatterSelection: string,
+  boxSelection: string,
+  moduleName: string = "caprieval"
+): Promise<CaprievalPlotlyProps> {
+  const shtml = await getReportHtml(
+    jobid,
+    module,
+    interactivness,
+    bartenderToken,
+    moduleIndexPadding,
+    moduleName,
+    `${scatterSelection}.html`
+  );
+  const scatters = await getPlotFromHtml(shtml, 1);
+  let bhtml: CheerioAPI;
+  if (scatterSelection === "report" && boxSelection === "report") {
+    // if both are report, we can reuse the html
+    bhtml = shtml;
+  } else {
+    bhtml = await getReportHtml(
+      jobid,
+      module,
+      interactivness,
+      bartenderToken,
+      moduleIndexPadding,
+      moduleName,
+      `${boxSelection}.html`
+    );
+  }
+  // plot id is always 1 for non-report plot as html file contains just one plot
+  let bplotId = boxSelection === "report" ? 2 : 1;
+  const boxes = await getPlotFromHtml(bhtml, bplotId);
+  return { scatters, boxes };
+}
+
+export async function getReportHtml(
   jobid: number,
   module: number,
   interactivness: number,
   bartenderToken: string,
   moduleIndexPadding: number,
   moduleName = "caprieval",
-  htmlFilename = "report.html",
-  plotId = 1,
+  htmlFilename = "report.html"
 ) {
-const prefix = buildAnalyisPath({
+  const prefix = buildAnalyisPath({
     moduleIndex: module,
     moduleName,
     interactivness,
@@ -98,12 +164,14 @@ const prefix = buildAnalyisPath({
     `${prefix}${htmlFilename}`,
     bartenderToken
   );
-  const html = await response.text()
-  const scriptTag = load(html)(`script#data${plotId}`)
-  const dataAsString = scriptTag.text()
-  return JSON.parse(dataAsString) as {
-    data: Data[], layout: Layout
-  }
+  const html = await response.text();
+  return load(html);
+}
+
+export async function getPlotFromHtml(cheerioApi: CheerioAPI, plotId = 1) {
+  const a = cheerioApi(`script#data${plotId}`);
+  const dataAsString = a.text();
+  return JSON.parse(dataAsString) as PlotlyProps;
 }
 
 export interface CaprievalStructureRow {

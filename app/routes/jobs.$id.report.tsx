@@ -9,7 +9,13 @@ import { ClientOnly } from "~/components/ClientOnly";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
 // TODO rescore is not used here, so imports should not be from this module
 // move to a separate module called ~/model/modules and ~/models/caprieval
-import { step2rescoreModule, getScores } from "~/tools/rescore.server";
+import type { CaprievalPlotlyProps } from "~/tools/rescore.server";
+import {
+  step2rescoreModule,
+  getScores,
+  getCaprievalPlots,
+  getPlotSelection,
+} from "~/tools/rescore.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
@@ -19,19 +25,22 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     throw new Error("Job is not completed");
   }
   try {
-    const [module, maxInteractivness, pad] = await step2rescoreModule(
-      jobId,
-      token
-    );
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [module, _, pad] = await step2rescoreModule(jobId, token);
     // const [module, maxInteractivness] = [5,0]
-    const scores = await getScores(
+    const scores = await getScores(jobId, module, 0, token, pad);
+
+    const { scatterSelection, boxSelection } = getPlotSelection(request.url);
+    const plotlyPlots = await getCaprievalPlots(
       jobId,
       module,
-      maxInteractivness,
+      0,
       token,
-      pad
+      pad,
+      scatterSelection,
+      boxSelection
     );
-    return json({ job, scores });
+    return json({ job, scores, plotlyPlots });
   } catch (error) {
     if (
       error instanceof Error &&
@@ -44,8 +53,9 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 };
 
 export default function RescorePage() {
-  const { job, scores } = useLoaderData<typeof loader>();
-
+  const { job, scores, plotlyPlots } = useLoaderData<typeof loader>();
+  // Strip SerializeObject<UndefinedToOptional wrapper
+  const plotlyPlotsStripped = plotlyPlots as CaprievalPlotlyProps;
   return (
     <>
       <div className="flex flex-row justify-between pb-4">
@@ -75,7 +85,13 @@ export default function RescorePage() {
         </div>
       </div>
       <ClientOnly fallback={<p>Loading...</p>}>
-        {() => <CaprievalReport scores={scores} prefix="files/output/" />}
+        {() => (
+          <CaprievalReport
+            scores={scores}
+            prefix="files/output/"
+            plotlyPlots={plotlyPlotsStripped}
+          />
+        )}
       </ClientOnly>
     </>
   );

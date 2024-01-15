@@ -935,6 +935,7 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": {
+          module_nr: number;
           clustrmsd_dir: string;
           /** @enum {string} */
           criterion: "maxclust" | "distance";
@@ -977,6 +978,7 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": {
+          module_nr: number;
           clustfcc_dir: string;
           clust_cutoff: number;
           strictness: number;

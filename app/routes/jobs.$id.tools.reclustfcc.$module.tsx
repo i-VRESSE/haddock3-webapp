@@ -7,16 +7,26 @@ import { flatten, safeParse } from "valibot";
 import { getBartenderToken } from "~/bartender_token.server";
 import { ErrorMessages } from "~/components/ErrorMessages";
 import { ToolHistory } from "~/components/ToolHistory";
-import { jobIdFromParams, getJobById, buildPath } from "~/models/job.server";
+import {
+  jobIdFromParams,
+  getJobById,
+  buildPath,
+  listOutputFiles,
+} from "~/models/job.server";
 import {
   Schema,
   getClusters,
   getParams,
   reclustfcc,
 } from "~/tools/reclustfcc.server";
-import { moduleInfo } from "~/tools/shared";
+import { getPreviousCaprievalModule, moduleInfo } from "~/tools/shared";
 import { CompletedJobs } from "~/utils";
-import { getScores } from "~/tools/rescore.server";
+import type { CaprievalPlotlyProps } from "~/tools/rescore.server";
+import {
+  getCaprievalPlots,
+  getPlotSelection,
+  getScores,
+} from "~/tools/rescore.server";
 import { ClientOnly } from "~/components/ClientOnly";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
 import { ReWarning } from "~/components/ReWarning";
@@ -36,10 +46,10 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  const [moduleName, maxInteractivness, moduleIndexPadding] = await moduleInfo(
-    jobId,
-    moduleIndex,
-    token
+  const outputFiles = await listOutputFiles(jobId, token, 1);
+  const [moduleName, maxInteractivness, moduleIndexPadding] = moduleInfo(
+    outputFiles,
+    moduleIndex
   );
   const i = new URL(request.url).searchParams.get("i");
   const interactivness = i === null ? maxInteractivness : parseInt(i);
@@ -57,20 +67,30 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     token,
     moduleIndexPadding
   );
-  let scores;
-  try {
-    scores = await getScores(
-      jobId,
-      moduleIndex,
-      interactivness,
-      token,
-      moduleIndexPadding,
-      "clustfcc"
-    );
-  } catch (error) {
-    // Scores where not found
-    scores = undefined;
-  }
+  const caprievalModuleIndex = getPreviousCaprievalModule(
+    outputFiles,
+    moduleIndex,
+    interactivness
+  );
+  const scores = await getScores(
+    jobId,
+    interactivness ? moduleIndex : caprievalModuleIndex,
+    interactivness,
+    token,
+    moduleIndexPadding,
+    interactivness ? "clustfcc" : "caprieval"
+  );
+  const { scatterSelection, boxSelection } = getPlotSelection(request.url);
+  const plotlyPlots = await getCaprievalPlots(
+    jobId,
+    interactivness ? moduleIndex : caprievalModuleIndex,
+    interactivness,
+    token,
+    moduleIndexPadding,
+    scatterSelection,
+    boxSelection,
+    interactivness ? "clustrmsd" : "caprieval"
+  );
 
   return json({
     moduleIndex,
@@ -80,6 +100,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     maxInteractivness,
     clusters,
     scores,
+    plotlyPlots,
   });
 };
 
@@ -98,14 +119,15 @@ export const action = async ({ request, params }: LoaderArgs) => {
     return json({ errors }, { status: 400 });
   }
   const clustfccParams = result.data;
-  const interactivness = await moduleInfo(jobId, moduleIndex, token);
+  const outputFiles = await listOutputFiles(jobId, token, 1);
+  const interactivness = moduleInfo(outputFiles, moduleIndex);
   const clustccDir = buildPath({
     moduleIndex,
     moduleName: "clustfcc",
     interactivness: 0,
     moduleIndexPadding: interactivness[2],
   });
-  await reclustfcc(jobId, clustccDir, clustfccParams, token);
+  await reclustfcc(jobId, moduleIndex, clustccDir, clustfccParams, token);
   return json({ errors: { nested: {} } });
 };
 
@@ -117,9 +139,11 @@ export default function ReclusterPage() {
     maxInteractivness,
     clusters,
     scores,
+    plotlyPlots,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-
+  // Strip SerializeObject<UndefinedToOptional wrapper
+  const plotlyPlotsStripped = plotlyPlots as CaprievalPlotlyProps;
   return (
     <>
       <Form method="post" action="?">
@@ -197,7 +221,11 @@ export default function ReclusterPage() {
             <summary>Capri evaluation</summary>
             <ClientOnly fallback={<p>Loading...</p>}>
               {() => (
-                <CaprievalReport scores={scores} prefix="../files/output/" />
+                <CaprievalReport
+                  scores={scores}
+                  prefix="../files/output/"
+                  plotlyPlots={plotlyPlotsStripped}
+                />
               )}
             </ClientOnly>
           </details>

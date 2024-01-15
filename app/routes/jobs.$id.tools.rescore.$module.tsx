@@ -2,19 +2,25 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { flatten, safeParse } from "valibot";
-import Plot from "react-plotly.js";
 
 import { getBartenderToken } from "~/bartender_token.server";
-import { jobIdFromParams, getJobById, buildPath } from "~/models/job.server";
+import {
+  jobIdFromParams,
+  getJobById,
+  buildPath,
+  listOutputFiles,
+} from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
 import { ClientOnly } from "~/components/ClientOnly";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
+import type { CaprievalPlotlyProps } from "~/tools/rescore.server";
 import {
   getWeights,
   getScores,
   WeightsSchema,
   rescore,
-  getScatterPlots,
+  getCaprievalPlots,
+  getPlotSelection,
 } from "~/tools/rescore.server";
 import { RescoreForm } from "~/tools/rescore";
 import { moduleInfo } from "~/tools/shared";
@@ -27,10 +33,10 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  const [moduleName, maxInteractivness, moduleIndexPadding] = await moduleInfo(
-    jobId,
-    moduleIndex,
-    token
+  const outputFiles = await listOutputFiles(jobId, token, 1);
+  const [moduleName, maxInteractivness, moduleIndexPadding] = moduleInfo(
+    outputFiles,
+    moduleIndex
   );
   const i = new URL(request.url).searchParams.get("i");
   const interactivness = i === null ? maxInteractivness : parseInt(i);
@@ -49,15 +55,23 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     moduleIndexPadding,
     moduleName
   );
-  const plotlyScatterPlots = await getScatterPlots(jobId, moduleIndex, 
-    interactivness, token, moduleIndexPadding, moduleName);
+  const { scatterSelection, boxSelection } = getPlotSelection(request.url);
+  const plotlyPlots = await getCaprievalPlots(
+    jobId,
+    moduleIndex,
+    interactivness,
+    token,
+    moduleIndexPadding,
+    scatterSelection,
+    boxSelection
+  );
   return json({
     moduleIndex,
     weights,
     scores,
     interactivness,
     maxInteractivness,
-    plotlyScatterPlots,
+    plotlyPlots,
   });
 };
 
@@ -76,10 +90,10 @@ export const action = async ({ request, params }: LoaderArgs) => {
     return json({ errors }, { status: 400 });
   }
   const weights = result.data;
-  const [moduleName, maxInteractivness, moduleIndexPadding] = await moduleInfo(
-    jobId,
-    moduleIndex,
-    token
+  const outputFiles = await listOutputFiles(jobId, token, 1);
+  const [moduleName, maxInteractivness, moduleIndexPadding] = moduleInfo(
+    outputFiles,
+    moduleIndex
   );
   const i = new URL(request.url).searchParams.get("i");
   const interactivness = i === null ? maxInteractivness : parseInt(i);
@@ -94,9 +108,17 @@ export const action = async ({ request, params }: LoaderArgs) => {
 };
 
 export default function RescorePage() {
-  const { moduleIndex, weights, scores, interactivness, maxInteractivness, plotlyScatterPlots } =
-    useLoaderData<typeof loader>();
+  const {
+    moduleIndex,
+    weights,
+    scores,
+    interactivness,
+    maxInteractivness,
+    plotlyPlots,
+  } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+  // Strip SerializeObject<UndefinedToOptional wrapper
+  const plotlyPlotsStripped = plotlyPlots as CaprievalPlotlyProps;
   return (
     <>
       <RescoreForm
@@ -107,12 +129,16 @@ export default function RescorePage() {
         errors={actionData?.errors}
       />
       <ClientOnly fallback={<p>Loading...</p>}>
-        {() => <>
-          <CaprievalReport scores={scores} prefix="../files/output/" plotlyScatterPlots={plotlyScatterPlots}/>
-        </>
-        }
+        {() => (
+          <>
+            <CaprievalReport
+              scores={scores}
+              prefix="../files/output/"
+              plotlyPlots={plotlyPlotsStripped}
+            />
+          </>
+        )}
       </ClientOnly>
-
     </>
   );
 }

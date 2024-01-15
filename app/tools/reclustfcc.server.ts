@@ -62,12 +62,14 @@ export async function getClusters(
 
 export async function reclustfcc(
   jobid: number,
+  moduleIndex: number,
   clustfccDir: string,
   params: Schema,
   bartenderToken: string
 ) {
   const body = {
     clustfcc_dir: clustfccDir,
+    module_nr: moduleIndex,
     ...params,
   };
   // Second submit fails with  No such file or directory: 'output/09_clustfcc_interactive/io.json'\n

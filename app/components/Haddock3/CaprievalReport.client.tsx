@@ -7,12 +7,13 @@ import type {
 import { useMemo } from "react";
 import type {
   CaprievalClusterRow,
+  CaprievalPlotlyProps,
   CaprievalStructureRow,
 } from "~/tools/rescore.server";
+
 import { ScatterPlots } from "./ScatterPlots";
-import Plot from "react-plotly.js";
+import { useSearchParams } from "@remix-run/react";
 import { BoxPlots } from "./BoxPlots";
-import type { Data, Layout } from "plotly.js";
 
 /*
   Component has to be client only due 
@@ -27,10 +28,7 @@ export interface Scores {
 interface CaprievalReportProps {
   scores: Scores;
   prefix: string;
-  plotlyScatterPlots: {
-    data: Data[]
-    layout: Layout
-  };
+  plotlyPlots: CaprievalPlotlyProps;
 }
 
 const MAX_BEST = 3;
@@ -116,7 +114,7 @@ export function scores2clusters(
         .slice(0, MAX_BEST)
         .map((s, i) => {
           const index = i + 1;
-          const path = s.model!.toString().replace("../", prefix);
+          const path = s.model!.toString().replace("../", prefix) + ".gz";
           return [
             `Nr ${index
               .toString()
@@ -140,19 +138,49 @@ export function scores2clusters(
   return Object.fromEntries(result);
 }
 
-export const CaprievalReport = ({ scores, prefix, plotlyScatterPlots }: CaprievalReportProps) => {
+export const CaprievalReport = ({
+  scores,
+  prefix,
+  plotlyPlots,
+}: CaprievalReportProps) => {
+  const { scatters, boxes } = plotlyPlots;
   const clusters = useMemo(
     () => scores2clusters(scores, prefix),
     [scores, prefix]
   );
+  const [searchParams, setSearchParams] = useSearchParams();
+
   return (
     <div className="flex flex-col gap-4">
       <ClusterTable headers={headers} clusters={clusters} maxbest={MAX_BEST} />
-      {/* <ScatterPlots scores={scores} /> */}
-      <Plot data={plotlyScatterPlots.data} layout={plotlyScatterPlots.layout} config={{
-          responsive: true,
-        }}/>
-      <BoxPlots scores={scores} />
+      <ScatterPlots
+        data={scatters.data}
+        layout={scatters.layout}
+        selected={searchParams.get("ss") ?? "report"}
+        onChange={(s) =>
+          setSearchParams(
+            (prev) => {
+              prev.set("ss", s);
+              return prev;
+            },
+            { preventScrollReset: true }
+          )
+        }
+      />
+      <BoxPlots
+        data={boxes.data}
+        layout={boxes.layout}
+        selected={searchParams.get("bs") ?? "report"}
+        onChange={(s) =>
+          setSearchParams(
+            (prev) => {
+              prev.set("bs", s);
+              return prev;
+            },
+            { preventScrollReset: true }
+          )
+        }
+      />
     </div>
   );
 };

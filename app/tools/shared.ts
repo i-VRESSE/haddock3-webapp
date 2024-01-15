@@ -1,5 +1,5 @@
 import type { components } from "~/bartender-client/bartenderschema";
-import { getModuleIndexPadding, listOutputFiles } from "~/models/job.server";
+import { getModuleIndexPadding } from "~/models/job.server";
 
 type DirectoryItem = components["schemas"]["DirectoryItem"];
 
@@ -65,17 +65,37 @@ export function removeEmptyLines(body: string) {
  * @returns [moduleName, interactivness, moduleIndexPadding]
  */
 
-export async function moduleInfo(
-  jobid: number,
-  moduleIndex: number,
-  bartenderToken: string
-): Promise<[string, number, number]> {
-  const files = await listOutputFiles(jobid, bartenderToken, 1);
+export function moduleInfo(
+  files: DirectoryItem,
+  moduleIndex: number
+): [string, number, number] {
   const moduleName = nameOfModule(moduleIndex, files);
   const pad = getModuleIndexPadding(files);
   const interactivness = interactivenessOfModule(moduleIndex, files);
   return [moduleName, interactivness, pad];
 }
+
+export function getPreviousCaprievalModule(
+  files: DirectoryItem,
+  moduleIndex: number,
+  interactivness: number
+): number {
+  const moduleName = moduleInfo(files, moduleIndex)[0];
+  if (interactivness !== 0 || moduleName === "caprieval") {
+    // - clustrmsd and clustrfcc use output of caprieval earlier in the workflow
+    // - caprieval has own output
+    // - re-* write caprieval output to *_interactive_* dir
+    return moduleIndex;
+  }
+  const modules = files.children?.slice(0, moduleIndex).reverse();
+  for (const module of modules || []) {
+    if (module.is_dir && module.name.endsWith("caprieval")) {
+      return parseInt(module.name.split("_")[0]);
+    }
+  }
+  throw new Error("No previous caprieval module found");
+}
+
 export function getLastCaprievalModule(files: DirectoryItem): number {
   if (!files.children) {
     throw new Error("No modules found");

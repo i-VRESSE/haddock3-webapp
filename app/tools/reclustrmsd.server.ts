@@ -74,12 +74,14 @@ export async function getClusters(
 
 export async function reclustrmsd(
   jobid: number,
+  moduleIndex: number,
   clustfccDir: string,
   params: Schema,
   bartenderToken: string
 ) {
   const body: any = {
     clustrmsd_dir: clustfccDir,
+    module_nr: moduleIndex,
     ...params,
   };
 

@@ -246,7 +246,7 @@ export function buildPath({
 // output/analysis/12_caprieval_analysis/report.html
 // output/analysis/12_caprieval_interactive_analysis/report.html
 export function buildAnalyisPath({
-  prefix = "output/analyis",
+  prefix = "output/analysis",
   moduleIndex,
   moduleName,
   interactivness = 0,
