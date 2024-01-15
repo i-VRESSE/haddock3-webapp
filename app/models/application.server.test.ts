@@ -75,6 +75,7 @@ molecules = ['hy3.pdb']
 run_dir = 'output'
 mode = 'local'
 postprocess = true
+clean = true
 `;
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
@@ -93,6 +94,7 @@ mode = 'hpc'
 run_dir = 'output'
 mode = 'local'
 postprocess = true
+clean = true
 `;
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
@@ -118,6 +120,7 @@ cns_exec = '/usr/bin/cns'
 run_dir = 'output'
 mode = 'local'
 postprocess = true
+clean = true
 `;
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
@@ -140,6 +143,7 @@ molecules = ['hy3.pdb']
 run_dir = 'output'
 mode = 'local'
 postprocess = true
+clean = true
 
 [seletop]
 

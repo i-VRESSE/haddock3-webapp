@@ -56,6 +56,7 @@ async function rewriteConfig(config_body: string) {
   table.run_dir = JOB_OUTPUT_DIR;
   table.mode = "local";
   table.postprocess = true;
+  table.clean = true;
   delete table.ncores;
   delete table.batch_type;
   delete table.queue;
