@@ -32,6 +32,16 @@ function descriptionsFromSchema(
   return descriptions;
 }
 
+/**
+ * Retrieves the descriptions of modules from the guru catalog based on the module name and whitelist.
+ *
+ * @param moduleName - The name of the module.
+ * If "global", the global schema will be used.
+ * @param whitelist - An array of strings representing the whitelist of descriptions to retrieve.
+ * If empty, all descriptions will be retrieved.
+ * @returns An array of descriptions from the schema.
+ * @throws Error if no schema is found for the specified module.
+ */
 export function getModuleDescriptions(moduleName: string, whitelist: string[]) {
   const catalog = guru as unknown as ICatalog;
   let schema: ICatalog["global"]["schema"] | undefined = undefined;
