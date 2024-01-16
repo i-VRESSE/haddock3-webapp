@@ -78,7 +78,7 @@
           "format": "uri-reference"
         },
         "ncores": {
-          "default": 8,
+          "default": 4,
           "title": "Number of CPU cores",
           "description": "Number of CPU cores to use for the CNS calculations. It is truncated to max available CPUs  minus 1.",
           "$comment": "Number of CPU cores to use for the CNS calculations. This will define the number of concurrent jobs being executed. Note that is truncated to the total number of available CPUs minus 1.",
@@ -97,11 +97,11 @@
           "default": "local",
           "title": "Mode of execution",
           "description": "Mode of execution of the jobs, either local or using a batch system.",
-          "$comment": "Mode of execution of the jobs, either local or using a batch system. Currently slurm and torque are supported. For the HPC mode the queue command must be specified in the queue parameter.",
+          "$comment": "Mode of execution of the jobs, either local or using a batch system. Currently slurm and torque are supported. For the batch mode the queue command must be specified in the queue parameter.",
           "type": "string",
           "minLength": 0,
           "maxLength": 20,
-          "enum": ["local", "hpc"]
+          "enum": ["local", "batch"]
         },
         "batch_type": {
           "default": "slurm",

@@ -8,7 +8,7 @@
     "catalogs:easy": "curl -L https://github.com/i-VRESSE/workflow-builder/raw/${WBTAG:=main}/packages/haddock3_catalog/public/catalog/haddock3.easy.yaml | npx js-yaml > app/catalogs/haddock3.easy.json",
     "catalogs:expert": "curl -L https://github.com/i-VRESSE/workflow-builder/raw/${WBTAG:=main}/packages/haddock3_catalog/public/catalog/haddock3.expert.yaml | npx js-yaml > app/catalogs/haddock3.expert.json",
     "catalogs:guru": "curl -L https://github.com/i-VRESSE/workflow-builder/raw/${WBTAG:=main}/packages/haddock3_catalog/public/catalog/haddock3.guru.yaml  | npx js-yaml > app/catalogs/haddock3.guru.json",
-    "catalogs": "npm run catalogs:easy && npm run catalogs:expert && npm run catalogs:guru",
+    "catalogs": "npm run catalogs:easy && npm run catalogs:expert && npm run catalogs:guru && npx prettier --write app/catalogs/*.json",
     "dev": "remix dev",
     "format": "prettier --write . '!postgres-data'",
     "generate-client": "node app/bartender-client/generate.mjs && npx prettier --write app/bartender-client/bartenderschema.d.ts",
