@@ -64,10 +64,12 @@ export default function RescorePage() {
   const { job, scores, plotlyPlots } = useLoaderData<typeof loader>();
   // Strip SerializeObject<UndefinedToOptional wrapper
   const plotlyPlotsStripped = plotlyPlots as CaprievalPlotlyProps;
+  const updatedOn = new Date(job.updated_on).toUTCString();
   return (
     <>
       <div className="flex flex-row justify-between pb-4">
         <div>{job.name}</div>
+        <div>Completed on {updatedOn}</div>
         <div className="flex flex-row gap-1">
           <a
             title="Browse"

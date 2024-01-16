@@ -15,9 +15,8 @@ export function JobStatus({ job }: Props) {
       <p>
         State: <b>{job.state}</b>
       </p>
-      {/* TODO nicer format datetime then iso8601 */}
-      <p>Created on: {job.created_on}</p>
-      <p>Updated on: {job.updated_on}</p>
+      <p>Created on: {new Date(job.created_on).toUTCString()}</p>
+      <p>Updated on: {new Date(job.updated_on).toUTCString()}</p>
       {CompletedJobs.has(job.state) && (
         <>
           <a href={`/jobs/${job.id}/zip`}>&#128230; Download archive</a>
