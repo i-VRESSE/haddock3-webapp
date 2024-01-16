@@ -117,7 +117,7 @@ export function scores2clusters(
           // webapp always performs clean which packs the models with gzip
           // but capri_ss.tsv is written before clean
           // so we need to correct the path as it is after clean
-          const path = s.model!.toString().replace("../", prefix) + '.gz';
+          const path = s.model!.toString().replace("../", prefix) + ".gz";
           return [
             `Nr ${index
               .toString()

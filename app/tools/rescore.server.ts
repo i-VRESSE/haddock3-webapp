@@ -110,7 +110,7 @@ export async function getCaprievalPlots(
   boxSelection: string,
   moduleName: string = "caprieval"
 ): Promise<CaprievalPlotlyProps> {
-  console.time('getReportHtml')
+  console.time("getReportHtml");
   const shtml = await getReportHtml(
     jobid,
     module,
@@ -120,8 +120,8 @@ export async function getCaprievalPlots(
     moduleName,
     `${scatterSelection}.html`
   );
-  console.timeEnd('getReportHtml')
-  console.time('getPlotFromHtml scatter')
+  console.timeEnd("getReportHtml");
+  console.time("getPlotFromHtml scatter");
   const scatters = getPlotFromHtml(shtml, 1);
   let bhtml: string;
   if (scatterSelection === "report" && boxSelection === "report") {
@@ -140,10 +140,10 @@ export async function getCaprievalPlots(
   }
   // plot id is always 1 for non-report plot as html file contains just one plot
   let bplotId = boxSelection === "report" ? 2 : 1;
-  console.timeEnd('getPlotFromHtml scatter')
-  console.time('getPlotFromHtml box')
+  console.timeEnd("getPlotFromHtml scatter");
+  console.time("getPlotFromHtml box");
   const boxes = getPlotFromHtml(bhtml, bplotId);
-  console.timeEnd('getPlotFromHtml box')
+  console.timeEnd("getPlotFromHtml box");
   return { scatters, boxes };
 }
 
@@ -177,7 +177,9 @@ export function getPlotFromHtml(html: string, plotId = 1) {
   // this is very fragile, but much faster then using a HTML parser
   // as order of attributes is not guaranteed
   // see commit meessage of this line for benchmark
-  const re = new RegExp(`<script id="data${plotId}" type="application\\/json">([\\s\\S]*?)<\\/script>`)
+  const re = new RegExp(
+    `<script id="data${plotId}" type="application\\/json">([\\s\\S]*?)<\\/script>`
+  );
   const a = html.match(re);
   const dataAsString = a![1].trim();
   return JSON.parse(dataAsString) as PlotlyProps;

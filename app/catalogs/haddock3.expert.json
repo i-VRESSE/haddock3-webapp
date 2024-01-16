@@ -101,10 +101,7 @@
           "type": "string",
           "minLength": 0,
           "maxLength": 20,
-          "enum": [
-            "local",
-            "hpc"
-          ]
+          "enum": ["local", "hpc"]
         },
         "batch_type": {
           "default": "slurm",
@@ -114,10 +111,7 @@
           "type": "string",
           "minLength": 0,
           "maxLength": 100,
-          "enum": [
-            "slurm",
-            "torque"
-          ]
+          "enum": ["slurm", "torque"]
         },
         "queue": {
           "title": "Queue name",
@@ -153,9 +147,7 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "run_dir"
-      ],
+      "required": ["run_dir"],
       "additionalProperties": false
     },
     "uiSchema": {
@@ -414,9 +406,7 @@
             "format": "chain"
           },
           "ligand_chains": {
-            "default": [
-              "B"
-            ],
+            "default": ["B"],
             "title": "Ligand ChainIDs",
             "description": "Ligand ChainIDs to be considered for the RMSD calculations.",
             "$comment": "Ligand ChainIDs to be considered for the RMSD calculations. This determines which chains will be treated as the ligand for the L-RMSD and for I-L-RMSD.",
@@ -436,14 +426,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 20,
-            "enum": [
-              "score",
-              "irmsd",
-              "lrmsd",
-              "ilrmsd",
-              "fnat",
-              "dockq"
-            ]
+            "enum": ["score", "irmsd", "lrmsd", "ilrmsd", "fnat", "dockq"]
           },
           "sort_ascending": {
             "default": true,
@@ -460,10 +443,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": [
-              "structure",
-              "sequence"
-            ]
+            "enum": ["structure", "sequence"]
           },
           "lovoalign_exec": {
             "title": "Location (path) of the LovoAlign executable",
@@ -627,10 +607,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": [
-              "distance",
-              "maxclust"
-            ]
+            "enum": ["distance", "maxclust"]
           },
           "linkage": {
             "default": "average",
@@ -801,10 +778,7 @@
             "type": "string",
             "minLength": 5,
             "maxLength": 30,
-            "enum": [
-              "ca-ca-dist",
-              "shortest-dist"
-            ]
+            "enum": ["ca-ca-dist", "shortest-dist"]
           }
         },
         "required": [],
@@ -989,12 +963,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": [
-              "none",
-              "all",
-              "alpha",
-              "alphabeta"
-            ]
+            "enum": ["none", "all", "alpha", "alphabeta"]
           },
           "error_dih": {
             "default": 10,
@@ -1951,10 +1920,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 4,
-            "enum": [
-              "cdie",
-              "rdie"
-            ]
+            "enum": ["cdie", "rdie"]
           },
           "epsilon": {
             "default": 1,
@@ -2899,10 +2865,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 4,
-            "enum": [
-              "cdie",
-              "rdie"
-            ]
+            "enum": ["cdie", "rdie"]
           },
           "epsilon": {
             "default": 1,
@@ -3297,12 +3260,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": [
-              "none",
-              "all",
-              "alpha",
-              "alphabeta"
-            ]
+            "enum": ["none", "all", "alpha", "alphabeta"]
           },
           "error_dih": {
             "default": 10,
@@ -4259,10 +4217,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 4,
-            "enum": [
-              "cdie",
-              "rdie"
-            ]
+            "enum": ["cdie", "rdie"]
           },
           "epsilon": {
             "default": 1,
@@ -5272,9 +5227,7 @@
             "format": "chain"
           },
           "ligand_chains": {
-            "default": [
-              "B"
-            ],
+            "default": ["B"],
             "title": "Ligand ChainIDs",
             "description": "Ligand ChainIDs to be considered for the IL-RMSD calculations.",
             "$comment": "Ligand ChainIDs to be considered for the IL-RMSD calculations. This determines which chains will be treated as the ligand for the IL-RMSD.",
@@ -5562,12 +5515,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": [
-              "none",
-              "all",
-              "alpha",
-              "alphabeta"
-            ]
+            "enum": ["none", "all", "alpha", "alphabeta"]
           },
           "error_dih": {
             "default": 10,
@@ -6524,10 +6472,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 4,
-            "enum": [
-              "cdie",
-              "rdie"
-            ]
+            "enum": ["cdie", "rdie"]
           },
           "epsilon": {
             "default": 1,
@@ -6571,10 +6516,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": [
-              "water",
-              "dmso"
-            ]
+            "enum": ["water", "dmso"]
           },
           "nemsteps": {
             "default": 200,
@@ -7528,12 +7470,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": [
-              "none",
-              "all",
-              "alpha",
-              "alphabeta"
-            ]
+            "enum": ["none", "all", "alpha", "alphabeta"]
           },
           "error_dih": {
             "default": 10,
@@ -7580,10 +7517,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 4,
-            "enum": [
-              "cdie",
-              "rdie"
-            ]
+            "enum": ["cdie", "rdie"]
           },
           "epsilon": {
             "default": 1,
@@ -7613,10 +7547,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": [
-              "water",
-              "dmso"
-            ]
+            "enum": ["water", "dmso"]
           },
           "nemsteps": {
             "default": 200,
@@ -8932,10 +8863,7 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 4,
-            "enum": [
-              "cdie",
-              "rdie"
-            ]
+            "enum": ["cdie", "rdie"]
           },
           "epsilon": {
             "default": 10,

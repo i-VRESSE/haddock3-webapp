@@ -20,23 +20,23 @@ import {
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
   const token = await getBartenderToken(request);
-  console.time('getJobById')
+  console.time("getJobById");
   const job = await getJobById(jobId, token);
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  console.timeEnd('getJobById')
+  console.timeEnd("getJobById");
 
   try {
-    console.time('step2rescoreModule')
+    console.time("step2rescoreModule");
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [module, _, pad] = await step2rescoreModule(jobId, token);
-    console.timeEnd('step2rescoreModule')
-    console.time('getScores')
+    console.timeEnd("step2rescoreModule");
+    console.time("getScores");
     // const [module, maxInteractivness] = [5,0]
     const scores = await getScores(jobId, module, 0, token, pad);
-    console.timeEnd('getScores')
-    console.time('getCaprievalPlots')
+    console.timeEnd("getScores");
+    console.time("getCaprievalPlots");
     const { scatterSelection, boxSelection } = getPlotSelection(request.url);
     const plotlyPlots = await getCaprievalPlots(
       jobId,
@@ -47,7 +47,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
       scatterSelection,
       boxSelection
     );
-    console.timeEnd('getCaprievalPlots')
+    console.timeEnd("getCaprievalPlots");
     return json({ job, scores, plotlyPlots });
   } catch (error) {
     if (

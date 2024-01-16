@@ -2,7 +2,7 @@ import { describe, test, expect } from "vitest";
 import type { components } from "~/bartender-client/bartenderschema";
 import { interactivenessOfModule, getLastCaprievalModule } from "./shared";
 import { buildPath } from "~/models/job.server";
-import fs from "node:fs"
+import fs from "node:fs";
 import { getPlotFromHtml } from "./rescore.server";
 
 type DirectoryItem = components["schemas"]["DirectoryItem"];
@@ -328,39 +328,29 @@ describe("buildPath()", () => {
   });
 });
 
-describe('getPlotFromHtml', () => {
-  test('should return the plotly data and layout', () => {
+describe("getPlotFromHtml", () => {
+  test("should return the plotly data and layout", () => {
     const expected = {
-      "data": [
+      data: [
         {
-          "x": [
-            1999,
-            2000,
-            2001,
-            2002
-          ],
-          "y": [
-            10,
-            15,
-            13,
-            17
-          ],
-          "type": "scatter"
-        }
-      ],
-      "layout": {
-        "title": "Sales Growth",
-        "xaxis": {
-          "title": "Year",
-          "showgrid": false,
-          "zeroline": false
+          x: [1999, 2000, 2001, 2002],
+          y: [10, 15, 13, 17],
+          type: "scatter",
         },
-        "yaxis": {
-          "title": "Percent",
-          "showline": false
-        }
-      }
-    }
+      ],
+      layout: {
+        title: "Sales Growth",
+        xaxis: {
+          title: "Year",
+          showgrid: false,
+          zeroline: false,
+        },
+        yaxis: {
+          title: "Percent",
+          showline: false,
+        },
+      },
+    };
     const input = `
     <div>
     <script type="text/javascript">window.PlotlyConfig = { MathJaxConfig: 'local' };</script>
@@ -383,9 +373,9 @@ describe('getPlotFromHtml', () => {
         }
     </script>
 </div>
-    `
+    `;
 
-    const p = getPlotFromHtml(input)
-    expect(p).toEqual(expected)
-  })
-})
+    const p = getPlotFromHtml(input);
+    expect(p).toEqual(expected);
+  });
+});
