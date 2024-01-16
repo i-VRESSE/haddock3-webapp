@@ -67,6 +67,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     token,
     moduleIndexPadding
   );
+  // TODO dont show caprieval if interactive app has not been run yet.
   const caprievalModuleIndex = getPreviousCaprievalModule(
     outputFiles,
     moduleIndex,
