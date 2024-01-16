@@ -7,15 +7,15 @@ import { jobIdFromParams, getJobById } from "~/models/job.server";
 import { CompletedJobs } from "~/utils";
 import { ClientOnly } from "~/components/ClientOnly";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
+import type { CaprievalPlotlyProps } from "~/models/caprieval.server";
+import {
+  getCaprievalModuleInfo,
+  getScores,
+  getPlotSelection,
+  getCaprievalPlots,
+} from "~/models/caprieval.server";
 // TODO rescore is not used here, so imports should not be from this module
 // move to a separate module called ~/model/modules and ~/models/caprieval
-import type { CaprievalPlotlyProps } from "~/tools/rescore.server";
-import {
-  step2rescoreModule,
-  getScores,
-  getCaprievalPlots,
-  getPlotSelection,
-} from "~/tools/rescore.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
@@ -27,7 +27,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [module, _, pad] = await step2rescoreModule(jobId, token);
+    const [module, _, pad] = await getCaprievalModuleInfo(jobId, token);
     // const [module, maxInteractivness] = [5,0]
     const scores = await getScores(jobId, module, 0, token, pad);
     const { scatterSelection, boxSelection } = getPlotSelection(request.url);

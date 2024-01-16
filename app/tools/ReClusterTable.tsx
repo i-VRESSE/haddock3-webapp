@@ -1,6 +1,6 @@
-import type { ClusterRow } from "./shared";
+import type { ClusterRow } from "./recluster.server";
 
-export function ClusterTable({ clusters }: { clusters: ClusterRow[] }) {
+export function ReClusterTable({ clusters }: { clusters: ClusterRow[] }) {
   // TODO add structure viewer with contacts (*.con file)
   return (
     <table className="table">

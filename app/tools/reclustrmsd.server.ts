@@ -3,7 +3,7 @@ import { object, coerce, number, optional, picklist } from "valibot";
 import { parse as parseTOML } from "@ltd/j-toml";
 
 import { buildPath, getJobfile } from "~/models/job.server";
-import { parseClusterTsv } from "./shared";
+import { parseClusterTsv } from "./recluster.server";
 import { createClient } from "~/models/config.server";
 
 export const Schema = object({

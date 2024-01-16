@@ -1,5 +1,5 @@
 import { buildPath, getJobfile } from "~/models/job.server";
-import { parseClusterTsv } from "./shared";
+import { parseClusterTsv } from "./recluster.server";
 import { object, number, coerce, finite, type Output } from "valibot";
 import { parse as parseTOML } from "@ltd/j-toml";
 import { createClient } from "~/models/config.server";

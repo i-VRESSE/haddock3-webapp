@@ -16,26 +16,27 @@ import { ErrorMessages } from "~/components/ErrorMessages";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
 import { ReWarning } from "~/components/ReWarning";
 import { ToolHistory } from "~/components/ToolHistory";
+import type { CaprievalPlotlyProps } from "~/models/caprieval.server";
+import {
+  getScores,
+  getPlotSelection,
+  getCaprievalPlots,
+} from "~/models/caprieval.server";
 import {
   jobIdFromParams,
   getJobById,
   buildPath,
   listOutputFiles,
 } from "~/models/job.server";
-import { ClusterTable } from "~/tools/reclust";
+import { moduleInfo } from "~/models/module_utils";
+import { ReClusterTable } from "~/tools/ReClusterTable";
 import {
   Schema,
   getClusters,
   getParams,
   reclustrmsd,
 } from "~/tools/reclustrmsd.server";
-import type { CaprievalPlotlyProps } from "~/tools/rescore.server";
-import {
-  getCaprievalPlots,
-  getPlotSelection,
-  getScores,
-} from "~/tools/rescore.server";
-import { getPreviousCaprievalModule, moduleInfo } from "~/tools/shared";
+
 import { CompletedJobs } from "~/utils";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
@@ -67,32 +68,29 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     token,
     moduleIndexPadding
   );
-  // TODO dont show caprieval if interactive app has not been run yet.
-  const caprievalModuleIndex = getPreviousCaprievalModule(
-    outputFiles,
-    moduleIndex,
-    interactivness
-  );
-  const scores = await getScores(
-    jobId,
-    interactivness ? moduleIndex : caprievalModuleIndex,
-    interactivness,
-    token,
-    moduleIndexPadding,
-    interactivness ? "clustrmsd" : "caprieval"
-  );
-  const { scatterSelection, boxSelection } = getPlotSelection(request.url);
-  const plotlyPlots = await getCaprievalPlots(
-    jobId,
-    interactivness ? moduleIndex : caprievalModuleIndex,
-    interactivness,
-    token,
-    moduleIndexPadding,
-    scatterSelection,
-    boxSelection,
-    interactivness ? "clustrmsd" : "caprieval"
-  );
-
+  let scores;
+  let plotlyPlots;
+  if (interactivness > 0) {
+    scores = await getScores(
+      jobId,
+      moduleIndex,
+      interactivness,
+      token,
+      moduleIndexPadding,
+      "clustrmsd"
+    );
+    const { scatterSelection, boxSelection } = getPlotSelection(request.url);
+    plotlyPlots = await getCaprievalPlots(
+      jobId,
+      moduleIndex,
+      interactivness,
+      token,
+      moduleIndexPadding,
+      scatterSelection,
+      boxSelection,
+      "clustrmsd"
+    );
+  }
   return json({
     moduleIndex,
     moduleName,
@@ -150,7 +148,7 @@ export default function ReclusterPage() {
     plotlyPlots,
   } = useLoaderData<typeof loader>();
   // Strip SerializeObject<UndefinedToOptional wrapper
-  const plotlyPlotsStripped = plotlyPlots as CaprievalPlotlyProps;
+  const plotlyPlotsStripped = plotlyPlots as CaprievalPlotlyProps | undefined;
   const actionData = useActionData<typeof action>();
   const [criterion, setCriterion] = useState(defaultValues.criterion);
   const handleCriterionChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -279,9 +277,9 @@ export default function ReclusterPage() {
       <div>
         <details open={true}>
           <summary>Clusters</summary>
-          <ClusterTable clusters={clusters} />
+          <ReClusterTable clusters={clusters} />
         </details>
-        {scores && (
+        {scores && plotlyPlotsStripped && (
           <details open={true}>
             <summary>Capri evaluation</summary>
             <ClientOnly fallback={<p>Loading...</p>}>

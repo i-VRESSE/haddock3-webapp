@@ -5,15 +5,15 @@ import type {
   ClusterID,
 } from "@i-vresse/haddock3-analysis-components/dist/components/ClusterTable";
 import { useMemo } from "react";
-import type {
-  CaprievalClusterRow,
-  CaprievalPlotlyProps,
-  CaprievalStructureRow,
-} from "~/tools/rescore.server";
 
 import { ScatterPlots } from "./ScatterPlots";
 import { useSearchParams } from "@remix-run/react";
 import { BoxPlots } from "./BoxPlots";
+import type {
+  CaprievalClusterRow,
+  CaprievalPlotlyProps,
+  CaprievalStructureRow,
+} from "~/models/caprieval.server";
 
 /*
   Component has to be client only due 

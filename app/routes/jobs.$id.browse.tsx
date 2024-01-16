@@ -12,7 +12,7 @@ import { OutputReport } from "~/components/OutputReport";
 import { ListFiles } from "~/components/ListFiles";
 import { JobStatus } from "~/components/JobStatus";
 import { NonModuleOutputFiles } from "~/components/NonModuleOutputFiles";
-import { getLastCaprievalModule } from "~/tools/shared";
+import { getLastCaprievalModule } from "~/models/caprieval.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);

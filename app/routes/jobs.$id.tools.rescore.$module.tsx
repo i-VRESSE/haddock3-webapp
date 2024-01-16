@@ -13,17 +13,17 @@ import {
 import { CompletedJobs } from "~/utils";
 import { ClientOnly } from "~/components/ClientOnly";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
-import type { CaprievalPlotlyProps } from "~/tools/rescore.server";
+import { RescoreForm } from "~/tools/rescore";
+import type { CaprievalPlotlyProps } from "~/models/caprieval.server";
 import {
   getWeights,
   getScores,
-  WeightsSchema,
-  rescore,
-  getCaprievalPlots,
   getPlotSelection,
-} from "~/tools/rescore.server";
-import { RescoreForm } from "~/tools/rescore";
-import { moduleInfo } from "~/tools/shared";
+  getCaprievalPlots,
+  WeightsSchema,
+} from "~/models/caprieval.server";
+import { rescore } from "~/tools/rescore.server";
+import { moduleInfo } from "~/models/module_utils";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
@@ -39,7 +39,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     moduleIndex
   );
   const i = new URL(request.url).searchParams.get("i");
-  const interactivness = i === null ? maxInteractivness : parseInt(i);
+  const interactivness = i === null ? maxInteractivness : !!i;
   const weights = await getWeights(
     jobId,
     moduleIndex,

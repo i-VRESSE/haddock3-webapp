@@ -1,8 +1,9 @@
 import { describe, test, expect } from "vitest";
-import { interactivenessOfModule, getLastCaprievalModule } from "./shared";
+import { getLastCaprievalModule, getPlotFromHtml } from "~/models/caprieval.server";
 import { buildPath } from "~/models/job.server";
-import { getPlotFromHtml } from "./rescore.server";
+
 import type { DirectoryItem } from "~/bartender-client/types";
+import { hasInteractiveVersion } from "~/models/module_utils";
 
 function outputFileWithoutInteractivness(): DirectoryItem {
   return {
@@ -135,7 +136,7 @@ function outputFileWithoutInteractivness(): DirectoryItem {
   };
 }
 
-function outputFileWtih3Interactivness(): DirectoryItem {
+function outputFileWithInteractivness(): DirectoryItem {
   return {
     name: "output",
     path: "output",
@@ -245,22 +246,11 @@ function outputFileWtih3Interactivness(): DirectoryItem {
         is_file: false,
       },
       {
-        name: "15_caprieval_interactive_interactive",
-        path: "output/15_caprieval_interactive_interactive",
-        is_dir: true,
-        is_file: false,
-      },
-      {
-        name: "15_caprieval_interactive_interactive_interactive",
-        path: "output/15_caprieval_interactive_interactive_interactive",
-        is_dir: true,
-        is_file: false,
-      },
-      {
         name: "analysis",
         path: "output/analysis",
         is_dir: true,
         is_file: false,
+        // has 15_caprieval_interactive_analysis as child
       },
       {
         name: "data",
@@ -293,12 +283,12 @@ describe("getLastCaprievalModule", () => {
   });
 });
 
-describe("interactivenessOfModule", () => {
+describe("hasInteractiveVersion", () => {
   test.each([
-    [outputFileWithoutInteractivness(), 0],
-    [outputFileWtih3Interactivness(), 3],
+    [outputFileWithoutInteractivness(), false],
+    [outputFileWithInteractivness(), true],
   ])("should return the number of interactive modules", (files, expected) => {
-    const result = interactivenessOfModule(15, files);
+    const result = hasInteractiveVersion(15, files);
     expect(result).toEqual(expected);
   });
 });

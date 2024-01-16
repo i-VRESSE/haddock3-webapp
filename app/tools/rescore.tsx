@@ -3,7 +3,7 @@ import type { FlatErrors } from "valibot";
 
 import { ErrorMessages } from "~/components/ErrorMessages";
 import { ToolHistory } from "../components/ToolHistory";
-import type { Weights } from "./rescore.server";
+import type { Weights } from "../models/caprieval.server";
 import { ReWarning } from "~/components/ReWarning";
 import { getModuleDescriptions } from "~/catalogs/descriptionsFromSchema";
 
