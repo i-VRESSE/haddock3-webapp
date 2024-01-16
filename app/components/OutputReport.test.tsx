@@ -1,9 +1,7 @@
 import { describe, it, expect } from "vitest";
 
-import type { components } from "../bartender-client/bartenderschema";
 import { files2modules } from "./OutputReport";
-
-type DirectoryItem = components["schemas"]["DirectoryItem"];
+import type { DirectoryItem } from "~/bartender-client/types";
 
 describe("files2modules", () => {
   it("should return empty array if no children", () => {

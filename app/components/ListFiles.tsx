@@ -1,6 +1,4 @@
-import type { components } from "../bartender-client/bartenderschema";
-
-type DirectoryItem = components["schemas"]["DirectoryItem"];
+import type { DirectoryItem } from "~/bartender-client/types";
 
 const ListItem = ({ jobid, item }: { jobid: number; item: DirectoryItem }) => {
   if (item.is_dir) {

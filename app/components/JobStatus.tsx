@@ -1,9 +1,7 @@
 import type { SerializeFrom } from "@remix-run/node";
 import { CompletedJobs } from "~/utils";
 import { ListLogFiles } from "./ListLogFiles";
-import type { components } from "../bartender-client/bartenderschema";
-
-type JobModelDTO = components["schemas"]["JobModelDTO"];
+import type { JobModelDTO } from "~/bartender-client/types";
 
 interface Props {
   job: SerializeFrom<JobModelDTO>;

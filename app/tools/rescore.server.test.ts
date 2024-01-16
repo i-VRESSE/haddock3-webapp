@@ -1,11 +1,8 @@
 import { describe, test, expect } from "vitest";
-import type { components } from "~/bartender-client/bartenderschema";
 import { interactivenessOfModule, getLastCaprievalModule } from "./shared";
 import { buildPath } from "~/models/job.server";
-import fs from "node:fs";
 import { getPlotFromHtml } from "./rescore.server";
-
-type DirectoryItem = components["schemas"]["DirectoryItem"];
+import type { DirectoryItem } from "~/bartender-client/types";
 
 function outputFileWithoutInteractivness(): DirectoryItem {
   return {

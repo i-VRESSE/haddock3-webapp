@@ -1,8 +1,6 @@
-import type { components } from "~/bartender-client/bartenderschema";
 import { describe, test, expect } from "vitest";
 import { getPreviousCaprievalModule } from "./shared";
-
-type DirectoryItem = components["schemas"]["DirectoryItem"];
+import type { DirectoryItem } from "~/bartender-client/types";
 
 describe("getPreviousCaprievalModule()", () => {
   test("should reutrn the previous caprieval module", () => {

@@ -1,7 +1,5 @@
-import type { components } from "~/bartender-client/bartenderschema";
+import type { DirectoryItem } from "~/bartender-client/types";
 import { getModuleIndexPadding } from "~/models/job.server";
-
-type DirectoryItem = components["schemas"]["DirectoryItem"];
 
 export function interactivenessOfModule(
   module: number,

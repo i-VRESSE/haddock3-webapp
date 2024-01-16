@@ -1,7 +1,7 @@
 import type { Params } from "@remix-run/react";
 import { createClient } from "./config.server";
-import type { components } from "../bartender-client/bartenderschema";
 import { JOB_OUTPUT_DIR } from "./constants";
+import type { DirectoryItem } from "~/bartender-client/types";
 
 const BOOK_KEEPING_FILES = [
   "stderr.txt",
@@ -208,8 +208,6 @@ export async function getSubDirectoryAsArchive(
   });
   return response;
 }
-
-type DirectoryItem = components["schemas"]["DirectoryItem"];
 
 export function getModuleIndexPadding(files: DirectoryItem) {
   if (!files.children) {
