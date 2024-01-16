@@ -131,7 +131,6 @@ export const action = async ({ request, params }: LoaderArgs) => {
   return json({ errors: { nested: {} } });
 };
 
-// TODO haddock3-re clustrmsd will get different args, adjust this
 const fieldDescriptions = getModuleDescriptions(`clustrmsd`, [
   "criterion",
   "n_clusters",

@@ -35,13 +35,13 @@ import {
 import { ClientOnly } from "~/components/ClientOnly";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
 import { ReWarning } from "~/components/ReWarning";
+import { getModuleDescriptions } from "~/catalogs/descriptionsFromSchema";
 
-// TODO use the descriptions once they are filled
-// const fieldDescriptions = getModuleDescriptions(`clustfcc`, [
-//   "fraction_cutoff",
-//   "strictness",
-//   "threshold",
-// ])
+const fieldDescriptions = getModuleDescriptions(`clustfcc`, [
+  "clust_cutoff",
+  "strictness",
+  "min_population",
+]);
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
@@ -160,10 +160,10 @@ export default function ReclusterPage() {
           when the weights changes */}
           <div
             key={"clust_cutoff" + defaultValues.clust_cutoff}
-            title="fraction of common contacts to not be considered a singleton model."
+            title={fieldDescriptions.clust_cutoff.longDescription}
           >
             <label htmlFor="fraction_cutoff" className="block">
-              Cluster cutoff
+              {fieldDescriptions.clust_cutoff.title}
             </label>
             <input
               type="text"
@@ -176,10 +176,10 @@ export default function ReclusterPage() {
           </div>
           <div
             key={"strictness" + defaultValues.strictness}
-            title="fraction of common contacts to be considered to be part of the same cluster"
+            title={fieldDescriptions.strictness.longDescription}
           >
             <label htmlFor="strictness" className="block">
-              Strictness
+              {fieldDescriptions.strictness.title}
             </label>
             <input
               type="text"
@@ -190,9 +190,12 @@ export default function ReclusterPage() {
             />
             <ErrorMessages path="strictness" errors={actionData?.errors} />
           </div>
-          <div key={"min_population" + defaultValues.min_population}>
+          <div
+            key={"min_population" + defaultValues.min_population}
+            title={fieldDescriptions.min_population.longDescription}
+          >
             <label htmlFor="threshold" className="block">
-              Minimum cluster population
+              {fieldDescriptions.min_population.title}
             </label>
             <input
               type="text"
