@@ -223,31 +223,7 @@ async function getStructureScores(
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
   const { tsvParse, autoType } = await import("d3-dsv");
-  const data = tsvParse(body, autoType) as any as CaprievalStructureRow[];
-  return await correctModelPaths(data, jobid, bartenderToken);
-}
-
-/**
- * webapp always performs clean which packs the models with gzip
- * but capri_ss.tsv is written before clean
- * so we need to correct the path as it is after clean
- *
- * @param data 
- * @param jobid 
- * @param bartenderToken 
- * @returns 
- */
-async function correctModelPaths(
-  data: CaprievalStructureRow[],
-  jobid: number,
-  bartenderToken: string
-) {
-  for (const row of data) {
-    if (!row.model.endsWith(".gz")) {
-      row.model = `${row.model}.gz`;
-    }
-  }
-  return data;
+  return tsvParse(body, autoType) as any as CaprievalStructureRow[];
 }
 
 export interface CaprievalClusterRow {
