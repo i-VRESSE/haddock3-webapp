@@ -2,7 +2,8 @@ import fs from "node:fs";
 import openapiTS, { astToString } from "openapi-typescript";
 import ts from "typescript";
 
-const mySchema = new URL("http://127.0.0.1:8000/api/openapi.json");
+const bartenderApiUrl = process.env["BARTENDER_API_URL"] || "http://localhost:8000";
+const mySchema = new URL(`${bartenderApiUrl}/api/openapi.json`);
 
 // Support for `format: binary` see
 // https://openapi-ts.pages.dev/node#example-blob-types
