@@ -94,7 +94,10 @@
           "type": "string",
           "minLength": 0,
           "maxLength": 20,
-          "enum": ["local", "hpc"]
+          "enum": [
+            "local",
+            "hpc"
+          ]
         },
         "batch_type": {
           "default": "slurm",
@@ -104,7 +107,10 @@
           "type": "string",
           "minLength": 0,
           "maxLength": 100,
-          "enum": ["slurm", "torque"]
+          "enum": [
+            "slurm",
+            "torque"
+          ]
         },
         "queue": {
           "title": "Queue name",
@@ -127,7 +133,7 @@
           "default": 1,
           "title": "Number of models to produce per job.",
           "description": "Multiple models can be calculated within one job",
-          "$comment": "The defins the number of models that will be generated within on job script. This allows to concatenate the generation of models into one script. In that way jobs might run longer in the batch system and reduce the load on the scheduler.",
+          "$comment": "This defines the number of models that will be generated within on job script. This allows to concatenate the generation of models into one script. In that way jobs might run longer in the batch system and reduce the load on the scheduler.",
           "type": "number",
           "maximum": 9999,
           "minimum": 1
@@ -140,7 +146,9 @@
           "type": "boolean"
         }
       },
-      "required": ["run_dir"],
+      "required": [
+        "run_dir"
+      ],
       "additionalProperties": false
     },
     "uiSchema": {
@@ -182,6 +190,111 @@
     "tomlSchema": {}
   },
   "nodes": [
+    {
+      "id": "alascan",
+      "category": "analysis",
+      "label": "HADDOCK3 module for alanine scan.",
+      "description": "HADDOCK3 module for alanine scan.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "int_cutoff": {
+            "default": 5,
+            "title": "Distance cutoff (Å) used to define interface contacts.",
+            "description": "Distance cutoff (Å) used to define interface contacts between two interacting molecules.",
+            "$comment": "Distance cutoff (Å) used to define interface contacts between two interacting molecules.",
+            "type": "number",
+            "maximum": 20,
+            "minimum": 1
+          },
+          "output": {
+            "default": false,
+            "title": "Dump all the models in the output folder",
+            "description": "Dump all the models in the output folder with the delta_score written in the b-factor column.",
+            "$comment": "Dump all the models in the output folder with the delta_score written in the b-factor column.",
+            "type": "boolean"
+          },
+          "scan_residue": {
+            "default": "ALA",
+            "title": "Residue to be used for the scanning",
+            "description": "Residue to be used for the scanning. The default is alanine.",
+            "$comment": "Residue to be used for the scanning. The default is alanine. Use bigger residues at your own risk.",
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3,
+            "enum": [
+              "ALA",
+              "ARG",
+              "ASN",
+              "ASP",
+              "CYS",
+              "GLN",
+              "GLU",
+              "GLY",
+              "HIS",
+              "ILE",
+              "LEU",
+              "LYS",
+              "MET",
+              "PHE",
+              "PRO",
+              "SER",
+              "THR",
+              "TRP",
+              "TYR",
+              "VAL",
+              "ALY",
+              "ASH",
+              "CFE",
+              "CSP",
+              "CYC",
+              "CYF",
+              "CYM",
+              "DDZ",
+              "GLH",
+              "HLY",
+              "HY3",
+              "HYP",
+              "M3L",
+              "MLY",
+              "MLZ",
+              "MSE",
+              "NEP",
+              "PNS",
+              "PTR",
+              "SEP",
+              "TOP",
+              "TYP",
+              "TYS"
+            ]
+          },
+          "plot": {
+            "default": false,
+            "title": "Plot scanning data.",
+            "description": "Plot scanning data.",
+            "$comment": "Plot scanning data.",
+            "type": "boolean"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "uiSchema": {
+        "int_cutoff": {
+          "ui:group": "analysis"
+        },
+        "output": {
+          "ui:group": "analysis"
+        },
+        "scan_residue": {
+          "ui:group": "analysis"
+        },
+        "plot": {
+          "ui:group": "analysis"
+        }
+      },
+      "tomlSchema": {}
+    },
     {
       "id": "caprieval",
       "category": "analysis",
@@ -261,7 +374,9 @@
             "format": "chain"
           },
           "ligand_chains": {
-            "default": ["B"],
+            "default": [
+              "B"
+            ],
             "title": "Ligand ChainIDs",
             "description": "Ligand ChainIDs to be considered for the RMSD calculations.",
             "$comment": "Ligand ChainIDs to be considered for the RMSD calculations. This determines which chains will be treated as the ligand for the L-RMSD and for I-L-RMSD.",
@@ -281,7 +396,14 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 20,
-            "enum": ["score", "irmsd", "lrmsd", "ilrmsd", "fnat", "dockq"]
+            "enum": [
+              "score",
+              "irmsd",
+              "lrmsd",
+              "ilrmsd",
+              "fnat",
+              "dockq"
+            ]
           },
           "sort_ascending": {
             "default": true,
@@ -298,7 +420,10 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["structure", "sequence"]
+            "enum": [
+              "structure",
+              "sequence"
+            ]
           },
           "lovoalign_exec": {
             "title": "Location (path) of the LovoAlign executable",
@@ -379,43 +504,47 @@
       "schema": {
         "type": "object",
         "properties": {
-          "executable": {
-            "type": "string",
-            "format": "uri-reference"
-          },
           "contact_distance_cutoff": {
             "default": 5,
+            "title": "Cutoff distance (A) for contact detection.",
+            "description": "Cutoff distance (A) for contact detection. By default 5.0 Angstroms.",
+            "$comment": "Cutoff distance between two atoms for contact detection. By default 5.0 Angstroms.",
             "type": "number",
-            "maximum": 9999,
-            "minimum": -9999
+            "maximum": 999.99,
+            "minimum": 2
           },
           "clust_cutoff": {
             "default": 0.6,
+            "title": "Minimum fraction of common contacts to be considered in a cluster.",
+            "description": "Minimum fraction of common contacts to be considered in a cluster. By default 0.6.",
+            "$comment": "Minimum fraction of common contacts (fcc) to cluster complexes together. Complexes not sharing fraction of common contacts above the `fraction_cutoff` parameter cannot belong to the same cluster.",
             "type": "number",
-            "maximum": 9999,
-            "minimum": -9999
+            "maximum": 1,
+            "minimum": 0
           },
           "min_population": {
             "default": 4,
+            "title": "Clustering population threshold.",
+            "description": "Threshold employed to exclude clusters with less than this number of members. By default 4.",
+            "$comment": "Minimum set of grouped complexes to define a cluster. If a potential cluster is composed of less than this number of members, it will be considered as `singleton` and discarded from final clusters. If set to 1, all complexes will be part of a cluster. By default 4.",
             "type": "number",
             "maximum": 9999,
-            "minimum": -9999
+            "minimum": 1
           },
           "strictness": {
             "default": 0.75,
+            "title": "Strictness factor.",
+            "description": "Strictness factor. It's multiplied by the fraction_cutoff to obtain a new cutoff for the second half of the matrix. By default 0.75.",
+            "$comment": "Strictness factor. It's multiplied by the fraction_cutoff to obtain a new cutoff for the second half of the matrix. Used to allow for some variability. By default 0.75.",
             "type": "number",
-            "maximum": 9999,
-            "minimum": -9999
+            "maximum": 1,
+            "minimum": 0
           }
         },
         "required": [],
         "additionalProperties": false
       },
       "uiSchema": {
-        "executable": {
-          "ui:widget": "file",
-          "ui:group": "analysis"
-        },
         "contact_distance_cutoff": {
           "ui:group": "analysis"
         },
@@ -441,9 +570,9 @@
         "properties": {
           "min_population": {
             "default": 4,
-            "title": "Minimum cluster population",
-            "description": "Threshold employed to exclude clusters with less than this number of members",
-            "$comment": "Threshold employed to exclude clusters with less than this number of members. When criterion is maxclust, this value is ignored.",
+            "title": "Clustering population threshold",
+            "description": "Threshold employed to exclude clusters with less than this number of members. By default 4.",
+            "$comment": "Threshold employed to exclude clusters with less than this number of members. By default 4. When criterion is maxclust, this value is ignored.",
             "type": "number",
             "maximum": 9999,
             "minimum": 1
@@ -478,6 +607,135 @@
           "ui:group": "analysis"
         },
         "n_clusters": {
+          "ui:group": "analysis"
+        }
+      },
+      "tomlSchema": {}
+    },
+    {
+      "id": "contactmap",
+      "category": "analysis",
+      "label": "Compute contacts and generate heatmaps.",
+      "description": "HADDOCK3 module to compute complexes contacts and generate heatmap.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "ca_ca_dist_threshold": {
+            "default": 9,
+            "title": "Ca-Ca distance defining a contact.",
+            "description": "Distance between Ca atoms of two residues defining a contact.",
+            "$comment": "Distance between Ca atoms of two residues defining a contact.",
+            "type": "number",
+            "maximum": 1000,
+            "minimum": 4
+          },
+          "shortest_dist_threshold": {
+            "default": 4.5,
+            "title": "Distance defining a contact between two residues.",
+            "description": "Shortest distance between any atom of two residues defining a contact.",
+            "$comment": "Shortest distance between any atom of two residues defining a contact.",
+            "type": "number",
+            "maximum": 1000,
+            "minimum": 2
+          },
+          "color_ramp": {
+            "default": "Greys",
+            "title": "Color ramp used to color heatmap.",
+            "description": "Color ramp used to color heatmap.",
+            "$comment": "Color ramp used to color heatmap. Please refer to `plotly builtin-colorscales` for more information",
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 10,
+            "enum": [
+              "Greys",
+              "Purples",
+              "BuPu",
+              "Blues",
+              "BuGn",
+              "Greens",
+              "deep",
+              "tempo",
+              "algae",
+              "dense",
+              "amp"
+            ]
+          },
+          "single_model_analysis": {
+            "default": false,
+            "title": "Analyse contacts at single model level.",
+            "description": "Analyse contacts at single model level.",
+            "$comment": "In addition to cluster analysis, also perform single model analyses.",
+            "type": "boolean"
+          },
+          "generate_heatmap": {
+            "default": true,
+            "title": "Generate contact heatmap.",
+            "description": "Generate plotly heatmap matrix representation of the contacts.",
+            "$comment": "Uses generated contact matrices files to generate heatmap.",
+            "type": "boolean"
+          },
+          "generate_chordchart": {
+            "default": true,
+            "title": "Generate chordchart.",
+            "description": "Generate plotly chordchart representation of the contacts.",
+            "$comment": "Uses generated contact matrices files to generate chord chart.",
+            "type": "boolean"
+          },
+          "cluster_heatmap_datatype": {
+            "default": "shortest-cont-ratio",
+            "title": "Type of data to be used in the heatmap.",
+            "description": "Type of data to be used in the heatmap.",
+            "$comment": "ca-ca-dist and shortest-dist are averages distances observed in cluster. While ca-ca-cont-ratio and shortest-cont-ratio are ratio of the distances to be observed under their respective thresholds.",
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 30,
+            "enum": [
+              "ca-ca-dist",
+              "ca-ca-cont-ratio",
+              "shortest-dist",
+              "shortest-cont-ratio"
+            ]
+          },
+          "chordchart_datatype": {
+            "default": "shortest-dist",
+            "title": "Type of data to be used in the chordchart.",
+            "description": "Type of data to be used in the chordchart.",
+            "$comment": "ca-ca-dist and shortest-dist are averages distances observed in cluster.",
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 30,
+            "enum": [
+              "ca-ca-dist",
+              "shortest-dist"
+            ]
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "uiSchema": {
+        "ca_ca_dist_threshold": {
+          "ui:group": "analysis"
+        },
+        "shortest_dist_threshold": {
+          "ui:group": "analysis"
+        },
+        "color_ramp": {
+          "ui:group": "analysis"
+        },
+        "single_model_analysis": {
+          "ui:group": "analysis"
+        },
+        "generate_heatmap": {
+          "ui:group": "analysis"
+        },
+        "generate_chordchart": {
+          "ui:group": "analysis"
+        },
+        "cluster_heatmap_datatype": {
+          "ui:group": "analysis"
+        },
+        "chordchart_datatype": {
           "ui:group": "analysis"
         }
       },
@@ -547,13 +805,19 @@
             "minimum": -9999
           },
           "ssdihed": {
+            "default": "none",
             "title": "Define automatically backbone dihedral angle restraints",
             "description": "If turned on, this option will automatically defined backbone dihedral angle restraints for the selected regions.",
             "$comment": "This option allows to utomatically defined backbone dihedral angle restraints for the selected regions. The restraints will be defined for the phi and psi backbone dihedral angles of amino acids, with the target value taken from the measured angle in the input structure, and the error bound defined by the error_dih parameter. Those restraints can be applied to the entire structure (all), the alpha/beta secondary structure elements (alphabeta) or only to the alpha helical regions (alpha). Those are automatically detected based on the measured dihedral angle combinations.",
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["all", "alpha", "alphabeta"]
+            "enum": [
+              "none",
+              "all",
+              "alpha",
+              "alphabeta"
+            ]
           },
           "error_dih": {
             "default": 10,
@@ -733,13 +997,19 @@
             "type": "boolean"
           },
           "ssdihed": {
+            "default": "none",
             "title": "Define automatically backbone dihedral angle restraints",
             "description": "If turned on, this option will automatically defined backbone dihedral angle restraints for the selected regions.",
             "$comment": "This option allows to utomatically defined backbone dihedral angle restraints for the selected regions. The restraints will be defined for the phi and psi backbone dihedral angles of amino acids, with the target value taken from the measured angle in the input structure, and the error bound defined by the error_dih parameter. Those restraints can be applied to the entire structure (all), the alpha/beta secondary structure elements (alphabeta) or only to the alpha helical regions (alpha). Those are automatically detected based on the measured dihedral angle combinations.",
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["all", "alpha", "alphabeta"]
+            "enum": [
+              "none",
+              "all",
+              "alpha",
+              "alphabeta"
+            ]
           },
           "error_dih": {
             "default": 10,
@@ -839,6 +1109,53 @@
       "uiSchema": {
         "ambig_fname": {
           "ui:widget": "file"
+        }
+      },
+      "tomlSchema": {}
+    },
+    {
+      "id": "ilrmsdmatrix",
+      "category": "analysis",
+      "label": "ilRMSD matrix module.",
+      "description": "HADDOCK3 module for clustering with RMSD.",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "receptor_chain": {
+            "default": "A",
+            "title": "Receptor ChainID",
+            "description": "Receptor ChainID to be considered for the RMSD calculations.",
+            "$comment": "Receptor ChainID to be considered for the RMSD calculations. This determines which chain will be treated as the receptor for the L-RMSD and for I-L-RMSD.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1,
+            "format": "chain"
+          },
+          "ligand_chains": {
+            "default": [
+              "B"
+            ],
+            "title": "Ligand ChainIDs",
+            "description": "Ligand ChainIDs to be considered for the IL-RMSD calculations.",
+            "$comment": "Ligand ChainIDs to be considered for the IL-RMSD calculations. This determines which chains will be treated as the ligand for the IL-RMSD.",
+            "type": "array",
+            "minItems": 0,
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "format": "chain"
+            }
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "uiSchema": {
+        "receptor_chain": {
+          "ui:group": "analysis"
+        },
+        "ligand_chains": {
+          "ui:group": "analysis"
         }
       },
       "tomlSchema": {}
@@ -989,13 +1306,19 @@
             "type": "boolean"
           },
           "ssdihed": {
+            "default": "none",
             "title": "Define automatically backbone dihedral angle restraints",
             "description": "If turned on, this option will automatically defined backbone dihedral angle restraints for the selected regions.",
             "$comment": "This option allows to utomatically defined backbone dihedral angle restraints for the selected regions. The restraints will be defined for the phi and psi backbone dihedral angles of amino acids, with the target value taken from the measured angle in the input structure, and the error bound defined by the error_dih parameter. Those restraints can be applied to the entire structure (all), the alpha/beta secondary structure elements (alphabeta) or only to the alpha helical regions (alpha). Those are automatically detected based on the measured dihedral angle combinations.",
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["all", "alpha", "alphabeta"]
+            "enum": [
+              "none",
+              "all",
+              "alpha",
+              "alphabeta"
+            ]
           },
           "error_dih": {
             "default": 10,
@@ -1028,7 +1351,10 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["water", "dmso"]
+            "enum": [
+              "water",
+              "dmso"
+            ]
           }
         },
         "required": [],
@@ -1086,13 +1412,19 @@
         "type": "object",
         "properties": {
           "ssdihed": {
+            "default": "none",
             "title": "Define automatically backbone dihedral angle restraints",
             "description": "If turned on, this option will automatically defined backbone dihedral angle restraints for the selected regions.",
             "$comment": "This option allows to utomatically defined backbone dihedral angle restraints for the selected regions. The restraints will be defined for the phi and psi backbone dihedral angles of amino acids, with the target value taken from the measured angle in the input structure, and the error bound defined by the error_dih parameter. Those restraints can be applied to the entire structure (all), the alpha/beta secondary structure elements (alphabeta) or only to the alpha helical regions (alpha). Those are automatically detected based on the measured dihedral angle combinations.",
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["all", "alpha", "alphabeta"]
+            "enum": [
+              "none",
+              "all",
+              "alpha",
+              "alphabeta"
+            ]
           },
           "error_dih": {
             "default": 10,
@@ -1125,7 +1457,10 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["water", "dmso"]
+            "enum": [
+              "water",
+              "dmso"
+            ]
           }
         },
         "required": [],
@@ -1305,15 +1640,22 @@
         "properties": {
           "select": {
             "default": 200,
+            "title": "Number of best-ranked models to select",
+            "description": "Number of best-ranked models to select for further steps of the workflow",
+            "$comment": "Number of best-ranked models to select for further steps of the workflow. Typically only 200 models produced at the rigid-body docking stage are selected for further refinement.",
             "type": "number",
-            "maximum": 9999,
-            "minimum": -9999
+            "maximum": 50000,
+            "minimum": 1
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "uiSchema": {},
+      "uiSchema": {
+        "select": {
+          "ui:group": "analysis"
+        }
+      },
       "tomlSchema": {}
     },
     {
@@ -1334,15 +1676,26 @@
             "minimum": 1
           },
           "top_models": {
+            "default": 10,
+            "title": "Number of best-ranked models to select per cluster",
+            "description": "Number of best-ranked models to select per cluster. By default, 10 models are selected.",
+            "$comment": "Number of best-ranked models to select per cluster. By default, 10 models are selected. If one expects to find many clusters (e.g., in the case of vague restraints), this number can be reduced to speed up the protocol. Instead, if few clusters are expected (very specific and localized restraints) this number can be increased.",
             "type": "number",
-            "maximum": 9999,
-            "minimum": -9999
+            "maximum": 99999,
+            "minimum": 1
           }
         },
         "required": [],
         "additionalProperties": false
       },
-      "uiSchema": {},
+      "uiSchema": {
+        "top_cluster": {
+          "ui:group": "analysis"
+        },
+        "top_models": {
+          "ui:group": "analysis"
+        }
+      },
       "tomlSchema": {}
     },
     {

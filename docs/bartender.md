@@ -73,3 +73,9 @@ To fetch the latest catalogs run
 ```shell
 npm run catalogs
 ```
+
+To fetch catalogs from another branch then `main` in the workflow builder repo use
+
+```shell
+WBTAG='someotherbranchname' npm run catalogs
+```
