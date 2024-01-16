@@ -12,7 +12,7 @@ export default defineConfig({
       ".*\\/postgres-data\\/.*",
     ],
     coverage: {
-      provider: "c8",
+      provider: "v8",
     },
   },
 });

@@ -11,11 +11,8 @@ import { interactivenessOfModule, getLastCaprievalModule } from "./shared";
 import {
   CAPRIEVAL_BOXPLOT_CHOICES,
   CAPRIEVAL_SCATTERPLOT_CHOICES,
-  JOB_OUTPUT_DIR,
 } from "~/models/constants";
 import { createClient } from "~/models/config.server";
-import type { CheerioAPI } from "cheerio";
-import { load } from "cheerio";
 import type { PlotlyProps } from "~/components/PlotlyPlot";
 
 export const WeightsSchema = object({
@@ -113,6 +110,7 @@ export async function getCaprievalPlots(
   boxSelection: string,
   moduleName: string = "caprieval"
 ): Promise<CaprievalPlotlyProps> {
+  console.time('getReportHtml')
   const shtml = await getReportHtml(
     jobid,
     module,
@@ -122,8 +120,10 @@ export async function getCaprievalPlots(
     moduleName,
     `${scatterSelection}.html`
   );
-  const scatters = await getPlotFromHtml(shtml, 1);
-  let bhtml: CheerioAPI;
+  console.timeEnd('getReportHtml')
+  console.time('getPlotFromHtml scatter')
+  const scatters = getPlotFromHtml(shtml, 1);
+  let bhtml: string;
   if (scatterSelection === "report" && boxSelection === "report") {
     // if both are report, we can reuse the html
     bhtml = shtml;
@@ -140,7 +140,10 @@ export async function getCaprievalPlots(
   }
   // plot id is always 1 for non-report plot as html file contains just one plot
   let bplotId = boxSelection === "report" ? 2 : 1;
-  const boxes = await getPlotFromHtml(bhtml, bplotId);
+  console.timeEnd('getPlotFromHtml scatter')
+  console.time('getPlotFromHtml box')
+  const boxes = getPlotFromHtml(bhtml, bplotId);
+  console.timeEnd('getPlotFromHtml box')
   return { scatters, boxes };
 }
 
@@ -164,13 +167,19 @@ export async function getReportHtml(
     `${prefix}${htmlFilename}`,
     bartenderToken
   );
-  const html = await response.text();
-  return load(html);
+  if (!response.ok) {
+    throw new Error(`could not get ${htmlFilename}`);
+  }
+  return await response.text();
 }
 
-export async function getPlotFromHtml(cheerioApi: CheerioAPI, plotId = 1) {
-  const a = cheerioApi(`script#data${plotId}`);
-  const dataAsString = a.text();
+export function getPlotFromHtml(html: string, plotId = 1) {
+  // this is very fragile, but much faster then using a HTML parser
+  // as order of attributes is not guaranteed
+  // see commit meessage of this line for benchmark
+  const re = new RegExp(`<script id="data${plotId}" type="application\\/json">([\\s\\S]*?)<\\/script>`)
+  const a = html.match(re);
+  const dataAsString = a![1].trim();
   return JSON.parse(dataAsString) as PlotlyProps;
 }
 
@@ -215,32 +224,30 @@ async function getStructureScores(
   const body = await response.text();
   const { tsvParse, autoType } = await import("d3-dsv");
   const data = tsvParse(body, autoType) as any as CaprievalStructureRow[];
-  return await correctPaths(data, jobid, bartenderToken);
+  return await correctModelPaths(data, jobid, bartenderToken);
 }
 
-function isString(x: any): string {
-  if (typeof x === "string") {
-    return x;
-  }
-  throw new Error("Expected string");
-}
-
-async function correctPaths(
+/**
+ * webapp always performs clean which packs the models with gzip
+ * but capri_ss.tsv is written before clean
+ * so we need to correct the path as it is after clean
+ *
+ * @param data 
+ * @param jobid 
+ * @param bartenderToken 
+ * @returns 
+ */
+async function correctModelPaths(
   data: CaprievalStructureRow[],
   jobid: number,
   bartenderToken: string
 ) {
-  const path = isString(data[0].model).replace("..", JOB_OUTPUT_DIR);
-  try {
-    await getJobfile(jobid, path, bartenderToken);
-    return data;
-  } catch (e) {
-    // When the model is not found, it is probably gzipped
-    for (const row of data) {
+  for (const row of data) {
+    if (!row.model.endsWith(".gz")) {
       row.model = `${row.model}.gz`;
     }
-    return data;
   }
+  return data;
 }
 
 export interface CaprievalClusterRow {
