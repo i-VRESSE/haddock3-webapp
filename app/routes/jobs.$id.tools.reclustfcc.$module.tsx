@@ -10,7 +10,6 @@ import { flatten, safeParse } from "valibot";
 
 import { getBartenderToken } from "~/bartender_token.server";
 import { ErrorMessages } from "~/components/ErrorMessages";
-import { ToolHistory } from "~/components/ToolHistory";
 import {
   jobIdFromParams,
   getJobById,
@@ -35,7 +34,8 @@ import {
   getCaprievalPlots,
 } from "~/models/caprieval.server";
 import { moduleInfo } from "~/models/module_utils";
-import { ReClusterTable } from "~/tools/ReClusterTable";
+import { ToolHistory } from "~/components/tools/ToolHistory";
+import { ReClusterTable } from "~/components/tools/ReClusterTable";
 
 const fieldDescriptions = getModuleDescriptions(`clustfcc`, [
   "clust_cutoff",

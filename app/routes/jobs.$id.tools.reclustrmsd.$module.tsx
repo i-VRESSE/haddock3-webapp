@@ -15,7 +15,8 @@ import { ClientOnly } from "~/components/ClientOnly";
 import { ErrorMessages } from "~/components/ErrorMessages";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
 import { ReWarning } from "~/components/ReWarning";
-import { ToolHistory } from "~/components/ToolHistory";
+import { ReClusterTable } from "~/components/tools/ReClusterTable";
+import { ToolHistory } from "~/components/tools/ToolHistory";
 import type { CaprievalPlotlyProps } from "~/models/caprieval.server";
 import {
   getScores,
@@ -29,7 +30,6 @@ import {
   listOutputFiles,
 } from "~/models/job.server";
 import { moduleInfo } from "~/models/module_utils";
-import { ReClusterTable } from "~/tools/ReClusterTable";
 import {
   Schema,
   getClusters,

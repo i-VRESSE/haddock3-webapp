@@ -9,13 +9,13 @@ export function ToolHistory({
 }) {
   return (
     <div className="block">
-      <Link to="?i=0" className={showInteractiveVersion ? "font-bold" : ""}>
+      <Link to="?i=0" className={showInteractiveVersion ? "": "font-bold"}>
         Original
       </Link>
       {hasInteractiveVersion && (
         <>
           {" "}
-          <Link to="?i=1" className={showInteractiveVersion ? "" : "font-bold"}>
+          <Link to="?i=1" className={showInteractiveVersion ? "font-bold" : ""}>
             Re-computed
           </Link>
         </>

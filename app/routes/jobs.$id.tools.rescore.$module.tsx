@@ -13,7 +13,6 @@ import {
 import { CompletedJobs } from "~/utils";
 import { ClientOnly } from "~/components/ClientOnly";
 import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
-import { RescoreForm } from "~/tools/rescore";
 import type { CaprievalPlotlyProps } from "~/models/caprieval.server";
 import {
   getWeights,
@@ -24,6 +23,7 @@ import {
 } from "~/models/caprieval.server";
 import { rescore } from "~/tools/rescore.server";
 import { moduleInfo } from "~/models/module_utils";
+import { RescoreForm } from "~/components/tools/RescoreForm";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
