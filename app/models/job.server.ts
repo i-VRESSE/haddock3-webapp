@@ -100,10 +100,11 @@ export async function getJobfile(
   return response;
 }
 
-export async function listOutputFiles(
+export async function listFilesAt(
   jobid: number,
+  path: string,
   bartenderToken: string,
-  maxDepth = 3
+  maxDepth = 1
 ) {
   const client = createClient(bartenderToken);
   const { data, error } = await client.GET(
@@ -112,7 +113,7 @@ export async function listOutputFiles(
       params: {
         path: {
           jobid,
-          path: JOB_OUTPUT_DIR,
+          path,
         },
         query: {
           // user might have supplied deeper directory structure
@@ -127,6 +128,14 @@ export async function listOutputFiles(
     throw error;
   }
   return data;
+}
+
+export async function listOutputFiles(
+  jobid: number,
+  bartenderToken: string,
+  maxDepth = 3
+) {
+  return listFilesAt(jobid, JOB_OUTPUT_DIR, bartenderToken, maxDepth);
 }
 
 export async function listInputFiles(jobid: number, bartenderToken: string) {

@@ -71,6 +71,14 @@ export const OutputReport = ({
                     🔧
                   </a>
                 )}
+                {module.name === "contactmap" && (
+                  <a
+                    title="Recluster"
+                    href={`/jobs/${jobid}/analysis/contactmap/${module.id}`}
+                  >
+                    &#128202;
+                  </a>
+                )}
                 {module.report && (
                   <a
                     title="Analysis report"
