@@ -39,7 +39,10 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     outputFiles,
     moduleIndex
   );
-  const showInteractiveVersion = shouldShowInteractiveVersion(request.url, hasInteractiveVersion);
+  const showInteractiveVersion = shouldShowInteractiveVersion(
+    request.url,
+    hasInteractiveVersion
+  );
   const weights = await getWeights({
     jobid: jobId,
     module: moduleIndex,
@@ -136,7 +139,7 @@ export default function RescorePage() {
           <>
             <CaprievalReport
               scores={scores}
-              prefix="../files/output/"
+              prefix="../../files/output/"
               plotlyPlots={plotlyPlotsStripped}
             />
           </>

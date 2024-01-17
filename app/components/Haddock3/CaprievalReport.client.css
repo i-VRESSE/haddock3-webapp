@@ -1,0 +1,10 @@
+/* ClusterTable adjust according to preferred color scheme, 
+however rest of webapp does not so overwrite colors here */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #f2f2f2;
+    --text-color: #000;
+    --border-color: #ddd;
+  }
+}

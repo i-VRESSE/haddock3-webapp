@@ -243,7 +243,7 @@ export default function ReclusterPage() {
               {() => (
                 <CaprievalReport
                   scores={scores}
-                  prefix="../files/output/"
+                  prefix="../../files/output/"
                   plotlyPlots={plotlyPlotsStripped}
                 />
               )}

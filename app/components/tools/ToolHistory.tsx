@@ -9,7 +9,7 @@ export function ToolHistory({
 }) {
   return (
     <div className="block">
-      <Link to="?i=0" className={showInteractiveVersion ? "": "font-bold"}>
+      <Link to="?i=0" className={showInteractiveVersion ? "" : "font-bold"}>
         Original
       </Link>
       {hasInteractiveVersion && (

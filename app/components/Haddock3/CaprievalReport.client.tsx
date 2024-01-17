@@ -1,5 +1,6 @@
 import { ClusterTable } from "@i-vresse/haddock3-analysis-components";
 import "@i-vresse/haddock3-analysis-components/dist/style.css";
+import "./CaprievalReport.client.css";
 import type {
   Cluster,
   ClusterID,
