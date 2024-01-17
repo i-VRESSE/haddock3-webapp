@@ -42,61 +42,61 @@ import { CompletedJobs } from "~/utils";
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");
-  const token = await getBartenderToken(request);
-  const job = await getJobById(jobId, token);
+  const bartenderToken = await getBartenderToken(request);
+  const job = await getJobById(jobId, bartenderToken);
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  const outputFiles = await listOutputFiles(jobId, token, 1);
-  const [moduleName, maxInteractivness, moduleIndexPadding] = moduleInfo(
+  const outputFiles = await listOutputFiles(jobId, bartenderToken, 1);
+  const [moduleName, hasInteractiveVersion, moduleIndexPadding] = moduleInfo(
     outputFiles,
     moduleIndex
   );
   const i = new URL(request.url).searchParams.get("i");
-  const interactivness = i === null ? maxInteractivness : parseInt(i);
-  const defaultValues = await getParams(
-    jobId,
+  const showInteractiveVersion = i === null ? hasInteractiveVersion : !!i;
+  const defaultValues = await getParams({
+    jobid: jobId,
     moduleIndex,
-    interactivness,
-    token,
-    moduleIndexPadding
-  );
-  const clusters = await getClusters(
-    jobId,
+    isInteractive: showInteractiveVersion,
+    bartenderToken,
+    moduleIndexPadding,
+  });
+  const clusters = await getClusters({
+    jobid: jobId,
     moduleIndex,
-    interactivness,
-    token,
-    moduleIndexPadding
-  );
+    isInteractive: showInteractiveVersion,
+    bartenderToken,
+    moduleIndexPadding,
+  });
   let scores;
   let plotlyPlots;
-  if (interactivness > 0) {
-    scores = await getScores(
-      jobId,
-      moduleIndex,
-      interactivness,
-      token,
+  if (showInteractiveVersion) {
+    scores = await getScores({
+      jobid: jobId,
+      module: moduleIndex,
+      isInteractive: showInteractiveVersion,
+      bartenderToken,
       moduleIndexPadding,
-      "clustrmsd"
-    );
+      moduleName: "clustrmsd",
+    });
     const { scatterSelection, boxSelection } = getPlotSelection(request.url);
-    plotlyPlots = await getCaprievalPlots(
-      jobId,
-      moduleIndex,
-      interactivness,
-      token,
+    plotlyPlots = await getCaprievalPlots({
+      jobid: jobId,
+      module: moduleIndex,
+      isInteractive: showInteractiveVersion,
+      bartenderToken,
       moduleIndexPadding,
       scatterSelection,
       boxSelection,
-      "clustrmsd"
-    );
+      moduleName: "clustrmsd",
+    });
   }
   return json({
     moduleIndex,
     moduleName,
     defaultValues,
-    interactivness,
-    maxInteractivness,
+    interactivness: showInteractiveVersion,
+    maxInteractivness: hasInteractiveVersion,
     clusters,
     scores,
     plotlyPlots,
@@ -104,10 +104,10 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 };
 
 export const action = async ({ request, params }: LoaderArgs) => {
-  const token = await getBartenderToken(request);
+  const bartenderToken = await getBartenderToken(request);
   const jobId = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");
-  const job = await getJobById(jobId, token);
+  const job = await getJobById(jobId, bartenderToken);
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
@@ -117,16 +117,21 @@ export const action = async ({ request, params }: LoaderArgs) => {
     const errors = flatten(result.error);
     return json({ errors }, { status: 400 });
   }
-  const clustfccParams = result.data;
-  const outputFiles = await listOutputFiles(jobId, token, 1);
-  const interactivness = moduleInfo(outputFiles, moduleIndex);
-  const clustccDir = buildPath({
+  const clustparams = result.data;
+  const outputFiles = await listOutputFiles(jobId, bartenderToken, 1);
+  const [, , moduleIndexPadding] = moduleInfo(outputFiles, moduleIndex);
+  const clustrmsdDir = buildPath({
     moduleIndex,
     moduleName: "clustrmsd",
-    interactivness: 0,
-    moduleIndexPadding: interactivness[2],
+    moduleIndexPadding,
   });
-  await reclustrmsd(jobId, moduleIndex, clustccDir, clustfccParams, token);
+  await reclustrmsd({
+    jobid: jobId,
+    moduleIndex,
+    clustrmsdDir,
+    params: clustparams,
+    bartenderToken,
+  });
   return json({ errors: { nested: {} } });
 };
 
@@ -270,8 +275,8 @@ export default function ReclusterPage() {
           </a>
         </div>
         <ToolHistory
-          interactivness={interactivness}
-          maxInteractivness={maxInteractivness}
+          showInteractiveVersion={interactivness}
+          hasInteractiveVersion={maxInteractivness}
         />
       </Form>
       <div>

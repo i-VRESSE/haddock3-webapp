@@ -3,7 +3,7 @@ import { object, coerce, number, optional, picklist } from "valibot";
 import { parse as parseTOML } from "@ltd/j-toml";
 
 import { buildPath, getJobfile } from "~/models/job.server";
-import { parseClusterTsv } from "./recluster.server";
+import { getClusterTsv } from "./recluster.server";
 import { createClient } from "~/models/config.server";
 
 export const Schema = object({
@@ -15,24 +15,30 @@ export const Schema = object({
 });
 export type Schema = Output<typeof Schema>;
 
-export async function getParams(
-  jobid: number,
-  moduleIndex: number,
-  interactivness: number,
-  bartenderToken: string,
-  pad: number
-): Promise<Schema> {
+export async function getParams({
+  jobid,
+  moduleIndex,
+  bartenderToken,
+  moduleIndexPadding,
+  isInteractive = false,
+}: {
+  jobid: number;
+  moduleIndex: number;
+  bartenderToken: string;
+  moduleIndexPadding: number;
+  isInteractive: boolean;
+}): Promise<Schema> {
   const path = buildPath({
     moduleIndex,
+    isInteractive,
+    moduleIndexPadding,
     moduleName: "clustrmsd",
-    interactivness,
     suffix: "params.cfg",
-    moduleIndexPadding: pad,
   });
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
   let config: any = parseTOML(body, { bigint: false });
-  if (!interactivness) {
+  if (!isInteractive) {
     // non-interactive has `[clustrmsd]` section
     config = config.clustrmsd;
   }
@@ -52,35 +58,35 @@ export async function getParams(
   return params;
 }
 
-export async function getClusters(
-  jobid: number,
-  moduleIndex: number,
-  interactivness: number,
-  bartenderToken: string,
-  pad: number
-) {
-  const path = buildPath({
-    moduleIndex,
+export async function getClusters(options: {
+  jobid: number;
+  moduleIndex: number;
+  bartenderToken: string;
+  moduleIndexPadding: number;
+  isInteractive: boolean;
+}) {
+  return getClusterTsv({
+    ...options,
     moduleName: "clustrmsd",
-    interactivness,
-    suffix: "clustrmsd.tsv",
-    moduleIndexPadding: pad,
+    filename: "clustrmsd.tsv",
   });
-  const response = await getJobfile(jobid, path, bartenderToken);
-  const body = await response.text();
-  const rows = await parseClusterTsv(body);
-  return rows;
 }
 
-export async function reclustrmsd(
-  jobid: number,
-  moduleIndex: number,
-  clustfccDir: string,
-  params: Schema,
-  bartenderToken: string
-) {
+export async function reclustrmsd({
+  jobid,
+  moduleIndex,
+  clustrmsdDir,
+  params,
+  bartenderToken,
+}: {
+  jobid: number;
+  moduleIndex: number;
+  clustrmsdDir: string;
+  params: Schema;
+  bartenderToken: string;
+}) {
   const body: any = {
-    clustrmsd_dir: clustfccDir,
+    clustrmsd_dir: clustrmsdDir,
     module_nr: moduleIndex,
     ...params,
   };

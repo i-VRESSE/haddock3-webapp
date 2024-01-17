@@ -19,14 +19,14 @@ const moduleDescriptions = getModuleDescriptions("mdref", [
 export function RescoreForm({
   weights,
   errors,
-  interactivness,
-  maxInteractivness,
+  showInteractiveVersion,
+  hasInteractiveVersion,
   moduleIndex,
 }: {
   weights: Weights;
   errors: FlatErrors | undefined;
-  interactivness: number;
-  maxInteractivness: number;
+  showInteractiveVersion: boolean;
+  hasInteractiveVersion: boolean;
   moduleIndex: number;
 }) {
   const { state } = useNavigation();
@@ -136,8 +136,8 @@ export function RescoreForm({
         </a>
       </div>
       <ToolHistory
-        interactivness={interactivness}
-        maxInteractivness={maxInteractivness}
+        showInteractiveVersion={showInteractiveVersion}
+        hasInteractiveVersion={hasInteractiveVersion}
       />
     </Form>
   );

@@ -1,21 +1,21 @@
 import { Link } from "@remix-run/react";
 
 export function ToolHistory({
-  interactivness,
-  maxInteractivness,
+  showInteractiveVersion,
+  hasInteractiveVersion,
 }: {
-  interactivness: number;
-  maxInteractivness: number;
+  showInteractiveVersion: boolean;
+  hasInteractiveVersion: boolean;
 }) {
   return (
     <div className="block">
-      <Link to="?i=0" className={interactivness === 0 ? "font-bold" : ""}>
+      <Link to="?i=0" className={showInteractiveVersion ? "font-bold" : ""}>
         Original
       </Link>
-      {maxInteractivness > 0 && (
+      {hasInteractiveVersion && (
         <>
           {" "}
-          <Link to="?i=1" className={interactivness === 1 ? "font-bold" : ""}>
+          <Link to="?i=1" className={showInteractiveVersion ? "" : "font-bold"}>
             Re-computed
           </Link>
         </>

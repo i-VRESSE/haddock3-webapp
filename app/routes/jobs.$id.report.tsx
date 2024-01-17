@@ -18,28 +18,35 @@ import {
 // move to a separate module called ~/model/modules and ~/models/caprieval
 
 export const loader = async ({ params, request }: LoaderArgs) => {
-  const jobId = jobIdFromParams(params);
-  const token = await getBartenderToken(request);
-  const job = await getJobById(jobId, token);
+  const jobid = jobIdFromParams(params);
+  const bartenderToken = await getBartenderToken(request);
+  const job = await getJobById(jobid, bartenderToken);
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [module, _, pad] = await getCaprievalModuleInfo(jobId, token);
-    // const [module, maxInteractivness] = [5,0]
-    const scores = await getScores(jobId, module, 0, token, pad);
-    const { scatterSelection, boxSelection } = getPlotSelection(request.url);
-    const plotlyPlots = await getCaprievalPlots(
-      jobId,
-      module,
-      0,
-      token,
-      pad,
-      scatterSelection,
-      boxSelection
+    const [module, _, moduleIndexPadding] = await getCaprievalModuleInfo(
+      jobid,
+      bartenderToken
     );
+    // const [module, maxInteractivness] = [5,0]
+    const scores = await getScores({
+      jobid,
+      module,
+      bartenderToken,
+      moduleIndexPadding,
+    });
+    const { scatterSelection, boxSelection } = getPlotSelection(request.url);
+    const plotlyPlots = await getCaprievalPlots({
+      jobid,
+      module,
+      bartenderToken,
+      moduleIndexPadding,
+      scatterSelection,
+      boxSelection,
+    });
     return json({ job, scores, plotlyPlots });
   } catch (error) {
     if (

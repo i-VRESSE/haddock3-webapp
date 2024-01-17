@@ -28,58 +28,58 @@ import { moduleInfo } from "~/models/module_utils";
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");
-  const token = await getBartenderToken(request);
-  const job = await getJobById(jobId, token);
+  const bartenderToken = await getBartenderToken(request);
+  const job = await getJobById(jobId, bartenderToken);
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  const outputFiles = await listOutputFiles(jobId, token, 1);
-  const [moduleName, maxInteractivness, moduleIndexPadding] = moduleInfo(
+  const outputFiles = await listOutputFiles(jobId, bartenderToken, 1);
+  const [moduleName, hasInteractiveVersion, moduleIndexPadding] = moduleInfo(
     outputFiles,
     moduleIndex
   );
   const i = new URL(request.url).searchParams.get("i");
-  const interactivness = i === null ? maxInteractivness : !!i;
-  const weights = await getWeights(
-    jobId,
-    moduleIndex,
-    interactivness,
-    token,
-    moduleIndexPadding
-  );
-  const scores = await getScores(
-    jobId,
-    moduleIndex,
-    interactivness,
-    token,
+  const showInteractiveVersion = i === null ? hasInteractiveVersion : !!i;
+  const weights = await getWeights({
+    jobid: jobId,
+    module: moduleIndex,
+    isInteractive: showInteractiveVersion,
+    bartenderToken,
     moduleIndexPadding,
-    moduleName
-  );
+  });
+  const scores = await getScores({
+    jobid: jobId,
+    module: moduleIndex,
+    isInteractive: showInteractiveVersion,
+    bartenderToken,
+    moduleIndexPadding,
+    moduleName,
+  });
   const { scatterSelection, boxSelection } = getPlotSelection(request.url);
-  const plotlyPlots = await getCaprievalPlots(
-    jobId,
-    moduleIndex,
-    interactivness,
-    token,
+  const plotlyPlots = await getCaprievalPlots({
+    jobid: jobId,
+    module: moduleIndex,
+    isInteractive: showInteractiveVersion,
+    bartenderToken,
     moduleIndexPadding,
     scatterSelection,
-    boxSelection
-  );
+    boxSelection,
+  });
   return json({
     moduleIndex,
     weights,
     scores,
-    interactivness,
-    maxInteractivness,
+    showInteractiveVersion,
+    hasInteractiveVersion,
     plotlyPlots,
   });
 };
 
 export const action = async ({ request, params }: LoaderArgs) => {
-  const token = await getBartenderToken(request);
+  const bartenderToken = await getBartenderToken(request);
   const jobId = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");
-  const job = await getJobById(jobId, token);
+  const job = await getJobById(jobId, bartenderToken);
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
@@ -90,20 +90,23 @@ export const action = async ({ request, params }: LoaderArgs) => {
     return json({ errors }, { status: 400 });
   }
   const weights = result.data;
-  const outputFiles = await listOutputFiles(jobId, token, 1);
-  const [moduleName, maxInteractivness, moduleIndexPadding] = moduleInfo(
+  const outputFiles = await listOutputFiles(jobId, bartenderToken, 1);
+  const [moduleName, , moduleIndexPadding] = moduleInfo(
     outputFiles,
     moduleIndex
   );
-  const i = new URL(request.url).searchParams.get("i");
-  const interactivness = i === null ? maxInteractivness : parseInt(i);
   const capriDir = buildPath({
     moduleIndex,
     moduleName,
-    interactivness,
     moduleIndexPadding,
   });
-  await rescore(jobId, moduleIndex, capriDir, weights, token);
+  await rescore({
+    jobid: jobId,
+    moduleIndex,
+    capriDir,
+    weights,
+    bartenderToken,
+  });
   return json({ errors: { nested: {} } });
 };
 
@@ -112,8 +115,8 @@ export default function RescorePage() {
     moduleIndex,
     weights,
     scores,
-    interactivness,
-    maxInteractivness,
+    showInteractiveVersion,
+    hasInteractiveVersion,
     plotlyPlots,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
@@ -123,8 +126,8 @@ export default function RescorePage() {
     <>
       <RescoreForm
         weights={weights}
-        interactivness={interactivness}
-        maxInteractivness={maxInteractivness}
+        showInteractiveVersion={showInteractiveVersion}
+        hasInteractiveVersion={hasInteractiveVersion}
         moduleIndex={moduleIndex}
         errors={actionData?.errors}
       />

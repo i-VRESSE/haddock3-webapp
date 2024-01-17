@@ -223,44 +223,45 @@ export function buildPath({
   prefix = "output",
   moduleIndex,
   moduleName,
-  interactivness = 0,
+  isInteractive = false,
   suffix = "",
   moduleIndexPadding,
 }: {
   prefix?: string;
   moduleIndex: number;
   moduleName: string;
-  interactivness?: number;
+  isInteractive?: boolean;
   suffix?: string;
   moduleIndexPadding: number;
 }) {
-  const interactive_suffix = Array(interactivness + 1).join("_interactive");
+  const interactiveSuffix = isInteractive ? "_interactive" : "";
   const moduleIndexPadded = moduleIndex
     .toString()
     .padStart(moduleIndexPadding, "0");
-  return `${prefix}/${moduleIndexPadded}_${moduleName}${interactive_suffix}/${suffix}`;
+  return `${prefix}/${moduleIndexPadded}_${moduleName}${interactiveSuffix}/${suffix}`;
 }
 
 // output/analysis/12_caprieval_analysis/report.html
 // output/analysis/12_caprieval_interactive_analysis/report.html
+// {prefix}/{paddedModuleIndex}_{moduleName}{interactiveSuffix}/{suffix}
 export function buildAnalyisPath({
   prefix = "output/analysis",
   moduleIndex,
   moduleName,
-  interactivness = 0,
+  isInteractive = false,
   suffix = "",
   moduleIndexPadding,
 }: {
   prefix?: string;
   moduleIndex: number;
   moduleName: string;
-  interactivness?: number;
+  isInteractive?: boolean;
   suffix?: string;
   moduleIndexPadding: number;
 }) {
-  const interactive_suffix = Array(interactivness + 1).join("_interactive");
+  const interactiveSuffix = isInteractive ? "_interactive" : "";
   const moduleIndexPadded = moduleIndex
     .toString()
     .padStart(moduleIndexPadding, "0");
-  return `${prefix}/${moduleIndexPadded}_${moduleName}${interactive_suffix}_analysis/${suffix}`;
+  return `${prefix}/${moduleIndexPadded}_${moduleName}${interactiveSuffix}_analysis/${suffix}`;
 }

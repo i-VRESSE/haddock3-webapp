@@ -1,13 +1,19 @@
 import type { Weights } from "~/models/caprieval.server";
 import { createClient } from "~/models/config.server";
 
-export async function rescore(
-  jobid: number,
-  moduleIndex: number,
-  capriDir: string,
-  weights: Weights,
-  bartenderToken: string
-) {
+export async function rescore({
+  jobid,
+  moduleIndex,
+  capriDir,
+  weights,
+  bartenderToken,
+}: {
+  jobid: number;
+  moduleIndex: number;
+  capriDir: string;
+  weights: Weights;
+  bartenderToken: string;
+}) {
   const body = {
     capri_dir: capriDir,
     module_nr: moduleIndex,

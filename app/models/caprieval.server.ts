@@ -14,7 +14,7 @@ import {
 import type { PlotlyProps } from "~/components/PlotlyPlot";
 import type { DirectoryItem } from "~/bartender-client/types";
 import { parseTsv } from "./tsv";
-import { hasInteractiveVersion as doesModuleHaveInteractiveVersion } from "./module_utils";
+import { hasInteractiveVersion } from "./module_utils";
 
 export const WeightsSchema = object({
   // could use minimum/maximum from catalog,
@@ -27,19 +27,25 @@ export const WeightsSchema = object({
 });
 export type Weights = Output<typeof WeightsSchema>;
 
-export async function getWeights(
-  jobid: number,
-  module: number,
-  interactivness: number,
-  bartenderToken: string,
-  pad: number
-): Promise<Weights> {
+export async function getWeights({
+  jobid,
+  module,
+  bartenderToken,
+  moduleIndexPadding,
+  isInteractive = false,
+}: {
+  jobid: number;
+  module: number;
+  isInteractive?: boolean;
+  bartenderToken: string;
+  moduleIndexPadding: number;
+}): Promise<Weights> {
   const path = buildPath({
     moduleIndex: module,
     moduleName: "caprieval",
-    interactivness,
+    isInteractive,
     suffix: "weights_params.json",
-    moduleIndexPadding: pad,
+    moduleIndexPadding: moduleIndexPadding,
   });
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.json();
@@ -56,22 +62,29 @@ export async function getCaprievalModuleInfo(
     moduleIndex = getLastCaprievalModule(files);
   }
   const pad = getModuleIndexPadding(files);
-  const interactivness = doesModuleHaveInteractiveVersion(moduleIndex, files);
+  const interactivness = hasInteractiveVersion(moduleIndex, files);
   return [moduleIndex, interactivness, pad];
 }
 
-export async function getScores(
-  jobid: number,
-  module: number,
-  interactivness: number,
-  bartenderToken: string,
-  moduleIndexPadding: number,
-  moduleName = "caprieval"
-) {
+export async function getScores({
+  jobid,
+  module,
+  bartenderToken,
+  moduleIndexPadding,
+  isInteractive = false,
+  moduleName = "caprieval",
+}: {
+  jobid: number;
+  module: number;
+  isInteractive?: boolean;
+  bartenderToken: string;
+  moduleIndexPadding: number;
+  moduleName?: string;
+}) {
   const prefix = buildPath({
     moduleIndex: module,
     moduleName,
-    interactivness,
+    isInteractive,
     moduleIndexPadding,
   });
   const structures = await getStructureScores(prefix, jobid, bartenderToken);
@@ -101,20 +114,29 @@ export function getPlotSelection(url: string) {
   };
 }
 
-export async function getCaprievalPlots(
-  jobid: number,
-  module: number,
-  interactivness: number,
-  bartenderToken: string,
-  moduleIndexPadding: number,
-  scatterSelection: string,
-  boxSelection: string,
-  moduleName: string = "caprieval"
-): Promise<CaprievalPlotlyProps> {
-  const shtml = await getReportHtml(
+export async function getCaprievalPlots({
+  jobid,
+  module,
+  bartenderToken,
+  moduleIndexPadding,
+  scatterSelection,
+  boxSelection,
+  isInteractive = false,
+  moduleName = "caprieval",
+}: {
+  jobid: number;
+  module: number;
+  isInteractive?: boolean;
+  bartenderToken: string;
+  moduleIndexPadding: number;
+  scatterSelection: string;
+  boxSelection: string;
+  moduleName?: string;
+}): Promise<CaprievalPlotlyProps> {
+  const shtml = await fetchHtml(
     jobid,
     module,
-    interactivness,
+    isInteractive,
     bartenderToken,
     moduleIndexPadding,
     moduleName,
@@ -126,10 +148,10 @@ export async function getCaprievalPlots(
     // if both are report, we can reuse the html
     bhtml = shtml;
   } else {
-    bhtml = await getReportHtml(
+    bhtml = await fetchHtml(
       jobid,
       module,
-      interactivness,
+      isInteractive,
       bartenderToken,
       moduleIndexPadding,
       moduleName,
@@ -142,10 +164,10 @@ export async function getCaprievalPlots(
   return { scatters, boxes };
 }
 
-export async function getReportHtml(
+async function fetchHtml(
   jobid: number,
   module: number,
-  interactivness: number,
+  isInteractive: boolean,
   bartenderToken: string,
   moduleIndexPadding: number,
   moduleName = "caprieval",
@@ -154,7 +176,7 @@ export async function getReportHtml(
   const prefix = buildAnalyisPath({
     moduleIndex: module,
     moduleName,
-    interactivness,
+    isInteractive,
     moduleIndexPadding,
   });
   const response = await getJobfile(
@@ -269,7 +291,11 @@ export function getLastCaprievalModule(files: DirectoryItem): number {
   }
   const modules = [...files.children].reverse();
   for (const module of modules || []) {
-    if (module.is_dir && module.name.endsWith("caprieval")) {
+    if (
+      module.is_dir &&
+      module.name.endsWith("caprieval") &&
+      !module.name.includes("_interactive")
+    ) {
       return parseInt(module.name.split("_")[0]);
     }
   }

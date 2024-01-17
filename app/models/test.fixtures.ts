@@ -1,11 +1,9 @@
-import { describe, test, expect } from "vitest";
-import { getLastCaprievalModule, getPlotFromHtml } from "~/models/caprieval.server";
-import { buildPath } from "~/models/job.server";
-
+/**
+ * This file contains fixtures for testing parsing the Bartender web service responses.
+ */
 import type { DirectoryItem } from "~/bartender-client/types";
-import { hasInteractiveVersion } from "~/models/module_utils";
 
-function outputFileWithoutInteractivness(): DirectoryItem {
+export function outputFileWithoutInteractiveVersions(): DirectoryItem {
   return {
     name: "output",
     path: "output",
@@ -136,7 +134,7 @@ function outputFileWithoutInteractivness(): DirectoryItem {
   };
 }
 
-function outputFileWithInteractivness(): DirectoryItem {
+export function outputFileWithInteractiveVersion(): DirectoryItem {
   return {
     name: "output",
     path: "output",
@@ -273,96 +271,3 @@ function outputFileWithInteractivness(): DirectoryItem {
     ],
   };
 }
-
-describe("getLastCaprievalModule", () => {
-  test("should return the last caprieval module", () => {
-    const files = outputFileWithoutInteractivness();
-    const result = getLastCaprievalModule(files);
-    const expected = 15;
-    expect(result).toEqual(expected);
-  });
-});
-
-describe("hasInteractiveVersion", () => {
-  test.each([
-    [outputFileWithoutInteractivness(), false],
-    [outputFileWithInteractivness(), true],
-  ])("should return the number of interactive modules", (files, expected) => {
-    const result = hasInteractiveVersion(15, files);
-    expect(result).toEqual(expected);
-  });
-});
-
-describe("buildPath()", () => {
-  test.each([
-    [{ moduleIndex: 1, moduleName: "caprieval" }, "output/01_caprieval/"],
-    [{ moduleIndex: 15, moduleName: "caprieval" }, "output/15_caprieval/"],
-    [
-      { moduleIndex: 1, moduleName: "caprieval", interactivness: 1 },
-      "output/01_caprieval_interactive/",
-    ],
-    [
-      { moduleIndex: 1, moduleName: "caprieval", interactivness: 2 },
-      "output/01_caprieval_interactive_interactive/",
-    ],
-    [
-      { moduleIndex: 1, moduleName: "caprieval", interactivness: 3 },
-      "output/01_caprieval_interactive_interactive_interactive/",
-    ],
-  ])("should return the correct path", (input, expected) => {
-    const result = buildPath({ ...input, moduleIndexPadding: 2 });
-    expect(result).toEqual(expected);
-  });
-});
-
-describe("getPlotFromHtml", () => {
-  test("should return the plotly data and layout", () => {
-    const expected = {
-      data: [
-        {
-          x: [1999, 2000, 2001, 2002],
-          y: [10, 15, 13, 17],
-          type: "scatter",
-        },
-      ],
-      layout: {
-        title: "Sales Growth",
-        xaxis: {
-          title: "Year",
-          showgrid: false,
-          zeroline: false,
-        },
-        yaxis: {
-          title: "Percent",
-          showline: false,
-        },
-      },
-    };
-    const input = `
-    <div>
-    <script type="text/javascript">window.PlotlyConfig = { MathJaxConfig: 'local' };</script>
-    <script src="https://cdn.plot.ly/plotly-2.16.1.min.js"></script>
-    <div id="6ce37419-297c-401e-860d-61704c0795b8" class="plotly-graph-div" style="height:800px; width:1000px;">
-    </div>
-    <script id="data1" type="application/json">
-        ${JSON.stringify(expected)}
-    </script>
-    <script type="text/javascript">
-        const { data, layout } = JSON.parse(document.getElementById("data1").text)
-        window.PLOTLYENV = window.PLOTLYENV || {};
-        if (document.getElementById("6ce37419-297c-401e-860d-61704c0795b8")) {
-            Plotly.newPlot(
-                "6ce37419-297c-401e-860d-61704c0795b8",
-                data,
-                layout,
-                { responsive: true },
-            );
-        }
-    </script>
-</div>
-    `;
-
-    const p = getPlotFromHtml(input);
-    expect(p).toEqual(expected);
-  });
-});

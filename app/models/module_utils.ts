@@ -17,10 +17,10 @@ export function hasInteractiveVersion(
   for (const m of files.children) {
     if (m.is_dir && m.name.startsWith(`${moduleIndexPadded}_`)) {
       hasIndex = true;
-      if (m.name.endsWith("interactive")) {
+      if (m.name.endsWith("_interactive")) {
         hasInteractive = true;
+        break;
       }
-      break;
     }
   }
   if (!hasIndex) {
