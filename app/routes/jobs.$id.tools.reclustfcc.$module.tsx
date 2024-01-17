@@ -36,6 +36,7 @@ import {
 import { moduleInfo } from "~/models/module_utils";
 import { ToolHistory } from "~/components/tools/ToolHistory";
 import { ReClusterTable } from "~/components/tools/ReClusterTable";
+import { shouldShowInteractiveVersion } from "~/tools/shared";
 
 const fieldDescriptions = getModuleDescriptions(`clustfcc`, [
   "clust_cutoff",
@@ -56,8 +57,10 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     outputFiles,
     moduleIndex
   );
-  const i = new URL(request.url).searchParams.get("i");
-  const showInteractiveVersion = i === null ? hasInteractiveVersion : !!i;
+  const showInteractiveVersion = shouldShowInteractiveVersion(
+    request.url,
+    hasInteractiveVersion
+  );
   const defaultValues = await getParams({
     jobid,
     moduleIndex,
@@ -217,7 +220,7 @@ export default function ReclusterPage() {
             className="btn btn-primary btn-sm"
             disabled={state !== "idle"}
           >
-            {state !== "idle" ? "Running..." : "Recluster"}
+            {state === "submitting" ? "Running..." : "Recluster"}
           </button>
           <a href="../.." className=" btn-outline btn btn-sm">
             Back

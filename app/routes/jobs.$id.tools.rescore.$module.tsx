@@ -24,6 +24,7 @@ import {
 import { rescore } from "~/tools/rescore.server";
 import { moduleInfo } from "~/models/module_utils";
 import { RescoreForm } from "~/components/tools/RescoreForm";
+import { shouldShowInteractiveVersion } from "~/tools/shared";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
@@ -38,8 +39,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
     outputFiles,
     moduleIndex
   );
-  const i = new URL(request.url).searchParams.get("i");
-  const showInteractiveVersion = i === null ? hasInteractiveVersion : !!i;
+  const showInteractiveVersion = shouldShowInteractiveVersion(request.url, hasInteractiveVersion);
   const weights = await getWeights({
     jobid: jobId,
     module: moduleIndex,

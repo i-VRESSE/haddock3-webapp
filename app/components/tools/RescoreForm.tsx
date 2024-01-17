@@ -129,7 +129,7 @@ export function RescoreForm({
           className="btn btn-primary btn-sm"
           disabled={state !== "idle"}
         >
-          {state !== "idle" ? "Running..." : "Rescore"}
+          {state === "submitting" ? "Running..." : "Rescore"}
         </button>
         <a href="../.." className=" btn-outline btn btn-sm">
           Back
