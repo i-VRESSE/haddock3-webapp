@@ -3,7 +3,7 @@ import {
   json,
   type LinksFunction,
   type LoaderArgs,
-  type V2_MetaFunction,
+  type MetaFunction,
 } from "@remix-run/node";
 import {
   Links,
@@ -23,7 +23,7 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
 ];
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [{ title: "Haddock3" }];
 };
 
