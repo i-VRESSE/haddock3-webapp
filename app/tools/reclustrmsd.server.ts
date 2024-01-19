@@ -1,5 +1,5 @@
 import type { Output } from "valibot";
-import { object, coerce, number, optional, picklist } from "valibot";
+import { object, coerce, number, optional, picklist, integer } from "valibot";
 import { parse as parseTOML } from "@ltd/j-toml";
 
 import { buildPath, getJobfile } from "~/models/job.server";
@@ -9,9 +9,9 @@ import { createClient } from "~/models/config.server";
 export const Schema = object({
   // TODO newer valibot has picklist to constrain values, but gives tsc error, wait for next version
   criterion: optional(picklist(["maxclust", "distance"]), "maxclust"),
-  n_clusters: optional(coerce(number(), Number)),
+  n_clusters: optional(coerce(number([integer()]), Number)),
   clust_cutoff: optional(coerce(number(), Number)),
-  min_population: optional(coerce(number(), Number)),
+  min_population: optional(coerce(number([integer()]), Number)),
 });
 export type Schema = Output<typeof Schema>;
 

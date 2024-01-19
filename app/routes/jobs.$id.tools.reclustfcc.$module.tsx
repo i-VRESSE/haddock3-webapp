@@ -206,7 +206,7 @@ export default function ReclusterPage() {
               {fieldDescriptions.min_population.title}
             </label>
             <input
-              type="text"
+              type="number"
               name="min_population"
               id="min_population"
               defaultValue={defaultValues.min_population}
@@ -223,7 +223,11 @@ export default function ReclusterPage() {
           >
             {state === "submitting" ? "Running..." : "Recluster"}
           </button>
-          <Link to="../../.." relative="path" className=" btn-outline btn btn-sm">
+          <Link
+            to="../../.."
+            relative="path"
+            className=" btn-outline btn btn-sm"
+          >
             Back
           </Link>
         </div>

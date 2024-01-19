@@ -1,13 +1,13 @@
 import { buildPath, getJobfile } from "~/models/job.server";
 import { getClusterTsv } from "./recluster.server";
-import { object, number, coerce, finite, type Output } from "valibot";
+import { object, number, coerce, finite, type Output, integer } from "valibot";
 import { parse as parseTOML } from "@ltd/j-toml";
 import { createClient } from "~/models/config.server";
 
 export const Schema = object({
   clust_cutoff: coerce(number([finite()]), Number),
   strictness: coerce(number([finite()]), Number),
-  min_population: coerce(number([finite()]), Number),
+  min_population: coerce(number([integer()]), Number),
 });
 export type Schema = Output<typeof Schema>;
 
