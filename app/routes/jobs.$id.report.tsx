@@ -7,7 +7,12 @@ import { CompletedJobs } from "~/bartender-client/types";
 import { ClientOnly } from "~/components/ClientOnly";
 import { getBartenderToken } from "~/bartender-client/token.server";
 import type { CaprievalPlotlyProps } from "~/caprieval/caprieval.server";
-import { getCaprievalModuleInfo, getScores, getPlotSelection, getCaprievalPlots } from "~/caprieval/caprieval.server";
+import {
+  getCaprievalModuleInfo,
+  getScores,
+  getPlotSelection,
+  getCaprievalPlots,
+} from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 // TODO rescore is not used here, so imports should not be from this module
 // move to a separate module called ~/model/modules and ~/models/caprieval

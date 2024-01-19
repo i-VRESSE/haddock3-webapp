@@ -15,7 +15,6 @@ import { NonModuleOutputFiles } from "~/browse/NonModuleOutputFiles";
 import { OutputReport } from "~/browse/OutputReport";
 import { getLastCaprievalModule } from "~/caprieval/caprieval.server";
 
-
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);
   const token = await getBartenderToken(request);

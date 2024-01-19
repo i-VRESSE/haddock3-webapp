@@ -11,7 +11,6 @@ import {
 import { mustBeAdmin } from "~/auth.server";
 import { UserTableRow } from "~/admin/UserTableRow";
 
-
 export async function loader({ request }: LoaderArgs) {
   await mustBeAdmin(request);
   const users = await listUsers();

@@ -6,7 +6,6 @@ import guru from "./haddock3.guru.json";
 import type { ExpertiseLevel } from "@prisma/client";
 import { JOB_OUTPUT_DIR } from "~/bartender-client/constants";
 
-
 export async function getCatalog(level: ExpertiseLevel) {
   // Tried serverDependenciesToBundle in remix.config.js but it didn't work
   // Fallback to using dynamic import

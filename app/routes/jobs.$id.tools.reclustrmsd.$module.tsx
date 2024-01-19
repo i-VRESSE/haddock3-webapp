@@ -12,7 +12,11 @@ import { flatten, safeParse } from "valibot";
 
 import { getBartenderToken } from "~/bartender-client/token.server";
 import type { CaprievalPlotlyProps } from "~/caprieval/caprieval.server";
-import { getScores, getPlotSelection, getCaprievalPlots } from "~/caprieval/caprieval.server";
+import {
+  getScores,
+  getPlotSelection,
+  getCaprievalPlots,
+} from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 import { getModuleDescriptions } from "~/catalogs/descriptionsFromSchema";
 import { ClientOnly } from "~/components/ClientOnly";

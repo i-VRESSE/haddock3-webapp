@@ -17,7 +17,13 @@ import { moduleInfo } from "~/models/module_utils";
 import { shouldShowInteractiveVersion } from "~/tools/shared";
 import { RescoreForm } from "~/tools/RescoreForm";
 import type { CaprievalPlotlyProps } from "~/caprieval/caprieval.server";
-import { getWeights, getScores, getPlotSelection, getCaprievalPlots, WeightsSchema } from "~/caprieval/caprieval.server";
+import {
+  getWeights,
+  getScores,
+  getPlotSelection,
+  getCaprievalPlots,
+  WeightsSchema,
+} from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 
 export const loader = async ({ params, request }: LoaderArgs) => {

@@ -10,7 +10,11 @@ import { useMemo } from "react";
 import { ScatterPlots } from "./ScatterPlots";
 import { useSearchParams } from "@remix-run/react";
 import { BoxPlots } from "./BoxPlots";
-import type { CaprievalStructureRow, CaprievalClusterRow, CaprievalPlotlyProps } from "./caprieval.server";
+import type {
+  CaprievalStructureRow,
+  CaprievalClusterRow,
+  CaprievalPlotlyProps,
+} from "./caprieval.server";
 
 /*
   Component has to be client only due 

@@ -11,7 +11,10 @@ import type { PlotlyProps } from "~/components/PlotlyPlot";
 import type { DirectoryItem } from "~/bartender-client/types";
 import { parseTsv } from "../models/tsv";
 import { hasInteractiveVersion } from "../models/module_utils";
-import { CAPRIEVAL_SCATTERPLOT_CHOICES, CAPRIEVAL_BOXPLOT_CHOICES } from "./constants";
+import {
+  CAPRIEVAL_SCATTERPLOT_CHOICES,
+  CAPRIEVAL_BOXPLOT_CHOICES,
+} from "./constants";
 
 export const WeightsSchema = object({
   // could use minimum/maximum from catalog,

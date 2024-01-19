@@ -1,4 +1,3 @@
-
 export const CAPRIEVAL_SCATTERPLOT_CHOICES = {
   report: "All vs All",
   fnat_score: "FCC vs HADDOCK score",
@@ -42,4 +41,3 @@ export const CAPRIEVAL_BOXPLOT_CHOICES = {
   dockq_clt: "DOCKQ",
   bsa_clt: "Buried Surface Area [A^2]",
 } as const;
-

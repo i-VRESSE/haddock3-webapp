@@ -32,7 +32,11 @@ import { ReClusterTable } from "~/tools/ReClusterTable";
 import { ReWarning } from "~/tools/ReWarning";
 import { ToolHistory } from "~/tools/ToolHistory";
 import type { CaprievalPlotlyProps } from "~/caprieval/caprieval.server";
-import { getScores, getPlotSelection, getCaprievalPlots } from "~/caprieval/caprieval.server";
+import {
+  getScores,
+  getPlotSelection,
+  getCaprievalPlots,
+} from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 
 const fieldDescriptions = getModuleDescriptions(`clustfcc`, [
