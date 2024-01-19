@@ -1,6 +1,6 @@
 import { type LoaderArgs } from "@remix-run/node";
+import { getBartenderToken } from "~/bartender-client/token.server";
 import { getOutputArchive, jobIdFromParams } from "~/models/job.server";
-import { getBartenderToken } from "~/bartender_token.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const id = jobIdFromParams(params);

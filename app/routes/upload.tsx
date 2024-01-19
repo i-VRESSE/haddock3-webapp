@@ -7,9 +7,10 @@ import {
 import { Form } from "@remix-run/react";
 
 import { submitJob } from "~/models/applicaton.server";
-import { WORKFLOW_CONFIG_FILENAME } from "~/models/constants";
+
 import { mustBeAllowedToSubmit } from "~/auth.server";
-import { getBartenderToken } from "~/bartender_token.server";
+import { getBartenderToken } from "~/bartender-client/token.server";
+import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 
 export const loader = async ({ request }: LoaderArgs) => {
   await mustBeAllowedToSubmit(request);

@@ -1,18 +1,20 @@
 import { json, type LoaderArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { getBartenderToken } from "~/bartender_token.server";
+
+import { getBartenderToken } from "~/bartender-client/token.server";
 import {
   listOutputFiles,
   getJobById,
   listInputFiles,
   jobIdFromParams,
 } from "~/models/job.server";
-import { CompletedJobs } from "~/utils";
-import { OutputReport } from "~/components/OutputReport";
-import { ListFiles } from "~/components/ListFiles";
+import { CompletedJobs } from "~/bartender-client/types";
 import { JobStatus } from "~/components/JobStatus";
-import { NonModuleOutputFiles } from "~/components/NonModuleOutputFiles";
-import { getLastCaprievalModule } from "~/models/caprieval.server";
+import { ListFiles } from "~/browse/ListFiles";
+import { NonModuleOutputFiles } from "~/browse/NonModuleOutputFiles";
+import { OutputReport } from "~/browse/OutputReport";
+import { getLastCaprievalModule } from "~/caprieval/caprieval.server";
+
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);

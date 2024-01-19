@@ -1,6 +1,6 @@
 import type { SerializeFrom } from "@remix-run/node";
-import { CompletedJobs } from "~/utils";
-import { ListLogFiles } from "./ListLogFiles";
+import { CompletedJobs } from "~/bartender-client/types";
+import { ListLogFiles } from "../browse/ListLogFiles";
 import type { JobModelDTO } from "~/bartender-client/types";
 
 interface Props {

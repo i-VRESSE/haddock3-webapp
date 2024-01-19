@@ -10,20 +10,13 @@ import {
 import { type ChangeEvent, useState } from "react";
 import { flatten, safeParse } from "valibot";
 
-import { getBartenderToken } from "~/bartender_token.server";
+import { getBartenderToken } from "~/bartender-client/token.server";
+import type { CaprievalPlotlyProps } from "~/caprieval/caprieval.server";
+import { getScores, getPlotSelection, getCaprievalPlots } from "~/caprieval/caprieval.server";
+import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 import { getModuleDescriptions } from "~/catalogs/descriptionsFromSchema";
 import { ClientOnly } from "~/components/ClientOnly";
 import { ErrorMessages } from "~/components/ErrorMessages";
-import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
-import { ReWarning } from "~/components/ReWarning";
-import { ReClusterTable } from "~/components/tools/ReClusterTable";
-import { ToolHistory } from "~/components/tools/ToolHistory";
-import type { CaprievalPlotlyProps } from "~/models/caprieval.server";
-import {
-  getScores,
-  getPlotSelection,
-  getCaprievalPlots,
-} from "~/models/caprieval.server";
 import {
   jobIdFromParams,
   getJobById,
@@ -31,6 +24,9 @@ import {
   listOutputFiles,
 } from "~/models/job.server";
 import { moduleInfo } from "~/models/module_utils";
+import { ReClusterTable } from "~/tools/ReClusterTable";
+import { ReWarning } from "~/tools/ReWarning";
+import { ToolHistory } from "~/tools/ToolHistory";
 import {
   Schema,
   getClusters,
@@ -39,7 +35,7 @@ import {
 } from "~/tools/reclustrmsd.server";
 import { shouldShowInteractiveVersion } from "~/tools/shared";
 
-import { CompletedJobs } from "~/utils";
+import { CompletedJobs } from "~/bartender-client/types";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);

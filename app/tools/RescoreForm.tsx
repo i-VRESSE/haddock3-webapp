@@ -2,10 +2,10 @@ import { Form, Link, useNavigation } from "@remix-run/react";
 import type { FlatErrors } from "valibot";
 
 import { ToolHistory } from "./ToolHistory";
-import type { Weights } from "../../models/caprieval.server";
-import { ReWarning } from "~/components/ReWarning";
+import type { Weights } from "../caprieval/caprieval.server";
 import { getModuleDescriptions } from "~/catalogs/descriptionsFromSchema";
-import { ErrorMessages } from "../ErrorMessages";
+import { ErrorMessages } from "../components/ErrorMessages";
+import { ReWarning } from "./ReWarning";
 
 // w_* props are not defined in caprieval modile, but in scoring and refinement modules
 const moduleDescriptions = getModuleDescriptions("mdref", [

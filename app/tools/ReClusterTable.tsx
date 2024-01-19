@@ -1,4 +1,4 @@
-import type { ClusterRow } from "../../tools/recluster.server";
+import type { ClusterRow } from "./recluster.server";
 
 export function ReClusterTable({ clusters }: { clusters: ClusterRow[] }) {
   // TODO add structure viewer with contacts (*.con file)

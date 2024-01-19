@@ -14,9 +14,9 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-import { Navbar } from "~/components/Navbar";
 import { getOptionalClientUser } from "./auth.server";
 import styles from "./tailwind.css";
+import { Navbar } from "./components/Navbar";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),

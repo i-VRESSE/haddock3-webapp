@@ -4,7 +4,8 @@ import easy from "./haddock3.easy.json";
 import expert from "./haddock3.expert.json";
 import guru from "./haddock3.guru.json";
 import type { ExpertiseLevel } from "@prisma/client";
-import { JOB_OUTPUT_DIR } from "~/models/constants";
+import { JOB_OUTPUT_DIR } from "~/bartender-client/constants";
+
 
 export async function getCatalog(level: ExpertiseLevel) {
   // Tried serverDependenciesToBundle in remix.config.js but it didn't work

@@ -1,6 +1,6 @@
-import { CAPRIEVAL_SCATTERPLOT_CHOICES } from "~/models/constants";
-import type { PlotlyProps } from "../PlotlyPlot";
-import { PlotlyPlot } from "../PlotlyPlot";
+import { CAPRIEVAL_SCATTERPLOT_CHOICES } from "./constants";
+import type { PlotlyProps } from "../components/PlotlyPlot";
+import { PlotlyPlot } from "../components/PlotlyPlot";
 
 export function ScatterPlots({
   data,

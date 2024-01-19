@@ -1,10 +1,10 @@
 import { json, redirect, type LoaderArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { getBartenderTokenByUser } from "~/bartender_token.server";
-import { getJobById, jobIdFromParams } from "~/models/job.server";
 
+import { getJobById, jobIdFromParams } from "~/models/job.server";
 import { getUser } from "~/auth.server";
 import { JobStatus } from "~/components/JobStatus";
+import { getBartenderTokenByUser } from "~/bartender-client/token.server";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);

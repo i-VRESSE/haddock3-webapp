@@ -1,6 +1,7 @@
 import { json, type LoaderArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { getBartenderToken } from "~/bartender_token.server";
+
+import { getBartenderToken } from "~/bartender-client/token.server";
 import { getJobs } from "~/models/job.server";
 
 export const loader = async ({ request }: LoaderArgs) => {

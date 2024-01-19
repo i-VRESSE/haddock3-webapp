@@ -1,7 +1,7 @@
-import Card from "~/components/Card";
-import builder_image from "~/components/cards/builder.png";
-import upload_image from "~/components/cards/upload.svg";
-import manage_image from "~/components/cards/manage.jpg";
+import Card from "~/cards/Card";
+import builder_image from "~/cards/builder.png";
+import upload_image from "~/cards/upload.svg";
+import manage_image from "~/cards/manage.jpg";
 
 const cards = [
   {

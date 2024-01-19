@@ -1,6 +1,6 @@
 import type { Params } from "@remix-run/react";
 import { createClient } from "./config.server";
-import { JOB_OUTPUT_DIR } from "./constants";
+import { JOB_OUTPUT_DIR } from "../bartender-client/constants";
 import type { DirectoryItem } from "~/bartender-client/types";
 
 const BOOK_KEEPING_FILES = [

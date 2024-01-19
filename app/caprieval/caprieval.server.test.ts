@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 
 import { getLastCaprievalModule, getPlotFromHtml } from "./caprieval.server";
-import { outputFileWithoutInteractiveVersions } from "./test.fixtures";
+import { outputFileWithoutInteractiveVersions } from "../models/test.fixtures";
 
 describe("getLastCaprievalModule", () => {
   test("should return the last caprieval module", () => {

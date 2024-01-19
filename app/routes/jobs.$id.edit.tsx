@@ -1,15 +1,15 @@
 import { type LoaderArgs } from "@remix-run/node";
 
 import { getCatalog } from "~/catalogs/index.server";
-import { Haddock3WorkflowBuilder } from "~/components/Haddock3/Form.client";
-import { haddock3Styles } from "~/components/Haddock3/styles";
 import { isSubmitAllowed } from "~/models/user.server";
 import { action } from "~/routes/builder";
 import { Link, useLoaderData } from "@remix-run/react";
 import { ClientOnly } from "~/components/ClientOnly";
 import { getJobById, jobIdFromParams } from "~/models/job.server";
 import { getUser } from "~/auth.server";
-import { getBartenderTokenByUser } from "~/bartender_token.server";
+import { getBartenderTokenByUser } from "~/bartender-client/token.server";
+import { Haddock3WorkflowBuilder } from "~/builder/Form.client";
+import { haddock3Styles } from "~/builder/styles";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);

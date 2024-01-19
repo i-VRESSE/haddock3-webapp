@@ -3,10 +3,9 @@
  */
 import { readFile } from "fs/promises";
 import { type KeyLike, SignJWT, importPKCS8, decodeJwt } from "jose";
-
-import { getUser } from "./auth.server";
-import type { User } from "./models/user.server";
-import { setBartenderToken } from "./models/user.server";
+import { getUser } from "~/auth.server";
+import type { User } from "~/models/user.server";
+import { setBartenderToken } from "~/models/user.server";
 
 const alg = "RS256";
 

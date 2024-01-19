@@ -1,6 +1,7 @@
 import { json, type LoaderArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { getBartenderToken } from "~/bartender_token.server";
+
+import { getBartenderToken } from "~/bartender-client/token.server";
 import {
   buildPath,
   getJobById,
@@ -9,7 +10,7 @@ import {
   listOutputFiles,
 } from "~/models/job.server";
 import { moduleInfo } from "~/models/module_utils";
-import { CompletedJobs } from "~/utils";
+import { CompletedJobs } from "~/bartender-client/types";
 
 interface ContactMapCluster {
   contacts: string;

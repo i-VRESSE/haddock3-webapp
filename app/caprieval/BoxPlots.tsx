@@ -1,6 +1,6 @@
-import type { PlotlyProps } from "../PlotlyPlot";
-import { PlotlyPlot } from "../PlotlyPlot";
-import { CAPRIEVAL_BOXPLOT_CHOICES } from "~/models/constants";
+import type { PlotlyProps } from "../components/PlotlyPlot";
+import { PlotlyPlot } from "../components/PlotlyPlot";
+import { CAPRIEVAL_BOXPLOT_CHOICES } from "./constants";
 
 export function BoxPlots({
   data,

@@ -1,6 +1,3 @@
-export const BARTENDER_APPLICATION_NAME = "haddock3";
-export const WORKFLOW_CONFIG_FILENAME = "workflow.cfg";
-export const JOB_OUTPUT_DIR = "output";
 
 export const CAPRIEVAL_SCATTERPLOT_CHOICES = {
   report: "All vs All",
@@ -45,3 +42,4 @@ export const CAPRIEVAL_BOXPLOT_CHOICES = {
   dockq_clt: "DOCKQ",
   bsa_clt: "Buried Surface Area [A^2]",
 } as const;
+

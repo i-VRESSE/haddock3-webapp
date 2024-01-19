@@ -2,18 +2,13 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
-import { getBartenderToken } from "~/bartender_token.server";
 import { jobIdFromParams, getJobById } from "~/models/job.server";
-import { CompletedJobs } from "~/utils";
+import { CompletedJobs } from "~/bartender-client/types";
 import { ClientOnly } from "~/components/ClientOnly";
-import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
-import type { CaprievalPlotlyProps } from "~/models/caprieval.server";
-import {
-  getCaprievalModuleInfo,
-  getScores,
-  getPlotSelection,
-  getCaprievalPlots,
-} from "~/models/caprieval.server";
+import { getBartenderToken } from "~/bartender-client/token.server";
+import type { CaprievalPlotlyProps } from "~/caprieval/caprieval.server";
+import { getCaprievalModuleInfo, getScores, getPlotSelection, getCaprievalPlots } from "~/caprieval/caprieval.server";
+import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 // TODO rescore is not used here, so imports should not be from this module
 // move to a separate module called ~/model/modules and ~/models/caprieval
 

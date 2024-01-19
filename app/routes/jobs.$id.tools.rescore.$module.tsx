@@ -3,28 +3,22 @@ import { json } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { flatten, safeParse } from "valibot";
 
-import { getBartenderToken } from "~/bartender_token.server";
+import { getBartenderToken } from "~/bartender-client/token.server";
 import {
   jobIdFromParams,
   getJobById,
   buildPath,
   listOutputFiles,
 } from "~/models/job.server";
-import { CompletedJobs } from "~/utils";
+import { CompletedJobs } from "~/bartender-client/types";
 import { ClientOnly } from "~/components/ClientOnly";
-import { CaprievalReport } from "~/components/Haddock3/CaprievalReport.client";
-import type { CaprievalPlotlyProps } from "~/models/caprieval.server";
-import {
-  getWeights,
-  getScores,
-  getPlotSelection,
-  getCaprievalPlots,
-  WeightsSchema,
-} from "~/models/caprieval.server";
 import { rescore } from "~/tools/rescore.server";
 import { moduleInfo } from "~/models/module_utils";
-import { RescoreForm } from "~/components/tools/RescoreForm";
 import { shouldShowInteractiveVersion } from "~/tools/shared";
+import { RescoreForm } from "~/tools/RescoreForm";
+import type { CaprievalPlotlyProps } from "~/caprieval/caprieval.server";
+import { getWeights, getScores, getPlotSelection, getCaprievalPlots, WeightsSchema } from "~/caprieval/caprieval.server";
+import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const jobId = jobIdFromParams(params);

@@ -1,4 +1,4 @@
-import type { Weights } from "~/models/caprieval.server";
+import type { Weights } from "~/caprieval/caprieval.server";
 import { createClient } from "~/models/config.server";
 
 export async function rescore({

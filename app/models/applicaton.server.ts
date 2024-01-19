@@ -1,7 +1,7 @@
 import JSZip from "jszip";
 import { stringify, parse } from "@ltd/j-toml";
 
-import { JOB_OUTPUT_DIR, WORKFLOW_CONFIG_FILENAME } from "./constants";
+import { JOB_OUTPUT_DIR, WORKFLOW_CONFIG_FILENAME } from "../bartender-client/constants";
 import { createClient, multipart } from "./config.server";
 import { getJobById } from "./job.server";
 
