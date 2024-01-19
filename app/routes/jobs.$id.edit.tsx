@@ -5,7 +5,7 @@ import { Haddock3WorkflowBuilder } from "~/components/Haddock3/Form.client";
 import { haddock3Styles } from "~/components/Haddock3/styles";
 import { isSubmitAllowed } from "~/models/user.server";
 import { action } from "~/routes/builder";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { ClientOnly } from "~/components/ClientOnly";
 import { getJobById, jobIdFromParams } from "~/models/job.server";
 import { getUser } from "~/auth.server";
@@ -40,7 +40,7 @@ export default function EditPage() {
   return (
     <main>
       <p>
-        Editing input of <a href={`/jobs/${jobId}`}>job {jobId}</a>
+        Editing input of <Link to={`/jobs/${jobId}`}>job {jobId}</Link>
       </p>
       <ClientOnly fallback={<p>Loading...</p>}>
         {() => <Haddock3WorkflowBuilder />}

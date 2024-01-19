@@ -1,5 +1,5 @@
 import { json, type LoaderArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { getBartenderToken } from "~/bartender_token.server";
 import {
   buildPath,
@@ -103,13 +103,13 @@ export default function ContactMapPage() {
     <>
       <h2 className="text-2xl">Contact map of module {moduleIndex}</h2>
       <div className="pb-4">
-        <a
+        <Link
           title="Browse"
-          href={`/jobs/${jobid}/browse`}
+          to={`/jobs/${jobid}/browse`}
           className="btn-outline btn btn-sm"
         >
           Back to browse
-        </a>
+        </Link>
       </div>
       {clusters.map((cluster, i) => (
         <details key={i} open={i === 0}>

@@ -1,6 +1,6 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 
 import { getBartenderToken } from "~/bartender_token.server";
 import { jobIdFromParams, getJobById } from "~/models/job.server";
@@ -70,13 +70,13 @@ export default function RescorePage() {
         <div>{job.name}</div>
         <div>Completed on {updatedOn}</div>
         <div className="flex flex-row gap-1">
-          <a
+          <Link
             title="Browse"
-            href={`/jobs/${job.id}/browse`}
+            to={`/jobs/${job.id}/browse`}
             className="btn-outline btn btn-sm"
           >
             🗀 Browse
-          </a>
+          </Link>
           <a
             title="Download archive"
             href={`/jobs/${job.id}/zip`}
@@ -84,13 +84,13 @@ export default function RescorePage() {
           >
             &#128230; Download
           </a>
-          <a
+          <Link
             title="Edit"
-            href={`/jobs/${job.id}/edit`}
+            to={`/jobs/${job.id}/edit`}
             className="btn-outline btn btn-sm"
           >
             &#128393; Edit
-          </a>
+          </Link>
         </div>
       </div>
       <ClientOnly fallback={<p>Loading...</p>}>

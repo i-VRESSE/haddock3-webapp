@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import { ListFiles } from "./ListFiles";
 import type { DirectoryItem } from "~/bartender-client/types";
+import { Link } from "@remix-run/react";
 
 export function files2modules(files: DirectoryItem) {
   if (!files.children) {
@@ -48,36 +49,36 @@ export const OutputReport = ({
               </div>
               <div>
                 {module.name === "clustfcc" && (
-                  <a
+                  <Link
                     title="Recluster"
-                    href={`/jobs/${jobid}/tools/reclustfcc/${module.id}`}
+                    to={`/jobs/${jobid}/tools/reclustfcc/${module.id}`}
                   >
                     🔧
-                  </a>
+                  </Link>
                 )}
                 {module.name === "clustrmsd" && (
-                  <a
+                  <Link
                     title="Recluster"
-                    href={`/jobs/${jobid}/tools/reclustrmsd/${module.id}`}
+                    to={`/jobs/${jobid}/tools/reclustrmsd/${module.id}`}
                   >
                     🔧
-                  </a>
+                  </Link>
                 )}
                 {module.name === "caprieval" && (
-                  <a
+                  <Link
                     title="Rescore"
-                    href={`/jobs/${jobid}/tools/rescore/${module.id}`}
+                    to={`/jobs/${jobid}/tools/rescore/${module.id}`}
                   >
                     🔧
-                  </a>
+                  </Link>
                 )}
                 {module.name === "contactmap" && (
-                  <a
+                  <Link
                     title="Recluster"
-                    href={`/jobs/${jobid}/analysis/contactmap/${module.id}`}
+                    to={`/jobs/${jobid}/analysis/contactmap/${module.id}`}
                   >
                     &#128202;
-                  </a>
+                  </Link>
                 )}
                 {module.report && (
                   <a

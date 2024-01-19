@@ -1,5 +1,5 @@
 import { json, type LoaderArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { getBartenderToken } from "~/bartender_token.server";
 import {
   listOutputFiles,
@@ -41,12 +41,12 @@ export default function JobPage() {
       <div>
         <JobStatus job={job} />
         {hasCaprieval && (
-          <a
+          <Link
             className="btn-outline btn btn-lg mt-8"
-            href={`/jobs/${job.id}/report`}
+            to={`/jobs/${job.id}/report`}
           >
             👁 Report
-          </a>
+          </Link>
         )}
       </div>
       <div>
@@ -56,7 +56,7 @@ export default function JobPage() {
           <a href={`/jobs/${job.id}/input.zip`}>&#128230; Download archive</a>
         </p>
         <p>
-          <a href={`/jobs/${job.id}/edit`}>&#128393; Edit</a>
+          <Link to={`/jobs/${job.id}/edit`}>&#128393; Edit</Link>
         </p>
       </div>
       <div>

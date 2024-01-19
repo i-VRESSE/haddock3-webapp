@@ -2,6 +2,7 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
   Form,
+  Link,
   useActionData,
   useLoaderData,
   useNavigation,
@@ -222,9 +223,9 @@ export default function ReclusterPage() {
           >
             {state === "submitting" ? "Running..." : "Recluster"}
           </button>
-          <a href="../.." className=" btn-outline btn btn-sm">
+          <Link to="../../.." relative="path" className=" btn-outline btn btn-sm">
             Back
-          </a>
+          </Link>
         </div>
         <ToolHistory
           showInteractiveVersion={interactivness}

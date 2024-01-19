@@ -1,4 +1,4 @@
-import { Form, useNavigation } from "@remix-run/react";
+import { Form, Link, useNavigation } from "@remix-run/react";
 import type { FlatErrors } from "valibot";
 
 import { ToolHistory } from "./ToolHistory";
@@ -131,9 +131,9 @@ export function RescoreForm({
         >
           {state === "submitting" ? "Running..." : "Rescore"}
         </button>
-        <a href="../.." className=" btn-outline btn btn-sm">
+        <Link to="../../.." relative="path" className=" btn-outline btn btn-sm">
           Back
-        </a>
+        </Link>
       </div>
       <ToolHistory
         showInteractiveVersion={showInteractiveVersion}
