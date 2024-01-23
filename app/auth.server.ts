@@ -5,11 +5,6 @@ import {
   OAuth2Strategy,
   type OAuth2StrategyVerifyParams,
 } from "remix-auth-oauth2";
-import {
-  type KeycloakExtraParams,
-  KeycloakStrategy,
-  type KeycloakProfile,
-} from "remix-keycloak";
 import { json } from "@remix-run/node";
 
 import { sessionStorage } from "./session.server";
@@ -203,75 +198,6 @@ if (
   authenticator.use(orcidStrategy);
 }
 
-if (
-  process.env.HADDOCK3WEBAPP_EGI_CLIENT_ID &&
-  process.env.HADDOCK3WEBAPP_EGI_CLIENT_SECRET
-) {
-  interface EgiOptions {
-    clientID: string;
-    clientSecret: string;
-    callbackURL: string;
-    environment: "production" | "development" | "demo";
-  }
-
-  class EgiStrategy<User> extends KeycloakStrategy<User> {
-    name = "egi";
-
-    constructor(
-      options: EgiOptions,
-      verify: StrategyVerifyCallback<
-        User,
-        OAuth2StrategyVerifyParams<KeycloakProfile, KeycloakExtraParams>
-      >
-    ) {
-      const domain = {
-        production: "aai.egi.eu/auth",
-        development: "aai-dev.egi.eu/auth",
-        demo: "aai-demoegi.eu/auth",
-      }[options.environment];
-      super(
-        {
-          clientID: options.clientID,
-          clientSecret: options.clientSecret,
-          callbackURL: options.callbackURL,
-          domain,
-          realm: "egi",
-          useSSL: true,
-        },
-        verify
-      );
-    }
-  }
-
-  const egiStrategy = new EgiStrategy(
-    {
-      clientID: process.env.HADDOCK3WEBAPP_EGI_CLIENT_ID,
-      clientSecret: process.env.HADDOCK3WEBAPP_EGI_CLIENT_SECRET,
-      callbackURL:
-        process.env.HADDOCK3WEBAPP_EGI_CALLBACK_URL ||
-        "http://localhost:3000/auth/egi/callback",
-      environment:
-        (process.env.HADDOCK3WEBAPP_EGI_ENVIRONMENT as
-          | "development"
-          | "production"
-          | "demo") || "production",
-    },
-    async ({ profile }) => {
-      const primaryEmail = profile.emails![0].value;
-      if (!profile._json.email_verified) {
-        throw new Error("Email not verified");
-      }
-      const photo = profile.photos ? profile.photos![0].value : undefined;
-      const userId = await oauthregister(primaryEmail, photo);
-      // TODO store egi fields like orcid, eduperson or voperson into database
-      // in far future could be used to submit job on GRID with users credentials
-      return userId;
-    }
-  );
-
-  authenticator.use(egiStrategy);
-}
-
 export async function mustBeAuthenticated(request: Request) {
   const userId = await authenticator.isAuthenticated(request);
   if (userId === null) {
@@ -303,8 +229,14 @@ export async function getOptionalClientUser(
   if (!user) {
     return null;
   }
-  const { bartenderToken, bartenderTokenExpiresAt, ...tokenLessUser } = user;
-  return tokenLessUser;
+  return {
+    id: user.id,
+    email: user.email,
+    isAdmin: user.isAdmin,
+    preferredExpertiseLevel: user.preferredExpertiseLevel,
+    expertiseLevels: user.expertiseLevels,
+    photo: user.photo,
+  }
 }
 
 export async function mustBeAdmin(request: Request) {
