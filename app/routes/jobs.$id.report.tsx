@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
@@ -17,7 +17,7 @@ import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 // TODO rescore is not used here, so imports should not be from this module
 // move to a separate module called ~/model/modules and ~/models/caprieval
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobid = jobIdFromParams(params);
   const bartenderToken = await getBartenderToken(request);
   const job = await getJobById(jobid, bartenderToken);
@@ -73,21 +73,21 @@ export default function RescorePage() {
           <Link
             title="Browse"
             to={`/jobs/${job.id}/browse`}
-            className="btn-outline btn btn-sm"
+            className="btn btn-outline btn-sm"
           >
             🗀 Browse
           </Link>
           <a
             title="Download archive"
             href={`/jobs/${job.id}/zip`}
-            className="btn-outline btn btn-sm"
+            className="btn btn-outline btn-sm"
           >
             &#128230; Download
           </a>
           <Link
             title="Edit"
             to={`/jobs/${job.id}/edit`}
-            className="btn-outline btn btn-sm"
+            className="btn btn-outline btn-sm"
           >
             &#128393; Edit
           </Link>

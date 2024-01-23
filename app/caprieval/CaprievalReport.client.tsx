@@ -1,10 +1,6 @@
 import { ClusterTable } from "@i-vresse/haddock3-analysis-components";
 import "@i-vresse/haddock3-analysis-components/dist/style.css";
 import "./CaprievalReport.client.css";
-import type {
-  Cluster,
-  ClusterID,
-} from "@i-vresse/haddock3-analysis-components/dist/components/ClusterTable";
 import { useMemo } from "react";
 
 import { ScatterPlots } from "./ScatterPlots";
@@ -15,6 +11,8 @@ import type {
   CaprievalClusterRow,
   CaprievalPlotlyProps,
 } from "./caprieval.server";
+import { Cluster, ClusterID } from "node_modules/@i-vresse/haddock3-analysis-components/dist/components/ClusterTable";
+
 
 /*
   Component has to be client only due 

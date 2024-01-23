@@ -1,7 +1,7 @@
 import {
-  type ActionArgs,
+  type ActionFunctionArgs,
   json,
-  type LoaderArgs,
+  type LoaderFunctionArgs,
   redirect,
 } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
@@ -21,7 +21,7 @@ import { register } from "~/models/user.server";
 import { commitSession, getSession } from "~/session.server";
 import { ErrorMessages } from "../components/ErrorMessages";
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {
     successRedirect: "/",
   });
@@ -42,7 +42,7 @@ const RegisterSchema = object(
   ]
 );
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const result = safeParse(RegisterSchema, Object.fromEntries(formData));
   if (!result.success) {

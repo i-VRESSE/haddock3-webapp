@@ -1,4 +1,6 @@
-export async function parseTsv<TRow>(
+import { autoType, tsvParse } from "d3-dsv";
+
+export function parseTsv<TRow>(
   body: string,
   dropComments = false,
   dropEmptyLines = false
@@ -13,8 +15,8 @@ export async function parseTsv<TRow>(
   // have to use dynamic import because
   // thats what makes it available in commonjs modules
   // according to remix dev error
-  const { tsvParse, autoType } = await import("d3-dsv");
-  return tsvParse(lines, autoType) as any as Promise<TRow[]>;
+  const rows = tsvParse(lines, autoType);
+  return rows as unknown as TRow[];
 }
 
 export function removeEmptyLines(body: string) {

@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
   Form,
@@ -45,7 +45,7 @@ const fieldDescriptions = getModuleDescriptions(`clustfcc`, [
   "min_population",
 ]);
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobid = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");
   const bartenderToken = await getBartenderToken(request);
@@ -112,7 +112,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   });
 };
 
-export const action = async ({ request, params }: LoaderArgs) => {
+export const action = async ({ request, params }: LoaderFunctionArgs) => {
   const bartenderToken = await getBartenderToken(request);
   const jobId = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");
@@ -226,7 +226,7 @@ export default function ReclusterPage() {
           <Link
             to="../../.."
             relative="path"
-            className=" btn-outline btn btn-sm"
+            className=" btn btn-outline btn-sm"
           >
             Back
           </Link>

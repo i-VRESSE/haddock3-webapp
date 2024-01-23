@@ -1,5 +1,13 @@
 import type { Output } from "valibot";
-import { object, coerce, number, optional, picklist, integer } from "valibot";
+import {
+  object,
+  coerce,
+  number,
+  optional,
+  picklist,
+  integer,
+  parse,
+} from "valibot";
 import { parse as parseTOML } from "@ltd/j-toml";
 
 import { buildPath, getJobfile } from "~/models/job.server";
@@ -37,24 +45,12 @@ export async function getParams({
   });
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
-  let config: any = parseTOML(body, { bigint: false });
+  let config = parseTOML(body, { bigint: false });
   if (!isInteractive) {
     // non-interactive has `[clustrmsd]` section
-    config = config.clustrmsd;
+    config = config.clustrmsd as typeof config;
   }
-  // TODO use valibot to get required fields from config
-  const params: Schema = {
-    criterion: config.criterion,
-  };
-  if (config.n_clusters !== undefined) {
-    params.n_clusters = config.n_clusters;
-  }
-  if (config.clust_cutoff !== undefined) {
-    params.clust_cutoff = config.clust_cutoff;
-  }
-  if (config.min_population !== undefined) {
-    params.min_population = config.min_population;
-  }
+  const params = parse(Schema, config);
   return params;
 }
 
@@ -85,7 +81,7 @@ export async function reclustrmsd({
   params: Schema;
   bartenderToken: string;
 }) {
-  const body: any = {
+  const body = {
     clustrmsd_dir: clustrmsdDir,
     module_nr: moduleIndex,
     ...params,

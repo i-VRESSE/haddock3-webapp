@@ -3,7 +3,7 @@ import {
   useFiles,
   useWorkflow,
 } from "@i-vresse/wb-core/dist/store";
-import { catalog2tomlSchemas } from "@i-vresse/wb-core/dist/toml";
+import { catalog2tomlSchemas } from "@i-vresse/wb-core/dist/toml.js";
 import { createZip } from "@i-vresse/wb-core/dist/archive";
 import { useSubmit } from "@remix-run/react";
 

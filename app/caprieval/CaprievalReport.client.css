@@ -8,3 +8,11 @@ however rest of webapp does not so overwrite colors here */
     --border-color: #ddd;
   }
 }
+
+#Nglviewport {
+  top: 2rem;
+}
+#structureViewerDialog {
+  height: 640px;
+  width: 810px;
+}

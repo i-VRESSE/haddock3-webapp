@@ -1,4 +1,4 @@
-import { type LoaderArgs } from "@remix-run/node";
+import { type LoaderFunctionArgs } from "@remix-run/node";
 
 import { getCatalog } from "~/catalogs/index.server";
 import { isSubmitAllowed } from "~/models/user.server";
@@ -11,7 +11,7 @@ import { getBartenderTokenByUser } from "~/bartender-client/token.server";
 import { Haddock3WorkflowBuilder } from "~/builder/Form.client";
 import { haddock3Styles } from "~/builder/styles";
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
   const user = await getUser(request);
   const level = user.preferredExpertiseLevel;

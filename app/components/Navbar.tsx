@@ -5,13 +5,15 @@ const LoggedInButton = () => {
   const user = useUser();
   const isAdmin = useIsAdmin();
   return (
-    <div className="dropdown-end dropdown">
-      <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
+    <div className="dropdown dropdown-end">
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+      <label tabIndex={0} className="avatar btn btn-circle btn-ghost">
         <div className="w-10 rounded-full">
           <img alt="gravatar" src={user.photo} />{" "}
         </div>
       </label>
       <ul
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         className="dropdown-content menu rounded-box menu-compact mt-3 w-52 bg-base-100 p-2 shadow"
       >

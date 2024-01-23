@@ -111,7 +111,7 @@ export async function getClusterTsv({
     throw new Error(`Could not get ${path}`);
   }
   const body = await response.text();
-  const rows = await parseClusterTsv(body);
+  const rows = parseClusterTsv(body);
 
   const ioJson = await getIoJson({
     jobid,

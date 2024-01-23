@@ -1,4 +1,8 @@
-import { type ActionArgs, type LoaderArgs, redirect } from "@remix-run/node";
+import {
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+  redirect,
+} from "@remix-run/node";
 import { type ICatalog } from "@i-vresse/wb-core/dist/types";
 
 import { getCatalog } from "~/catalogs/index.server";
@@ -12,7 +16,7 @@ import { haddock3Styles } from "~/builder/styles";
 
 export const loader = async ({
   request,
-}: LoaderArgs): Promise<{
+}: LoaderFunctionArgs): Promise<{
   catalog: ICatalog;
   submitAllowed: boolean;
   archive: string | undefined;
@@ -31,7 +35,7 @@ export const loader = async ({
   };
 };
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   console.error("myaction");
   const formData = await request.formData();
   const upload = formData.get("upload");

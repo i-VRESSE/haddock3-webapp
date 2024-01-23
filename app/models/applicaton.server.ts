@@ -7,6 +7,7 @@ import {
 } from "../bartender-client/constants";
 import { createClient, multipart } from "./config.server";
 import { getJobById } from "./job.server";
+import { dedupWorkflow } from "@i-vresse/wb-core/dist/toml.js";
 
 export async function submitJob(upload: File, accessToken: string) {
   const client = createClient(accessToken);
@@ -54,7 +55,6 @@ export async function submitJob(upload: File, accessToken: string) {
  * @returns The rewritten config file
  */
 async function rewriteConfig(config_body: string) {
-  const { dedupWorkflow } = await import("@i-vresse/wb-core/dist/toml.js");
   const table = parse(dedupWorkflow(config_body), { bigint: false });
   table.run_dir = JOB_OUTPUT_DIR;
   table.mode = "local";
@@ -68,6 +68,7 @@ async function rewriteConfig(config_body: string) {
   delete table.self_contained;
   delete table.cns_exec;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return stringify(table as any, {
     newline: "\n",
     indent: 2,

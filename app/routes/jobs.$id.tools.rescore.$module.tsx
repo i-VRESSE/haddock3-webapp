@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useActionData, useLoaderData } from "@remix-run/react";
 import { flatten, safeParse } from "valibot";
@@ -26,7 +26,7 @@ import {
 } from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");
   const bartenderToken = await getBartenderToken(request);
@@ -78,7 +78,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   });
 };
 
-export const action = async ({ request, params }: LoaderArgs) => {
+export const action = async ({ request, params }: LoaderFunctionArgs) => {
   const bartenderToken = await getBartenderToken(request);
   const jobId = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");

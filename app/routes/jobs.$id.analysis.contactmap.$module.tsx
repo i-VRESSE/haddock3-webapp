@@ -1,4 +1,4 @@
-import { json, type LoaderArgs } from "@remix-run/node";
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
 import { getBartenderToken } from "~/bartender-client/token.server";
@@ -73,7 +73,7 @@ async function getClusters(
   return clusters;
 }
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobid = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "-1");
   const bartenderToken = await getBartenderToken(request);
@@ -107,7 +107,7 @@ export default function ContactMapPage() {
         <Link
           title="Browse"
           to={`/jobs/${jobid}/browse`}
-          className="btn-outline btn btn-sm"
+          className="btn btn-outline btn-sm"
         >
           Back to browse
         </Link>

@@ -26,7 +26,7 @@ function descriptionsFromSchema(
     descriptions[name] = {
       description: field.description || "",
       title: field.title || name,
-      longDescription: (field as any)["$comment"] || "",
+      longDescription: (field as { $comment?: string })["$comment"] || "",
     };
   }
   return descriptions;
