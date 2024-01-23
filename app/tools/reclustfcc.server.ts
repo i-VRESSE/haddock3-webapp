@@ -1,6 +1,14 @@
 import { buildPath, getJobfile } from "~/models/job.server";
 import { getClusterTsv } from "./recluster.server";
-import { object, number, coerce, finite, type Output, integer } from "valibot";
+import {
+  object,
+  number,
+  coerce,
+  finite,
+  type Output,
+  integer,
+  parse,
+} from "valibot";
 import { parse as parseTOML } from "@ltd/j-toml";
 import { createClient } from "~/models/config.server";
 
@@ -33,16 +41,12 @@ export async function getParams({
   });
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
-  let config: any = parseTOML(body, { bigint: false });
+  let config = parseTOML(body, { bigint: false });
   if (!isInteractive) {
     // non-interactive has `[clustfcc]` section
-    config = config.clustfcc;
+    config = config.clustfcc as typeof config;
   }
-  const params = {
-    clust_cutoff: config.clust_cutoff,
-    strictness: config.strictness,
-    min_population: config.min_population,
-  };
+  const params = parse(Schema, config);
   return params;
 }
 

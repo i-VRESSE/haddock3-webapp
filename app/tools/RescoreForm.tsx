@@ -131,7 +131,7 @@ export function RescoreForm({
         >
           {state === "submitting" ? "Running..." : "Rescore"}
         </button>
-        <Link to="../../.." relative="path" className=" btn-outline btn btn-sm">
+        <Link to="../../.." relative="path" className=" btn btn-outline btn-sm">
           Back
         </Link>
       </div>

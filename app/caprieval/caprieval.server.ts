@@ -11,7 +11,10 @@ import type { PlotlyProps } from "~/components/PlotlyPlot";
 import type { DirectoryItem } from "~/bartender-client/types";
 import { parseTsv } from "../models/tsv";
 import { hasInteractiveVersion } from "../models/module_utils";
-import { CAPRIEVAL_SCATTERPLOT_CHOICES, CAPRIEVAL_BOXPLOT_CHOICES } from "./constants";
+import {
+  CAPRIEVAL_SCATTERPLOT_CHOICES,
+  CAPRIEVAL_BOXPLOT_CHOICES,
+} from "./constants";
 
 export const WeightsSchema = object({
   // could use minimum/maximum from catalog,
@@ -156,7 +159,7 @@ export async function getCaprievalPlots({
     );
   }
   // plot id is always 1 for non-report plot as html file contains just one plot
-  let bplotId = boxSelection === "report" ? 2 : 1;
+  const bplotId = boxSelection === "report" ? 2 : 1;
   const boxes = getPlotFromHtml(bhtml, bplotId);
   return { scatters, boxes };
 }
@@ -238,7 +241,7 @@ async function getStructureScores(
   const path = `${prefix}capri_ss.tsv`;
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
-  return await parseTsv<CaprievalStructureRow>(body);
+  return parseTsv<CaprievalStructureRow>(body);
 }
 
 export interface CaprievalClusterRow {
@@ -279,7 +282,7 @@ async function getClusterScores(
   const path = `${prefix}capri_clt.tsv`;
   const response = await getJobfile(jobid, path, bartenderToken);
   const body = await response.text();
-  return await parseTsv<CaprievalClusterRow>(body, true);
+  return parseTsv<CaprievalClusterRow>(body, true);
 }
 
 export function getLastCaprievalModule(files: DirectoryItem): number {

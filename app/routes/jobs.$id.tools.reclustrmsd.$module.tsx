@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import {
   Form,
@@ -12,7 +12,11 @@ import { flatten, safeParse } from "valibot";
 
 import { getBartenderToken } from "~/bartender-client/token.server";
 import type { CaprievalPlotlyProps } from "~/caprieval/caprieval.server";
-import { getScores, getPlotSelection, getCaprievalPlots } from "~/caprieval/caprieval.server";
+import {
+  getScores,
+  getPlotSelection,
+  getCaprievalPlots,
+} from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 import { getModuleDescriptions } from "~/catalogs/descriptionsFromSchema";
 import { ClientOnly } from "~/components/ClientOnly";
@@ -37,7 +41,7 @@ import { shouldShowInteractiveVersion } from "~/tools/shared";
 
 import { CompletedJobs } from "~/bartender-client/types";
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");
   const bartenderToken = await getBartenderToken(request);
@@ -103,7 +107,7 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   });
 };
 
-export const action = async ({ request, params }: LoaderArgs) => {
+export const action = async ({ request, params }: LoaderFunctionArgs) => {
   const bartenderToken = await getBartenderToken(request);
   const jobId = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");
@@ -273,7 +277,7 @@ export default function ReclusterPage() {
           <Link
             to="../../.."
             relative="path"
-            className=" btn-outline btn btn-sm"
+            className=" btn btn-outline btn-sm"
           >
             Back
           </Link>

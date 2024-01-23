@@ -2,7 +2,7 @@ import { cssBundleHref } from "@remix-run/css-bundle";
 import {
   json,
   type LinksFunction,
-  type LoaderArgs,
+  type LoaderFunctionArgs,
   type MetaFunction,
 } from "@remix-run/node";
 import {
@@ -27,7 +27,7 @@ export const meta: MetaFunction = () => {
   return [{ title: "Haddock3" }];
 };
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getOptionalClientUser(request);
   return json({ user });
 }

@@ -9,7 +9,7 @@ import { useState, useEffect, type ReactNode } from "react";
 let hydrating = true;
 
 function useHydrated() {
-  let [hydrated, setHydrated] = useState(() => !hydrating);
+  const [hydrated, setHydrated] = useState(() => !hydrating);
 
   useEffect(function hydrate() {
     hydrating = false;

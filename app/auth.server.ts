@@ -236,7 +236,7 @@ export async function getOptionalClientUser(
     preferredExpertiseLevel: user.preferredExpertiseLevel,
     expertiseLevels: user.expertiseLevels,
     photo: user.photo,
-  }
+  };
 }
 
 export async function mustBeAdmin(request: Request) {

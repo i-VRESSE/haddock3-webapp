@@ -1,4 +1,4 @@
-import { json, type LoaderArgs } from "@remix-run/node";
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
 import { getBartenderToken } from "~/bartender-client/token.server";
@@ -15,8 +15,7 @@ import { NonModuleOutputFiles } from "~/browse/NonModuleOutputFiles";
 import { OutputReport } from "~/browse/OutputReport";
 import { getLastCaprievalModule } from "~/caprieval/caprieval.server";
 
-
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
   const token = await getBartenderToken(request);
   const job = await getJobById(jobId, token);
@@ -44,7 +43,7 @@ export default function JobPage() {
         <JobStatus job={job} />
         {hasCaprieval && (
           <Link
-            className="btn-outline btn btn-lg mt-8"
+            className="btn btn-outline btn-lg mt-8"
             to={`/jobs/${job.id}/report`}
           >
             👁 Report

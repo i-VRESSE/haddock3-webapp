@@ -179,7 +179,7 @@ div.checkbox {
 }
 
 .table-field {
-  @apply mb-4 table border-collapse border border-gray-300;
+  @apply table mb-4 border-collapse border border-gray-300;
 }
 
 .table-bordered td,

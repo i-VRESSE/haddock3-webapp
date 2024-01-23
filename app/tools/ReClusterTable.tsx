@@ -3,7 +3,7 @@ import type { ClusterRow } from "./recluster.server";
 export function ReClusterTable({ clusters }: { clusters: ClusterRow[] }) {
   // TODO add structure viewer with contacts (*.con file)
   return (
-    <table className="table-compact table">
+    <table className="table table-compact">
       <thead>
         <tr>
           <th>Rank</th>

@@ -1,4 +1,8 @@
-import { type ActionArgs, json, type LoaderArgs } from "@remix-run/node";
+import {
+  type ActionFunctionArgs,
+  json,
+  type LoaderFunctionArgs,
+} from "@remix-run/node";
 import { Form, Link, useSubmit } from "@remix-run/react";
 import { mustBeAuthenticated } from "~/auth.server";
 import { useUser } from "~/auth";
@@ -8,12 +12,12 @@ import {
 } from "~/models/user.server";
 import { enumType, object, safeParse } from "valibot";
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAuthenticated(request);
   return json({});
 };
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const userId = await mustBeAuthenticated(request);
   const formData = await request.formData();
   const ActionSchema = object({
@@ -68,7 +72,7 @@ export default function Page() {
         ) : (
           <span>
             None assigned. If you just registered wait for administrator to
-            assign a level to you. If you still don't have a level please
+            assign a level to you. If you still don&apos;t have a level please
             context administrator.
           </span>
         )}

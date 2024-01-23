@@ -1,4 +1,4 @@
-import { json, redirect, type LoaderArgs } from "@remix-run/node";
+import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 import { getJobById, jobIdFromParams } from "~/models/job.server";
@@ -6,7 +6,7 @@ import { getUser } from "~/auth.server";
 import { JobStatus } from "~/components/JobStatus";
 import { getBartenderTokenByUser } from "~/bartender-client/token.server";
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
   const user = await getUser(request);
   const token = await getBartenderTokenByUser(user);

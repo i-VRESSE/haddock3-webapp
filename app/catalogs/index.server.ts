@@ -5,12 +5,11 @@ import expert from "./haddock3.expert.json";
 import guru from "./haddock3.guru.json";
 import type { ExpertiseLevel } from "@prisma/client";
 import { JOB_OUTPUT_DIR } from "~/bartender-client/constants";
-
+import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog.js";
 
 export async function getCatalog(level: ExpertiseLevel) {
   // Tried serverDependenciesToBundle in remix.config.js but it didn't work
   // Fallback to using dynamic import
-  const { prepareCatalog } = await import("@i-vresse/wb-core/dist/catalog.js");
   const catalogs: Record<string, ICatalog> = {
     easy: easy as unknown as ICatalog,
     expert: expert as unknown as ICatalog,
