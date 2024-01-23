@@ -11,8 +11,10 @@ import type {
   CaprievalClusterRow,
   CaprievalPlotlyProps,
 } from "./caprieval.server";
-import { Cluster, ClusterID } from "node_modules/@i-vresse/haddock3-analysis-components/dist/components/ClusterTable";
-
+import {
+  Cluster,
+  ClusterID,
+} from "node_modules/@i-vresse/haddock3-analysis-components/dist/components/ClusterTable";
 
 /*
   Component has to be client only due 
