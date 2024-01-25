@@ -1,6 +1,6 @@
 import {
-  type LoaderArgs,
-  type ActionArgs,
+  type LoaderFunctionArgs,
+  type ActionFunctionArgs,
   redirect,
   json,
 } from "@remix-run/node";
@@ -12,7 +12,7 @@ import { authenticator, getOptionalUser } from "~/auth.server";
 import { ErrorMessages } from "~/components/ErrorMessages";
 import { UserNotFoundError, WrongPasswordError } from "~/models/user.server";
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getOptionalUser(request);
   if (user) {
     return redirect("/");
@@ -21,7 +21,7 @@ export async function loader({ request }: LoaderArgs) {
   return json({ socials });
 }
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   try {
     return await authenticator.authenticate("user-pass", request, {
       successRedirect: "/",

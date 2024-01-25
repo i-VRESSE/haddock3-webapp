@@ -2,8 +2,8 @@ import { cssBundleHref } from "@remix-run/css-bundle";
 import {
   json,
   type LinksFunction,
-  type LoaderArgs,
-  type V2_MetaFunction,
+  type LoaderFunctionArgs,
+  type MetaFunction,
 } from "@remix-run/node";
 import {
   Links,
@@ -14,20 +14,20 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-import { Navbar } from "~/components/Navbar";
 import { getOptionalClientUser } from "./auth.server";
 import styles from "./tailwind.css";
+import { Navbar } from "./components/Navbar";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
   { rel: "stylesheet", href: styles },
 ];
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [{ title: "Haddock3" }];
 };
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getOptionalClientUser(request);
   return json({ user });
 }

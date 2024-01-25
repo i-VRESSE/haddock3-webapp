@@ -1,7 +1,7 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { authenticator } from "~/auth.server";
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const provider = params.provider || "";
   return authenticator.authenticate(provider, request, {
     successRedirect: "/",

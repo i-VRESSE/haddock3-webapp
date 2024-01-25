@@ -1,22 +1,23 @@
 import {
-  type ActionArgs,
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
   json,
-  type LoaderArgs,
   redirect,
 } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 
 import { submitJob } from "~/models/applicaton.server";
-import { WORKFLOW_CONFIG_FILENAME } from "~/models/constants";
-import { mustBeAllowedToSubmit } from "~/auth.server";
-import { getBartenderToken } from "~/bartender_token.server";
 
-export const loader = async ({ request }: LoaderArgs) => {
+import { mustBeAllowedToSubmit } from "~/auth.server";
+import { getBartenderToken } from "~/bartender-client/token.server";
+import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
   return json({});
 };
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const upload = formData.get("upload");
 
@@ -40,14 +41,12 @@ export default function ApplicationSlug() {
       </p>
       <Form method="post" encType="multipart/form-data">
         <div className="form-control">
-          <label className="label">
-            <input
-              className="file-input"
-              type="file"
-              name="upload"
-              accept="application/zip,.zip"
-            />
-          </label>
+          <input
+            className="file-input"
+            type="file"
+            name="upload"
+            accept="application/zip,.zip"
+          />
         </div>
         <button type="submit" className="btn btn-primary">
           Submit job

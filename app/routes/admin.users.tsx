@@ -1,7 +1,6 @@
-import type { ActionArgs, LoaderArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
-import { UserTableRow } from "~/components/admin/UserTableRow";
 import {
   assignExpertiseLevel,
   listExpertiseLevels,
@@ -10,8 +9,9 @@ import {
   unassignExpertiseLevel,
 } from "~/models/user.server";
 import { mustBeAdmin } from "~/auth.server";
+import { UserTableRow } from "~/admin/UserTableRow";
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   await mustBeAdmin(request);
   const users = await listUsers();
   const expertiseLevels = listExpertiseLevels();
@@ -21,7 +21,7 @@ export async function loader({ request }: LoaderArgs) {
   });
 }
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   await mustBeAdmin(request);
   const formData = await request.formData();
   const userId = formData.get("userId");

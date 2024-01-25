@@ -6,7 +6,7 @@ See bartender [documentation](https://i-vresse-bartender.readthedocs.io/en/lates
 
 ## API Client
 
-This web app uses a client to consume the bartender web service.
+This web app uses a openapi client to consume the bartender web service.
 
 The client can be (re-)generated with
 
@@ -14,7 +14,11 @@ The client can be (re-)generated with
 npm run generate-client
 ```
 
-(This command requires that the bartender webservice is running at http://localhost:8000)
+This command requires that the bartender webservice is running at http://localhost:8000
+or specify the location with the `BARTENDER_API_URL` environment variable.
+
+The generated client code is a reflection of the bartender configuration.
+So if the bartender configuration changes, the client needs to be regenerated.
 
 ## Configuration
 
@@ -69,4 +73,10 @@ To fetch the latest catalogs run
 
 ```shell
 npm run catalogs
+```
+
+To fetch catalogs from another branch then `main` in the workflow builder repo use
+
+```shell
+WBTAG='someotherbranchname' npm run catalogs
 ```

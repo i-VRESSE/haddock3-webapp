@@ -2,7 +2,7 @@ import JSZip from "jszip";
 import { assert, describe, test } from "vitest";
 
 import { rewriteConfigInArchive } from "./applicaton.server";
-import { WORKFLOW_CONFIG_FILENAME } from "./constants";
+import { WORKFLOW_CONFIG_FILENAME } from "../bartender-client/constants";
 
 const HY3_PDB = `\
 ATOM      1  SHA SHA S   1      30.913  40.332   2.133  1.00 36.12      S       
@@ -75,6 +75,7 @@ molecules = ['hy3.pdb']
 run_dir = 'output'
 mode = 'local'
 postprocess = true
+clean = true
 `;
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
@@ -93,6 +94,7 @@ mode = 'hpc'
 run_dir = 'output'
 mode = 'local'
 postprocess = true
+clean = true
 `;
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
@@ -118,6 +120,7 @@ cns_exec = '/usr/bin/cns'
 run_dir = 'output'
 mode = 'local'
 postprocess = true
+clean = true
 `;
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
@@ -140,6 +143,7 @@ molecules = ['hy3.pdb']
 run_dir = 'output'
 mode = 'local'
 postprocess = true
+clean = true
 
 [seletop]
 

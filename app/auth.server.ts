@@ -1,16 +1,10 @@
 import { Authenticator, type StrategyVerifyCallback } from "remix-auth";
-import { type GitHubEmails, GitHubStrategy } from "remix-auth-github";
 import { FormStrategy } from "remix-auth-form";
 import {
   type OAuth2Profile,
   OAuth2Strategy,
   type OAuth2StrategyVerifyParams,
 } from "remix-auth-oauth2";
-import {
-  type KeycloakExtraParams,
-  KeycloakStrategy,
-  type KeycloakProfile,
-} from "remix-auth-keycloak";
 import { json } from "@remix-run/node";
 
 import { sessionStorage } from "./session.server";
@@ -47,61 +41,63 @@ authenticator.use(
   "user-pass"
 );
 
-/**
- * The super class GitHubStrategy returns emails that are not verified.
- * This subclass filters out unverified emails.
- */
-class GitHubStrategyWithVerifiedEmail extends GitHubStrategy<string> {
-  // From https://github.com/sergiodxa/remix-auth-github/blob/75cedd281b58523c5d3db5f7bbe92218cb733c46/src/index.ts#L197
-  protected async userEmails(accessToken: string): Promise<GitHubEmails> {
-    // url & agent are private to super class so we have to copy them here
-    const userEmailsURL = "https://api.github.com/user/emails";
-    const userAgent = "Haddock3WebApp";
-    const response = await fetch(userEmailsURL, {
-      headers: {
-        Accept: "application/vnd.github.v3+json",
-        Authorization: `token ${accessToken}`,
-        "User-Agent": userAgent,
-      },
-    });
+// remix-auth-github is not compatible with the remix v2
+// TODO uncomment when it is fixed
+// /**
+//  * The super class GitHubStrategy returns emails that are not verified.
+//  * This subclass filters out unverified emails.
+//  */
+// class GitHubStrategyWithVerifiedEmail extends GitHubStrategy<string> {
+//   // From https://github.com/sergiodxa/remix-auth-github/blob/75cedd281b58523c5d3db5f7bbe92218cb733c46/src/index.ts#L197
+//   protected async userEmails(accessToken: string): Promise<GitHubEmails> {
+//     // url & agent are private to super class so we have to copy them here
+//     const userEmailsURL = "https://api.github.com/user/emails";
+//     const userAgent = "Haddock3WebApp";
+//     const response = await fetch(userEmailsURL, {
+//       headers: {
+//         Accept: "application/vnd.github.v3+json",
+//         Authorization: `token ${accessToken}`,
+//         "User-Agent": userAgent,
+//       },
+//     });
 
-    const data: {
-      email: string;
-      verified: boolean;
-      primary: boolean;
-      visibility: string;
-    }[] = await response.json();
-    const emails: GitHubEmails = data
-      .filter((e) => e.verified)
-      .map(({ email }) => ({ value: email }));
-    return emails;
-  }
-}
+//     const data: {
+//       email: string;
+//       verified: boolean;
+//       primary: boolean;
+//       visibility: string;
+//     }[] = await response.json();
+//     const emails: GitHubEmails = data
+//       .filter((e) => e.verified)
+//       .map(({ email }) => ({ value: email }));
+//     return emails;
+//   }
+// }
 
-if (
-  process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID &&
-  process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET
-) {
-  const gitHubStrategy = new GitHubStrategyWithVerifiedEmail(
-    {
-      clientID: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID,
-      clientSecret: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET,
-      callbackURL:
-        process.env.HADDOCK3WEBAPP_GITHUB_CALLBACK_URL ||
-        "http://localhost:3000/auth/github/callback",
-      userAgent: "Haddock3WebApp",
-    },
-    async ({ profile }) => {
-      // TODO store users display name in database for more personal greeting
-      const primaryEmail = profile.emails[0].value;
-      const photo = profile.photos[0].value ?? undefined;
-      const userId = await oauthregister(primaryEmail, photo);
-      return userId;
-    }
-  );
+// if (
+//   process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID &&
+//   process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET
+// ) {
+//   const gitHubStrategy = new GitHubStrategyWithVerifiedEmail(
+//     {
+//       clientID: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID,
+//       clientSecret: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET,
+//       callbackURL:
+//         process.env.HADDOCK3WEBAPP_GITHUB_CALLBACK_URL ||
+//         "http://localhost:3000/auth/github/callback",
+//       userAgent: "Haddock3WebApp",
+//     },
+//     async ({ profile }) => {
+//       // TODO store users display name in database for more personal greeting
+//       const primaryEmail = profile.emails[0].value;
+//       const photo = profile.photos[0].value ?? undefined;
+//       const userId = await oauthregister(primaryEmail, photo);
+//       return userId;
+//     }
+//   );
 
-  authenticator.use(gitHubStrategy);
-}
+//   authenticator.use(gitHubStrategy);
+// }
 
 if (
   process.env.HADDOCK3WEBAPP_ORCID_CLIENT_ID &&
@@ -202,75 +198,6 @@ if (
   authenticator.use(orcidStrategy);
 }
 
-if (
-  process.env.HADDOCK3WEBAPP_EGI_CLIENT_ID &&
-  process.env.HADDOCK3WEBAPP_EGI_CLIENT_SECRET
-) {
-  interface EgiOptions {
-    clientID: string;
-    clientSecret: string;
-    callbackURL: string;
-    environment: "production" | "development" | "demo";
-  }
-
-  class EgiStrategy<User> extends KeycloakStrategy<User> {
-    name = "egi";
-
-    constructor(
-      options: EgiOptions,
-      verify: StrategyVerifyCallback<
-        User,
-        OAuth2StrategyVerifyParams<KeycloakProfile, KeycloakExtraParams>
-      >
-    ) {
-      const domain = {
-        production: "aai.egi.eu/auth",
-        development: "aai-dev.egi.eu/auth",
-        demo: "aai-demoegi.eu/auth",
-      }[options.environment];
-      super(
-        {
-          clientID: options.clientID,
-          clientSecret: options.clientSecret,
-          callbackURL: options.callbackURL,
-          domain,
-          realm: "egi",
-          useSSL: true,
-        },
-        verify
-      );
-    }
-  }
-
-  const egiStrategy = new EgiStrategy(
-    {
-      clientID: process.env.HADDOCK3WEBAPP_EGI_CLIENT_ID,
-      clientSecret: process.env.HADDOCK3WEBAPP_EGI_CLIENT_SECRET,
-      callbackURL:
-        process.env.HADDOCK3WEBAPP_EGI_CALLBACK_URL ||
-        "http://localhost:3000/auth/egi/callback",
-      environment:
-        (process.env.HADDOCK3WEBAPP_EGI_ENVIRONMENT as
-          | "development"
-          | "production"
-          | "demo") || "production",
-    },
-    async ({ profile }) => {
-      const primaryEmail = profile.emails![0].value;
-      if (!profile._json.email_verified) {
-        throw new Error("Email not verified");
-      }
-      const photo = profile.photos ? profile.photos![0].value : undefined;
-      const userId = await oauthregister(primaryEmail, photo);
-      // TODO store egi fields like orcid, eduperson or voperson into database
-      // in far future could be used to submit job on GRID with users credentials
-      return userId;
-    }
-  );
-
-  authenticator.use(egiStrategy);
-}
-
 export async function mustBeAuthenticated(request: Request) {
   const userId = await authenticator.isAuthenticated(request);
   if (userId === null) {
@@ -302,8 +229,14 @@ export async function getOptionalClientUser(
   if (!user) {
     return null;
   }
-  const { bartenderToken, bartenderTokenExpiresAt, ...tokenLessUser } = user;
-  return tokenLessUser;
+  return {
+    id: user.id,
+    email: user.email,
+    isAdmin: user.isAdmin,
+    preferredExpertiseLevel: user.preferredExpertiseLevel,
+    expertiseLevels: user.expertiseLevels,
+    photo: user.photo,
+  };
 }
 
 export async function mustBeAdmin(request: Request) {

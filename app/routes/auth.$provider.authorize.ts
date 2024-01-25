@@ -1,4 +1,4 @@
-import { json, type ActionArgs } from "@remix-run/node";
+import { json, type ActionFunctionArgs } from "@remix-run/node";
 import { redirect } from "react-router";
 import { availableSocialLogins } from "~/auth";
 import { authenticator } from "~/auth.server";
@@ -7,7 +7,7 @@ export async function loader() {
   return redirect("/login");
 }
 
-export const action = async ({ params, request }: ActionArgs) => {
+export const action = async ({ params, request }: ActionFunctionArgs) => {
   const provider = params.provider || "";
   const socials = availableSocialLogins();
   if (!socials.includes(provider)) {

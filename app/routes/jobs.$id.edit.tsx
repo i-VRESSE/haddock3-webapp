@@ -1,17 +1,17 @@
-import { type LoaderArgs } from "@remix-run/node";
+import { type LoaderFunctionArgs } from "@remix-run/node";
 
 import { getCatalog } from "~/catalogs/index.server";
-import { Haddock3WorkflowBuilder } from "~/components/Haddock3/Form.client";
-import { haddock3Styles } from "~/components/Haddock3/styles";
 import { isSubmitAllowed } from "~/models/user.server";
 import { action } from "~/routes/builder";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { ClientOnly } from "~/components/ClientOnly";
 import { getJobById, jobIdFromParams } from "~/models/job.server";
 import { getUser } from "~/auth.server";
-import { getBartenderTokenByUser } from "~/bartender_token.server";
+import { getBartenderTokenByUser } from "~/bartender-client/token.server";
+import { Haddock3WorkflowBuilder } from "~/builder/Form.client";
+import { haddock3Styles } from "~/builder/styles";
 
-export const loader = async ({ params, request }: LoaderArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
   const user = await getUser(request);
   const level = user.preferredExpertiseLevel;
@@ -36,10 +36,11 @@ export default function EditPage() {
   const { jobId } = useLoaderData<typeof loader>();
   // TODO replace ClientOnly with Suspense,
   // see https://github.com/sergiodxa/remix-utils#clientonly
+  // might need upgrade to remix v2
   return (
     <main>
       <p>
-        Editing input of <a href={`/jobs/${jobId}`}>job {jobId}</a>
+        Editing input of <Link to={`/jobs/${jobId}`}>job {jobId}</Link>
       </p>
       <ClientOnly fallback={<p>Loading...</p>}>
         {() => <Haddock3WorkflowBuilder />}

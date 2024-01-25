@@ -1,9 +1,10 @@
-import { json, type LoaderArgs } from "@remix-run/node";
+import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { getBartenderToken } from "~/bartender_token.server";
+
+import { getBartenderToken } from "~/bartender-client/token.server";
 import { getJobs } from "~/models/job.server";
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const token = await getBartenderToken(request);
   const jobs = await getJobs(token);
   return json({ jobs });
@@ -37,10 +38,10 @@ export default function JobPage() {
                 <Link to={`/jobs/${job.id}`}>{job.name}</Link>
               </td>
               <td>
-                <Link to={`/jobs/${job.id}`}>{job.createdOn}</Link>
+                <Link to={`/jobs/${job.id}`}>{job.created_on}</Link>
               </td>
               <td>
-                <Link to={`/jobs/${job.id}`}>{job.updatedOn}</Link>
+                <Link to={`/jobs/${job.id}`}>{job.updated_on}</Link>
               </td>
             </tr>
           ))}

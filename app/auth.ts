@@ -9,19 +9,21 @@ import type { TokenLessUser } from "./models/user.server";
  * @param {string} id The route id
  * @returns {JSON|undefined} The router data or undefined if not found
  */
-export function useMatchesData(
-  id: string
-): Record<string, unknown> | undefined {
+export function useMatchesData(id: string) {
   const matchingRoutes = useMatches();
   const route = useMemo(
     () => matchingRoutes.find((route) => route.id === id),
     [matchingRoutes, id]
   );
-  return route?.data;
+  return route?.data as Record<string, unknown> | undefined;
 }
 
-function isUser(user: any): user is TokenLessUser {
-  return user && typeof user === "object" && typeof user.email === "string";
+function isUser(user: unknown): user is TokenLessUser {
+  return (
+    !!user &&
+    typeof user === "object" &&
+    typeof (user as TokenLessUser).email === "string"
+  );
 }
 
 export function useOptionalUser() {

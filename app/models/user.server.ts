@@ -1,8 +1,10 @@
-import { db } from "~/utils/db.server";
-import { compare, hash } from "bcryptjs";
-
+import bcryptjs from "bcryptjs";
 import { ExpertiseLevel } from "@prisma/client";
+
 import { generatePhoto } from "./generatePhoto";
+import { db } from "./db.server";
+
+const { compare, hash } = bcryptjs;
 
 export interface User {
   readonly id: string;
