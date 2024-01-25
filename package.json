@@ -32,7 +32,7 @@
   ],
   "dependencies": {
     "@i-vresse/haddock3-analysis-components": "^0.3.2",
-    "@i-vresse/wb-core": "^1.2.1",
+    "@i-vresse/wb-core": "^1.2.2",
     "@prisma/client": "^5.1.1",
     "@remix-run/css-bundle": "^2.5.1",
     "@remix-run/node": "^2.5.1",
