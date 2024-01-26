@@ -119,7 +119,7 @@ export async function getClusterTsv({
     moduleName,
     bartenderToken,
     moduleIndexPadding,
-    isInteractive,
+    isInteractive: false,
   });
   return appendPath(rows, ioJson.input);
 }
