@@ -33,7 +33,7 @@ npm install
 Configuration of the web application is done via `.env` file or environment variables.
 For configuration of authentication & authorization see [docs/auth.md](docs/auth.md).
 For configuration of job submission see [docs/bartender.md#configuration](docs/bartender.md#configuration).
-Use [.env.example](../.env.example) as a template:
+Use [.env.example](./.env.example) as a template:
 
 ```shell
 cp .env.example .env
