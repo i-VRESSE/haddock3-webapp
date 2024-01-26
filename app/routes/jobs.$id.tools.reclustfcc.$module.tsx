@@ -96,7 +96,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       moduleIndexPadding,
       scatterSelection,
       boxSelection,
-      moduleName: "clustrmsd",
+      moduleName: "clustfcc",
     });
   }
 
