@@ -60,7 +60,14 @@ async function rewriteConfig(config_body: string) {
   table.mode = "local";
   table.postprocess = true;
   table.clean = true;
-  delete table.ncores;
+
+  const haddock3_ncores = getNCores();
+  if (haddock3_ncores > 0) {
+    table.ncores = haddock3_ncores;
+  } else {
+    delete table.ncores;
+  }
+  delete table.max_cpus;
   delete table.batch_type;
   delete table.queue;
   delete table.queue_limit;
@@ -74,6 +81,26 @@ async function rewriteConfig(config_body: string) {
     indent: 2,
     integer: Number.MAX_SAFE_INTEGER,
   });
+}
+
+/**
+ *
+ * @returns Number of cores to use for haddock3. 0 means use default.
+ */
+function getNCores() {
+  let haddock3_ncores = 0;
+  if (
+    process.env.HADDOCK3_NCORES !== undefined &&
+    process.env.HADDOCK3_NCORES !== ""
+  ) {
+    haddock3_ncores = parseInt(process.env.HADDOCK3_NCORES);
+    if (isNaN(haddock3_ncores)) {
+      throw new Error(
+        `HADDOCK3_NCORES env var is not a number: ${process.env.HADDOCK3_NCORES}`
+      );
+    }
+  }
+  return haddock3_ncores;
 }
 
 export async function rewriteConfigInArchive(upload: Blob) {
