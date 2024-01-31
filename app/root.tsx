@@ -91,7 +91,7 @@ function BoundaryShell({
         <Links />
       </head>
       <body>
-      <div className="flex min-h-screen flex-col">
+        <div className="flex min-h-screen flex-col">
           <header>
             <div className="flex h-64 flex-col bg-[url('https://www.bonvinlab.org/images/pages/banner_home-mini.jpg')] bg-cover">
               <div className="flex-grow" />{" "}
@@ -99,10 +99,10 @@ function BoundaryShell({
               <Navbar />
             </div>
           </header>
-        <div className="p-6 grow bg-error-content">
-          <h1 className="py-8 text-2xl">Something bad happened.</h1>
-          {children}
-        </div>
+          <div className="grow bg-error-content p-6">
+            <h1 className="py-8 text-2xl">Something bad happened.</h1>
+            {children}
+          </div>
         </div>
         <Scripts />
       </body>
@@ -141,10 +141,12 @@ export function ErrorBoundary() {
   return (
     <BoundaryShell title="Error!">
       <div>The website administrators have been notified.</div>
-      <details>
-        <summary>Details</summary>
-        {errorInstance.stack}
-      </details>
+      {process.env.NODE_ENV !== "production" && (
+        <details>
+          <summary>Details</summary>
+          <pre>{errorInstance.stack}</pre>
+        </details>
+      )}
     </BoundaryShell>
   );
 }
