@@ -2,6 +2,7 @@ import type { SerializeFrom } from "@remix-run/node";
 import { CompletedJobs } from "~/bartender-client/types";
 import { ListLogFiles } from "../browse/ListLogFiles";
 import type { JobModelDTO } from "~/bartender-client/types";
+import { JobName } from "./JobName";
 
 interface Props {
   job: SerializeFrom<JobModelDTO>;
@@ -11,7 +12,9 @@ export function JobStatus({ job }: Props) {
   return (
     <>
       <p>ID: {job.id}</p>
-      <p>Name: {job.name}</p>
+      <p>
+        Name: <JobName jobid={job.id} name={job.name} />
+      </p>
       <p>
         State: <b>{job.state}</b>
       </p>

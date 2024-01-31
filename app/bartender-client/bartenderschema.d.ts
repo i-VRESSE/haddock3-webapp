@@ -295,6 +295,35 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/job/{jobid}/name": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Rename Job Name
+     * @description Rename the name of a job.
+     *
+     *     Args:
+     *         jobid: The job identifier.
+     *         job_dao: The job DAO.
+     *         user: The current user.
+     *         name: The new name of the job.
+     *
+     *     Raises:
+     *         HTTPException: When job is not found. Or when user is not owner of job.
+     */
+    post: operations["rename_job_name"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/whoami": {
     parameters: {
       query?: never;
@@ -820,6 +849,39 @@ export interface operations {
       };
     };
   };
+  rename_job_name: {
+    parameters: {
+      query: {
+        name: string;
+      };
+      header?: never;
+      path: {
+        jobid: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
   whoami: {
     parameters: {
       query?: never;
@@ -853,7 +915,7 @@ export interface operations {
           /**
            * Upload
            * Format: binary
-           * @description Archive containing workflow.cfg file.
+           * @description Zip archive containing workflow.cfg file(s).
            */
           upload: Blob;
         };

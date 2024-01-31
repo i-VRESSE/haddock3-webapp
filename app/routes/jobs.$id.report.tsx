@@ -14,6 +14,7 @@ import {
   getCaprievalPlots,
 } from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
+import { JobName } from "~/components/JobName";
 // TODO rescore is not used here, so imports should not be from this module
 // move to a separate module called ~/model/modules and ~/models/caprieval
 
@@ -67,7 +68,9 @@ export default function RescorePage() {
   return (
     <>
       <div className="flex flex-row justify-between pb-4">
-        <div>{job.name}</div>
+        <div>
+          <JobName jobid={job.id} name={job.name} />
+        </div>
         <div>Completed on {updatedOn}</div>
         <div className="flex flex-row gap-1">
           <Link

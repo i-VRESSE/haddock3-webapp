@@ -274,3 +274,24 @@ export function buildAnalyisPath({
     .padStart(moduleIndexPadding, "0");
   return `${prefix}/${moduleIndexPadded}_${moduleName}${interactiveSuffix}_analysis/${suffix}`;
 }
+
+export async function updateJobName(
+  jobid: number,
+  name: string,
+  bartenderToken: string
+) {
+  const client = createClient(bartenderToken);
+  const { error } = await client.POST("/api/job/{jobid}/name", {
+    params: {
+      path: {
+        jobid,
+      },
+      query: {
+        name,
+      },
+    },
+  });
+  if (error) {
+    throw error;
+  }
+}
