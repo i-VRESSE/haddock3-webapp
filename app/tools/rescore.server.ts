@@ -19,7 +19,6 @@ export async function rescore({
     module_nr: moduleIndex,
     ...weights,
   };
-  console.log(body);
   const client = createClient(bartenderToken);
   const { data, error } = await client.POST(
     "/api/job/{jobid}/interactive/rescore",
