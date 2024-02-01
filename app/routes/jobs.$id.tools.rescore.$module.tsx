@@ -89,10 +89,10 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
   const formData = await request.formData();
   const result = safeParse(WeightsSchema, Object.fromEntries(formData));
   if (!result.success) {
-    const errors = flatten(result.error);
+    const errors = flatten(result.issues);
     return json({ errors }, { status: 400 });
   }
-  const weights = result.data;
+  const weights = result.output;
   const outputFiles = await listOutputFiles(jobId, bartenderToken, 1);
   const [moduleName, , moduleIndexPadding] = moduleInfo(
     outputFiles,

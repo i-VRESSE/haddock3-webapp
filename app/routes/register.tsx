@@ -46,10 +46,10 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const result = safeParse(RegisterSchema, Object.fromEntries(formData));
   if (!result.success) {
-    const errors = flatten(result.error);
+    const errors = flatten(result.issues);
     return json({ errors }, { status: 400 });
   }
-  const { username, password } = result.data;
+  const { username, password } = result.output;
 
   try {
     const user = await register(username, password);
