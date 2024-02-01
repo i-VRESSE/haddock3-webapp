@@ -112,7 +112,9 @@ export async function rewriteConfigInArchive(upload: Blob) {
   await zip.loadAsync(await upload.arrayBuffer());
   const config_file = zip.file(WORKFLOW_CONFIG_FILENAME);
   if (config_file === null) {
-    throw new InvalidUploadError(`Unable to find ${WORKFLOW_CONFIG_FILENAME} in archive`);
+    throw new InvalidUploadError(
+      `Unable to find ${WORKFLOW_CONFIG_FILENAME} in archive`
+    );
   }
   const config_body = await config_file.async("string");
   zip.file(`${WORKFLOW_CONFIG_FILENAME}.orig`, config_body);

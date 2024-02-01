@@ -35,7 +35,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     if (error instanceof InvalidUploadError) {
       return json({ error: error.message }, { status: 422 });
     }
-    throw error
+    throw error;
   }
 };
 
@@ -57,13 +57,11 @@ export default function UploadPage() {
             accept="application/zip,.zip"
           />
         </div>
-        {
-          actionData?.error && (
-            <div className="text-red-500">
-              <p>{actionData.error}</p>
-            </div>
-          )
-        }
+        {actionData?.error && (
+          <div className="text-red-500">
+            <p>{actionData.error}</p>
+          </div>
+        )}
         <button type="submit" className="btn btn-primary">
           Submit job
         </button>
