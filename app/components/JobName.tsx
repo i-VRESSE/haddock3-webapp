@@ -29,6 +29,7 @@ export function JobName({ jobid, name }: { jobid: number; name: string }) {
           name="name"
           defaultValue={name}
           className="mx-1 rounded border-2 p-1"
+          maxLength={200}
         />
         <ErrorMessages path="name" errors={fetcherData?.errors} />
         <button className="btn btn-primary btn-sm" title="Save" type="submit">
@@ -43,7 +44,8 @@ export function JobName({ jobid, name }: { jobid: number; name: string }) {
       title="Click to change name"
       onClick={() => setIsEditing(true)}
     >
-      {name} <span className="invisible group-hover/name:visible">🖉</span>
+      {name}
+      <span className="invisible ps-1 group-hover/name:visible">🖉</span>
     </button>
   );
 }
