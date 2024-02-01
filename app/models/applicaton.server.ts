@@ -8,6 +8,7 @@ import {
 import { createClient, multipart } from "./config.server";
 import { getJobById } from "./job.server";
 import { dedupWorkflow } from "@i-vresse/wb-core/dist/toml.js";
+import { BartenderError, InvalidUploadError } from "./errors";
 
 export async function submitJob(upload: File, accessToken: string) {
   const client = createClient(accessToken);
@@ -28,7 +29,7 @@ export async function submitJob(upload: File, accessToken: string) {
     bodySerializer: multipart,
   });
   if (!response.ok && response.status !== 303) {
-    throw new Error(
+    throw new BartenderError(
       `Unable to submit job: ${response.status} ${
         response.statusText
       } ${await response.text()}`
@@ -111,7 +112,7 @@ export async function rewriteConfigInArchive(upload: Blob) {
   await zip.loadAsync(await upload.arrayBuffer());
   const config_file = zip.file(WORKFLOW_CONFIG_FILENAME);
   if (config_file === null) {
-    throw new Error(`Unable to find ${WORKFLOW_CONFIG_FILENAME} in archive`);
+    throw new InvalidUploadError(`Unable to find ${WORKFLOW_CONFIG_FILENAME} in archive`);
   }
   const config_body = await config_file.async("string");
   zip.file(`${WORKFLOW_CONFIG_FILENAME}.orig`, config_body);

@@ -36,7 +36,6 @@ export const loader = async ({
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  console.error("myaction");
   const formData = await request.formData();
   const upload = formData.get("upload");
   if (typeof upload === "string" || upload === null) {
