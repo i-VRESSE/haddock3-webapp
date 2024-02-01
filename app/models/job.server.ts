@@ -286,10 +286,8 @@ export async function updateJobName(
       path: {
         jobid,
       },
-      query: {
-        name,
-      },
     },
+    body: name,
   });
   if (error) {
     throw error;

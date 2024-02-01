@@ -851,16 +851,18 @@ export interface operations {
   };
   rename_job_name: {
     parameters: {
-      query: {
-        name: string;
-      };
+      query?: never;
       header?: never;
       path: {
         jobid: number;
       };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        "application/json": string;
+      };
+    };
     responses: {
       /** @description Successful Response */
       200: {

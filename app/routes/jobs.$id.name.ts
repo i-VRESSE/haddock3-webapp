@@ -1,10 +1,17 @@
 import { ActionFunctionArgs, json } from "@remix-run/node";
-import { flatten, minLength, object, safeParse, string } from "valibot";
+import {
+  flatten,
+  maxLength,
+  minLength,
+  object,
+  safeParse,
+  string,
+} from "valibot";
 import { getBartenderToken } from "~/bartender-client/token.server";
 import { jobIdFromParams, updateJobName } from "~/models/job.server";
 
 export const Schema = object({
-  name: string([minLength(1)]),
+  name: string([minLength(1), maxLength(200)]),
 });
 
 export async function action({ request, params }: ActionFunctionArgs) {
