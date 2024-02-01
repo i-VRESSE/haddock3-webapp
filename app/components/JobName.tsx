@@ -30,6 +30,7 @@ export function JobName({ jobid, name }: { jobid: number; name: string }) {
           defaultValue={name}
           className="mx-1 rounded border-2 p-1"
           maxLength={200}
+          minLength={1}
         />
         <ErrorMessages path="name" errors={fetcherData?.errors} />
         <button className="btn btn-primary btn-sm" title="Save" type="submit">
