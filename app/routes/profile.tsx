@@ -27,10 +27,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   if (result.success) {
     await setPreferredExpertiseLevel(
       userId,
-      result.data.preferredExpertiseLevel
+      result.output.preferredExpertiseLevel
     );
   } else {
-    const errors = result.error;
+    const errors = result.issues;
     return json({ errors }, { status: 400 });
   }
   return null;

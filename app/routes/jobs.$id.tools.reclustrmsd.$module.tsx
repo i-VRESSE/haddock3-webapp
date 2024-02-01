@@ -118,10 +118,10 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
   const formData = await request.formData();
   const result = safeParse(Schema, Object.fromEntries(formData));
   if (!result.success) {
-    const errors = flatten(result.error);
+    const errors = flatten(result.issues);
     return json({ errors }, { status: 400 });
   }
-  const clustparams = result.data;
+  const clustparams = result.output;
   const outputFiles = await listOutputFiles(jobId, bartenderToken, 1);
   const [, , moduleIndexPadding] = moduleInfo(outputFiles, moduleIndex);
   const clustrmsdDir = buildPath({
