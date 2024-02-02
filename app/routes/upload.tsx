@@ -12,6 +12,7 @@ import { mustBeAllowedToSubmit } from "~/auth.server";
 import { getBartenderTokenByUser } from "~/bartender-client/token.server";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import { InvalidUploadError } from "~/models/errors";
+import { ValidationError } from "@i-vresse/wb-core/dist/validate.js";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -34,7 +35,26 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return redirect(job_url);
   } catch (error) {
     if (error instanceof InvalidUploadError) {
-      return json({ error: error.message }, { status: 422 });
+      return json({ errors: [error.message] }, { status: 422 });
+    }
+    if (error instanceof ValidationError) {
+      console.log({
+        n: error.name,
+        m: error.message,
+        errors: JSON.stringify(error.errors, undefined, 2),
+      });
+
+      const errors = error.errors.map((e) => {
+        let message = e.message;
+        if (e.workflowPath) {
+          message = `Error in ${e.workflowPath}: ${message}`;
+          if (e.params.additionalProperty) {
+            message += `: ${e.params.additionalProperty}`;
+          }
+        }
+        return message;
+      });
+      return json({ errors: [error.message, ...errors] }, { status: 422 });
     }
     throw error;
   }
@@ -58,11 +78,11 @@ export default function UploadPage() {
             accept="application/zip,.zip"
           />
         </div>
-        {actionData?.error && (
-          <div className="text-red-500">
-            <p>{actionData.error}</p>
-          </div>
-        )}
+        <div className="py-2 text-red-500">
+          {actionData?.errors.map((error) => (
+            <p key={error}>{error}</p>
+          ))}
+        </div>
         <button type="submit" className="btn btn-primary">
           Submit job
         </button>

@@ -26,17 +26,14 @@ export async function submitJob(
   accessToken: string,
   expertiseLevels: ExpertiseLevel[]
 ) {
-  const client = createClient(accessToken);
+  const rewritten_blob = await rewriteConfigInArchive(upload, expertiseLevels);
+  const rewritten_upload = new File([rewritten_blob], upload.name, {
+    type: upload.type,
+    lastModified: upload.lastModified,
+  });
 
-  const rewritten_upload = new File(
-    [await rewriteConfigInArchive(upload, expertiseLevels)],
-    upload.name,
-    {
-      type: upload.type,
-      lastModified: upload.lastModified,
-    }
-  );
   const body = { upload: rewritten_upload };
+  const client = createClient(accessToken);
   // Redirect manual is needed because authorization header is not passed
   const { response } = await client.PUT("/api/application/haddock3", {
     redirect: "manual",
