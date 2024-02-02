@@ -1,35 +1,45 @@
 import { Link, NavLink } from "@remix-run/react";
 import { useIsAdmin, useIsLoggedIn, useUser } from "~/auth";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from "./ui/navigation-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
 
 const LoggedInButton = () => {
   const user = useUser();
   const isAdmin = useIsAdmin();
   return (
-    <div className="dropdown dropdown-end">
-      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-      <label tabIndex={0} className="avatar btn btn-circle btn-ghost">
-        <div className="w-10 rounded-full">
-          <img alt="gravatar" src={user.photo} />{" "}
-        </div>
-      </label>
-      <ul
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-        tabIndex={0}
-        className="dropdown-content menu rounded-box menu-compact mt-3 w-52 bg-base-100 p-2 shadow"
-      >
-        <li>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+          <div className="w-10 rounded-full">
+            <img alt="gravatar" src={user.photo} />{" "}
+          </div>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem>
           <Link to="/profile">Profile</Link>
-        </li>
+        </DropdownMenuItem>
         {isAdmin && (
-          <li>
+          <DropdownMenuItem>
             <Link to="/admin">Admin</Link>
-          </li>
+          </DropdownMenuItem>
         )}
-        <li>
+        <DropdownMenuItem>
           <Link to="/logout">Logout</Link>
-        </li>
-      </ul>
-    </div>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
@@ -39,31 +49,33 @@ export const Navbar = () => {
   const loggedIn = useIsLoggedIn();
 
   return (
-    <div className="navbar bg-primary">
+    <div className="flex w-full bg-secondary text-secondary-foreground items-center justify-between">
       <div>
-        <NavLink to="/" className="btn btn-ghost text-xl normal-case">
+        <NavLink to="/" className="text-xl normal-case">
           Haddock3
         </NavLink>
       </div>
-      <div className="navbar-start flex">
-        <ul className="menu menu-horizontal px-1">
-          <li>
+      <NavigationMenu>
+        <NavigationMenuList>
+          <NavigationMenuItem>
             <NavLink to="/builder">Build</NavLink>
-          </li>
-          <li>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
             <NavLink to="/upload">Upload</NavLink>
-          </li>
-          <li>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
             <NavLink to="/jobs">Manage</NavLink>
-          </li>
-          <li>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
             <NavLink to="/about">About</NavLink>
-          </li>
-          <li>
-            <NavLink to="/help">Help</NavLink>
-          </li>
-        </ul>
-      </div>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <NavLink to="/help">
+              <NavigationMenuLink>Help</NavigationMenuLink>
+            </NavLink>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
       <div className="navbar-end">
         {loggedIn ? <LoggedInButton /> : <LoginButton />}
       </div>

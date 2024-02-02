@@ -53,7 +53,7 @@ export default function App() {
           <div className="m-6 grow">
             <Outlet />
           </div>
-          <footer className="bg-primary p-1 text-center">
+          <footer className="bg-secondary text-secondary-foreground p-1 text-center">
             <p className="text-sm">
               This work is co-funded by the Horizon 2020 projects EOSC-hub and
               EGI-ACE (grant numbers 777536 and 101017567), BioExcel (grant

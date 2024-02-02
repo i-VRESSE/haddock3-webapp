@@ -1,3 +1,4 @@
+import {CardContent, CardFooter, CardHeader, Card as UiCard } from "~/components/ui/card"
 import { Link } from "@remix-run/react";
 
 interface CardProps {
@@ -9,16 +10,20 @@ interface CardProps {
 
 export default function Card(props: CardProps) {
   return (
-    <div className="card w-96 bg-base-100 shadow-lg hover:shadow-xl">
+    <UiCard>
       <Link to={props.target}>
+        <CardHeader>
         <figure>
           <img src={props.image} alt={props.title} className="h-48" />
         </figure>
-        <div className="card-body">
-          <h2 className="card-title">{props.title}</h2>
+        </CardHeader>
+        <CardContent>
+          <h2 className="text-2xl">{props.title}</h2>
+        </CardContent>
+        <CardFooter>
           <p>{props.description}</p>
-        </div>
+        </CardFooter>
       </Link>
-    </div>
+    </UiCard>
   );
 }
