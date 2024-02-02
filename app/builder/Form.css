@@ -32,15 +32,15 @@ h5 {
 }
 
 .btn-link {
-  @apply border-0 bg-inherit text-primary hover:bg-base-200;
+  @apply border-0 bg-inherit text-primary hover:bg-muted;
 }
 
 .btn-outline-danger {
-  @apply border border-error text-error hover:bg-error hover:text-white;
+  @apply border border-destructive text-destructive hover:bg-destructive hover:text-white;
 }
 
 .btn-danger {
-  @apply bg-error text-white;
+  @apply bg-destructive text-white;
 }
 
 .btn-toolbar {
@@ -97,7 +97,7 @@ div.checkbox {
 }
 
 .custom-select {
-  @apply select ml-2;
+  @apply ml-2;
 }
 
 .array-item-add,
@@ -155,15 +155,15 @@ div.checkbox {
 }
 
 .nav-tabs {
-  @apply border-b-4  border-b-primary-content;
+  @apply border-b-4  border-b-primary;
 }
 
 .nav-link {
-  @apply block rounded-t-md border bg-base-200 px-4 py-2;
+  @apply block rounded-t-md border bg-muted px-4 py-2;
 }
 
 .nav .active {
-  @apply border-base-200 bg-primary-content text-primary;
+  @apply border-muted bg-primary text-primary;
 }
 
 .justify-content-end {
