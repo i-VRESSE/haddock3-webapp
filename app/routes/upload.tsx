@@ -23,13 +23,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const upload = formData.get("upload");
 
+  const user = await mustBeAllowedToSubmit(request);
+  const token = await getBartenderTokenByUser(user);
   try {
     if (typeof upload === "string" || upload === null) {
       throw new InvalidUploadError("Bad upload, no file found");
     }
 
-    const user = await mustBeAllowedToSubmit(request);
-    const token = await getBartenderTokenByUser(user);
     const job = await submitJob(upload, token, user.expertiseLevels);
     const job_url = `/jobs/${job.id}`;
     return redirect(job_url);
@@ -38,27 +38,25 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       return json({ errors: [error.message] }, { status: 422 });
     }
     if (error instanceof ValidationError) {
-      console.log({
-        n: error.name,
-        m: error.message,
-        errors: JSON.stringify(error.errors, undefined, 2),
-      });
-
-      const errors = error.errors.map((e) => {
-        let message = e.message;
-        if (e.workflowPath) {
-          message = `Error in ${e.workflowPath}: ${message}`;
-          if (e.params.additionalProperty) {
-            message += `: ${e.params.additionalProperty}`;
-          }
-        }
-        return message;
-      });
+      const errors = flattenValidationErrors(error);
       return json({ errors: [error.message, ...errors] }, { status: 422 });
     }
     throw error;
   }
 };
+
+function flattenValidationErrors(error: ValidationError) {
+  return error.errors.map((e) => {
+    let message = e.message;
+    if (e.workflowPath) {
+      message = `Error in ${e.workflowPath}: ${message}`;
+      if (e.params.additionalProperty) {
+        message += `: ${e.params.additionalProperty}`;
+      }
+    }
+    return message;
+  });
+}
 
 export default function UploadPage() {
   const actionData = useActionData<typeof action>();
