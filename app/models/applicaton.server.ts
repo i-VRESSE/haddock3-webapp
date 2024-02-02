@@ -7,14 +7,29 @@ import {
 } from "../bartender-client/constants";
 import { createClient, multipart } from "./config.server";
 import { getJobById } from "./job.server";
-import { dedupWorkflow } from "@i-vresse/wb-core/dist/toml.js";
+import {
+  dedupWorkflow,
+  parseWorkflowFromTable,
+} from "@i-vresse/wb-core/dist/toml.js";
 import { BartenderError, InvalidUploadError } from "./errors";
+import { ExpertiseLevel } from "@prisma/client";
+import type { IFiles, IWorkflow } from "@i-vresse/wb-core/dist/types";
+import {
+  Errors,
+  ValidationError,
+  validateWorkflow,
+} from "@i-vresse/wb-core/dist/validate.js";
+import { getCatalog } from "~/catalogs/index.server";
 
-export async function submitJob(upload: File, accessToken: string) {
+export async function submitJob(
+  upload: File,
+  accessToken: string,
+  expertiseLevels: ExpertiseLevel[]
+) {
   const client = createClient(accessToken);
 
   const rewritten_upload = new File(
-    [await rewriteConfigInArchive(upload)],
+    [await rewriteConfigInArchive(upload, expertiseLevels)],
     upload.name,
     {
       type: upload.type,
@@ -55,8 +70,7 @@ export async function submitJob(upload: File, accessToken: string) {
  * @param config_body Body of workflow config file to rewrite
  * @returns The rewritten config file
  */
-async function rewriteConfig(config_body: string) {
-  const table = parse(dedupWorkflow(config_body), { bigint: false });
+function rewriteConfig(table: ReturnType<typeof parse>) {
   table.run_dir = JOB_OUTPUT_DIR;
   table.mode = "local";
   table.postprocess = true;
@@ -75,13 +89,7 @@ async function rewriteConfig(config_body: string) {
   delete table.concat;
   delete table.self_contained;
   delete table.cns_exec;
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return stringify(table as any, {
-    newline: "\n",
-    indent: 2,
-    integer: Number.MAX_SAFE_INTEGER,
-  });
+  return table;
 }
 
 /**
@@ -104,11 +112,14 @@ function getNCores() {
   return haddock3_ncores;
 }
 
-export async function rewriteConfigInArchive(upload: Blob) {
+export async function rewriteConfigInArchive(
+  upload: Blob,
+  expertiseLevels: ExpertiseLevel[]
+) {
   const zip = new JSZip();
   // Tried to give upload blob directly to loadAsync, but failed with
   // Error: Can't read the data of 'the loaded zip file'. Is it in a supported JavaScript type (String, Blob, ArrayBuffer, etc) ?
-  // however converting to array buffer works.
+  // however converting to array buffer works, but will load entire file into memory
   await zip.loadAsync(await upload.arrayBuffer());
   const config_file = zip.file(WORKFLOW_CONFIG_FILENAME);
   if (config_file === null) {
@@ -117,13 +128,75 @@ export async function rewriteConfigInArchive(upload: Blob) {
     );
   }
   const config_body = await config_file.async("string");
+
+  // Keep backup of original config, before rewriting it
   zip.file(`${WORKFLOW_CONFIG_FILENAME}.orig`, config_body);
 
-  // TODO validate config using catalog and ajv
-  // now have to wait for job to run before its validated
+  const table = parse(dedupWorkflow(config_body), { bigint: false });
+  const new_table = rewriteConfig(table);
 
-  const new_config = await rewriteConfig(config_body);
+  const new_config = parseWorkflowFromTable(new_table, getCatalog("guru"));
+  await validateWorkflowAgainstExpertiseLevels(
+    new_config,
+    expertiseLevels,
+    zip
+  );
 
-  zip.file(WORKFLOW_CONFIG_FILENAME, new_config);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const new_config_body = stringify(new_table as any, {
+    newline: "\n",
+    indent: 2,
+    integer: Number.MAX_SAFE_INTEGER,
+  });
+
+  zip.file(WORKFLOW_CONFIG_FILENAME, new_config_body);
   return await zip.generateAsync({ type: "blob" });
+}
+
+async function validateWorkflowAgainstExpertiseLevels(
+  workflow: IWorkflow,
+  expertiseLevels: ExpertiseLevel[],
+  zip: JSZip
+) {
+  const files = await filesFromZip(zip);
+  let errors: Errors = [];
+  if (expertiseLevels.length === 0) {
+    throw new ValidationError("No expertise levels provided", []);
+  }
+  for (const expertiseLevel of expertiseLevels) {
+    const catalog = getCatalog(expertiseLevel);
+    errors = await validateWorkflow(workflow, catalog, files);
+    if (errors.length === 0) {
+      // If workflow is valid for any expertise level, then it's valid
+      return;
+    }
+  }
+  throw new ValidationError("Invalid workflow", errors);
+}
+
+async function filesFromZip(zip: JSZip): Promise<IFiles> {
+  const blobs: Promise<[string, string]>[] = [];
+  zip.forEach((relativePath, file) => {
+    if (
+      relativePath === WORKFLOW_CONFIG_FILENAME ||
+      relativePath === `${WORKFLOW_CONFIG_FILENAME}.orig`
+    ) {
+      // Skip workflow config file
+      return;
+    }
+    blobs.push(
+      file.async("blob").then((blob) => blob2dataurl(blob, relativePath))
+    );
+  });
+  const dataurls = await Promise.all(blobs);
+  return Object.fromEntries(dataurls);
+}
+
+async function blob2dataurl(
+  value: Blob,
+  path: string
+): Promise<[string, string]> {
+  const base64 = Buffer.from(await value.arrayBuffer()).toString("base64");
+  const dataurl = `data:${value.type};name=${path};base64,${base64}`;
+  return [path, dataurl];
 }

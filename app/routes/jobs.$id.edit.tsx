@@ -15,7 +15,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
   const user = await getUser(request);
   const level = user.preferredExpertiseLevel;
-  const catalog = await getCatalog(level ?? "easy");
+  const catalog = getCatalog(level ?? "easy");
   const token = await getBartenderTokenByUser(user);
   // Check that user can see job, otherwise throw 404
   await getJobById(jobId, token);

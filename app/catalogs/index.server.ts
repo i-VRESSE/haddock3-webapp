@@ -7,18 +7,17 @@ import type { ExpertiseLevel } from "@prisma/client";
 import { JOB_OUTPUT_DIR } from "~/bartender-client/constants";
 import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog.js";
 
-export async function getCatalog(level: ExpertiseLevel) {
-  // Tried serverDependenciesToBundle in remix.config.js but it didn't work
-  // Fallback to using dynamic import
-  const catalogs: Record<string, ICatalog> = {
-    easy: easy as unknown as ICatalog,
-    expert: expert as unknown as ICatalog,
-    guru: guru as unknown as ICatalog,
-  };
-  const catalog = catalogs[level];
+// Load catalogs during startup
+const catalogs = loadCatalogs();
+
+export function getCatalog(level: ExpertiseLevel) {
   if (!(level in catalogs)) {
     throw new Error(`No catalog found for level ${level}`);
   }
+  return catalogs[level];
+}
+
+function loadCatalog(catalog: ICatalog) {
   catalog.examples = {};
   // Set default run_dir to JOB_OUTPUT_DIR
   if (
@@ -28,4 +27,12 @@ export async function getCatalog(level: ExpertiseLevel) {
     catalog.global.schema.properties.run_dir.default = JOB_OUTPUT_DIR;
   }
   return prepareCatalog(catalog);
+}
+
+function loadCatalogs() {
+  return {
+    easy: loadCatalog(easy as unknown as ICatalog),
+    expert: loadCatalog(expert as unknown as ICatalog),
+    guru: loadCatalog(guru as unknown as ICatalog),
+  } as const;
 }

@@ -27,7 +27,7 @@ export const loader = async ({
   // can still use builder with easy level
   // but cannot submit only download
   const catalogLevel = level === "" ? "easy" : level;
-  const catalog = await getCatalog(catalogLevel);
+  const catalog = getCatalog(catalogLevel);
   return {
     catalog,
     submitAllowed: isSubmitAllowed(level ?? ""),
@@ -44,7 +44,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const user = await mustBeAllowedToSubmit(request);
   const accessToken = await getBartenderTokenByUser(user);
-  const job = await submitJob(upload, accessToken);
+  const job = await submitJob(upload, accessToken, user.expertiseLevels);
   const job_url = `/jobs/${job.id}`;
   return redirect(job_url);
 };

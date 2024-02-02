@@ -9,7 +9,7 @@ import { Form, useActionData } from "@remix-run/react";
 import { submitJob } from "~/models/applicaton.server";
 
 import { mustBeAllowedToSubmit } from "~/auth.server";
-import { getBartenderToken } from "~/bartender-client/token.server";
+import { getBartenderTokenByUser } from "~/bartender-client/token.server";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import { InvalidUploadError } from "~/models/errors";
 
@@ -27,8 +27,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       throw new InvalidUploadError("Bad upload, no file found");
     }
 
-    const token = await getBartenderToken(request);
-    const job = await submitJob(upload, token);
+    const user = await mustBeAllowedToSubmit(request);
+    const token = await getBartenderTokenByUser(user);
+    const job = await submitJob(upload, token, user.expertiseLevels);
     const job_url = `/jobs/${job.id}`;
     return redirect(job_url);
   } catch (error) {
