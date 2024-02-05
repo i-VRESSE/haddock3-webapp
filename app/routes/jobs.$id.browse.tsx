@@ -17,6 +17,7 @@ import {
   buildBestRankedPath,
   getLastCaprievalModule,
 } from "~/caprieval/caprieval.server";
+import { Button } from "~/components/ui/button";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
@@ -57,12 +58,9 @@ export default function JobPage() {
                 🏆 Download best ranked
               </a>
             </p>
-            <Link
-              className="btn btn-outline btn-lg mt-8"
-              to={`/jobs/${job.id}/report`}
-            >
-              👁 Report
-            </Link>
+            <Button className="mt-8" variant="outline" size="xl" asChild>
+              <Link to={`/jobs/${job.id}/report`}>👁 Report</Link>
+            </Button>
           </>
         )}
       </div>
