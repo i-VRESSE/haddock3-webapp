@@ -22,11 +22,11 @@ export function JobStatus({ job }: Props) {
       <p>Updated on: {new Date(job.updated_on).toUTCString()}</p>
       {CompletedJobs.has(job.state) && (
         <>
-          <a href={`/jobs/${job.id}/zip`}>&#128230; Download archive</a>
           <details>
             <summary className="cursor-pointer">Logs</summary>
             <ListLogFiles jobid={job.id} ok={job.state === "ok"} />
           </details>
+          <a href={`/jobs/${job.id}/zip`}>&#128230; Download archive</a>
         </>
       )}
     </>
