@@ -27,20 +27,14 @@ export const WorkflowSubmitButton = ({
     submit(formData, { method: "post", encType: "multipart/form-data" });
   };
   if (submitAllowed) {
-    return (
-      <Button onClick={submitworkflow}>
-        Submit
-      </Button>
-    );
+    return <Button onClick={submitworkflow}>Submit</Button>;
   }
   return (
     <div
       className="tooltip"
       data-tip="You don't have permission to submit. Please login and make sure you have the right expertise level."
     >
-      <Button disabled>
-        Submit
-      </Button>
+      <Button disabled>Submit</Button>
     </div>
   );
 };

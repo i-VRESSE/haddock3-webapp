@@ -5,7 +5,11 @@ export const WorkflowDownloadButton = (): JSX.Element => {
   const { save } = useWorkflow();
 
   return (
-    <Button variant="secondary" onClick={save} className="text-primary hover:bg-gray-200">
+    <Button
+      variant="secondary"
+      onClick={save}
+      className="text-primary hover:bg-gray-200"
+    >
       Download archive
     </Button>
   );
