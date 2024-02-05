@@ -11,6 +11,9 @@ import {
   setPreferredExpertiseLevel,
 } from "~/models/user.server";
 import { enumType, object, safeParse } from "valibot";
+import { Button } from "~/components/ui/button";
+import { Label } from "~/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAuthenticated(request);
@@ -47,27 +50,25 @@ export default function Page() {
   return (
     <main>
       <p>Email: {user.email}</p>
-      <fieldset>
+      <fieldset className="py-2">
         <legend>Expertise levels</legend>
         {user.expertiseLevels.length ? (
           <Form method="post" onChange={handleChangePreferredExpertiseLevel}>
-            <ul className="list-inside">
+            <RadioGroup defaultValue={user.preferredExpertiseLevel as string}
+              name="preferredExpertiseLevel"
+            >
               {user.expertiseLevels.map((level) => (
-                <li key={level}>
-                  <label>
-                    <input
-                      title="Preferred"
-                      type="radio"
-                      className="radio"
-                      name="preferredExpertiseLevel"
+                 <div className="flex items-center space-x-2" key={level}>
+                    <RadioGroupItem
                       value={level}
-                      defaultChecked={user.preferredExpertiseLevel === level}
-                    />{" "}
+                      id={level}
+                    />
+                    <Label htmlFor={level}>
                     {level}
-                  </label>
-                </li>
+                  </Label>
+                </div>
               ))}
-            </ul>
+            </RadioGroup>
           </Form>
         ) : (
           <span>
@@ -79,9 +80,12 @@ export default function Page() {
       </fieldset>
 
       {/* TODO add change password form if user is not authenticated with a social login */}
-      <Link role="button" className="btn btn-sm m-2" to="/logout">
+      <Button asChild variant="secondary">
+      <Link to="/logout">
         Logout
       </Link>
+      </Button>
+        
     </main>
   );
 }

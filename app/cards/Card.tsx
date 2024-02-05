@@ -10,10 +10,10 @@ interface CardProps {
 
 export default function Card(props: CardProps) {
   return (
-    <UiCard>
+    <UiCard className="w-96 hover:shadow-xl">
       <Link to={props.target}>
         <CardHeader>
-        <figure>
+        <figure className="place-self-center">
           <img src={props.image} alt={props.title} className="h-48" />
         </figure>
         </CardHeader>

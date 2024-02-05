@@ -11,6 +11,9 @@ import { AuthorizationError } from "remix-auth";
 import { authenticator, getOptionalUser } from "~/auth.server";
 import { ErrorMessages } from "~/components/ErrorMessages";
 import { UserNotFoundError, WrongPasswordError } from "~/models/user.server";
+import { Button } from "~/components/ui/button";
+import { Label } from "~/components/ui/label";
+import { Input } from "~/components/ui/input";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getOptionalUser(request);
@@ -56,51 +59,47 @@ export default function LoginPage() {
   const centeredColumn = "flex flex-col items-center gap-4";
   const formStyle =
     "flex flex-col items-stretch gap-4 border-2 rounded shadow-lg p-4";
-  const inputStyle = "border-2 rounded p-1 w-full";
-  const buttonStyle = "btn btn-sm btn-primary";
-  const linkStyle = "link link-primary link-hover";
   const headerStyle = "text-lg text-center font-semibold";
 
   return (
     <main className={centeredColumn}>
       <Form method="post" className={formStyle}>
-        <h2 className={headerStyle}>Log in with username and password</h2>
+        <h2 className={headerStyle}>Log in</h2>
         <div>
-          <label>
-            <p>Email</p>
-            <input
+          <Label htmlFor="email">
+            Email
+            </Label>
+            <Input
               id="email"
               name="email"
               type="email"
               autoComplete="username"
-              className={inputStyle}
               required
             />
-          </label>
           <ErrorMessages path="email" errors={actionData?.errors} />
         </div>
         <div>
-          <label>
-            <p>Password</p>
-            <input
+          <Label htmlFor="password">
+            Password
+            </Label>
+            <Input
               id="password"
               name="password"
               type="password"
               autoComplete="current-password"
-              className={inputStyle}
               required
             />
-          </label>
           <ErrorMessages path="password" errors={actionData?.errors} />
         </div>
-        <button type="submit" className={buttonStyle}>
+        <Button type="submit">
           Log in
-        </button>
+        </Button>
         <p>
-          New user?{" "}
-          <Link to="/register" className={linkStyle}>
-            Click here to register.
+        <Button asChild variant={"link"}>
+          <Link to="/register">
+          New user? Click here to register.
           </Link>
+          </Button>
         </p>
       </Form>
 
@@ -109,7 +108,7 @@ export default function LoginPage() {
       <div className="space-evenly flex gap-4">
         {socials.includes("github") && (
           <form method="post" action="/auth/github/authorize">
-            <button type="submit" className="btn h-auto">
+            <Button type="submit" className="h-12" variant="secondary">
               <img
                 height="32"
                 width="32"
@@ -117,20 +116,20 @@ export default function LoginPage() {
                 alt="GitHub logo"
               />
               <p className="px-2">GitHub</p>
-            </button>
+            </Button>
           </form>
         )}
         {socials.includes("orcid") && (
           <form method="post" action="/auth/orcid/authorize">
-            <button type="submit" className="btn h-auto">
+            <Button type="submit" className="h-12" variant="secondary">
               <img height="32" width="32" src="orcid.png" alt="ORCID logo" />
               <p className="px-2">ORCID</p>
-            </button>
+            </Button>
           </form>
         )}
         {socials.includes("egi") && (
           <form method="post" action="/auth/egi/authorize">
-            <button type="submit" className="btn h-auto">
+            <Button type="submit" className="h-12" variant="secondary">
               <img
                 height="32"
                 width="32"
@@ -138,7 +137,7 @@ export default function LoginPage() {
                 alt="EGI Check-in logo"
               />
               <p className="px-2">EGI Check-in</p>
-            </button>
+            </Button>
           </form>
         )}
       </div>

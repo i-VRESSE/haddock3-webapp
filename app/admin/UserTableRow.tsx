@@ -1,5 +1,8 @@
 import type { User } from "~/models/user.server";
 import type { ExpertiseLevel } from "@prisma/client";
+import { TableCell, TableRow } from "~/components/ui/table";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Label } from "~/components/ui/label";
 
 interface IProps {
   user: User;
@@ -16,13 +19,11 @@ export const UserTableRow = ({
 }: IProps) => {
   const usersExpertiseLevels = user.expertiseLevels;
   return (
-    <tr>
-      <td>{user.email}</td>
-      <td>
-        <input
-          type="checkbox"
+    <TableRow>
+      <TableCell>{user.email}</TableCell>
+      <TableCell>
+        <Checkbox
           checked={user.isAdmin}
-          className="checkbox"
           disabled={submitting}
           onChange={() => {
             if (window.confirm("Are you sure?") === false) {
@@ -33,21 +34,18 @@ export const UserTableRow = ({
             onUpdate(data);
           }}
         />
-      </td>
-      <td>
-        <ul className="flex">
+      </TableCell>
+      <TableCell>
+        <ul className="flex space-x-4">
           {expertiseLevels.map((expertiseLevel) => {
             return (
               <li key={expertiseLevel}>
-                <div className="form-control">
-                  <label className="label cursor-pointer">
-                    <span className="label-text">{expertiseLevel}</span>
-                    <input
-                      type="checkbox"
+                <div className="flex items-center space-x-1">
+                    <Checkbox
                       checked={usersExpertiseLevels.includes(expertiseLevel)}
-                      className="checkbox ml-2"
                       disabled={submitting}
-                      onChange={() => {
+                      id={`${user.id}-${expertiseLevel}`}
+                      onCheckedChange={() => {
                         const data = new FormData();
                         data.set(
                           expertiseLevel,
@@ -58,13 +56,15 @@ export const UserTableRow = ({
                         onUpdate(data);
                       }}
                     />
-                  </label>
+                  <Label htmlFor={`${user.id}-${expertiseLevel}`}>
+                    {expertiseLevel}
+                    </Label>
                 </div>
               </li>
             );
           })}
         </ul>
-      </td>
-    </tr>
+      </TableCell>
+    </TableRow>
   );
 };

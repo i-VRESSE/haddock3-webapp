@@ -5,6 +5,7 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
+  navigationMenuTriggerStyle,
 } from "./ui/navigation-menu";
 import {
   DropdownMenu,
@@ -20,22 +21,21 @@ const LoggedInButton = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <div className="w-10 rounded-full">
-            <img alt="gravatar" src={user.photo} />{" "}
-          </div>
+        {/* TODO button is not vertically centered */}
+        <Button variant="outline" size="icon" className="rounded-full">
+          <img alt="gravatar" src={user.photo} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link to="/profile">Profile</Link>
         </DropdownMenuItem>
         {isAdmin && (
-          <DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link to="/admin">Admin</Link>
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link to="/logout">Logout</Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -43,40 +43,62 @@ const LoggedInButton = () => {
   );
 };
 
-const LoginButton = () => <Link to="/login">Login</Link>;
+const LoginButton = () => (
+  <Link className={navigationMenuTriggerStyle()} to="/login">
+    Login
+  </Link>
+);
 
 export const Navbar = () => {
   const loggedIn = useIsLoggedIn();
 
   return (
-    <div className="flex w-full bg-secondary text-secondary-foreground items-center justify-between">
-      <div>
-        <NavLink to="/" className="text-xl normal-case">
+    <div className="flex w-full items-center bg-primary p-2 text-primary-foreground">
+      <div className={navigationMenuTriggerStyle()}>
+        <NavLink to="/" className="text-2xl ">
           Haddock3
         </NavLink>
       </div>
-      <NavigationMenu>
-        <NavigationMenuList>
+      <NavigationMenu className="">
+        <NavigationMenuList className="flex space-x-5">
           <NavigationMenuItem>
-            <NavLink to="/builder">Build</NavLink>
+            <NavigationMenuLink asChild>
+              <NavLink to="/builder" className={navigationMenuTriggerStyle()}>
+                Build
+              </NavLink>
+            </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <NavLink to="/upload">Upload</NavLink>
+            <NavigationMenuLink asChild>
+              <NavLink to="/upload" className={navigationMenuTriggerStyle()}>
+                Upload
+              </NavLink>
+            </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <NavLink to="/jobs">Manage</NavLink>
+            <NavigationMenuLink asChild>
+              <NavLink to="/jobs" className={navigationMenuTriggerStyle()}>
+                Manage
+              </NavLink>
+            </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <NavLink to="/about">About</NavLink>
+            <NavigationMenuLink asChild>
+              <NavLink to="/about" className={navigationMenuTriggerStyle()}>
+                About
+              </NavLink>
+            </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <NavLink to="/help">
-              <NavigationMenuLink>Help</NavigationMenuLink>
-            </NavLink>
+            <NavigationMenuLink asChild>
+              <NavLink to="/help" className={navigationMenuTriggerStyle()}>
+                Help
+              </NavLink>
+            </NavigationMenuLink>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
-      <div className="navbar-end">
+      <div className="ml-auto">
         {loggedIn ? <LoggedInButton /> : <LoginButton />}
       </div>
     </div>

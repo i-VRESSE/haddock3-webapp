@@ -176,6 +176,8 @@ export async function assignExpertiseLevel(
     ? user.preferredExpertiseLevel
     : level;
 
+    // TODO retain order should be easy,expert,guru
+    // now order is based on click order by admin
   await db.user.update({
     where: {
       id: userId,
