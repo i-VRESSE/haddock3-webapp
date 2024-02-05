@@ -67,7 +67,7 @@ molecules = ['hy3.pdb']
 `;
     const archive = await prepareArchive(input_config);
 
-    const result = await rewriteConfigInArchive(archive);
+    const result = await rewriteConfigInArchive(archive, ["easy"]);
 
     const expected_config = `\
 
@@ -88,7 +88,7 @@ mode = 'hpc'
 `;
     const archive = await prepareArchive(input_config);
 
-    const result = await rewriteConfigInArchive(archive);
+    const result = await rewriteConfigInArchive(archive, ["easy"]);
     const expected_config = `\
 
 run_dir = 'output'
@@ -114,7 +114,7 @@ cns_exec = '/usr/bin/cns'
 `;
     const archive = await prepareArchive(input_config);
 
-    const result = await rewriteConfigInArchive(archive);
+    const result = await rewriteConfigInArchive(archive, ["easy"]);
     const expected_config = `\
 
 run_dir = 'output'
@@ -135,7 +135,7 @@ select = 5
 `;
     const archive = await prepareArchive(input_config);
 
-    const result = await rewriteConfigInArchive(archive);
+    const result = await rewriteConfigInArchive(archive, ["easy"]);
 
     const expected_config = `\
 

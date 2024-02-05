@@ -12,6 +12,7 @@ import {
   getScores,
   getPlotSelection,
   getCaprievalPlots,
+  buildBestRankedPath,
 } from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 import { JobName } from "~/components/JobName";
@@ -48,7 +49,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       scatterSelection,
       boxSelection,
     });
-    return json({ job, scores, plotlyPlots });
+    const bestRanked = buildBestRankedPath(module, moduleIndexPadding);
+    return json({ job, scores, plotlyPlots, bestRanked });
   } catch (error) {
     if (
       error instanceof Error &&
@@ -61,7 +63,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 };
 
 export default function RescorePage() {
-  const { job, scores, plotlyPlots } = useLoaderData<typeof loader>();
+  const { job, scores, plotlyPlots, bestRanked } =
+    useLoaderData<typeof loader>();
   // Strip SerializeObject<UndefinedToOptional wrapper
   const plotlyPlotsStripped = plotlyPlots as CaprievalPlotlyProps;
   const updatedOn = new Date(job.updated_on).toUTCString();
@@ -81,11 +84,18 @@ export default function RescorePage() {
             🗀 Browse
           </Link>
           <a
-            title="Download archive"
+            title="Download archive of best ranked clusters/structures"
+            href={`/jobs/${job.id}/files/${bestRanked}`}
+            className="btn btn-outline btn-sm"
+          >
+            🏆 Download best ranked
+          </a>
+          <a
+            title="Download archive of all files"
             href={`/jobs/${job.id}/zip`}
             className="btn btn-outline btn-sm"
           >
-            &#128230; Download
+            &#128230; Download all
           </a>
           <Link
             title="Edit"

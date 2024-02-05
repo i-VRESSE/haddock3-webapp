@@ -81,14 +81,22 @@ export const OutputReport = ({
                   </Link>
                 )}
                 {module.report && (
-                  <a
-                    title="Analysis report"
-                    target="_blank"
-                    rel="noreferrer"
-                    href={`/jobs/${jobid}/files/${module.report.path}`}
-                  >
-                    &#128202;
-                  </a>
+                  <>
+                    <a
+                      title="Analysis report"
+                      target="_blank"
+                      rel="noreferrer"
+                      href={`/jobs/${jobid}/files/${module.report.path}`}
+                    >
+                      &#128202;
+                    </a>
+                    <a
+                      title="Download archive of best ranked clusters/structures"
+                      href={`/jobs/${jobid}/files/${module.report.path}/../summary.tgz`}
+                    >
+                      🏆
+                    </a>
+                  </>
                 )}
                 <a
                   target="_blank"

@@ -13,7 +13,10 @@ import { JobStatus } from "~/components/JobStatus";
 import { ListFiles } from "~/browse/ListFiles";
 import { NonModuleOutputFiles } from "~/browse/NonModuleOutputFiles";
 import { OutputReport } from "~/browse/OutputReport";
-import { getLastCaprievalModule } from "~/caprieval/caprieval.server";
+import {
+  buildBestRankedPath,
+  getLastCaprievalModule,
+} from "~/caprieval/caprieval.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
@@ -25,29 +28,42 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const inputFiles = await listInputFiles(jobId, token);
   const outputFiles = await listOutputFiles(jobId, token);
   let hasCaprieval = true;
+  let bestRanked = "";
   try {
-    getLastCaprievalModule(outputFiles);
+    const [moduleIndex, moduleIndexPadding] =
+      getLastCaprievalModule(outputFiles);
+    bestRanked = buildBestRankedPath(moduleIndex, moduleIndexPadding);
   } catch (error) {
     hasCaprieval = false;
   }
 
-  return json({ job, inputFiles, outputFiles, hasCaprieval });
+  return json({ job, inputFiles, outputFiles, hasCaprieval, bestRanked });
 };
 
 export default function JobPage() {
-  const { job, outputFiles, inputFiles, hasCaprieval } =
+  const { job, outputFiles, inputFiles, hasCaprieval, bestRanked } =
     useLoaderData<typeof loader>();
   return (
     <main className="flex flex-row gap-16">
       <div>
         <JobStatus job={job} />
         {hasCaprieval && (
-          <Link
-            className="btn btn-outline btn-lg mt-8"
-            to={`/jobs/${job.id}/report`}
-          >
-            👁 Report
-          </Link>
+          <>
+            <p>
+              <a
+                title="Download archive of best ranked clusters/structures"
+                href={`/jobs/${job.id}/files/${bestRanked}`}
+              >
+                🏆 Download best ranked
+              </a>
+            </p>
+            <Link
+              className="btn btn-outline btn-lg mt-8"
+              to={`/jobs/${job.id}/report`}
+            >
+              👁 Report
+            </Link>
+          </>
         )}
       </div>
       <div>
