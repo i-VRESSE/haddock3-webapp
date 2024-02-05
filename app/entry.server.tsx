@@ -16,6 +16,7 @@ import { createReadableStreamFromReadable } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
+import { init as SentryInit, captureException } from "@sentry/node";
 
 const ABORT_DELAY = 5_000;
 
@@ -144,11 +145,15 @@ function handleBrowserRequest(
   });
 }
 
+SentryInit({ dsn: process.env.SENTRY_DSN });
+
 export function handleError(
   error: unknown,
   { request }: LoaderFunctionArgs | ActionFunctionArgs
 ) {
   if (!request.signal.aborted) {
-    // TODO send error to reporting service
+    console.log('Capturing error with Sentry.')
+    // TODO add hint like request.url
+    captureException(error)
   }
 }
