@@ -66,39 +66,31 @@ export default function LoginPage() {
       <Form method="post" className={formStyle}>
         <h2 className={headerStyle}>Log in</h2>
         <div>
-          <Label htmlFor="email">
-            Email
-            </Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="username"
-              required
-            />
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            autoComplete="username"
+            required
+          />
           <ErrorMessages path="email" errors={actionData?.errors} />
         </div>
         <div>
-          <Label htmlFor="password">
-            Password
-            </Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-            />
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            required
+          />
           <ErrorMessages path="password" errors={actionData?.errors} />
         </div>
-        <Button type="submit">
-          Log in
-        </Button>
+        <Button type="submit">Log in</Button>
         <p>
-        <Button asChild variant={"link"}>
-          <Link to="/register">
-          New user? Click here to register.
-          </Link>
+          <Button asChild variant={"link"}>
+            <Link to="/register">New user? Click here to register.</Link>
           </Button>
         </p>
       </Form>

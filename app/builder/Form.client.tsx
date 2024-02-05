@@ -35,7 +35,7 @@ const App = () => {
   }, [archive, activetCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div>
+    <div className="workflow-builder-app bg-secondary">
       <div className="page grid h-full w-full gap-2 p-4">
         <div>
           <CatalogPanel></CatalogPanel>

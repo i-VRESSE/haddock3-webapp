@@ -89,56 +89,46 @@ export default function RegisterPage() {
       <Form method="post" className={formStyle}>
         <h2 className={headerStyle}>Register</h2>
         <div>
-          <Label htmlFor="username">
-            Email
-            </Label>
-            <Input
-              id="username"
-              name="username"
-              type="email"
-              autoComplete="username"
-              required
-            />
+          <Label htmlFor="username">Email</Label>
+          <Input
+            id="username"
+            name="username"
+            type="email"
+            autoComplete="username"
+            required
+          />
           <ErrorMessages path="username" errors={actionData?.errors} />
         </div>
         <div>
-          <Label htmlFor="password">
-            Password
-            </Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              minLength={8}
-              required
-              autoComplete="new-password"
-            />
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            minLength={8}
+            required
+            autoComplete="new-password"
+          />
           <ErrorMessages path="password" errors={actionData?.errors} />
         </div>
 
         <div>
-          <Label htmlFor="password2">
-            Confirm password
-            </Label>
-            <Input
-              id="password2"
-              name="password2"
-              type="password"
-              minLength={8}
-              required
-              autoComplete="new-password"
-            />
+          <Label htmlFor="password2">Confirm password</Label>
+          <Input
+            id="password2"
+            name="password2"
+            type="password"
+            minLength={8}
+            required
+            autoComplete="new-password"
+          />
           <ErrorMessages path="password2" errors={actionData?.errors} />
         </div>
         <ErrorMessages path="root" errors={actionData?.errors} />
-        <Button type="submit">
-          Register
-        </Button>
+        <Button type="submit">Register</Button>
         <p>
-        <Button asChild variant={"link"}>
-          <Link to="/login">
-          Or login if you already have an account.
-          </Link>
+          <Button asChild variant={"link"}>
+            <Link to="/login">Or login if you already have an account.</Link>
           </Button>
         </p>
       </Form>

@@ -54,18 +54,14 @@ export default function Page() {
         <legend>Expertise levels</legend>
         {user.expertiseLevels.length ? (
           <Form method="post" onChange={handleChangePreferredExpertiseLevel}>
-            <RadioGroup defaultValue={user.preferredExpertiseLevel as string}
+            <RadioGroup
+              defaultValue={user.preferredExpertiseLevel as string}
               name="preferredExpertiseLevel"
             >
               {user.expertiseLevels.map((level) => (
-                 <div className="flex items-center space-x-2" key={level}>
-                    <RadioGroupItem
-                      value={level}
-                      id={level}
-                    />
-                    <Label htmlFor={level}>
-                    {level}
-                  </Label>
+                <div className="flex items-center space-x-2" key={level}>
+                  <RadioGroupItem value={level} id={level} />
+                  <Label htmlFor={level}>{level}</Label>
                 </div>
               ))}
             </RadioGroup>
@@ -80,12 +76,9 @@ export default function Page() {
       </fieldset>
 
       {/* TODO add change password form if user is not authenticated with a social login */}
-      <Button asChild variant="secondary">
-      <Link to="/logout">
-        Logout
-      </Link>
+      <Button asChild variant="outline">
+        <Link to="/logout">Logout</Link>
       </Button>
-        
     </main>
   );
 }

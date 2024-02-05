@@ -2,7 +2,14 @@ import { json, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
 import { getBartenderToken } from "~/bartender-client/token.server";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
 import { getJobs } from "~/models/job.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -39,10 +46,14 @@ export default function JobPage() {
                 <Link to={`/jobs/${job.id}`}>{job.name}</Link>
               </TableCell>
               <TableCell>
-                <Link to={`/jobs/${job.id}`}>{new Date(job.created_on).toUTCString()}</Link>
+                <Link to={`/jobs/${job.id}`}>
+                  {new Date(job.created_on).toUTCString()}
+                </Link>
               </TableCell>
               <TableCell>
-                <Link to={`/jobs/${job.id}`}>{new Date(job.updated_on).toUTCString()}</Link>
+                <Link to={`/jobs/${job.id}`}>
+                  {new Date(job.updated_on).toUTCString()}
+                </Link>
               </TableCell>
             </TableRow>
           ))}

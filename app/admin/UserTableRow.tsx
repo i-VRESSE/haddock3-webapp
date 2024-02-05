@@ -41,24 +41,24 @@ export const UserTableRow = ({
             return (
               <li key={expertiseLevel}>
                 <div className="flex items-center space-x-1">
-                    <Checkbox
-                      checked={usersExpertiseLevels.includes(expertiseLevel)}
-                      disabled={submitting}
-                      id={`${user.id}-${expertiseLevel}`}
-                      onCheckedChange={() => {
-                        const data = new FormData();
-                        data.set(
-                          expertiseLevel,
-                          usersExpertiseLevels.includes(expertiseLevel)
-                            ? "false"
-                            : "true"
-                        );
-                        onUpdate(data);
-                      }}
-                    />
+                  <Checkbox
+                    checked={usersExpertiseLevels.includes(expertiseLevel)}
+                    disabled={submitting}
+                    id={`${user.id}-${expertiseLevel}`}
+                    onCheckedChange={() => {
+                      const data = new FormData();
+                      data.set(
+                        expertiseLevel,
+                        usersExpertiseLevels.includes(expertiseLevel)
+                          ? "false"
+                          : "true"
+                      );
+                      onUpdate(data);
+                    }}
+                  />
                   <Label htmlFor={`${user.id}-${expertiseLevel}`}>
                     {expertiseLevel}
-                    </Label>
+                  </Label>
                 </div>
               </li>
             );

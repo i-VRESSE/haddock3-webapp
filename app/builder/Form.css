@@ -19,7 +19,7 @@ h5 {
 }
 
 .btn-light {
-  @apply border-gray-100 bg-gray-100 text-start text-primary  hover:bg-gray-200;
+  @apply border-gray-100 bg-transparent text-start text-primary  hover:bg-gray-200;
 }
 
 .btn-sm {
@@ -32,7 +32,7 @@ h5 {
 }
 
 .btn-link {
-  @apply border-0 bg-inherit text-primary hover:bg-muted;
+  @apply border-0 bg-inherit text-primary hover:bg-gray-200;
 }
 
 .btn-outline-danger {
@@ -45,6 +45,10 @@ h5 {
 
 .btn-toolbar {
   @apply flex flex-wrap justify-start;
+}
+
+.btn-primary {
+  @apply bg-primary text-primary-foreground;
 }
 
 ul {
@@ -87,7 +91,7 @@ li {
   @apply ml-2;
 }
 
-/* rjsf uses .checkbox in div and input. daisyui uses checkbox on input. */
+/* rjsf uses .checkbox in div and input. shadcn uses radix components. */
 div.checkbox {
   @apply h-auto w-auto cursor-default border-none;
 }
@@ -97,7 +101,7 @@ div.checkbox {
 }
 
 .custom-select {
-  @apply ml-2;
+  @apply ml-2 bg-background text-base;
 }
 
 .array-item-add,
@@ -159,7 +163,7 @@ div.checkbox {
 }
 
 .nav-link {
-  @apply block rounded-t-md border bg-muted text-muted-foreground px-4 py-2;
+  @apply block rounded-t-md bg-muted px-4 py-2 text-muted-foreground;
 }
 
 .nav .active {
@@ -179,7 +183,7 @@ div.checkbox {
 }
 
 .table-field {
-  @apply table mb-4 border-collapse border border-gray-300;
+  @apply mb-4 table border-collapse border border-gray-300;
 }
 
 .table-bordered td,
@@ -222,4 +226,13 @@ div.checkbox {
 
 code .table {
   @apply contents;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
+  @apply flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+/* Exclude styling of upload button in workflow column */
+.form-group input[type="file"] {
+  @apply flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
 }

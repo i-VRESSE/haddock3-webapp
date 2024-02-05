@@ -10,7 +10,13 @@ import {
 } from "~/models/user.server";
 import { mustBeAdmin } from "~/auth.server";
 import { UserTableRow } from "~/admin/UserTableRow";
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "~/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await mustBeAdmin(request);
