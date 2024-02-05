@@ -6,12 +6,14 @@ import {
   type MetaFunction,
 } from "@remix-run/node";
 import {
+  isRouteErrorResponse,
   Links,
   LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useRouteError,
 } from "@remix-run/react";
 
 import { getOptionalClientUser } from "./auth.server";
@@ -71,5 +73,80 @@ export default function App() {
         <LiveReload />
       </body>
     </html>
+  );
+}
+
+function BoundaryShell({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" data-theme="bonvinlab">
+      <head>
+        <title>Haddock3 - {title}</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <div className="flex min-h-screen flex-col">
+          <header>
+            <div className="flex h-64 flex-col bg-[url('https://www.bonvinlab.org/images/pages/banner_home-mini.jpg')] bg-cover">
+              <div className="flex-grow" />{" "}
+              {/* Push the navbar to the bottom of the banner */}
+              <Navbar />
+            </div>
+          </header>
+          <div className="grow bg-error-content p-6">
+            <h1 className="py-8 text-2xl">Something bad happened.</h1>
+            {children}
+          </div>
+        </div>
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  console.error(error);
+
+  // Logic copied from https://github.com/remix-run/remix/blob/main/packages/remix-react/errorBoundaries.tsx
+  if (isRouteErrorResponse(error)) {
+    return (
+      <BoundaryShell title="Unhandled Thrown Response!">
+        <h1 style={{ fontFamily: "system-ui, sans-serif", padding: "2rem" }}>
+          {error.status} {error.statusText}
+        </h1>
+      </BoundaryShell>
+    );
+  }
+
+  let errorInstance: Error;
+  if (error instanceof Error) {
+    errorInstance = error;
+  } else {
+    const errorString =
+      error == null
+        ? "Unknown Error"
+        : typeof error === "object" && "toString" in error
+        ? error.toString()
+        : JSON.stringify(error);
+    errorInstance = new Error(errorString);
+  }
+
+  return (
+    <BoundaryShell title="Error!">
+      <div>The website administrators have been notified.</div>
+      {process.env.NODE_ENV !== "production" && (
+        <details>
+          <summary>Details</summary>
+          <pre>{errorInstance.stack}</pre>
+        </details>
+      )}
+    </BoundaryShell>
   );
 }
