@@ -12,6 +12,7 @@ import { mustBeAllowedToSubmit } from "~/auth.server";
 import { getBartenderToken } from "~/bartender-client/token.server";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -42,14 +43,13 @@ export default function ApplicationSlug() {
       </p>
       <Form method="post" encType="multipart/form-data">
         <div className="form-control py-2">
-          <input
-            className="file-input"
+          <Input
             type="file"
             name="upload"
             accept="application/zip,.zip"
           />
         </div>
-        <Button type="submit" variant="default">
+        <Button type="submit">
           Submit job
         </Button>
       </Form>
