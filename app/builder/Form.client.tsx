@@ -51,7 +51,7 @@ const App = () => {
       </div>
       <div className="page sticky inset-x-0 bottom-0 grid h-14">
         <div></div>
-        <div role="group" className="btn-group">
+        <div role="group" className="flex flex-row">
           <WorkflowSubmitButton submitAllowed={submitAllowed} />
           <WorkflowDownloadButton />
         </div>
