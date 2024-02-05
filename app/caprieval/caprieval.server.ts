@@ -59,7 +59,7 @@ export async function getCaprievalModuleInfo(
 ): Promise<[number, boolean, number]> {
   const files = await listOutputFiles(jobid, bartenderToken, 1);
   if (moduleIndex === -1) {
-    moduleIndex = getLastCaprievalModule(files);
+    moduleIndex = getLastCaprievalModule(files)[0];
   }
   const pad = getModuleIndexPadding(files);
   const interactivness = hasInteractiveVersion(moduleIndex, files);
@@ -285,7 +285,7 @@ async function getClusterScores(
   return parseTsv<CaprievalClusterRow>(body, true);
 }
 
-export function getLastCaprievalModule(files: DirectoryItem): number {
+export function getLastCaprievalModule(files: DirectoryItem): [number, number] {
   if (!files.children) {
     throw new Error("No modules found");
   }
@@ -296,8 +296,23 @@ export function getLastCaprievalModule(files: DirectoryItem): number {
       module.name.endsWith("caprieval") &&
       !module.name.includes("_interactive")
     ) {
-      return parseInt(module.name.split("_")[0]);
+      const index = parseInt(module.name.split("_")[0]);
+      const moduleIndexPadding = getModuleIndexPadding(files);
+      return [index, moduleIndexPadding];
     }
   }
   throw new Error("No caprieval module found");
+}
+
+export function buildBestRankedPath(
+  module: number,
+  moduleIndexPadding: number
+) {
+  // output/analysis/12_caprieval_analysis/summary.tgz
+  return buildAnalyisPath({
+    moduleIndex: module,
+    moduleName: "caprieval",
+    moduleIndexPadding,
+    suffix: "summary.tgz",
+  });
 }
