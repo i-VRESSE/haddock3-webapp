@@ -82,11 +82,11 @@ module.exports = {
 
     // Shadcn-ui
     {
-      files: ['**/components/ui/*.tsx'],
+      files: ["**/components/ui/*.tsx"],
       rules: {
-        'react/prop-types': 'off',
-        'jsx-a11y/heading-has-content': 'off',
-      }
-    }
+        "react/prop-types": "off",
+        "jsx-a11y/heading-has-content": "off",
+      },
+    },
   ],
 };
