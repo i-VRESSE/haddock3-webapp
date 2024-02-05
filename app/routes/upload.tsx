@@ -43,15 +43,9 @@ export default function ApplicationSlug() {
       </p>
       <Form method="post" encType="multipart/form-data">
         <div className="form-control py-2">
-          <Input
-            type="file"
-            name="upload"
-            accept="application/zip,.zip"
-          />
+          <Input type="file" name="upload" accept="application/zip,.zip" />
         </div>
-        <Button type="submit">
-          Submit job
-        </Button>
+        <Button type="submit">Submit job</Button>
       </Form>
     </main>
   );
