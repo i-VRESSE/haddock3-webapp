@@ -14,8 +14,12 @@ h5 {
   @apply text-xl;
 }
 
+/*
+Btn classes are copied from app/components/ui/button.tsx
+*/
+
 .btn {
-  @apply inline-block rounded px-3 py-1.5 text-center align-middle text-base font-normal normal-case transition-colors duration-150 ease-in-out;
+  @apply inline-block h-10 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out;
 }
 
 .btn-light {
@@ -48,7 +52,7 @@ h5 {
 }
 
 .btn-primary {
-  @apply bg-primary text-primary-foreground;
+  @apply bg-primary text-primary-foreground hover:bg-primary/90;
 }
 
 ul {

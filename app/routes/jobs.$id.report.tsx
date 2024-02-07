@@ -16,6 +16,7 @@ import {
 } from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 import { JobName } from "~/components/JobName";
+import { buttonVariants } from "~/components/ui/button";
 // TODO rescore is not used here, so imports should not be from this module
 // move to a separate module called ~/model/modules and ~/models/caprieval
 
@@ -79,28 +80,28 @@ export default function RescorePage() {
           <Link
             title="Browse"
             to={`/jobs/${job.id}/browse`}
-            className="btn btn-outline btn-sm"
+            className={buttonVariants({ variant: "outline", size: "sm" })}
           >
             🗀 Browse
           </Link>
           <a
             title="Download archive of best ranked clusters/structures"
             href={`/jobs/${job.id}/files/${bestRanked}`}
-            className="btn btn-outline btn-sm"
+            className={buttonVariants({ variant: "outline", size: "sm" })}
           >
             🏆 Download best ranked
           </a>
           <a
             title="Download archive of all files"
             href={`/jobs/${job.id}/zip`}
-            className="btn btn-outline btn-sm"
+            className={buttonVariants({ variant: "outline", size: "sm" })}
           >
             &#128230; Download all
           </a>
           <Link
             title="Edit"
             to={`/jobs/${job.id}/edit`}
-            className="btn btn-outline btn-sm"
+            className={buttonVariants({ variant: "outline", size: "sm" })}
           >
             &#128393; Edit
           </Link>
