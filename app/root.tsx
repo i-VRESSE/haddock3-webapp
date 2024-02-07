@@ -86,7 +86,7 @@ function BoundaryShell({
   return (
     <html lang="en" data-theme="bonvinlab">
       <head>
-        <title>Haddock3 - {title}</title>
+        <title>{`Haddock3 - ${title}`}</title>
         <Meta />
         <Links />
       </head>
