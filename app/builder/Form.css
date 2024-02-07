@@ -23,7 +23,7 @@ Btn classes are copied from app/components/ui/button.tsx
 }
 
 .btn-light {
-  @apply border-gray-100 bg-transparent text-start text-primary  hover:bg-gray-200;
+  @apply border-gray-100 bg-transparent text-start text-primary hover:bg-gray-200;
 }
 
 .btn-sm {
@@ -72,7 +72,7 @@ li {
 }
 
 .card-header {
-  @apply border border-gray-100 bg-secondary p-2 py-4 align-middle text-secondary;
+  @apply border border-gray-100 bg-secondary p-2 py-4 align-middle text-secondary-foreground;
 }
 
 .card-header svg {
@@ -192,11 +192,11 @@ div.checkbox {
 
 .table-bordered td,
 .table-bordered th {
-  @apply border border-gray-300;
+  @apply border border-gray-300 bg-background text-foreground;
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
-  @apply bg-gray-100;
+  @apply bg-background/90;
 }
 
 .table-field th:first-child {
@@ -232,11 +232,15 @@ code .table {
   @apply contents;
 }
 
+/*
+ * Input classes are copied from app/components/ui/input.tsx
+ */
+
 input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
-  @apply flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
 }
 
 /* Exclude styling of upload button in workflow column */
 .form-group input[type="file"] {
-  @apply flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
 }
