@@ -19,6 +19,7 @@ import {
 import { getOptionalClientUser } from "./auth.server";
 import styles from "./tailwind.css";
 import { Navbar } from "./components/Navbar";
+import { Banner } from "./components/Banner";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -46,11 +47,8 @@ export default function App() {
       <body>
         <div className="flex min-h-screen flex-col">
           <header>
-            <div className="flex h-64 flex-col bg-[url('https://www.bonvinlab.org/images/pages/banner_home-mini.jpg')] bg-cover">
-              <div className="flex-grow" />{" "}
-              {/* Push the navbar to the bottom of the banner */}
-              <Navbar />
-            </div>
+            <Banner/>
+            <Navbar />
           </header>
           <div className="m-6 grow">
             <Outlet />
