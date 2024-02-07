@@ -86,10 +86,15 @@ export default function Page() {
             setTheme(t === "" ? null : (t as Theme));
           }}
         >
+          {/* 
+          TODO system is not yet supported by remix-themes, 
+          but issue by author was created on 2 feb 2024.
+          
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="" id="system" />
             <Label htmlFor="system">System</Label>
-          </div>
+          </div> 
+          */}
           <div className="flex items-center space-x-2">
             <RadioGroupItem value={Theme.LIGHT} id={Theme.LIGHT} />
             <Label htmlFor={Theme.LIGHT}>Light</Label>
