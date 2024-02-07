@@ -152,8 +152,6 @@ export function handleError(
   { request }: LoaderFunctionArgs | ActionFunctionArgs
 ) {
   if (!request.signal.aborted) {
-    console.log('Capturing error with Sentry.')
-    // TODO add hint like request.url
-    captureException(error)
+    captureException(error);
   }
 }
