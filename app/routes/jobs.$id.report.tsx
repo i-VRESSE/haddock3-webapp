@@ -84,6 +84,13 @@ export default function RescorePage() {
           >
             🗀 Browse
           </Link>
+          <Link
+            title="Edit workflow"
+            to={`/jobs/${job.id}/edit`}
+            className={buttonVariants({ variant: "outline", size: "sm" })}
+          >
+            &#128393; Edit
+          </Link>
           <a
             title="Download archive of best ranked clusters/structures"
             href={`/jobs/${job.id}/files/${bestRanked}`}
@@ -98,13 +105,6 @@ export default function RescorePage() {
           >
             &#128230; Download all
           </a>
-          <Link
-            title="Edit"
-            to={`/jobs/${job.id}/edit`}
-            className={buttonVariants({ variant: "outline", size: "sm" })}
-          >
-            &#128393; Edit
-          </Link>
         </div>
       </div>
       <ClientOnly fallback={<p>Loading...</p>}>
