@@ -17,7 +17,6 @@
   }
 }
 
-
 #Nglviewport {
   top: 2rem;
 }
@@ -28,19 +27,19 @@
 
 .caprieval-report {
   table {
-    @apply w-full text-sm
+    @apply w-full text-sm;
   }
 
   tr {
-    @apply border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted
+    @apply border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted;
   }
 
   th {
-    @apply sticky px-4 text-left align-middle font-medium [&:has([role=checkbox])]:pr-0
+    @apply sticky px-4 text-left align-middle font-medium [&:has([role=checkbox])]:pr-0;
   }
 
   td {
-    @apply p-4 align-middle [&:has([role=checkbox])]:pr-0
+    @apply p-4 align-middle [&:has([role=checkbox])]:pr-0;
   }
 
   .sort-icon {
@@ -48,13 +47,13 @@
     right: 5px;
     top: 50%;
     transform: translateY(-50%);
-    @apply cursor-pointer opacity-25 hover:opacity-100
+    @apply cursor-pointer opacity-25 hover:opacity-100;
   }
 
   .active {
-    @apply opacity-100
+    @apply opacity-100;
   }
-  
+
   .viewport {
     position: relative;
     top: 5px;
@@ -62,25 +61,24 @@
     width: 800px;
     height: 600px;
   }
-  
+
   .dl {
     position: absolute;
     top: 2px;
     left: 2px;
   }
-  
+
   .Xbutton {
     position: absolute;
     top: 2px;
     right: 2px;
   }
-  
+
   .viewbutton {
     cursor: pointer;
   }
 
   #structureViewerDialog {
-    @apply bg-background text-foreground
+    @apply bg-background text-foreground;
   }
-  
 }
