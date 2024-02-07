@@ -76,7 +76,7 @@ export default function Page() {
       </fieldset>
 
       {/* TODO add change password form if user is not authenticated with a social login */}
-      <Button asChild variant="secondary" className="hover:bg-gray-200">
+      <Button asChild variant="outline">
         <Link to="/logout">Logout</Link>
       </Button>
     </main>

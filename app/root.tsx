@@ -47,7 +47,7 @@ export default function App() {
       <body>
         <div className="flex min-h-screen flex-col">
           <header>
-            <Banner/>
+            <Banner />
             <Navbar />
           </header>
           <div className="m-6 grow">
