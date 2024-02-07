@@ -76,6 +76,7 @@ export const OutputReport = ({
                   <Link
                     title="Recluster"
                     to={`/jobs/${jobid}/analysis/contactmap/${module.id}`}
+                    className="dark:invert"
                   >
                     &#128202;
                   </Link>
@@ -87,6 +88,7 @@ export const OutputReport = ({
                       target="_blank"
                       rel="noreferrer"
                       href={`/jobs/${jobid}/files/${module.report.path}`}
+                      className="dark:invert"
                     >
                       &#128202;
                     </a>

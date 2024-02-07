@@ -1,7 +1,86 @@
+/*
+ * The haddock3-analysis components library has a css which follows prefer-color-scheme.
+ * We dont import that css, but have a tailwindified copy here.
+ */
+
+:root {
+  --background-color: var(--bg-background);
+  --text-color: var(--text-foreground);
+  --border-color: var(--border);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: var(--bg-background)
+    --text-color: var(--text-foreground);
+    --border-color: var(--border);
+  }
+}
+
+
 #Nglviewport {
   top: 2rem;
 }
 #structureViewerDialog {
   height: 640px;
   width: 810px;
+}
+
+.caprieval-report {
+  table {
+    @apply w-full text-sm
+  }
+
+  tr {
+    @apply border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted
+  }
+
+  th {
+    @apply sticky px-4 text-left align-middle font-medium [&:has([role=checkbox])]:pr-0
+  }
+
+  td {
+    @apply p-4 align-middle [&:has([role=checkbox])]:pr-0
+  }
+
+  .sort-icon {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    @apply cursor-pointer opacity-25 hover:opacity-100
+  }
+
+  .active {
+    @apply opacity-100
+  }
+  
+  .viewport {
+    position: relative;
+    top: 5px;
+    left: 5px;
+    width: 800px;
+    height: 600px;
+  }
+  
+  .dl {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+  }
+  
+  .Xbutton {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+  }
+  
+  .viewbutton {
+    cursor: pointer;
+  }
+
+  #structureViewerDialog {
+    @apply bg-background text-foreground
+  }
+  
 }

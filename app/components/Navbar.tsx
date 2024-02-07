@@ -23,7 +23,7 @@ const LoggedInButton = () => {
       <DropdownMenuTrigger asChild>
         {/* TODO button is not vertically centered */}
         <Button variant="outline" size="icon" className="rounded-full">
-          <img alt="gravatar" src={user.photo} />
+          <img alt="gravatar" src={user.photo} className="dark:invert" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

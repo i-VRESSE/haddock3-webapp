@@ -1,31 +1,43 @@
+import {
+  Table,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
 import type { ClusterRow } from "./recluster.server";
 
 export function ReClusterTable({ clusters }: { clusters: ClusterRow[] }) {
   // TODO add structure viewer with contacts (*.con file)
   return (
-    <table className="table-compact table">
-      <thead>
-        <tr>
-          <th>Rank</th>
-          <th>Model</th>
-          <th>Score</th>
-          <th>Cluster id</th>
-        </tr>
-      </thead>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Rank</TableHead>
+          <TableHead>Model</TableHead>
+          <TableHead>Score</TableHead>
+          <TableHead>Cluster id</TableHead>
+        </TableRow>
+      </TableHeader>
       <tbody>
         {clusters.map((cluster) => (
-          <tr key={cluster.rank}>
-            <td>{cluster.rank}</td>
-            <td>
-              <a href={cluster.model_path} target="_blank" rel="noreferrer">
+          <TableRow key={cluster.rank}>
+            <TableCell>{cluster.rank}</TableCell>
+            <TableCell>
+              <a
+                href={cluster.model_path}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:underline"
+              >
                 {cluster.model_name}
               </a>
-            </td>
-            <td>{cluster.score}</td>
-            <td>{cluster.cluster_id}</td>
-          </tr>
+            </TableCell>
+            <TableCell>{cluster.score}</TableCell>
+            <TableCell>{cluster.cluster_id}</TableCell>
+          </TableRow>
         ))}
       </tbody>
-    </table>
+    </Table>
   );
 }

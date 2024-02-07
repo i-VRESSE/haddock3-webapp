@@ -28,7 +28,7 @@ export function JobName({ jobid, name }: { jobid: number; name: string }) {
           type="text"
           name="name"
           defaultValue={name}
-          className="mx-1 rounded border-2 p-1"
+          className="mx-1 rounded border-2 bg-background p-1"
           maxLength={200}
           minLength={1}
         />
