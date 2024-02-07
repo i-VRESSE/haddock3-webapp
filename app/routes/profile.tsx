@@ -14,6 +14,7 @@ import { enumType, object, safeParse } from "valibot";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { useTheme, Theme } from "remix-themes";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAuthenticated(request);
@@ -47,6 +48,8 @@ export default function Page() {
   ) => {
     submit(event.currentTarget);
   };
+  const [theme, setTheme] = useTheme();
+
   return (
     <main>
       <p>Email: {user.email}</p>
@@ -73,6 +76,29 @@ export default function Page() {
             context administrator.
           </span>
         )}
+      </fieldset>
+      <fieldset className="py-2">
+        <legend>Theme</legend>
+        <RadioGroup
+          defaultValue={theme || ""}
+          name="theme"
+          onValueChange={(t) => {
+            setTheme(t === "" ? null : (t as Theme));
+          }}
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="" id="system" />
+            <Label htmlFor="system">System</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value={Theme.LIGHT} id={Theme.LIGHT} />
+            <Label htmlFor={Theme.LIGHT}>Light</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value={Theme.DARK} id={Theme.DARK} />
+            <Label htmlFor={Theme.DARK}>Dark</Label>
+          </div>
+        </RadioGroup>
       </fieldset>
 
       {/* TODO add change password form if user is not authenticated with a social login */}

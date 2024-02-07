@@ -18,7 +18,7 @@ export default function Card(props: CardProps) {
     <UiCard className="w-96 rounded-2xl shadow-lg hover:shadow-xl">
       <Link to={props.target}>
         <CardHeader>
-          <figure className="place-self-center">
+          <figure className="place-self-center dark:invert">
             <img src={props.image} alt={props.title} className="h-48" />
           </figure>
         </CardHeader>

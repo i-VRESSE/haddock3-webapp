@@ -72,7 +72,7 @@ li {
 }
 
 .card-header {
-  @apply border border-gray-100 bg-gray-100 p-2 py-4 align-middle;
+  @apply border border-gray-100 bg-secondary p-2 py-4 align-middle text-secondary;
 }
 
 .card-header svg {
