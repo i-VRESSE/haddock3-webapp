@@ -63,9 +63,9 @@ You need to have a PostgreSQL database running. The easiest way is to use Docker
 npm run docker:dev
 ```
 
-(Stores data in `./postgres-data`)
+(Stores data in a Docker volume)
 (You can get a psql shell with `npm run psql:dev`)
-(On CTRL-C the database is stopped. To remove container use `docker system prune`)
+(On CTRL-C the database is stopped. To remove container and volume use `docker compose `)
 
 The database can be initialized with
 

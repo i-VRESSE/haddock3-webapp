@@ -11,7 +11,7 @@
     "catalogs:guru": "curl -L https://github.com/i-VRESSE/workflow-builder/raw/${WBTAG:=main}/packages/haddock3_catalog/public/catalog/haddock3.guru.yaml  | npx js-yaml > app/catalogs/haddock3.guru.json",
     "catalogs": "npm run catalogs:easy && npm run catalogs:expert && npm run catalogs:guru && npx prettier --write app/catalogs/*.json",
     "dev": "remix dev --manual",
-    "format": "prettier --write . '!postgres-data'",
+    "format": "prettier --write .",
     "generate-client": "node app/bartender-client/generate.mjs && npx prettier --write app/bartender-client/bartenderschema.d.ts",
     "lint": "eslint  --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/index.js",
@@ -27,8 +27,7 @@
     "/build",
     "/public/build",
     "/.sessions",
-    "/coverage",
-    "/postgres-data"
+    "/coverage"
   ],
   "dependencies": {
     "@i-vresse/haddock3-analysis-components": "^0.3.3-next.0",
