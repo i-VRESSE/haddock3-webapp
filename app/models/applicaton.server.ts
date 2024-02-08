@@ -117,7 +117,14 @@ export async function rewriteConfigInArchive(
   // Tried to give upload blob directly to loadAsync, but failed with
   // Error: Can't read the data of 'the loaded zip file'. Is it in a supported JavaScript type (String, Blob, ArrayBuffer, etc) ?
   // however converting to array buffer works, but will load entire file into memory
-  await zip.loadAsync(await upload.arrayBuffer());
+  try {
+    await zip.loadAsync(await upload.arrayBuffer());
+  } catch (e) {
+    if (e instanceof Error) {
+      throw new InvalidUploadError(`Unable to read archive`, { cause: e });
+    }
+    throw e;
+  }
   const config_file = zip.file(WORKFLOW_CONFIG_FILENAME);
   if (config_file === null) {
     throw new InvalidUploadError(
