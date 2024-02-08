@@ -28,30 +28,30 @@
 Btn classes are copied from app/components/ui/button.tsx
 */
 
-.workflow-builder-app .btn {
+.btn {
   @apply inline-block h-10 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out;
 }
 
 /* variant=secondary */
-.workflow-builder-app .btn-light {
+.btn-light {
   @apply bg-secondary text-start text-secondary-foreground hover:bg-secondary/80;
 }
 
-.workflow-builder-app .btn-sm {
+.btn-sm {
   @apply h-12 bg-transparent p-1 text-sm;
 }
 
-.workflow-builder-app .grip,
-.workflow-builder-app .delete {
+.grip,
+.delete {
   @apply h-auto border-0;
 }
 
 /* variant=link */
-.workflow-builder-app .btn-link {
+.btn-link {
   @apply text-primary underline-offset-4 hover:underline;
 }
 
-.workflow-builder-app .btn-toolbar {
+.btn-toolbar {
   @apply flex flex-wrap justify-start;
 }
 
