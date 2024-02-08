@@ -3,21 +3,24 @@
 * style, position and layout the form elements.
 *
 * This file contains the classes with a tailwindcss equivalent.
+*
+* Have to prepend .workflow-builder-app to each class to avoid conflicts.
+* Using one big nested selector did not work, got `Expected ":" [css-syntax-error]`
 */
 
-h1 {
+.workflow-builder-app h1 {
   @apply text-4xl;
 }
 
-legend {
+.workflow-builder-app legend {
   @apply text-2xl;
 }
 
-h4 {
+.workflow-builder-app h4 {
   @apply text-xl;
 }
 
-h5 {
+.workflow-builder-app h5 {
   @apply text-xl;
 }
 
@@ -25,205 +28,196 @@ h5 {
 Btn classes are copied from app/components/ui/button.tsx
 */
 
-.btn {
+.workflow-builder-app .btn {
   @apply inline-block h-10 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out;
 }
 
 /* variant=secondary */
-.btn-light {
+.workflow-builder-app .btn-light {
   @apply bg-secondary text-start text-secondary-foreground hover:bg-secondary/80;
 }
 
-.btn-sm {
+.workflow-builder-app .btn-sm {
   @apply h-12 bg-transparent p-1 text-sm;
 }
 
-.grip,
-.delete {
+.workflow-builder-app .grip,
+.workflow-builder-app .delete {
   @apply h-auto border-0;
 }
 
 /* variant=link */
-.btn-link {
+.workflow-builder-app .btn-link {
   @apply text-primary underline-offset-4 hover:underline;
 }
 
-.btn-toolbar {
+.workflow-builder-app .btn-toolbar {
   @apply flex flex-wrap justify-start;
 }
 
 /* variant=default */
-.btn-primary {
+.workflow-builder-app .btn-primary {
   @apply bg-primary text-primary-foreground hover:bg-primary/90;
 }
 
-ul {
+.workflow-builder-app ul {
   @apply list-inside;
 }
 
-ul ul {
-  /* TODO add circle before button or not? */
+.workflow-builder-app li {
+  @apply pl-2;
 }
 
-.workflow-builder-app {
-  li {
-    @apply pl-2;
-  }
-}
-
-.card {
+.workflow-builder-app .card {
   @apply rounded border border-border;
 }
 
-.card-header {
+.workflow-builder-app .card-header {
   @apply border border-border bg-secondary p-2 py-4 align-middle text-secondary-foreground;
 }
 
-.card-header svg {
+.workflow-builder-app .card-header svg {
   @apply mr-3 inline;
 }
 
-.form-group {
+.workflow-builder-app .form-group {
   @apply mb-4 p-1;
 }
 
-.form-label {
+.workflow-builder-app .form-label {
   @apply mb-2 inline-block;
 }
 
-.form-control {
+.workflow-builder-app .form-control {
   @apply w-full p-1.5;
 }
 
-.form-check-label {
+.workflow-builder-app .form-check-label {
   @apply ml-2;
 }
 
 /* rjsf uses .checkbox in div and input. shadcn uses radix components. */
-div.checkbox {
+.workflow-builder-app div .checkbox {
   @apply h-auto w-auto cursor-default border-none;
 }
 
-.form-check-input {
-  @apply checkbox;
+/* Class from app/components/ui/checkbox.tsx */
+.workflow-builder-app .form-check-input {
+  @apply rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground;
 }
 
-.custom-select {
+.workflow-builder-app .custom-select {
   @apply ml-2 bg-background text-base;
 }
 
-.array-item-add,
-.object-property-expand {
+.workflow-builder-app .array-item-add,
+.workflow-builder-app .object-property-expand {
   /* TODO full width + center plus sign */
   @apply m-4 !w-auto;
 }
 
-.container {
+.workflow-builder-app .container {
   @apply w-full;
 }
 
-.container-fluid {
+.workflow-builder-app .container-fluid {
   @apply w-full;
 }
 
-.row {
+.workflow-builder-app .row {
   @apply flex flex-wrap;
 }
 
-.col {
+.workflow-builder-app .col {
   @apply max-w-full grow basis-0;
 }
 
-.col-2 {
+.workflow-builder-app .col-2 {
   @apply w-full max-w-[16.666667%] basis-2/12 px-3;
 }
 
-.col-3 {
+.workflow-builder-app .col-3 {
   @apply w-full max-w-[25%] basis-3/12 px-3;
 }
 
-.col-5 {
+.workflow-builder-app .col-5 {
   @apply max-w-[41.666667%] basis-5/12;
 }
 
-.col-9 {
+.workflow-builder-app .col-9 {
   @apply max-w-[75%] basis-9/12;
 }
 
-.col-10 {
+.workflow-builder-app .col-10 {
   @apply max-w-[85%] basis-10/12;
 }
 
-.col-12 {
+.workflow-builder-app .col-12 {
   @apply max-w-full basis-full;
 }
 
-.offset-9 {
+.workflow-builder-app .offset-9 {
   @apply ml-[75%];
 }
 
-.nav {
+.workflow-builder-app .nav {
   @apply flex flex-wrap;
 }
 
-.nav-tabs {
+.workflow-builder-app .nav-tabs {
   @apply border-b-4  border-b-primary;
 }
 
-.nav-link {
+.workflow-builder-app .nav-link {
   @apply block rounded-t-md bg-muted px-4 py-2 text-muted-foreground;
 }
 
-.nav .active {
+.workflow-builder-app .nav .active {
   @apply border-muted bg-primary text-primary-foreground;
 }
 
-.justify-content-end {
+.workflow-builder-app .justify-content-end {
   @apply justify-end;
 }
 
-.d-flex {
+.workflow-builder-app .d-flex {
   @apply !flex;
 }
 
-.align-items-center {
+.workflow-builder-app .align-items-center {
   @apply items-center;
 }
 
-.table-field {
-  @apply mb-4 table border-collapse border border-border;
+.workflow-builder-app .table-field {
+  @apply mb-4 border-collapse border border-border;
 }
 
-.table-bordered td,
-.table-bordered th {
+.workflow-builder-app .table-bordered td,
+.workflow-builder-app .table-bordered th {
   @apply border border-border bg-background text-foreground;
 }
 
-.table-striped tbody tr:nth-of-type(odd) {
+.workflow-builder-app .table-striped tbody tr:nth-of-type(odd) {
   @apply bg-background/90;
 }
 
-.table-field th:first-child {
+.workflow-builder-app .table-field th:first-child {
   @apply relative;
 }
 
-.popover-header {
+.workflow-builder-app .popover-header {
   @apply border bg-secondary px-3 py-2 text-secondary-foreground;
 }
 
-.popover-body {
+.workflow-builder-app .popover-body {
   @apply border bg-popover px-3 py-2 text-popover-foreground;
 }
 
-.page {
-  /* grid-template-areas:
-    "catalog workflow node"
-    "catalog workflow-actions node-actions"; */
-  grid-template-columns: 1fr 1fr 2fr;
-  /* grid-template-rows: 1fr auto; */
+.workflow-builder-app .page {
+  grid-template-columns: 1fr 1fr 4fr;
 }
 
-.page > .action-row {
+.workflow-builder-app .page > .action-row {
   padding: 0.25rem;
   overflow: unset;
 }
@@ -236,11 +230,20 @@ code .table {
  * Input classes are copied from app/components/ui/input.tsx
  */
 
-input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
+.workflow-builder-app
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
   @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
 }
 
 /* Exclude styling of upload button in workflow column */
-.form-group input[type="file"] {
+.workflow-builder-app .form-group input[type="file"] {
   @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+.workflow-builder-app .border-danger {
+  @apply border-destructive;
+}
+
+.workflow-builder-app .alert-danger {
+  @apply border-destructive bg-destructive text-destructive-foreground;
 }
