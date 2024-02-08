@@ -70,7 +70,7 @@ export default function UploadPage() {
         {WORKFLOW_CONFIG_FILENAME}.
       </p>
       <Form method="post" encType="multipart/form-data">
-        <div className="form-control py-2">
+        <div className="py-2">
           <Input
             type="file"
             name="upload"
