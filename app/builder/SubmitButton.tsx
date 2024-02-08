@@ -7,7 +7,12 @@ import { catalog2tomlSchemas } from "@i-vresse/wb-core/dist/toml.js";
 import { createZip } from "@i-vresse/wb-core/dist/archive";
 import { useSubmit } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 
 export const WorkflowSubmitButton = ({
   submitAllowed,
@@ -39,7 +44,10 @@ export const WorkflowSubmitButton = ({
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>You don't have permission to submit. Please login and make sure you have the right expertise level.</p>
+          <p>
+            You don't have permission to submit. Please login and make sure you
+            have the right expertise level.
+          </p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

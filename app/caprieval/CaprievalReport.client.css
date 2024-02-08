@@ -3,20 +3,6 @@
  * We dont import that css, but have a tailwindified copy here.
  */
 
-:root {
-  --background-color: var(--bg-background);
-  --text-color: var(--text-foreground);
-  --border-color: var(--border);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background-color: var(--bg-background);
-    --text-color: var(--text-foreground);
-    --border-color: var(--border);
-  }
-}
-
 #Nglviewport {
   top: 2rem;
 }

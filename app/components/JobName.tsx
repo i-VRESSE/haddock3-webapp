@@ -33,7 +33,7 @@ export function JobName({ jobid, name }: { jobid: number; name: string }) {
           minLength={1}
         />
         <ErrorMessages path="name" errors={fetcherData?.errors} />
-        <button className="btn btn-primary btn-sm" title="Save" type="submit">
+        <button title="Save" type="submit">
           🖉
         </button>
       </Form>

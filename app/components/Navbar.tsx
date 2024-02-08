@@ -1,4 +1,4 @@
-import { Link, NavLink } from "@remix-run/react";
+import { Link, NavLink, useLocation } from "@remix-run/react";
 import { useIsAdmin, useIsLoggedIn, useUser } from "~/auth";
 import {
   NavigationMenu,
@@ -49,6 +49,26 @@ const LoginButton = () => (
   </Link>
 );
 
+function MyNavLink({
+  to,
+  children,
+}: {
+  to: string;
+  children: React.ReactNode;
+}) {
+  const location = useLocation();
+  const isActive = location.pathname.startsWith(to);
+  return (
+    <NavigationMenuItem>
+      <NavigationMenuLink asChild active={isActive}>
+        <Link to={to} className={navigationMenuTriggerStyle()}>
+          {children}
+        </Link>
+      </NavigationMenuLink>
+    </NavigationMenuItem>
+  );
+}
+
 export const Navbar = () => {
   const loggedIn = useIsLoggedIn();
 
@@ -61,41 +81,11 @@ export const Navbar = () => {
       </div>
       <NavigationMenu className="">
         <NavigationMenuList className="flex space-x-5">
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <NavLink to="/builder" className={navigationMenuTriggerStyle()}>
-                Build
-              </NavLink>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <NavLink to="/upload" className={navigationMenuTriggerStyle()}>
-                Upload
-              </NavLink>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <NavLink to="/jobs" className={navigationMenuTriggerStyle()}>
-                Manage
-              </NavLink>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <NavLink to="/about" className={navigationMenuTriggerStyle()}>
-                About
-              </NavLink>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <NavLink to="/help" className={navigationMenuTriggerStyle()}>
-                Help
-              </NavLink>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
+          <MyNavLink to="/builder">Builder</MyNavLink>
+          <MyNavLink to="/upload">Upload</MyNavLink>
+          <MyNavLink to="/jobs">Manage</MyNavLink>
+          <MyNavLink to="/about">About</MyNavLink>
+          <MyNavLink to="/help">Help</MyNavLink>
         </NavigationMenuList>
       </NavigationMenu>
       <div className="ml-auto">

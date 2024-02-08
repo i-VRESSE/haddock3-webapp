@@ -1,3 +1,10 @@
+/*
+* The workflow builder (@i-vresse/wb-core) uses bootstrap 4 classes to
+* style, position and layout the form elements.
+*
+* This file contains the classes with a tailwindcss equivalent.
+*/
+
 h1 {
   @apply text-4xl;
 }
@@ -22,12 +29,13 @@ Btn classes are copied from app/components/ui/button.tsx
   @apply inline-block h-10 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out;
 }
 
+/* variant=secondary */
 .btn-light {
-  @apply border-gray-100 bg-transparent text-start text-primary hover:bg-gray-200;
+  @apply bg-secondary text-start text-secondary-foreground hover:bg-secondary/80;
 }
 
 .btn-sm {
-  @apply h-12 p-1 text-sm;
+  @apply h-12 bg-transparent p-1 text-sm;
 }
 
 .grip,
@@ -35,22 +43,16 @@ Btn classes are copied from app/components/ui/button.tsx
   @apply h-auto border-0;
 }
 
+/* variant=link */
 .btn-link {
-  @apply border-0 bg-inherit text-primary hover:bg-gray-200;
-}
-
-.btn-outline-danger {
-  @apply border border-destructive text-destructive hover:bg-destructive hover:text-white;
-}
-
-.btn-danger {
-  @apply bg-destructive text-white;
+  @apply text-primary underline-offset-4 hover:underline;
 }
 
 .btn-toolbar {
   @apply flex flex-wrap justify-start;
 }
 
+/* variant=default */
 .btn-primary {
   @apply bg-primary text-primary-foreground hover:bg-primary/90;
 }
@@ -63,16 +65,18 @@ ul ul {
   /* TODO add circle before button or not? */
 }
 
-li {
-  @apply pl-2;
+.workflow-builder-app {
+  li {
+    @apply pl-2;
+  }
 }
 
 .card {
-  @apply rounded border border-gray-300;
+  @apply rounded border border-border;
 }
 
 .card-header {
-  @apply border border-gray-100 bg-secondary p-2 py-4 align-middle text-secondary-foreground;
+  @apply border border-border bg-secondary p-2 py-4 align-middle text-secondary-foreground;
 }
 
 .card-header svg {
@@ -187,12 +191,12 @@ div.checkbox {
 }
 
 .table-field {
-  @apply mb-4 table border-collapse border border-gray-300;
+  @apply mb-4 table border-collapse border border-border;
 }
 
 .table-bordered td,
 .table-bordered th {
-  @apply border border-gray-300 bg-background text-foreground;
+  @apply border border-border bg-background text-foreground;
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
@@ -203,16 +207,12 @@ div.checkbox {
   @apply relative;
 }
 
-.array-item-remove {
-  @apply !text-black;
-}
-
 .popover-header {
-  @apply rounded border-b border-gray-200 bg-gray-100 px-3 py-2;
+  @apply border bg-secondary px-3 py-2 text-secondary-foreground;
 }
 
 .popover-body {
-  @apply bg-white px-3 py-2 text-black;
+  @apply border bg-popover px-3 py-2 text-popover-foreground;
 }
 
 .page {
