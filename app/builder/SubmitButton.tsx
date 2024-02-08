@@ -45,8 +45,8 @@ export const WorkflowSubmitButton = ({
         </TooltipTrigger>
         <TooltipContent>
           <p>
-            You don't have permission to submit. Please login and make sure you
-            have the right expertise level.
+            You don&apos;t have permission to submit. Please login and make sure
+            you have the right expertise level.
           </p>
         </TooltipContent>
       </Tooltip>
