@@ -65,7 +65,7 @@ npm run docker:dev
 
 (Stores data in a Docker volume)
 (You can get a psql shell with `npm run psql:dev`)
-(On CTRL-C the database is stopped. To remove container and volume use `docker compose `)
+(On CTRL-C the database is stopped. To remove container and volume use `npm run docker:devrm`)
 
 The database can be initialized with
 
