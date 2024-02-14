@@ -109,6 +109,19 @@ function getNCores() {
   return haddock3_ncores;
 }
 
+function parseToml(toml: string) {
+  try {
+    return parse(dedupWorkflow(toml), { bigint: false });
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new InvalidUploadError(`Invalid ${WORKFLOW_CONFIG_FILENAME} file`, {
+        cause: error,
+      });
+    }
+    throw error;
+  }
+}
+
 export async function rewriteConfigInArchive(
   upload: Blob,
   expertiseLevels: ExpertiseLevel[]
@@ -129,7 +142,7 @@ export async function rewriteConfigInArchive(
   // Keep backup of original config, before rewriting it
   zip.file(`${WORKFLOW_CONFIG_FILENAME}.orig`, config_body);
 
-  const table = parse(dedupWorkflow(config_body), { bigint: false });
+  const table = parseToml(config_body);
   const new_table = rewriteConfig(table);
 
   const new_config = parseWorkflowFromTable(new_table, getCatalog("guru"));
