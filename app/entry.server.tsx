@@ -145,7 +145,11 @@ function handleBrowserRequest(
   });
 }
 
-SentryInit({ dsn: process.env.SENTRY_DSN });
+SentryInit({
+  dsn: process.env.SENTRY_DSN?.startsWith("http")
+    ? process.env.SENTRY_DSN
+    : undefined,
+});
 
 export function handleError(
   error: unknown,

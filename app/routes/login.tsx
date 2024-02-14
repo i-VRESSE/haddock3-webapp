@@ -96,7 +96,9 @@ export default function LoginPage() {
       </Form>
 
       {/* Social buttons */}
-      <h2 className="text-lg font-semibold">Other login methods</h2>
+      {socials.length > 0 && (
+        <h2 className="text-lg font-semibold">Other login methods</h2>
+      )}
       <div className="space-evenly flex gap-4">
         {socials.includes("github") && (
           <form method="post" action="/auth/github/authorize">
