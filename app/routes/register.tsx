@@ -20,6 +20,9 @@ import { authenticator } from "~/auth.server";
 import { register } from "~/models/user.server";
 import { commitSession, getSession } from "~/session.server";
 import { ErrorMessages } from "../components/ErrorMessages";
+import { Label } from "~/components/ui/label";
+import { Input } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {
@@ -79,9 +82,6 @@ export default function RegisterPage() {
   const centeredColumn = "flex flex-col items-center gap-4";
   const formStyle =
     "flex flex-col items-stretch gap-4 border-2 rounded shadow-lg p-4";
-  const inputStyle = "border-2 rounded p-1 w-full";
-  const buttonStyle = "btn btn-sm btn-primary";
-  const linkStyle = "link link-primary link-hover";
   const headerStyle = "text-lg text-center font-semibold";
 
   return (
@@ -89,60 +89,47 @@ export default function RegisterPage() {
       <Form method="post" className={formStyle}>
         <h2 className={headerStyle}>Register</h2>
         <div>
-          <label>
-            <p>Email</p>
-            <input
-              id="username"
-              name="username"
-              type="email"
-              autoComplete="username"
-              required
-              className={inputStyle}
-            />
-          </label>
+          <Label htmlFor="username">Email</Label>
+          <Input
+            id="username"
+            name="username"
+            type="email"
+            autoComplete="username"
+            required
+          />
           <ErrorMessages path="username" errors={actionData?.errors} />
         </div>
         <div>
-          <label>
-            <p>Password</p>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              minLength={8}
-              required
-              autoComplete="new-password"
-              className={inputStyle}
-            />
-          </label>
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            minLength={8}
+            required
+            autoComplete="new-password"
+          />
           <ErrorMessages path="password" errors={actionData?.errors} />
         </div>
 
         <div>
-          <label>
-            <p>Confirm password</p>
-            <input
-              id="password2"
-              name="password2"
-              type="password"
-              minLength={8}
-              required
-              autoComplete="new-password"
-              className={inputStyle}
-            />
-          </label>
+          <Label htmlFor="password2">Confirm password</Label>
+          <Input
+            id="password2"
+            name="password2"
+            type="password"
+            minLength={8}
+            required
+            autoComplete="new-password"
+          />
           <ErrorMessages path="password2" errors={actionData?.errors} />
         </div>
         <ErrorMessages path="root" errors={actionData?.errors} />
-        <button type="submit" className={buttonStyle}>
-          Register
-        </button>
+        <Button type="submit">Register</Button>
         <p>
-          Or{" "}
-          <Link to="/login" className={linkStyle}>
-            login
-          </Link>{" "}
-          if you already have an account.
+          <Button asChild variant={"link"}>
+            <Link to="/login">Or login if you already have an account.</Link>
+          </Button>
         </p>
       </Form>
     </main>

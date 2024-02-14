@@ -3,6 +3,7 @@ import {
   useWorkflow,
   useActiveSubmitButton,
 } from "@i-vresse/wb-core/dist/store";
+import { Button } from "~/components/ui/button";
 
 /**
  * Panel for actions to be performed on the currently active form.
@@ -45,35 +46,34 @@ export const FormActions = (): JSX.Element => {
     return <></>;
   }
   const DeleteButton = (
-    <button
-      className="btn-light btn"
+    <Button
+      variant="secondary"
       onClick={() => deleteNode(index)}
       title="Delete node from workflow"
     >
       Delete
-    </button>
+    </Button>
   );
   return (
-    <div className="btn-group justify-end">
-      <button
+    <div className="justify-end">
+      <Button
         type="submit"
-        className="btn btn-primary"
         title={
           editingGlobal ? "Save global parameters" : "Save parameters to node"
         }
         onClick={() => submitFormRef.click()}
       >
         Save
-      </button>
-      <button
-        className="btn-light btn"
+      </Button>
+      <Button
+        variant="secondary"
         onClick={() =>
           editingGlobal ? toggleGlobalEdit() : clearNodeSelection()
         }
         title="Forget changes made in form and close form"
       >
         Cancel
-      </button>
+      </Button>
       {!editingGlobal && DeleteButton}
     </div>
   );

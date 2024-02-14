@@ -7,7 +7,7 @@ import {
   useLoaderData,
   useNavigation,
 } from "@remix-run/react";
-import { type ChangeEvent, useState } from "react";
+import { useState } from "react";
 import { flatten, safeParse } from "valibot";
 
 import { getBartenderToken } from "~/bartender-client/token.server";
@@ -40,6 +40,10 @@ import {
 import { shouldShowInteractiveVersion } from "~/tools/shared";
 
 import { CompletedJobs } from "~/bartender-client/types";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { Label } from "~/components/ui/label";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
@@ -160,12 +164,9 @@ export default function ReclusterPage() {
   const plotlyPlotsStripped = plotlyPlots as CaprievalPlotlyProps | undefined;
   const actionData = useActionData<typeof action>();
   const [criterion, setCriterion] = useState(defaultValues.criterion);
-  const handleCriterionChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (
-      event.target.value === "maxclust" ||
-      event.target.value === "distance"
-    ) {
-      setCriterion(event.target.value);
+  const handleCriterionChange = (value: string) => {
+    if (value === "maxclust" || value === "distance") {
+      setCriterion(value);
     }
   };
   const { state } = useNavigation();
@@ -179,46 +180,36 @@ export default function ReclusterPage() {
             className="flex flex-col p-2"
             title={fieldDescriptions.criterion.longDescription}
           >
-            <label>
-              <input
-                className="mr-2"
-                type="radio"
-                name="criterion"
-                value="maxclust"
-                checked={criterion === "maxclust"}
-                onChange={handleCriterionChange}
-              />
-              By number of desired clusters
-            </label>
-            <label>
-              <input
-                className="mr-2"
-                type="radio"
-                name="criterion"
-                value="distance"
-                checked={criterion === "distance"}
-                onChange={handleCriterionChange}
-              />
-              By distance
-            </label>
+            <RadioGroup
+              defaultValue={criterion}
+              name="criterion"
+              onValueChange={(value) => handleCriterionChange(value)}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="maxclust" id="maxclust" />
+                <Label htmlFor="maxclust">By number of desired clusters</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="distance" id="distance" />
+                <Label htmlFor="distance">By distance</Label>
+              </div>
+            </RadioGroup>
           </div>
           {/* key is used to force React to re-render the component
           when the weights changes */}
           {criterion === "maxclust" && (
             <div key={"n_clusters" + defaultValues.n_clusters}>
-              <label
+              <Label
                 htmlFor="n_clusters"
-                className="block"
                 title={fieldDescriptions.n_clusters.longDescription}
               >
                 {fieldDescriptions.n_clusters.title}
-              </label>
-              <input
+              </Label>
+              <Input
                 type="number"
                 name="n_clusters"
                 id="n_clusters"
                 defaultValue={defaultValues.n_clusters}
-                className="rounded border-2 p-1"
               />
               <ErrorMessages path="n_clusters" errors={actionData?.errors} />
             </div>
@@ -226,19 +217,17 @@ export default function ReclusterPage() {
           {criterion === "distance" && (
             <>
               <div key={"clust_cutoff" + defaultValues.clust_cutoff}>
-                <label
+                <Label
                   htmlFor="clust_cutoff"
-                  className="block"
                   title={fieldDescriptions.clust_cutoff.longDescription}
                 >
                   {fieldDescriptions.clust_cutoff.title}
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   name="clust_cutoff"
                   id="clust_cutoff"
                   defaultValue={defaultValues.clust_cutoff}
-                  className="rounded border-2 p-1"
                 />
                 <ErrorMessages
                   path="clust_cutoff"
@@ -247,19 +236,17 @@ export default function ReclusterPage() {
               </div>
 
               <div key={"min_population" + defaultValues.min_population}>
-                <label
+                <Label
                   htmlFor="min_population"
-                  className="block"
                   title={fieldDescriptions.min_population.longDescription}
                 >
                   {fieldDescriptions.min_population.title}
-                </label>
-                <input
+                </Label>
+                <Input
                   type="number"
                   name="min_population"
                   id="min_population"
                   defaultValue={defaultValues.min_population}
-                  className="rounded border-2 p-1"
                 />
                 <ErrorMessages path="threshold" errors={actionData?.errors} />
               </div>
@@ -267,20 +254,14 @@ export default function ReclusterPage() {
           )}
         </div>
         <div className="flex flex-row gap-2 p-2">
-          <button
-            type="submit"
-            className="btn btn-primary btn-sm"
-            disabled={state !== "idle"}
-          >
+          <Button type="submit" disabled={state !== "idle"}>
             {state === "submitting" ? "Running..." : "Recluster"}
-          </button>
-          <Link
-            to="../../.."
-            relative="path"
-            className=" btn btn-outline btn-sm"
-          >
-            Back
-          </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="../../.." relative="path">
+              Back
+            </Link>
+          </Button>
         </div>
         <ToolHistory
           showInteractiveVersion={interactivness}

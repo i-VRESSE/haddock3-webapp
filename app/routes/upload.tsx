@@ -11,6 +11,8 @@ import { submitJob } from "~/models/applicaton.server";
 import { mustBeAllowedToSubmit } from "~/auth.server";
 import { getBartenderTokenByUser } from "~/bartender-client/token.server";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import { InvalidUploadError } from "~/models/errors";
 import { ValidationError } from "@i-vresse/wb-core/dist/validate.js";
 
@@ -68,12 +70,12 @@ export default function UploadPage() {
         {WORKFLOW_CONFIG_FILENAME}.
       </p>
       <Form method="post" encType="multipart/form-data">
-        <div className="form-control">
-          <input
-            className="file-input"
+        <div className="py-2">
+          <Input
             type="file"
             name="upload"
             accept="application/zip,.zip"
+            required
           />
         </div>
         <div className="py-2 text-red-500">
@@ -81,9 +83,7 @@ export default function UploadPage() {
             <p key={error}>{error}</p>
           ))}
         </div>
-        <button type="submit" className="btn btn-primary">
-          Submit job
-        </button>
+        <Button type="submit">Submit job</Button>
       </Form>
     </main>
   );

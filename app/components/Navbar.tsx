@@ -1,70 +1,94 @@
-import { Link, NavLink } from "@remix-run/react";
+import { Link, NavLink, useLocation } from "@remix-run/react";
 import { useIsAdmin, useIsLoggedIn, useUser } from "~/auth";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
+} from "./ui/navigation-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
 
 const LoggedInButton = () => {
   const user = useUser();
   const isAdmin = useIsAdmin();
   return (
-    <div className="dropdown dropdown-end">
-      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-      <label tabIndex={0} className="avatar btn btn-circle btn-ghost">
-        <div className="w-10 rounded-full">
-          <img alt="gravatar" src={user.photo} />{" "}
-        </div>
-      </label>
-      <ul
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-        tabIndex={0}
-        className="dropdown-content menu rounded-box menu-compact mt-3 w-52 bg-base-100 p-2 shadow"
-      >
-        <li>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        {/* TODO button is not vertically centered */}
+        <Button variant="outline" size="icon" className="rounded-full">
+          <img alt="gravatar" src={user.photo} className="dark:invert" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem asChild>
           <Link to="/profile">Profile</Link>
-        </li>
+        </DropdownMenuItem>
         {isAdmin && (
-          <li>
+          <DropdownMenuItem asChild>
             <Link to="/admin">Admin</Link>
-          </li>
+          </DropdownMenuItem>
         )}
-        <li>
+        <DropdownMenuItem asChild>
           <Link to="/logout">Logout</Link>
-        </li>
-      </ul>
-    </div>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
-const LoginButton = () => <Link to="/login">Login</Link>;
+const LoginButton = () => (
+  <Link className={navigationMenuTriggerStyle()} to="/login">
+    Login
+  </Link>
+);
+
+function MyNavLink({
+  to,
+  children,
+}: {
+  to: string;
+  children: React.ReactNode;
+}) {
+  const location = useLocation();
+  const isActive = location.pathname.startsWith(to);
+  return (
+    <NavigationMenuItem>
+      <NavigationMenuLink asChild active={isActive}>
+        <Link to={to} className={navigationMenuTriggerStyle()}>
+          {children}
+        </Link>
+      </NavigationMenuLink>
+    </NavigationMenuItem>
+  );
+}
 
 export const Navbar = () => {
   const loggedIn = useIsLoggedIn();
 
   return (
-    <div className="navbar bg-primary">
-      <div>
-        <NavLink to="/" className="btn btn-ghost text-xl normal-case">
+    <div className="flex w-full items-center bg-primary p-2 text-primary-foreground">
+      <div className={navigationMenuTriggerStyle()}>
+        <NavLink to="/" className="text-2xl ">
           Haddock3
         </NavLink>
       </div>
-      <div className="navbar-start flex">
-        <ul className="menu menu-horizontal px-1">
-          <li>
-            <NavLink to="/builder">Build</NavLink>
-          </li>
-          <li>
-            <NavLink to="/upload">Upload</NavLink>
-          </li>
-          <li>
-            <NavLink to="/jobs">Manage</NavLink>
-          </li>
-          <li>
-            <NavLink to="/about">About</NavLink>
-          </li>
-          <li>
-            <NavLink to="/help">Help</NavLink>
-          </li>
-        </ul>
-      </div>
-      <div className="navbar-end">
+      <NavigationMenu className="">
+        <NavigationMenuList className="flex space-x-5">
+          <MyNavLink to="/builder">Builder</MyNavLink>
+          <MyNavLink to="/upload">Upload</MyNavLink>
+          <MyNavLink to="/jobs">Manage</MyNavLink>
+          <MyNavLink to="/about">About</MyNavLink>
+          <MyNavLink to="/help">Help</MyNavLink>
+        </NavigationMenuList>
+      </NavigationMenu>
+      <div className="ml-auto">
         {loggedIn ? <LoggedInButton /> : <LoginButton />}
       </div>
     </div>

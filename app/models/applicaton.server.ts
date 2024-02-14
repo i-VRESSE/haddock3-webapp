@@ -109,6 +109,19 @@ function getNCores() {
   return haddock3_ncores;
 }
 
+function parseToml(toml: string) {
+  try {
+    return parse(dedupWorkflow(toml), { bigint: false });
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new InvalidUploadError(`Invalid ${WORKFLOW_CONFIG_FILENAME} file`, {
+        cause: error,
+      });
+    }
+    throw error;
+  }
+}
+
 export async function rewriteConfigInArchive(
   upload: Blob,
   expertiseLevels: ExpertiseLevel[]
@@ -117,7 +130,14 @@ export async function rewriteConfigInArchive(
   // Tried to give upload blob directly to loadAsync, but failed with
   // Error: Can't read the data of 'the loaded zip file'. Is it in a supported JavaScript type (String, Blob, ArrayBuffer, etc) ?
   // however converting to array buffer works, but will load entire file into memory
-  await zip.loadAsync(await upload.arrayBuffer());
+  try {
+    await zip.loadAsync(await upload.arrayBuffer());
+  } catch (e) {
+    if (e instanceof Error) {
+      throw new InvalidUploadError(`Unable to read archive`, { cause: e });
+    }
+    throw e;
+  }
   const config_file = zip.file(WORKFLOW_CONFIG_FILENAME);
   if (config_file === null) {
     throw new InvalidUploadError(
@@ -129,7 +149,7 @@ export async function rewriteConfigInArchive(
   // Keep backup of original config, before rewriting it
   zip.file(`${WORKFLOW_CONFIG_FILENAME}.orig`, config_body);
 
-  const table = parse(dedupWorkflow(config_body), { bigint: false });
+  const table = parseToml(config_body);
   const new_table = rewriteConfig(table);
 
   const new_config = parseWorkflowFromTable(new_table, getCatalog("guru"));

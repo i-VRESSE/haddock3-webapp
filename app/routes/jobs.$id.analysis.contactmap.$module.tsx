@@ -11,6 +11,7 @@ import {
 } from "~/models/job.server";
 import { moduleInfo } from "~/models/module_utils";
 import { CompletedJobs } from "~/bartender-client/types";
+import { Button } from "~/components/ui/button";
 
 interface ContactMapCluster {
   contacts: string;
@@ -104,13 +105,11 @@ export default function ContactMapPage() {
     <>
       <h2 className="text-2xl">Contact map of module {moduleIndex}</h2>
       <div className="pb-4">
-        <Link
-          title="Browse"
-          to={`/jobs/${jobid}/browse`}
-          className="btn btn-outline btn-sm"
-        >
-          Back to browse
-        </Link>
+        <Button asChild variant="outline">
+          <Link title="Browse" to={`/jobs/${jobid}/browse`}>
+            Back to browse
+          </Link>
+        </Button>
       </div>
       {clusters.map((cluster, i) => (
         <details key={i} open={i === 0}>

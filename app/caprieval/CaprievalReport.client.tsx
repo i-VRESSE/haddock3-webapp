@@ -1,5 +1,4 @@
 import { ClusterTable } from "@i-vresse/haddock3-analysis-components";
-import "@i-vresse/haddock3-analysis-components/dist/style.css";
 import "./CaprievalReport.client.css";
 import { useMemo } from "react";
 
@@ -155,7 +154,7 @@ export const CaprievalReport = ({
   const [searchParams, setSearchParams] = useSearchParams();
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="caprieval-report flex flex-col gap-4">
       <ClusterTable headers={headers} clusters={clusters} maxbest={MAX_BEST} />
       <ScatterPlots
         data={scatters.data}

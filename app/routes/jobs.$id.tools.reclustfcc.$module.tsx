@@ -38,6 +38,9 @@ import {
   getCaprievalPlots,
 } from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 
 const fieldDescriptions = getModuleDescriptions(`clustfcc`, [
   "clust_cutoff",
@@ -170,15 +173,14 @@ export default function ReclusterPage() {
             key={"clust_cutoff" + defaultValues.clust_cutoff}
             title={fieldDescriptions.clust_cutoff.longDescription}
           >
-            <label htmlFor="fraction_cutoff" className="block">
+            <Label htmlFor="fraction_cutoff">
               {fieldDescriptions.clust_cutoff.title}
-            </label>
-            <input
+            </Label>
+            <Input
               type="text"
               name="clust_cutoff"
               id="clust_cutoff"
               defaultValue={defaultValues.clust_cutoff}
-              className="rounded border-2 p-1"
             />
             <ErrorMessages path="clust_cutoff" errors={actionData?.errors} />
           </div>
@@ -186,15 +188,14 @@ export default function ReclusterPage() {
             key={"strictness" + defaultValues.strictness}
             title={fieldDescriptions.strictness.longDescription}
           >
-            <label htmlFor="strictness" className="block">
+            <Label htmlFor="strictness">
               {fieldDescriptions.strictness.title}
-            </label>
-            <input
+            </Label>
+            <Input
               type="text"
               name="strictness"
               id="strictness"
               defaultValue={defaultValues.strictness}
-              className="rounded border-2 p-1"
             />
             <ErrorMessages path="strictness" errors={actionData?.errors} />
           </div>
@@ -202,34 +203,27 @@ export default function ReclusterPage() {
             key={"min_population" + defaultValues.min_population}
             title={fieldDescriptions.min_population.longDescription}
           >
-            <label htmlFor="threshold" className="block">
+            <Label htmlFor="threshold">
               {fieldDescriptions.min_population.title}
-            </label>
-            <input
+            </Label>
+            <Input
               type="number"
               name="min_population"
               id="min_population"
               defaultValue={defaultValues.min_population}
-              className="rounded border-2 p-1"
             />
             <ErrorMessages path="min_population" errors={actionData?.errors} />
           </div>
         </div>
         <div className="flex flex-row gap-2 p-2">
-          <button
-            type="submit"
-            className="btn btn-primary btn-sm"
-            disabled={state !== "idle"}
-          >
+          <Button type="submit" disabled={state !== "idle"}>
             {state === "submitting" ? "Running..." : "Recluster"}
-          </button>
-          <Link
-            to="../../.."
-            relative="path"
-            className=" btn btn-outline btn-sm"
-          >
-            Back
-          </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="../../.." relative="path">
+              Back
+            </Link>
+          </Button>
         </div>
         <ToolHistory
           showInteractiveVersion={interactivness}

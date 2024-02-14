@@ -6,6 +6,9 @@ import type { Weights } from "../caprieval/caprieval.server";
 import { getModuleDescriptions } from "~/catalogs/descriptionsFromSchema";
 import { ErrorMessages } from "../components/ErrorMessages";
 import { ReWarning } from "./ReWarning";
+import { Label } from "~/components/ui/label";
+import { Input } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
 
 // w_* props are not defined in caprieval modile, but in scoring and refinement modules
 const moduleDescriptions = getModuleDescriptions("mdref", [
@@ -38,14 +41,14 @@ export function RescoreForm({
         {/* key is used to force React to re-render the component
           when the weights changes */}
         <div key={"w_elec" + weights.w_elec}>
-          <label
+          <Label
             htmlFor="w_elec"
             className="block"
             title={moduleDescriptions.w_elec.longDescription}
           >
             {moduleDescriptions.w_elec.title}
-          </label>
-          <input
+          </Label>
+          <Input
             type="text"
             name="w_elec"
             id="w_elec"
@@ -55,14 +58,14 @@ export function RescoreForm({
           <ErrorMessages path="w_elec" errors={errors} />
         </div>
         <div key={"w_vdw" + weights.w_vdw}>
-          <label
+          <Label
             htmlFor="w_vdw"
             className="block"
             title={moduleDescriptions.w_vdw.longDescription}
           >
             {moduleDescriptions.w_vdw.title}
-          </label>
-          <input
+          </Label>
+          <Input
             type="text"
             name="w_vdw"
             id="w_vdw"
@@ -72,14 +75,14 @@ export function RescoreForm({
           <ErrorMessages path="w_vdw" errors={errors} />
         </div>
         <div key={"w_desolv" + weights.w_desolv}>
-          <label
+          <Label
             htmlFor="w_desolv"
             className="block"
             title={moduleDescriptions.w_desolv.longDescription}
           >
             {moduleDescriptions.w_desolv.title}
-          </label>
-          <input
+          </Label>
+          <Input
             type="text"
             name="w_desolv"
             id="w_desolv"
@@ -89,14 +92,14 @@ export function RescoreForm({
           <ErrorMessages path="w_desolv" errors={errors} />
         </div>
         <div key={"w_bsa" + weights.w_bsa}>
-          <label
+          <Label
             htmlFor="w_bsa"
             className="block"
             title={moduleDescriptions.w_bsa.longDescription}
           >
             {moduleDescriptions.w_bsa.title}
-          </label>
-          <input
+          </Label>
+          <Input
             type="text"
             name="w_bsa"
             id="w_bsa"
@@ -106,14 +109,14 @@ export function RescoreForm({
           <ErrorMessages path="w_bsa" errors={errors} />
         </div>
         <div key={"w_air" + weights.w_air}>
-          <label
+          <Label
             htmlFor="w_air"
             className="block"
             title={moduleDescriptions.w_air.longDescription}
           >
             {moduleDescriptions.w_air.title}
-          </label>
-          <input
+          </Label>
+          <Input
             type="text"
             name="w_air"
             id="w_air"
@@ -124,16 +127,14 @@ export function RescoreForm({
         </div>
       </div>
       <div className="flex flex-row gap-2 p-2">
-        <button
-          type="submit"
-          className="btn btn-primary btn-sm"
-          disabled={state !== "idle"}
-        >
+        <Button type="submit" disabled={state !== "idle"}>
           {state === "submitting" ? "Running..." : "Rescore"}
-        </button>
-        <Link to="../../.." relative="path" className=" btn btn-outline btn-sm">
-          Back
-        </Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link to="../../.." relative="path">
+            Back
+          </Link>
+        </Button>
       </div>
       <ToolHistory
         showInteractiveVersion={showInteractiveVersion}

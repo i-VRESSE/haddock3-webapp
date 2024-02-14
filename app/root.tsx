@@ -13,12 +13,21 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
   useRouteError,
 } from "@remix-run/react";
 
 import { getOptionalClientUser } from "./auth.server";
 import styles from "./tailwind.css";
 import { Navbar } from "./components/Navbar";
+import { Banner } from "./components/Banner";
+import { themeSessionResolver } from "./session.server";
+import {
+  PreventFlashOnWrongTheme,
+  ThemeProvider,
+  useTheme,
+} from "remix-themes";
+import clsx from "clsx";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -30,32 +39,33 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const { getTheme } = await themeSessionResolver(request);
   const user = await getOptionalClientUser(request);
-  return json({ user });
+  return json({ user, theme: getTheme() });
 }
 
-export default function App() {
+export function App() {
+  const data = useLoaderData<typeof loader>();
+  const [theme] = useTheme();
   return (
-    <html lang="en" data-theme="bonvinlab">
+    <html lang="en" className={clsx(theme ?? "")}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
+        <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
         <Links />
       </head>
       <body>
         <div className="flex min-h-screen flex-col">
           <header>
-            <div className="flex h-64 flex-col bg-[url('https://www.bonvinlab.org/images/pages/banner_home-mini.jpg')] bg-cover">
-              <div className="flex-grow" />{" "}
-              {/* Push the navbar to the bottom of the banner */}
-              <Navbar />
-            </div>
+            <Banner />
+            <Navbar />
           </header>
           <div className="m-6 grow">
             <Outlet />
           </div>
-          <footer className="bg-primary p-1 text-center">
+          <footer className="bg-primary p-1 text-center text-primary-foreground">
             <p className="text-sm">
               This work is co-funded by the Horizon 2020 projects EOSC-hub and
               EGI-ACE (grant numbers 777536 and 101017567), BioExcel (grant
@@ -73,6 +83,15 @@ export default function App() {
         <LiveReload />
       </body>
     </html>
+  );
+}
+
+export default function AppWithProviders() {
+  const data = useLoaderData<typeof loader>();
+  return (
+    <ThemeProvider specifiedTheme={data.theme} themeAction="/action/set-theme">
+      <App />
+    </ThemeProvider>
   );
 }
 
@@ -99,7 +118,7 @@ function BoundaryShell({
               <Navbar />
             </div>
           </header>
-          <div className="grow bg-error-content p-6">
+          <div className="bg-error-content grow p-6">
             <h1 className="py-8 text-2xl">Something bad happened.</h1>
             {children}
           </div>

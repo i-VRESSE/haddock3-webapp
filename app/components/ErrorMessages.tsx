@@ -17,7 +17,7 @@ export function ErrorMessages({
   if (!issues) return <></>;
 
   return (
-    <div className="text-red-500">
+    <div className="text-destructive">
       {issues.map((message: string) => (
         <p key={message}>{message}</p>
       ))}

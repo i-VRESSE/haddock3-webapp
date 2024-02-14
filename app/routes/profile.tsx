@@ -11,6 +11,10 @@ import {
   setPreferredExpertiseLevel,
 } from "~/models/user.server";
 import { enumType, object, safeParse } from "valibot";
+import { Button } from "~/components/ui/button";
+import { Label } from "~/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { useTheme, Theme } from "remix-themes";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAuthenticated(request);
@@ -44,30 +48,26 @@ export default function Page() {
   ) => {
     submit(event.currentTarget);
   };
+  const [theme, setTheme] = useTheme();
+
   return (
     <main>
       <p>Email: {user.email}</p>
-      <fieldset>
+      <fieldset className="py-2">
         <legend>Expertise levels</legend>
         {user.expertiseLevels.length ? (
           <Form method="post" onChange={handleChangePreferredExpertiseLevel}>
-            <ul className="list-inside">
+            <RadioGroup
+              defaultValue={user.preferredExpertiseLevel as string}
+              name="preferredExpertiseLevel"
+            >
               {user.expertiseLevels.map((level) => (
-                <li key={level}>
-                  <label>
-                    <input
-                      title="Preferred"
-                      type="radio"
-                      className="radio"
-                      name="preferredExpertiseLevel"
-                      value={level}
-                      defaultChecked={user.preferredExpertiseLevel === level}
-                    />{" "}
-                    {level}
-                  </label>
-                </li>
+                <div className="flex items-center space-x-2" key={level}>
+                  <RadioGroupItem value={level} id={level} />
+                  <Label htmlFor={level}>{level}</Label>
+                </div>
               ))}
-            </ul>
+            </RadioGroup>
           </Form>
         ) : (
           <span>
@@ -77,11 +77,39 @@ export default function Page() {
           </span>
         )}
       </fieldset>
+      <fieldset className="py-2">
+        <legend>Theme</legend>
+        <RadioGroup
+          defaultValue={theme || ""}
+          name="theme"
+          onValueChange={(t) => {
+            setTheme(t === "" ? null : (t as Theme));
+          }}
+        >
+          {/* 
+          TODO system is not yet supported by remix-themes, 
+          but issue by author was created on 2 feb 2024.
+          
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="" id="system" />
+            <Label htmlFor="system">System</Label>
+          </div> 
+          */}
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value={Theme.LIGHT} id={Theme.LIGHT} />
+            <Label htmlFor={Theme.LIGHT}>Light</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value={Theme.DARK} id={Theme.DARK} />
+            <Label htmlFor={Theme.DARK}>Dark</Label>
+          </div>
+        </RadioGroup>
+      </fieldset>
 
       {/* TODO add change password form if user is not authenticated with a social login */}
-      <Link role="button" className="btn btn-sm m-2" to="/logout">
-        Logout
-      </Link>
+      <Button asChild variant="outline">
+        <Link to="/logout">Logout</Link>
+      </Button>
     </main>
   );
 }

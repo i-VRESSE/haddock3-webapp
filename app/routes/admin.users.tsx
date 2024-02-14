@@ -10,6 +10,13 @@ import {
 } from "~/models/user.server";
 import { mustBeAdmin } from "~/auth.server";
 import { UserTableRow } from "~/admin/UserTableRow";
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await mustBeAdmin(request);
@@ -52,15 +59,15 @@ export default function AdminUsersPage() {
   return (
     <main>
       <h1 className="my-6 text-3xl">User admin</h1>
-      <table className="table w-full">
-        <thead>
-          <tr>
-            <th>Email</th>
-            <th>Administrator?</th>
-            <th>Expertise levels</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Email</TableHead>
+            <TableHead>Administrator?</TableHead>
+            <TableHead>Expertise levels</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {users.map((user) => {
             const update = (data: FormData) => {
               data.set("userId", user.id);
@@ -78,8 +85,8 @@ export default function AdminUsersPage() {
               />
             );
           })}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </main>
   );
 }

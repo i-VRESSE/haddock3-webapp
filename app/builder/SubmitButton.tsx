@@ -6,6 +6,13 @@ import {
 import { catalog2tomlSchemas } from "@i-vresse/wb-core/dist/toml.js";
 import { createZip } from "@i-vresse/wb-core/dist/archive";
 import { useSubmit } from "@remix-run/react";
+import { Button } from "~/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 
 export const WorkflowSubmitButton = ({
   submitAllowed,
@@ -26,20 +33,23 @@ export const WorkflowSubmitButton = ({
     submit(formData, { method: "post", encType: "multipart/form-data" });
   };
   if (submitAllowed) {
-    return (
-      <button className="btn btn-primary" onClick={submitworkflow}>
-        Submit
-      </button>
-    );
+    return <Button onClick={submitworkflow}>Submit</Button>;
   }
   return (
-    <div
-      className="tooltip"
-      data-tip="You don't have permission to submit. Please login and make sure you have the right expertise level."
-    >
-      <button className="btn" disabled>
-        Submit
-      </button>
-    </div>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div>
+            <Button disabled>Submit</Button>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>
+            You don&apos;t have permission to submit. Please login and make sure
+            you have the right expertise level.
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
