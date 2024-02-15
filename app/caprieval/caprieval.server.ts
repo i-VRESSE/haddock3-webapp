@@ -227,7 +227,9 @@ export interface CaprievalStructureRow {
   elec: number;
   improper: number;
   rdcs: number;
-  rgtotal: number;
+  rg: number;
+  sym: number;
+  total: number;
   vdw: number;
   vean: number;
   xpcs: number;
@@ -257,6 +259,8 @@ export interface CaprievalClusterRow {
   fnat_std: number;
   lrmsd: number;
   lrmsd_std: number;
+  ilrmsd?: number;
+  ilrmsd_std?: number;
   dockq: number;
   dockq_std: number;
   air: number;
