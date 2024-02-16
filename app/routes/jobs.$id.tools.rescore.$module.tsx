@@ -16,12 +16,11 @@ import { rescore } from "~/tools/rescore.server";
 import { moduleInfo } from "~/models/module_utils";
 import { shouldShowInteractiveVersion } from "~/tools/shared";
 import { RescoreForm } from "~/tools/RescoreForm";
-import type { CaprievalPlotlyProps } from "~/caprieval/caprieval.server";
+import type { CaprievalData } from "~/caprieval/caprieval.server";
 import {
   getWeights,
-  getScores,
   getPlotSelection,
-  getCaprievalPlots,
+  getCaprievalData,
   WeightsSchema,
 } from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
@@ -35,6 +34,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Error("Job is not completed");
   }
   const outputFiles = await listOutputFiles(jobId, bartenderToken, 1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [moduleName, hasInteractiveVersion, moduleIndexPadding] = moduleInfo(
     outputFiles,
     moduleIndex
@@ -50,16 +50,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     bartenderToken,
     moduleIndexPadding,
   });
-  const scores = await getScores({
-    jobid: jobId,
-    module: moduleIndex,
-    isInteractive: showInteractiveVersion,
-    bartenderToken,
-    moduleIndexPadding,
-    moduleName,
-  });
+
   const { scatterSelection, boxSelection } = getPlotSelection(request.url);
-  const plotlyPlots = await getCaprievalPlots({
+  const caprievalData = await getCaprievalData({
     jobid: jobId,
     module: moduleIndex,
     isInteractive: showInteractiveVersion,
@@ -67,14 +60,14 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     moduleIndexPadding,
     scatterSelection,
     boxSelection,
+    structurePrefix: "../../files/output/",
   });
   return json({
     moduleIndex,
     weights,
-    scores,
     showInteractiveVersion,
     hasInteractiveVersion,
-    plotlyPlots,
+    caprievalData,
   });
 };
 
@@ -117,14 +110,13 @@ export default function RescorePage() {
   const {
     moduleIndex,
     weights,
-    scores,
+    caprievalData,
     showInteractiveVersion,
     hasInteractiveVersion,
-    plotlyPlots,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   // Strip SerializeObject<UndefinedToOptional wrapper
-  const plotlyPlotsStripped = plotlyPlots as CaprievalPlotlyProps;
+  const caprievalDataCasted = caprievalData as CaprievalData;
   return (
     <>
       <RescoreForm
@@ -137,11 +129,7 @@ export default function RescorePage() {
       <ClientOnly fallback={<p>Loading...</p>}>
         {() => (
           <>
-            <CaprievalReport
-              scores={scores}
-              prefix="../../files/output/"
-              plotlyPlots={plotlyPlotsStripped}
-            />
+            <CaprievalReport {...caprievalDataCasted} />
           </>
         )}
       </ClientOnly>

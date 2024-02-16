@@ -9,12 +9,20 @@ import {
 } from "~/models/job.server";
 import type { PlotlyProps } from "~/components/PlotlyPlot";
 import type { DirectoryItem } from "~/bartender-client/types";
-import { parseTsv } from "../models/tsv";
 import { hasInteractiveVersion } from "../models/module_utils";
 import {
   CAPRIEVAL_SCATTERPLOT_CHOICES,
   CAPRIEVAL_BOXPLOT_CHOICES,
 } from "./constants";
+import type {
+  ClusterTable,
+  StructureTable,
+} from "@i-vresse/haddock3-analysis-components";
+
+// Package does not expose types, so extract them from the components
+export type Table =
+  | Parameters<typeof StructureTable>[0]
+  | Parameters<typeof ClusterTable>[0];
 
 export const WeightsSchema = object({
   // could use minimum/maximum from catalog,
@@ -66,35 +74,31 @@ export async function getCaprievalModuleInfo(
   return [moduleIndex, interactivness, pad];
 }
 
-export async function getScores({
-  jobid,
-  module,
-  bartenderToken,
-  moduleIndexPadding,
+export async function getReportHtml(
+  jobid: number,
+  module: number,
+  bartenderToken: string,
+  moduleIndexPadding: number,
   isInteractive = false,
-  moduleName = "caprieval",
-}: {
-  jobid: number;
-  module: number;
-  isInteractive?: boolean;
-  bartenderToken: string;
-  moduleIndexPadding: number;
-  moduleName?: string;
-}) {
-  const prefix = buildPath({
-    moduleIndex: module,
-    moduleName,
+  moduleName = "caprieval"
+) {
+  const shtml = await fetchHtml(
+    jobid,
+    module,
     isInteractive,
+    bartenderToken,
     moduleIndexPadding,
-  });
-  const structures = await getStructureScores(prefix, jobid, bartenderToken);
-  const clusters = await getClusterScores(prefix, jobid, bartenderToken);
-  return { structures, clusters };
+    moduleName,
+    `report.html`
+  );
+  const table = getTableFromHtml(shtml);
+  return table;
 }
 
-export interface CaprievalPlotlyProps {
+export interface CaprievalData {
   scatters: PlotlyProps;
   boxes: PlotlyProps;
+  table: Table;
 }
 
 export function getPlotSelection(url: string) {
@@ -114,7 +118,7 @@ export function getPlotSelection(url: string) {
   };
 }
 
-export async function getCaprievalPlots({
+export async function getCaprievalData({
   jobid,
   module,
   bartenderToken,
@@ -123,6 +127,7 @@ export async function getCaprievalPlots({
   boxSelection,
   isInteractive = false,
   moduleName = "caprieval",
+  structurePrefix = "files/output/module",
 }: {
   jobid: number;
   module: number;
@@ -132,7 +137,8 @@ export async function getCaprievalPlots({
   scatterSelection: string;
   boxSelection: string;
   moduleName?: string;
-}): Promise<CaprievalPlotlyProps> {
+  structurePrefix?: string;
+}): Promise<CaprievalData> {
   const shtml = await fetchHtml(
     jobid,
     module,
@@ -161,7 +167,26 @@ export async function getCaprievalPlots({
   // plot id is always 1 for non-report plot as html file contains just one plot
   const bplotId = boxSelection === "report" ? 2 : 1;
   const boxes = getPlotFromHtml(bhtml, bplotId);
-  return { scatters, boxes };
+
+  let thtml: string;
+  if (scatterSelection === "report") {
+    thtml = shtml;
+  } else if (boxSelection === "report") {
+    thtml = bhtml;
+  } else {
+    thtml = await fetchHtml(
+      jobid,
+      module,
+      isInteractive,
+      bartenderToken,
+      moduleIndexPadding,
+      moduleName,
+      `report.html`
+    );
+  }
+  const table = prefixTable(getTableFromHtml(thtml), structurePrefix);
+
+  return { scatters, boxes, table };
 }
 
 async function fetchHtml(
@@ -191,102 +216,26 @@ async function fetchHtml(
 }
 
 export function getPlotFromHtml(html: string, plotId = 1) {
+  return getDataFromHtml<PlotlyProps>(html, `data${plotId}`);
+}
+
+export function getTableFromHtml(html: string, tableId = 2) {
+  return getDataFromHtml<Table>(html, `datatable${tableId}`);
+}
+
+export function getDataFromHtml<T>(html: string, id: string) {
   // this is very fragile, but much faster then using a HTML parser
   // as order of attributes is not guaranteed
   // see commit meessage of this line for benchmark
   const re = new RegExp(
-    `<script id="data${plotId}" type="application\\/json">([\\s\\S]*?)<\\/script>`
+    `<script id="${id}" type="application\\/json">([\\s\\S]*?)<\\/script>`
   );
   const a = html.match(re);
-  const dataAsString = a![1].trim();
-  return JSON.parse(dataAsString) as PlotlyProps;
-}
-
-export interface CaprievalStructureRow {
-  model: string;
-  md5: number | "-";
-  caprieval_rank: number;
-  score: number;
-  irmsd: number;
-  fnat: number;
-  lrmsd: number;
-  ilrmsd: number;
-  dockq: number;
-  "cluster-id": number | "-";
-  "cluster-ranking": number | "-";
-  "model-cluster-ranking": number | "-";
-  air: number;
-  angles: number;
-  bonds: number;
-  bsa: number;
-  cdih: number;
-  coup: number;
-  dani: number;
-  desolv: number;
-  dihe: number;
-  elec: number;
-  improper: number;
-  rdcs: number;
-  rg: number;
-  sym: number;
-  total: number;
-  vdw: number;
-  vean: number;
-  xpcs: number;
-}
-
-async function getStructureScores(
-  prefix: string,
-  jobid: number,
-  bartenderToken: string
-) {
-  const path = `${prefix}capri_ss.tsv`;
-  const response = await getJobfile(jobid, path, bartenderToken);
-  const body = await response.text();
-  return parseTsv<CaprievalStructureRow>(body);
-}
-
-export interface CaprievalClusterRow {
-  cluster_rank: number | "-";
-  cluster_id: number | "-";
-  n: number;
-  under_eval: number | "-";
-  score: number;
-  score_std: number;
-  irmsd: number;
-  irmsd_std: number;
-  fnat: number;
-  fnat_std: number;
-  lrmsd: number;
-  lrmsd_std: number;
-  ilrmsd?: number;
-  ilrmsd_std?: number;
-  dockq: number;
-  dockq_std: number;
-  air: number;
-  air_std: number;
-  bsa: number;
-  bsa_std: number;
-  desolv: number;
-  desolv_std: number;
-  elec: number;
-  elec_std: number;
-  total: number;
-  total_std: number;
-  vdw: number;
-  vdw_std: number;
-  caprieval_rank: number;
-}
-
-async function getClusterScores(
-  prefix: string,
-  jobid: number,
-  bartenderToken: string
-) {
-  const path = `${prefix}capri_clt.tsv`;
-  const response = await getJobfile(jobid, path, bartenderToken);
-  const body = await response.text();
-  return parseTsv<CaprievalClusterRow>(body, true);
+  if (!a) {
+    throw new Error(`could not find script with id ${id}`);
+  }
+  const dataAsString = a[1].trim();
+  return JSON.parse(dataAsString) as T;
 }
 
 export function getLastCaprievalModule(files: DirectoryItem): [number, number] {
@@ -319,4 +268,26 @@ export function buildBestRankedPath(
     moduleIndexPadding,
     suffix: "summary.tgz",
   });
+}
+
+function prefixTable(table: Table, structurePrefix: string) {
+  if ("clusters" in table) {
+    type Cluster = Parameters<typeof ClusterTable>[0]["clusters"][0];
+    table.clusters = table.clusters.map((row) => {
+      return Object.fromEntries(
+        Object.entries(row).map(([key, value]) => {
+          if (key.startsWith("best")) {
+            return [key, `${structurePrefix}${value}`];
+          }
+          return [key, value];
+        })
+      ) as Cluster;
+    });
+  } else {
+    table.structures = table.structures.map((row) => ({
+      ...row,
+      model: `${structurePrefix}${row.model}`,
+    }));
+  }
+  return table;
 }

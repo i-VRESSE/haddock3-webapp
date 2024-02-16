@@ -11,11 +11,10 @@ import { useState } from "react";
 import { flatten, safeParse } from "valibot";
 
 import { getBartenderToken } from "~/bartender-client/token.server";
-import type { CaprievalPlotlyProps } from "~/caprieval/caprieval.server";
+import type { CaprievalData } from "~/caprieval/caprieval.server";
 import {
-  getScores,
   getPlotSelection,
-  getCaprievalPlots,
+  getCaprievalData,
 } from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 import { getModuleDescriptions } from "~/catalogs/descriptionsFromSchema";
@@ -76,19 +75,10 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     bartenderToken,
     moduleIndexPadding,
   });
-  let scores;
-  let plotlyPlots;
+  let caprievalData;
   if (showInteractiveVersion) {
-    scores = await getScores({
-      jobid: jobId,
-      module: moduleIndex,
-      isInteractive: showInteractiveVersion,
-      bartenderToken,
-      moduleIndexPadding,
-      moduleName: "clustrmsd",
-    });
     const { scatterSelection, boxSelection } = getPlotSelection(request.url);
-    plotlyPlots = await getCaprievalPlots({
+    caprievalData = await getCaprievalData({
       jobid: jobId,
       module: moduleIndex,
       isInteractive: showInteractiveVersion,
@@ -97,6 +87,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       scatterSelection,
       boxSelection,
       moduleName: "clustrmsd",
+      structurePrefix: "../../files/output/",
     });
   }
   return json({
@@ -106,8 +97,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     interactivness: showInteractiveVersion,
     maxInteractivness: hasInteractiveVersion,
     clusters,
-    scores,
-    plotlyPlots,
+    caprievalData,
   });
 };
 
@@ -157,11 +147,10 @@ export default function ReclusterPage() {
     interactivness,
     maxInteractivness,
     clusters,
-    scores,
-    plotlyPlots,
+    caprievalData,
   } = useLoaderData<typeof loader>();
-  // Strip SerializeObject<UndefinedToOptional wrapper
-  const plotlyPlotsStripped = plotlyPlots as CaprievalPlotlyProps | undefined;
+  // Strip JsonifyObject wrapper
+  const caprievalDataCasted = caprievalData as CaprievalData | undefined;
   const actionData = useActionData<typeof action>();
   const [criterion, setCriterion] = useState(defaultValues.criterion);
   const handleCriterionChange = (value: string) => {
@@ -273,17 +262,11 @@ export default function ReclusterPage() {
           <summary>Clusters</summary>
           <ReClusterTable clusters={clusters} />
         </details>
-        {scores && plotlyPlotsStripped && (
+        {caprievalDataCasted && (
           <details open={true}>
             <summary>Capri evaluation</summary>
             <ClientOnly fallback={<p>Loading...</p>}>
-              {() => (
-                <CaprievalReport
-                  scores={scores}
-                  prefix="../../files/output/"
-                  plotlyPlots={plotlyPlotsStripped}
-                />
-              )}
+              {() => <CaprievalReport {...caprievalDataCasted} />}
             </ClientOnly>
           </details>
         )}
