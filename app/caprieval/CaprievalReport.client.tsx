@@ -16,15 +16,22 @@ import type { CaprievalData } from "./caprieval.server";
 
 export const CaprievalReport = ({ scatters, boxes, table }: CaprievalData) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const hasOtherCluster = "clusters" in table && table.clusters.some((c) => c['cluster_id'] === "Other");
+  const hasOtherCluster =
+    "clusters" in table &&
+    table.clusters.some((c) => c["cluster_id"] === "Other");
   return (
     <div className="caprieval-report flex flex-col gap-4">
       {"clusters" in table ? (
         <ClusterTable {...table} />
       ) : (
         <>
-        <StructureTable {...table} />
-        {hasOtherCluster && <div>The &quot;Other&quot; cluster is not a real cluster it contains all structures that are not in the top 9 clusters.</div>}
+          <StructureTable {...table} />
+          {hasOtherCluster && (
+            <div>
+              The &quot;Other&quot; cluster is not a real cluster it contains
+              all structures that are not in the top 9 clusters.
+            </div>
+          )}
         </>
       )}
       <ScatterPlots
