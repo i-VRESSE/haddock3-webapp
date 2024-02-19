@@ -55,7 +55,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 };
 
-export default function RescorePage() {
+export default function ReportPage() {
   const { job, caprievalData, bestRanked } = useLoaderData<typeof loader>();
   // Strip JsonifyObject wrapper
   const caprievalDataCasted = caprievalData as CaprievalData;

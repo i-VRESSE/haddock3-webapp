@@ -136,7 +136,7 @@ export async function listOutputFiles(
   maxDepth = 3
 ) {
   return listFilesAt(jobid, JOB_OUTPUT_DIR, bartenderToken, maxDepth);
-}
+  }
 
 export async function listInputFiles(jobid: number, bartenderToken: string) {
   const client = createClient(bartenderToken);

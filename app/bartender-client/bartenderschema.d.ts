@@ -367,6 +367,27 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/application/runimport": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Import a HADDOCK3 run.
+     * @description Upload an archive of haddock3 output. The archive should have run dir as root. The run should have haddock3-clean and haddock3-analyse executed on it.
+     *
+     */
+    put: operations["application_runimport"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/job/{jobid}/interactive/rescore": {
     parameters: {
       query?: never;
@@ -918,6 +939,46 @@ export interface operations {
            * Upload
            * Format: binary
            * @description Zip archive containing workflow.cfg file(s).
+           */
+          upload: Blob;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      307: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  application_runimport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": {
+          /**
+           * Upload
+           * Format: binary
+           * @description Zip archive.
            */
           upload: Blob;
         };
