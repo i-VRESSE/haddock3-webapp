@@ -37,14 +37,9 @@ export const loader = async ({
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
-  const upload = formData.get("upload");
-  if (typeof upload === "string" || upload === null) {
-    throw new Error("Bad upload");
-  }
-
   const user = await mustBeAllowedToSubmit(request);
   const accessToken = await getBartenderTokenByUser(user);
-  const job = await submitJob(upload, accessToken, user.expertiseLevels);
+  const job = await submitJob(formData, accessToken, user.expertiseLevels);
   const job_url = `/jobs/${job.id}`;
   return redirect(job_url);
 };
