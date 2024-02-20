@@ -4,7 +4,7 @@ import {
   json,
   redirect,
 } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 
 import { submitJob } from "~/models/applicaton.server";
 
@@ -72,7 +72,7 @@ function flattenValidationErrors(error: ValidationError) {
 export default function UploadPage() {
   const { runImportAllowed } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  // TODO when form is being submitted disable button and show spinner
+  const { state } = useNavigation()
   return (
     <main className="mx-auto max-w-4xl">
       <h1 className="my-6 text-3xl">Upload haddock3 archive</h1>
@@ -118,7 +118,9 @@ export default function UploadPage() {
             <p key={error}>{error}</p>
           ))}
         </div>
-        <Button type="submit">Submit job</Button>
+        <Button type="submit" disabled={state === 'submitting'}>
+          {state === 'submitting' ? 'Submitting job ...' : 'Submit job'}
+          </Button>
       </Form>
     </main>
   );
