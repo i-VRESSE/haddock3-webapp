@@ -90,7 +90,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       scatterSelection,
       boxSelection,
       moduleName: "clustfcc",
-      structurePrefix: "../../files/output/",
+      structurePrefix: `/jobs/${jobid}/files/output/foo/bar/`,
     });
   }
 

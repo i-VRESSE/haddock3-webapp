@@ -60,7 +60,12 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     moduleIndexPadding,
     scatterSelection,
     boxSelection,
-    structurePrefix: "../../files/output/",
+    // report.html has path to pdb of ../../11_seletopclusts/cluster_2_model_1.pdb.gz
+    // this page is rendered at /jobs/52/tools/rescore/12?i=1
+    // the pdb file can be downloaed at /jobs/52/files/output/11_seletopclusts/cluster_1_model_1.pdb.gz
+    // so we need to do some path manipulation,
+    // with foo/bar/ negating the ../../ in the path
+    structurePrefix: `/jobs/${jobId}/files/output/foo/bar/`,
   });
   return json({
     moduleIndex,
