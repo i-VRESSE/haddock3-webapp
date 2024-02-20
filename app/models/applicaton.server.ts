@@ -28,6 +28,7 @@ import {
   picklist,
   parse as valibotParse,
 } from "valibot";
+import { NodeOnDiskFile } from "@remix-run/node";
 
 export async function submitJob(
   rawFormData: FormData,
@@ -35,7 +36,7 @@ export async function submitJob(
   expertiseLevels: ExpertiseLevel[]
 ) {
   const Schema = object({
-    upload: instance(File, [
+    upload: instance(NodeOnDiskFile, [
       mimeType(["application/zip"], "Please upload a zip file"),
     ]),
     kind: optional(picklist(["run", "workflow"]), "workflow"),

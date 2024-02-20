@@ -18,6 +18,7 @@ import { ValidationError } from "@i-vresse/wb-core/dist/validate.js";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Label } from "~/components/ui/label";
 import { ValiError } from "valibot";
+import { parseUploadRequest } from "../lib/parseUploadRequest";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await mustBeAllowedToSubmit(request);
@@ -26,7 +27,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const formData = await request.formData();
+  const formData = await parseUploadRequest(request);
 
   const user = await mustBeAllowedToSubmit(request);
   const token = await getBartenderTokenByUser(user);
@@ -71,6 +72,7 @@ function flattenValidationErrors(error: ValidationError) {
 export default function UploadPage() {
   const { runImportAllowed } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+  // TODO when form is being submitted disable button and show spinner
   return (
     <main className="mx-auto max-w-4xl">
       <h1 className="my-6 text-3xl">Upload haddock3 archive</h1>
@@ -89,7 +91,7 @@ export default function UploadPage() {
               <Label htmlFor="run">
                 <b>Run</b>: Archive of a haddock3 run. The archive should have
                 run dir as root. The run should have haddock3, haddock3-clean
-                and haddock3-analyse executed on it.
+                and haddock3-analyse executed on it. Maximum size is 1Gb.
               </Label>
             </div>
           </RadioGroup>

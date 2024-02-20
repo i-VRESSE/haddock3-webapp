@@ -13,6 +13,7 @@ import { getOptionalUser, mustBeAllowedToSubmit } from "~/auth.server";
 import { getBartenderTokenByUser } from "~/bartender-client/token.server";
 import { Haddock3WorkflowBuilder } from "~/builder/Form.client";
 import { haddock3Styles } from "~/builder/styles";
+import { parseUploadRequest } from "~/lib/parseUploadRequest";
 
 export const loader = async ({
   request,
@@ -36,7 +37,7 @@ export const loader = async ({
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const formData = await request.formData();
+  const formData = await parseUploadRequest(request);
   const user = await mustBeAllowedToSubmit(request);
   const accessToken = await getBartenderTokenByUser(user);
   const job = await submitJob(formData, accessToken, user.expertiseLevels);
