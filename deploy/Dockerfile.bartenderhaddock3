@@ -1,4 +1,5 @@
 # TODO get image with haddock3 from somewhere
+# TODO have image contain cns executable, likely from private registry, which would require `docker login` before building.
 ARG HADDOCK3_VERSION=latest
 FROM ghcr.io/haddocking/haddock3:${HADDOCK3_VERSION} as haddock3
 
