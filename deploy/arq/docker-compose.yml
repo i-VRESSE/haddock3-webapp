@@ -7,8 +7,7 @@ services:
     build:
       context: .
     restart: always
-    command: 
-      /wait && npm run setup && npm run start
+    command: /wait && npm run setup && npm run start
     depends_on:
       bartender:
         condition: service_started
@@ -47,8 +46,7 @@ services:
       dockerfile: ./deploy/Dockerfile.bartenderhaddock3
     image: bartender:${BARTENDER_VERSION:-latest}
     restart: always
-    command:
-      /wait && alembic upgrade head && bartender serve
+    command: /wait && alembic upgrade head && bartender serve
     env_file:
       - ../bartender/.env
     volumes:
@@ -96,7 +94,7 @@ services:
     restart: always
     ports:
       - "6379:6379"
-  
+
   bartenderworker:
     build:
       context: .

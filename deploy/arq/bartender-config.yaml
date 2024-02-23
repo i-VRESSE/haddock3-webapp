@@ -7,7 +7,7 @@ applications:
   haddock3:
     command_template: haddock3 workflow.cfg
     upload_needs:
-    - workflow.cfg
+      - workflow.cfg
   runimport:
     summary: Import a HADDOCK3 run.
     description: >
@@ -21,7 +21,7 @@ destinations:
       type: arq
       redis_dsn: redis://redis:6379
       max_jobs: 1
-      job_timeout: PT12H  # 12 hours
+      job_timeout: PT12H # 12 hours
     filesystem:
       type: local
 interactive_applications:
@@ -52,13 +52,13 @@ interactive_applications:
         w_vdw:
           type: number
       required:
-      - module_nr
-      - capri_dir
-      - w_elec
-      - w_vdw
-      - w_desolv
-      - w_bsa
-      - w_air
+        - module_nr
+        - capri_dir
+        - w_elec
+        - w_vdw
+        - w_desolv
+        - w_bsa
+        - w_air
       type: object
   reclustrmsd:
     command_template: >
@@ -93,9 +93,9 @@ interactive_applications:
         min_population:
           type: number
       required:
-      - module_nr
-      - criterion
-      - clustrmsd_dir
+        - module_nr
+        - criterion
+        - clustrmsd_dir
       type: object
   reclustfcc:
     command_template: >
@@ -120,9 +120,9 @@ interactive_applications:
         min_population:
           type: number
       required:
-      - module_nr
-      - clustfcc_dir
-      - clust_cutoff
-      - strictness
-      - min_population
+        - module_nr
+        - clustfcc_dir
+        - clust_cutoff
+        - strictness
+        - min_population
       type: object
