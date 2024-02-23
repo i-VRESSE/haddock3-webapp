@@ -12,8 +12,10 @@ export function files2modules(files: DirectoryItem) {
 
   const nonmodules = new Set(["analysis", "data", "log", "traceback"]);
   return files.children
-    .filter((i) => !nonmodules.has(i.name))
-    .filter((i) => !i.name.endsWith("_interactive"))
+    .filter(
+      (i) =>
+        i.is_dir && !nonmodules.has(i.name) && !i.name.endsWith("_interactive")
+    )
     .map((output) => {
       const report = analyisRoot?.children
         ?.find((c) => c.name === output.name + "_analysis")

@@ -103,20 +103,21 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Retrieve Job Files
-     * @description Retrieve files from a completed job.
+     * Retrieve Job File
+     * @description Retrieve file from a completed job.
      *
      *     Args:
      *         path: Path to file that job has produced.
      *         job_dir: Directory with job output files.
      *
      *     Raises:
-     *         HTTPException: When file is not found or is outside job directory.
+     *         HTTPException: When file is not found or is not a file
+     *             or is outside job directory.
      *
      *     Returns:
-     *         The file content.
+     *         The file contents.
      */
-    get: operations["retrieve_job_files"];
+    get: operations["retrieve_job_file"];
     put?: never;
     post?: never;
     delete?: never;
@@ -360,6 +361,27 @@ export interface paths {
     get?: never;
     /** Upload job to haddock3 */
     put: operations["application_haddock3"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/application/runimport": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Import a HADDOCK3 run.
+     * @description Upload an archive of haddock3 output. The archive should have run dir as root. The run should have haddock3-clean and haddock3-analyse executed on it.
+     *
+     */
+    put: operations["application_runimport"];
     post?: never;
     delete?: never;
     options?: never;
@@ -617,7 +639,7 @@ export interface operations {
       };
     };
   };
-  retrieve_job_files: {
+  retrieve_job_file: {
     parameters: {
       query?: never;
       header?: never;
@@ -918,6 +940,46 @@ export interface operations {
            * Upload
            * Format: binary
            * @description Zip archive containing workflow.cfg file(s).
+           */
+          upload: Blob;
+        };
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      307: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  application_runimport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": {
+          /**
+           * Upload
+           * Format: binary
+           * @description Zip archive.
            */
           upload: Blob;
         };

@@ -11,7 +11,7 @@ import {
   dedupWorkflow,
   parseWorkflowFromTable,
 } from "@i-vresse/wb-core/dist/toml.js";
-import { BartenderError, InvalidUploadError } from "./errors";
+import { BartenderError, ForbiddenError, InvalidUploadError } from "./errors";
 import { ExpertiseLevel } from "@prisma/client";
 import type { IFiles, IWorkflow } from "@i-vresse/wb-core/dist/types";
 import {
@@ -20,8 +20,39 @@ import {
   validateWorkflow,
 } from "@i-vresse/wb-core/dist/validate.js";
 import { getCatalog } from "~/catalogs/index.server";
+import {
+  instance,
+  mimeType,
+  object,
+  optional,
+  picklist,
+  parse as valibotParse,
+} from "valibot";
+import { NodeOnDiskFile } from "@remix-run/node";
 
 export async function submitJob(
+  rawFormData: FormData,
+  accessToken: string,
+  expertiseLevels: ExpertiseLevel[]
+) {
+  const Schema = object({
+    upload: instance(NodeOnDiskFile, [
+      mimeType(
+        ["application/zip", "application/x-zip-compressed"],
+        "Please upload a zip file"
+      ),
+    ]),
+    kind: optional(picklist(["run", "workflow"]), "workflow"),
+  });
+  const obj = Object.fromEntries(rawFormData.entries());
+  const formData = valibotParse(Schema, obj);
+  if (formData.kind === "run") {
+    return submitRunImportJob(formData.upload, accessToken, expertiseLevels);
+  }
+  return submitHaddock3Job(formData.upload, accessToken, expertiseLevels);
+}
+
+async function submitHaddock3Job(
   upload: File,
   accessToken: string,
   expertiseLevels: ExpertiseLevel[]
@@ -31,26 +62,47 @@ export async function submitJob(
     type: upload.type,
     lastModified: upload.lastModified,
   });
-
-  const body = { upload: rewritten_upload };
   const client = createClient(accessToken);
-  // Redirect manual is needed because authorization header is not passed
   const { response } = await client.PUT("/api/application/haddock3", {
     redirect: "manual",
-    body,
+    body: { upload: rewritten_upload },
     bodySerializer: multipart,
   });
+  return getJobByRedirect(response, accessToken);
+}
+
+async function submitRunImportJob(
+  upload: File,
+  accessToken: string,
+  expertiseLevels: ExpertiseLevel[]
+) {
+  if (!expertiseLevels.includes("guru")) {
+    throw new ForbiddenError(
+      "You don't have permission to submit run import jobs"
+    );
+  }
+  const client = createClient(accessToken);
+  const { response } = await client.PUT("/api/application/runimport", {
+    redirect: "manual",
+    body: { upload },
+    bodySerializer: multipart,
+  });
+  return getJobByRedirect(response, accessToken);
+}
+
+async function getJobByRedirect(response: Response, accessToken: string) {
   if (!response.ok && response.status !== 303) {
     throw new BartenderError(
       `Unable to submit job: ${response.status} ${
         response.statusText
-      } ${await response.text()}`
+      } ${await response.text()}`,
+      { cause: response }
     );
   }
 
-  const url = response.headers.get("Location");
+  const jobUrl = response.headers.get("Location");
   // url is like /api/job/1234
-  const jobId = parseInt(url!.split("/").pop()!);
+  const jobId = parseInt(jobUrl!.split("/").pop()!);
   return getJobById(jobId, accessToken);
 }
 

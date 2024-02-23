@@ -18,6 +18,7 @@ import {
   getLastCaprievalModule,
 } from "~/caprieval/caprieval.server";
 import { Button } from "~/components/ui/button";
+import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
@@ -44,6 +45,10 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 export default function JobPage() {
   const { job, outputFiles, inputFiles, hasCaprieval, bestRanked } =
     useLoaderData<typeof loader>();
+
+  const hasWorkflow = inputFiles.children?.some(
+    (file) => file.is_file && file.name === WORKFLOW_CONFIG_FILENAME
+  );
   return (
     <main className="flex flex-row gap-16">
       <div>
@@ -70,9 +75,11 @@ export default function JobPage() {
         <p>
           <a href={`/jobs/${job.id}/input.zip`}>&#128230; Download archive</a>
         </p>
-        <p>
-          <Link to={`/jobs/${job.id}/edit`}>&#128393; Edit</Link>
-        </p>
+        {hasWorkflow && (
+          <p>
+            <Link to={`/jobs/${job.id}/edit`}>&#128393; Edit</Link>
+          </p>
+        )}
       </div>
       <div>
         <h2 className="text-xl">Module output</h2>

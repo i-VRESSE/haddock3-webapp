@@ -14,7 +14,9 @@ export function NonModuleOutputFiles({
   const filtered_files = useMemo(() => {
     return {
       ...files,
-      children: files.children?.filter((i) => nonmodules.has(i.name)),
+      children: files.children?.filter(
+        (i) => nonmodules.has(i.name) || !i.is_dir
+      ),
     };
   }, [files]);
 

@@ -18,6 +18,7 @@ import type {
   ClusterTable,
   StructureTable,
 } from "@i-vresse/haddock3-analysis-components";
+import { BartenderError } from "~/models/errors";
 
 // Package does not expose types, so extract them from the components
 export type Table =
@@ -56,6 +57,11 @@ export async function getWeights({
     moduleIndexPadding: moduleIndexPadding,
   });
   const response = await getJobfile(jobid, path, bartenderToken);
+  if (!response.ok) {
+    throw new BartenderError(`Could not get weights_params.json`, {
+      cause: response,
+    });
+  }
   const body = await response.json();
   return parse(WeightsSchema, body);
 }
