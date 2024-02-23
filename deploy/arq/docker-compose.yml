@@ -1,0 +1,158 @@
+version: "3.9"
+
+services:
+  webapp:
+    # // TODO publish to ghcr.io
+    image: i-vresse/haddock3-webapp
+    build:
+      context: .
+    restart: always
+    depends_on:
+      bartender:
+        condition: service_started
+      webappdb:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./.env
+    environment:
+      BARTENDER_API_URL: "http://bartender:8000"
+      DATABASE_URL: postgresql://postgres:postgres@webappdb:5432/postgres
+      BARTENDER_PRIVATE_KEY: /certs/private_key.pem
+    volumes:
+      - bartender-certs/private_key.pem:/certs/private_key.pem:ro
+
+  webappdb:
+    image: postgres:15.4-bullseye
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - webapp-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  webappmigrator:
+    build:
+      context: .
+      dockerfile: prisma/Dockerfile
+      # TODO use web app image or publish as seperate image to ghcr.io
+    command: npm run setup
+    restart: "no"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@webappdb:5432/postgres
+    depends_on:
+      webappdb:
+        condition: service_healthy
+
+  bartender:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile.bartenderhaddock3
+    image: bartender:${BARTENDER_VERSION:-latest}
+    restart: always
+    env_file:
+      - ../bartender/.env
+    volumes:
+      - type: bind
+        source: ./bartender-config.yaml
+        target: /app/src/config.yaml
+      # TODO make sure certs are available
+      - bartender-certs/private_key.pem:/certs/private_key.pem:ro
+      - bartender-job-data:/tmp/jobs
+    depends_on:
+      bartenderdb:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      BARTENDER_HOST: 0.0.0.0
+      BARTENDER_DB_HOST: bartender-db
+      BARTENDER_DB_PORT: 5432
+      BARTENDER_DB_USER: bartender
+      BARTENDER_DB_PASS: bartender
+      BARTENDER_DB_BASE: bartender
+      BARTENDER_JOB_ROOT: /tmp/jobs
+      BARTENDER_PUBLIC_KEY: /certs/public_key.pem
+
+  # TODO user same database for webapp and bartender
+  # the tables do not overlap
+  bartenderdb:
+    image: postgres:15.4-bullseye
+    hostname: bartender-db
+    environment:
+      POSTGRES_PASSWORD: "bartender"
+      POSTGRES_USER: "bartender"
+      POSTGRES_DB: "bartender"
+    volumes:
+      - bartender-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U bartender
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  bartendermigrator:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile.bartenderhaddock3
+    image: bartender:${BARTENDER_VERSION:-latest}
+    restart: "no"
+    command: alembic upgrade head
+    environment:
+      BARTENDER_DB_HOST: bartender-db
+      BARTENDER_DB_PORT: 5432
+      BARTENDER_DB_USER: bartender
+      BARTENDER_DB_PASS: bartender
+      BARTENDER_DB_BASE: bartender
+    depends_on:
+      bartenderdb:
+        condition: service_healthy
+
+  redis:
+    image: redis:6.2.6
+    restart: always
+    ports:
+      - "6379:6379"
+  
+  bartenderworker:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile.bartenderhaddock3
+    image: bartender:${BARTENDER_VERSION:-latest}
+    restart: always
+    command: bartender perform
+    env_file:
+      - ../bartender/.env
+    volumes:
+      - type: bind
+        source: ./bartender-config.yaml
+        target: /app/src/config.yaml
+      - bartender-job-data:/tmp/jobs
+    depends_on:
+      redis:
+        condition: service_started
+    environment:
+      BARTENDER_JOB_ROOT: /tmp/jobs
+
+  certmaker:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile.openssl
+    volumes:
+      - bartender-certs:/certs
+    working_dir: /certs
+    restart: "no"
+
+volumes:
+  webapp-db-data:
+  bartender-db-data:
+  bartender-job-data:
+  bartender-certs:
