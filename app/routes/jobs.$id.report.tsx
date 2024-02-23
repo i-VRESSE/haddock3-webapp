@@ -6,12 +6,11 @@ import { jobIdFromParams, getJobById } from "~/models/job.server";
 import { CompletedJobs } from "~/bartender-client/types";
 import { ClientOnly } from "~/components/ClientOnly";
 import { getBartenderToken } from "~/bartender-client/token.server";
-import type { CaprievalPlotlyProps } from "~/caprieval/caprieval.server";
+import type { CaprievalData } from "~/caprieval/caprieval.server";
 import {
   getCaprievalModuleInfo,
-  getScores,
   getPlotSelection,
-  getCaprievalPlots,
+  getCaprievalData,
   buildBestRankedPath,
 } from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
@@ -34,15 +33,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       jobid,
       bartenderToken
     );
-    // const [module, maxInteractivness] = [5,0]
-    const scores = await getScores({
-      jobid,
-      module,
-      bartenderToken,
-      moduleIndexPadding,
-    });
     const { scatterSelection, boxSelection } = getPlotSelection(request.url);
-    const plotlyPlots = await getCaprievalPlots({
+    const caprievalData = await getCaprievalData({
       jobid,
       module,
       bartenderToken,
@@ -51,7 +43,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       boxSelection,
     });
     const bestRanked = buildBestRankedPath(module, moduleIndexPadding);
-    return json({ job, scores, plotlyPlots, bestRanked });
+    return json({ job, caprievalData, bestRanked });
   } catch (error) {
     if (
       error instanceof Error &&
@@ -64,10 +56,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 };
 
 export default function RescorePage() {
-  const { job, scores, plotlyPlots, bestRanked } =
-    useLoaderData<typeof loader>();
-  // Strip SerializeObject<UndefinedToOptional wrapper
-  const plotlyPlotsStripped = plotlyPlots as CaprievalPlotlyProps;
+  const { job, caprievalData, bestRanked } = useLoaderData<typeof loader>();
+  // Strip JsonifyObject wrapper
+  const caprievalDataCasted = caprievalData as CaprievalData;
   const updatedOn = new Date(job.updated_on).toUTCString();
   return (
     <>
@@ -108,13 +99,7 @@ export default function RescorePage() {
         </div>
       </div>
       <ClientOnly fallback={<p>Loading...</p>}>
-        {() => (
-          <CaprievalReport
-            scores={scores}
-            prefix="files/output/"
-            plotlyPlots={plotlyPlotsStripped}
-          />
-        )}
+        {() => <CaprievalReport {...caprievalDataCasted} />}
       </ClientOnly>
     </>
   );

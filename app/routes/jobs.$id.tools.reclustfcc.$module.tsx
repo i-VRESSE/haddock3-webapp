@@ -31,11 +31,10 @@ import { shouldShowInteractiveVersion } from "~/tools/shared";
 import { ReClusterTable } from "~/tools/ReClusterTable";
 import { ReWarning } from "~/tools/ReWarning";
 import { ToolHistory } from "~/tools/ToolHistory";
-import type { CaprievalPlotlyProps } from "~/caprieval/caprieval.server";
+import type { CaprievalData } from "~/caprieval/caprieval.server";
 import {
-  getScores,
   getPlotSelection,
-  getCaprievalPlots,
+  getCaprievalData,
 } from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 import { Button } from "~/components/ui/button";
@@ -79,19 +78,10 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     bartenderToken,
     moduleIndexPadding,
   });
-  let scores;
-  let plotlyPlots;
+  let caprievalData;
   if (showInteractiveVersion) {
-    scores = await getScores({
-      jobid,
-      module: moduleIndex,
-      isInteractive: showInteractiveVersion,
-      bartenderToken,
-      moduleIndexPadding,
-      moduleName: "clustfcc",
-    });
     const { scatterSelection, boxSelection } = getPlotSelection(request.url);
-    plotlyPlots = await getCaprievalPlots({
+    caprievalData = await getCaprievalData({
       jobid,
       module: moduleIndex,
       isInteractive: showInteractiveVersion,
@@ -100,6 +90,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       scatterSelection,
       boxSelection,
       moduleName: "clustfcc",
+      structurePrefix: `/jobs/${jobid}/files/output/foo/bar/`,
     });
   }
 
@@ -110,8 +101,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     interactivness: showInteractiveVersion,
     maxInteractivness: hasInteractiveVersion,
     clusters,
-    scores,
-    plotlyPlots,
+    caprievalData,
   });
 };
 
@@ -154,12 +144,11 @@ export default function ReclusterPage() {
     interactivness,
     maxInteractivness,
     clusters,
-    scores,
-    plotlyPlots,
+    caprievalData,
   } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
-  // Strip SerializeObject<UndefinedToOptional wrapper
-  const plotlyPlotsStripped = plotlyPlots as CaprievalPlotlyProps | undefined;
+  // Strip JsonifyObject wrapper
+  const caprievalDataCasted = caprievalData as CaprievalData;
   const { state } = useNavigation();
   return (
     <>
@@ -235,17 +224,11 @@ export default function ReclusterPage() {
           <summary>Clusters</summary>
           <ReClusterTable clusters={clusters} />
         </details>
-        {scores && plotlyPlotsStripped && (
+        {caprievalDataCasted && (
           <details open={true}>
             <summary>Capri evaluation</summary>
             <ClientOnly fallback={<p>Loading...</p>}>
-              {() => (
-                <CaprievalReport
-                  scores={scores}
-                  prefix="../../files/output/"
-                  plotlyPlots={plotlyPlotsStripped}
-                />
-              )}
+              {() => <CaprievalReport {...caprievalDataCasted} />}
             </ClientOnly>
           </details>
         )}
