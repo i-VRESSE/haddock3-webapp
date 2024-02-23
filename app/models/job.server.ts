@@ -5,6 +5,7 @@ import {
   WORKFLOW_CONFIG_FILENAME,
 } from "../bartender-client/constants";
 import type { DirectoryItem } from "~/bartender-client/types";
+import { BartenderError } from "./errors";
 
 const BOOK_KEEPING_FILES = [
   "stderr.txt",
@@ -121,7 +122,7 @@ export async function listFilesAt(
     }
   );
   if (error) {
-    throw error;
+    throw new BartenderError(`Unable to list files at ${path}`, {cause:error});
   }
   return data;
 }

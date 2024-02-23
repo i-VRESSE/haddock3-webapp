@@ -103,20 +103,21 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Retrieve Job Files
-     * @description Retrieve files from a completed job.
+     * Retrieve Job File
+     * @description Retrieve file from a completed job.
      *
      *     Args:
      *         path: Path to file that job has produced.
      *         job_dir: Directory with job output files.
      *
      *     Raises:
-     *         HTTPException: When file is not found or is outside job directory.
+     *         HTTPException: When file is not found or is not a file
+     *             or is outside job directory.
      *
      *     Returns:
-     *         The file content.
+     *         The file contents.
      */
-    get: operations["retrieve_job_files"];
+    get: operations["retrieve_job_file"];
     put?: never;
     post?: never;
     delete?: never;
@@ -638,7 +639,7 @@ export interface operations {
       };
     };
   };
-  retrieve_job_files: {
+  retrieve_job_file: {
     parameters: {
       query?: never;
       header?: never;
