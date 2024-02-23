@@ -2,13 +2,13 @@ version: "3.9"
 
 services:
   webapp:
-    # // TODO publish to ghcr.io
+    # TODO publish to ghcr.io
     image: i-vresse/haddock3-webapp
     build:
       context: .
     restart: always
     command: 
-      npm run setup && npm run start
+      /wait && npm run setup && npm run start
     depends_on:
       bartender:
         condition: service_started
@@ -22,6 +22,7 @@ services:
       BARTENDER_API_URL: "http://bartender:8000"
       DATABASE_URL: postgresql://postgres:postgres@webappdb:5432/postgres
       BARTENDER_PRIVATE_KEY: /certs/private_key.pem
+      WAIT_PATHS: /certs/private_key.pem
     volumes:
       - bartender-certs/private_key.pem:/certs/private_key.pem:ro
 
@@ -47,15 +48,14 @@ services:
     image: bartender:${BARTENDER_VERSION:-latest}
     restart: always
     command:
-      alembic upgrade head && bartender serve
+      /wait && alembic upgrade head && bartender serve
     env_file:
       - ../bartender/.env
     volumes:
       - type: bind
         source: ./bartender-config.yaml
         target: /app/src/config.yaml
-      # TODO make sure certs are available
-      - bartender-certs/private_key.pem:/certs/private_key.pem:ro
+      - bartender-certs/public_key.pem:/certs/public_key.pem:ro
       - bartender-job-data:/tmp/jobs
     depends_on:
       bartenderdb:
@@ -71,6 +71,7 @@ services:
       BARTENDER_DB_BASE: bartender
       BARTENDER_JOB_ROOT: /tmp/jobs
       BARTENDER_PUBLIC_KEY: /certs/public_key.pem
+      WAIT_PATHS: /certs/private_key.pem
 
   # TODO user same database for webapp and bartender
   # the tables do not overlap

@@ -1,7 +1,11 @@
 # TODO get image with haddock3 from somewhere
-FROM ghcr.io/haddocking/haddock3:latest as haddock3
+ARG HADDOCK3_VERSION=latest
+FROM ghcr.io/haddocking/haddock3:${HADDOCK3_VERSION} as haddock3
+
+COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
 
 # TODO publish image
-FROM ghcr.io/ivresse/bartender:latest
+ARG BARTENDER_VERSION=latest
+FROM ghcr.io/ivresse/bartender:${BARTENDER_VERSION}
 
 COPY --from=haddock3 /usr/local/bin/haddock3 /usr/local/bin/haddock3
