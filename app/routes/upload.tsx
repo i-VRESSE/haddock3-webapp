@@ -23,7 +23,7 @@ import { ValidationError } from "@i-vresse/wb-core/dist/validate.js";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Label } from "~/components/ui/label";
 import { ValiError } from "valibot";
-import { parseUploadRequest } from "../lib/parseUploadRequest";
+import { parseUploadRequest } from "../lib/parseUploadRequest.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await mustBeAllowedToSubmit(request);

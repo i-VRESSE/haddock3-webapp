@@ -13,7 +13,7 @@ import { getOptionalUser, mustBeAllowedToSubmit } from "~/auth.server";
 import { getBartenderTokenByUser } from "~/bartender-client/token.server";
 import { Haddock3WorkflowBuilder } from "~/builder/Form.client";
 import { haddock3Styles } from "~/builder/styles";
-import { parseUploadRequest } from "~/lib/parseUploadRequest";
+import { parseUploadRequest } from "~/lib/parseUploadRequest.server";
 
 export const loader = async ({
   request,
