@@ -37,7 +37,7 @@ export async function submitJob(
 ) {
   const Schema = object({
     upload: instance(NodeOnDiskFile, [
-      mimeType(["application/zip"], "Please upload a zip file"),
+      mimeType(["application/zip", "application/x-zip-compressed"], "Please upload a zip file"),
     ]),
     kind: optional(picklist(["run", "workflow"]), "workflow"),
   });
