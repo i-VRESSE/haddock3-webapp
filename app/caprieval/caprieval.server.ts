@@ -58,7 +58,9 @@ export async function getWeights({
   });
   const response = await getJobfile(jobid, path, bartenderToken);
   if (!response.ok) {
-    throw new BartenderError(`Could not get weights_params.json`, {cause: response});
+    throw new BartenderError(`Could not get weights_params.json`, {
+      cause: response,
+    });
   }
   const body = await response.json();
   return parse(WeightsSchema, body);

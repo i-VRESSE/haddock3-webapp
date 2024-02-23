@@ -122,7 +122,9 @@ export async function listFilesAt(
     }
   );
   if (error) {
-    throw new BartenderError(`Unable to list files at ${path}`, {cause:error});
+    throw new BartenderError(`Unable to list files at ${path}`, {
+      cause: error,
+    });
   }
   return data;
 }
