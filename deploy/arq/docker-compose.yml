@@ -7,6 +7,8 @@ services:
     build:
       context: .
     restart: always
+    command: 
+      npm run setup && npm run start
     depends_on:
       bartender:
         condition: service_started
@@ -38,25 +40,14 @@ services:
       timeout: 3s
       retries: 40
 
-  webappmigrator:
-    build:
-      context: .
-      dockerfile: prisma/Dockerfile
-      # TODO use web app image or publish as seperate image to ghcr.io
-    command: npm run setup
-    restart: "no"
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@webappdb:5432/postgres
-    depends_on:
-      webappdb:
-        condition: service_healthy
-
   bartender:
     build:
       context: .
       dockerfile: ./deploy/Dockerfile.bartenderhaddock3
     image: bartender:${BARTENDER_VERSION:-latest}
     restart: always
+    command:
+      alembic upgrade head && bartender serve
     env_file:
       - ../bartender/.env
     volumes:
@@ -98,23 +89,6 @@ services:
       interval: 2s
       timeout: 3s
       retries: 40
-
-  bartendermigrator:
-    build:
-      context: .
-      dockerfile: ./deploy/Dockerfile.bartenderhaddock3
-    image: bartender:${BARTENDER_VERSION:-latest}
-    restart: "no"
-    command: alembic upgrade head
-    environment:
-      BARTENDER_DB_HOST: bartender-db
-      BARTENDER_DB_PORT: 5432
-      BARTENDER_DB_USER: bartender
-      BARTENDER_DB_PASS: bartender
-      BARTENDER_DB_BASE: bartender
-    depends_on:
-      bartenderdb:
-        condition: service_healthy
 
   redis:
     image: redis:6.2.6
