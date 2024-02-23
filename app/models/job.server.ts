@@ -1,12 +1,14 @@
 import type { Params } from "@remix-run/react";
 import { createClient } from "./config.server";
-import { JOB_OUTPUT_DIR, WORKFLOW_CONFIG_FILENAME } from "../bartender-client/constants";
+import {
+  JOB_OUTPUT_DIR,
+  WORKFLOW_CONFIG_FILENAME,
+} from "../bartender-client/constants";
 import type { DirectoryItem } from "~/bartender-client/types";
 
 const BOOK_KEEPING_FILES = [
   "stderr.txt",
   "stdout.txt",
-  "meta",
   "returncode",
   "workflow.cfg.orig",
 ];
@@ -52,34 +54,28 @@ export async function getJobById(jobid: number, bartenderToken: string) {
 
 export async function getJobStdout(jobid: number, bartenderToken: string) {
   const client = createClient(bartenderToken);
-  const { data, error } = await client.GET("/api/job/{jobid}/stdout", {
+  const { response } = await client.GET("/api/job/{jobid}/stdout", {
     params: {
       path: {
         jobid,
       },
     },
-    parseAs: "text",
+    parseAs: "stream",
   });
-  if (error) {
-    throw error;
-  }
-  return data;
+  return response;
 }
 
 export async function getJobStderr(jobid: number, bartenderToken: string) {
   const client = createClient(bartenderToken);
-  const { data, error } = await client.GET("/api/job/{jobid}/stderr", {
+  const { response } = await client.GET("/api/job/{jobid}/stderr", {
     params: {
       path: {
         jobid,
       },
     },
-    parseAs: "text",
+    parseAs: "stream",
   });
-  if (error) {
-    throw error;
-  }
-  return data;
+  return response;
 }
 
 export async function getJobfile(
@@ -292,4 +288,13 @@ export async function updateJobName(
   if (error) {
     throw error;
   }
+}
+
+export async function jobHasWorkflow(jobid: number, bartenderToken: string) {
+  const response = await getJobfile(
+    jobid,
+    WORKFLOW_CONFIG_FILENAME,
+    bartenderToken
+  );
+  return response.status === 200;
 }

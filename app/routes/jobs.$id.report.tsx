@@ -2,7 +2,11 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
-import { jobIdFromParams, getJobById } from "~/models/job.server";
+import {
+  jobIdFromParams,
+  getJobById,
+  jobHasWorkflow,
+} from "~/models/job.server";
 import { CompletedJobs } from "~/bartender-client/types";
 import { ClientOnly } from "~/components/ClientOnly";
 import { getBartenderToken } from "~/bartender-client/token.server";
@@ -26,6 +30,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
+  const hasWorkflow = await jobHasWorkflow(jobid, bartenderToken);
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -43,7 +48,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       boxSelection,
     });
     const bestRanked = buildBestRankedPath(module, moduleIndexPadding);
-    return json({ job, caprievalData, bestRanked });
+    return json({ job, caprievalData, bestRanked, hasWorkflow });
   } catch (error) {
     if (
       error instanceof Error &&
@@ -56,7 +61,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 };
 
 export default function ReportPage() {
-  const { job, caprievalData, bestRanked } = useLoaderData<typeof loader>();
+  const { job, caprievalData, bestRanked, hasWorkflow } =
+    useLoaderData<typeof loader>();
   // Strip JsonifyObject wrapper
   const caprievalDataCasted = caprievalData as CaprievalData;
   const updatedOn = new Date(job.updated_on).toUTCString();
@@ -75,13 +81,15 @@ export default function ReportPage() {
           >
             🗀 Browse
           </Link>
-          <Link
-            title="Edit workflow"
-            to={`/jobs/${job.id}/edit`}
-            className={buttonVariants({ variant: "outline", size: "sm" })}
-          >
-            &#128393; Edit
-          </Link>
+          {hasWorkflow && (
+            <Link
+              title="Edit workflow"
+              to={`/jobs/${job.id}/edit`}
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              &#128393; Edit
+            </Link>
+          )}
           <a
             title="Download archive of best ranked clusters/structures"
             href={`/jobs/${job.id}/files/${bestRanked}`}
