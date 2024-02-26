@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { createCookieSessionStorage } from "@remix-run/node";
 import { createThemeSessionResolver } from "remix-themes";
 
@@ -10,7 +11,11 @@ export const sessionStorage = createCookieSessionStorage({
     path: "/",
     sameSite: "lax",
     maxAge: 604_800, // one week
-    secrets: [process.env.SESSION_SECRET || "somebadsecret"],
+    secrets: [
+      process.env.SESSION_SECRET || 
+      (process.env.SESSION_SECRET_FILE && readFileSync(process.env.SESSION_SECRET_FILE).toString()) || 
+      "somebadsecret"
+    ],
     secure: process.env.NODE_ENV === "production",
   },
 });
