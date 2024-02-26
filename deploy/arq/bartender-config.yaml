@@ -1,7 +1,6 @@
-# Example configuration file for haddock3 and haddock3-re.
-# Expects executables to be in PATH,
-# if not edit this file to use absolute path to executables
-job_root_dir: jobs
+# This file is the configuration file for the bartender service.
+# This configuration works for the webapp and the docker compose deployment.
+job_root_dir: /jobs
 destination_picker: bartender.picker:pick_first
 applications:
   haddock3:

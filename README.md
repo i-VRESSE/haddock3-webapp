@@ -76,12 +76,6 @@ npm run setup
 
 (You can reset database with `npx prisma migrate reset`.)
 
-The database setup should be run only once for a fresh database.
-Whenever you change the `prisma/schema.prisma` file you need to
-
-1. Use [prisma migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate) to generate a migration and to update the database.
-2. Run `npx prisma generate` to generate the prisma client.
-
 Start [remix](https://remix.run) development server from your terminal with:
 
 ```sh
@@ -91,6 +85,12 @@ npm run dev
 This will refresh & rebuild assets on file changes.
 
 ## Other development commands
+
+The database setup should be run only once for a fresh database.
+Whenever you change the `prisma/schema.prisma` file you need to
+
+1. Use [prisma migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate) to generate a migration and to update the database.
+2. Run `npx prisma generate` to generate the prisma client.
 
 To format according to [prettier](https://prettier.io) run
 
@@ -135,7 +135,7 @@ Then run the app in production mode:
 npm start
 ```
 
-The web application can be run inside a Docker container together with all its dependent containers, see [docs/docker.md](docs/docker.md).
+Other deployments with containers are explained in [deploy/README.md](deploy/README.md).
 
 ## Stack
 

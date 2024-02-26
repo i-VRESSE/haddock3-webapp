@@ -2,12 +2,13 @@ version: "3.9"
 
 services:
   webapp:
-    # TODO publish to ghcr.io
-    image: i-vresse/haddock3-webapp
+    image: ghcr.io/i-vresse/haddock3-webapp
     build:
-      context: .
+      context: ../..
+      dockerfile: deploy/Dockerfile
     restart: always
-    command: /wait && npm run setup && npm run start
+    entrypoint: /usr/bin/sh
+    command: ['-c', '/wait && npx prisma migrate deploy && npm run start']
     depends_on:
       bartender:
         condition: service_started
@@ -15,15 +16,14 @@ services:
         condition: service_healthy
     ports:
       - "8080:8080"
-    env_file:
-      - ./.env
     environment:
       BARTENDER_API_URL: "http://bartender:8000"
       DATABASE_URL: postgresql://postgres:postgres@webappdb:5432/postgres
       BARTENDER_PRIVATE_KEY: /certs/private_key.pem
+      SESSION_SECRET_FILE: /certs/session.secret
       WAIT_PATHS: /certs/private_key.pem
     volumes:
-      - bartender-certs/private_key.pem:/certs/private_key.pem:ro
+      - bartender-certs:/certs:ro
 
   webappdb:
     image: postgres:15.4-bullseye
@@ -41,20 +41,18 @@ services:
       retries: 40
 
   bartender:
+    image: ghcr.io/i-vresse/bartender
     build:
-      context: .
-      dockerfile: ./deploy/Dockerfile.bartenderhaddock3
-    image: bartender:${BARTENDER_VERSION:-latest}
+      context: ..
+      dockerfile: ./Dockerfile.bartenderhaddock3
     restart: always
-    command: /wait && alembic upgrade head && bartender serve
-    env_file:
-      - ../bartender/.env
+    command: sh -c '/wait && alembic upgrade head && bartender serve'
     volumes:
       - type: bind
         source: ./bartender-config.yaml
-        target: /app/src/config.yaml
-      - bartender-certs/public_key.pem:/certs/public_key.pem:ro
-      - bartender-job-data:/tmp/jobs
+        target: /opt/bartender/config.yaml
+      - bartender-certs:/certs:ro
+      - bartender-job-data:/jobs
     depends_on:
       bartenderdb:
         condition: service_healthy
@@ -62,29 +60,25 @@ services:
         condition: service_started
     environment:
       BARTENDER_HOST: 0.0.0.0
-      BARTENDER_DB_HOST: bartender-db
+      BARTENDER_DB_HOST: bartenderdb
       BARTENDER_DB_PORT: 5432
-      BARTENDER_DB_USER: bartender
-      BARTENDER_DB_PASS: bartender
-      BARTENDER_DB_BASE: bartender
-      BARTENDER_JOB_ROOT: /tmp/jobs
+      BARTENDER_DB_USER: postgres
+      BARTENDER_DB_PASS: postgres
+      BARTENDER_DB_BASE: postgres
       BARTENDER_PUBLIC_KEY: /certs/public_key.pem
       WAIT_PATHS: /certs/private_key.pem
 
-  # TODO user same database for webapp and bartender
-  # the tables do not overlap
   bartenderdb:
     image: postgres:15.4-bullseye
-    hostname: bartender-db
+    restart: always
     environment:
-      POSTGRES_PASSWORD: "bartender"
-      POSTGRES_USER: "bartender"
-      POSTGRES_DB: "bartender"
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
     volumes:
       - bartender-db-data:/var/lib/postgresql/data
-    restart: always
     healthcheck:
-      test: pg_isready -U bartender
+      test: pg_isready -U postgres
       interval: 2s
       timeout: 3s
       retries: 40
@@ -92,39 +86,34 @@ services:
   redis:
     image: redis:6.2.6
     restart: always
-    ports:
-      - "6379:6379"
 
   bartenderworker:
+    image: ghcr.io/i-vresse/bartender
     build:
-      context: .
-      dockerfile: ./deploy/Dockerfile.bartenderhaddock3
-    image: bartender:${BARTENDER_VERSION:-latest}
+      context: ..
+      dockerfile: ./Dockerfile.bartenderhaddock3
     restart: always
-    command: bartender perform
-    env_file:
-      - ../bartender/.env
+    command: sh -c 'bartender perform'
     volumes:
       - type: bind
         source: ./bartender-config.yaml
-        target: /app/src/config.yaml
-      - bartender-job-data:/tmp/jobs
+        target: /opt/bartender/config.yaml
+      - bartender-job-data:/jobs
     depends_on:
       redis:
         condition: service_started
-    environment:
-      BARTENDER_JOB_ROOT: /tmp/jobs
 
   certmaker:
     build:
-      context: .
-      dockerfile: ./deploy/Dockerfile.openssl
+      context: ..
+      dockerfile: ./Dockerfile.openssl
     volumes:
       - bartender-certs:/certs
     working_dir: /certs
     restart: "no"
 
 volumes:
+  # Tried to use single postgres, but prisma complains about non-empty database (P3005 error).
   webapp-db-data:
   bartender-db-data:
   bartender-job-data:

@@ -1,12 +1,75 @@
-# TODO get image with haddock3 from somewhere
-# TODO have image contain cns executable, likely from private registry, which would require `docker login` before building.
-ARG HADDOCK3_VERSION=latest
-FROM ghcr.io/haddocking/haddock3:${HADDOCK3_VERSION} as haddock3
+# Dockerfile for bartender web service with haddock3, lightdock, gdock executables.
+FROM python:3.9-slim-bookworm
+
+ARG HADDOCK3_VERSION=main
+ARG BARTENDER_VERSION=main
+ARG GDOCK_VERSION=master
+ARG LIGHTDOCK_VERSION=0.9.4
 
 COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
 
-# TODO publish image
-ARG BARTENDER_VERSION=latest
-FROM ghcr.io/ivresse/bartender:${BARTENDER_VERSION}
+# Common dependencies =================================================================================================
 
-COPY --from=haddock3 /usr/local/bin/haddock3 /usr/local/bin/haddock3
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends \
+  build-essential git ca-certificates curl libgfortran5 \
+  wget \
+  &&  \
+  apt-get clean && rm -rf /var/lib/apt/lists/* \
+  && \
+  pip install --upgrade pip
+
+# haddock3 ============================================================================================================
+WORKDIR /opt/haddock3
+RUN git clone --recursive https://github.com/haddocking/haddock3.git . && git checkout ${HADDOCK3_VERSION}
+WORKDIR /opt/haddock3/src/fcc/src
+RUN make
+WORKDIR /opt/haddock3
+RUN pip install -r requirements.txt && python setup.py develop
+COPY ./cns /opt/haddock3/bin/cns
+WORKDIR /
+ENV PYTHONPATH=/opt/haddock3/src
+
+# lightdock ==========================================================================================================
+
+RUN pip install lightdock==${LIGHTDOCK_VERSION}
+
+# gdock =============================================================================================================
+
+WORKDIR /opt/gdock
+RUN git clone https://github.com/gdocking/gdock.git . && git checkout ${GDOCK_VERSION}
+RUN python setup.py develop
+RUN bash install.sh /opt/gdock
+ENV GDOCK_PATH=/opt/gdock
+
+# bartender ==========================================================================================================
+
+WORKDIR /opt/bartender
+RUN git clone https://github.com/i-VRESSE/bartender.git . && git checkout ${BARTENDER_VERSION}
+RUN pip install .
+
+CMD ["/usr/local/bin/bartender", "serve"]
+
+HEALTHCHECK --interval=30s --timeout=5s CMD curl --fail http://localhost:8000/api/health || exit 1
+
+# non-root user ======================================================================================================
+
+ARG USERNAME=bartender
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+# Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    #
+    # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+RUN mkdir /jobs && chown -R $USERNAME:$USERNAME /jobs
+
+# All commands from here on will be run as the bartender user and not as root.
+USER ${USERNAME}

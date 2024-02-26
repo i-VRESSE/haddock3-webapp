@@ -3,7 +3,7 @@ node_modules
 /.cache
 /build
 /public/build
-.env
+/.env
 .vscode/
 
 # openapi-generator-cli bookkeeping
@@ -18,3 +18,4 @@ node_modules
 /public_key.pem
 
 Caddyfile
+/deploy/cns
