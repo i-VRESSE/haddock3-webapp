@@ -9,3 +9,8 @@ cd ../..
 cp <cns executable> deploy/cns
 docker compose -f deploy/remoteslurm/docker-compose.yml up --build
 ```
+
+## SSH Private key
+
+By default the bartender webservice will ssh/sftp to a remote machine using a password.
+To use a private key, you must mount the private key into the container see [./docker-compose.yml](./docker-compose.yml) for a commented out example.

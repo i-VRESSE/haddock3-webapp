@@ -73,3 +73,5 @@ RUN mkdir /jobs && chown -R $USERNAME:$USERNAME /jobs
 
 # All commands from here on will be run as the bartender user and not as root.
 USER ${USERNAME}
+
+RUN mkdir /home/bartender/.ssh && chmod 700 /home/bartender/.ssh
