@@ -1,0 +1,134 @@
+# This file is the configuration file for the bartender service.
+# This configuration works for the webapp and the docker compose deployment.
+destinations:
+  remoteslurm:
+    scheduler:
+      type: slurm
+      partition: <name of partition to submit jobs to>
+      ssh_config:
+        hostname: <host with slurm installed>
+        username: <Username to connect with>
+        password: <Password to connect with>
+    filesystem:
+      type: sftp
+      ssh_config:
+        hostname: <host with slurm installed>
+        username: <Username to connect with>
+        password: <Password to connect with>
+      entry: <root directory where files of jobs should reside>
+job_root_dir: /jobs
+destination_picker: bartender.picker:pick_first
+applications:
+  haddock3:
+    command_template: haddock3 workflow.cfg
+    upload_needs:
+      - workflow.cfg
+  runimport:
+    summary: Import a HADDOCK3 run.
+    description: >
+      Upload an archive of haddock3 output.
+      The archive should have run dir as root.
+      The run should have haddock3-clean and haddock3-analyse executed on it.
+    command_template: mkdir -p output && mv * output || true
+interactive_applications:
+  rescore:
+    command_template: >
+      haddock3-re score
+      --w_elec {{w_elec|q}} --w_vdw {{w_vdw|q}} --w_desolv {{w_desolv|q}} --w_bsa {{w_bsa|q}} --w_air {{w_air|q}}
+      {{ capri_dir|q }}
+      &&
+      haddock3-analyse  --is_cleaned True --inter True -m {{ module_nr|q }} -r output/
+    description: Rescore a HADDOCK run with different weights.
+    job_application: haddock3
+    input_schema:
+      additionalProperties: false
+      properties:
+        module_nr:
+          type: number
+        capri_dir:
+          type: string
+        w_air:
+          type: number
+        w_bsa:
+          type: number
+        w_desolv:
+          type: number
+        w_elec:
+          type: number
+        w_vdw:
+          type: number
+      required:
+        - module_nr
+        - capri_dir
+        - w_elec
+        - w_vdw
+        - w_desolv
+        - w_bsa
+        - w_air
+      type: object
+  reclustrmsd:
+    command_template: >
+      haddock3-re clustrmsd
+      {% if criterion == 'maxclust' -%}
+      --n_clusters {{n_clusters|q}}
+      {% else -%}
+      --clust_cutoff {{clust_cutoff|q}}
+      {% endif -%}
+      {% if min_population -%}
+      --min_population {{min_population|q}}
+      {% endif -%}
+      {{clustrmsd_dir|q}}
+      &&
+      haddock3-analyse --is_cleaned True --inter True -m {{ module_nr|q }} -r output/
+    description: Recluster a HADDOCK run with RSMD and different parameters.
+    job_application: haddock3
+    input_schema:
+      additionalProperties: false
+      properties:
+        module_nr:
+          type: number
+        clustrmsd_dir:
+          type: string
+        criterion:
+          type: string
+          enum: [maxclust, distance]
+        clust_cutoff:
+          type: number
+        n_clusters:
+          type: number
+        min_population:
+          type: number
+      required:
+        - module_nr
+        - criterion
+        - clustrmsd_dir
+      type: object
+  reclustfcc:
+    command_template: >
+      haddock3-re clustfcc
+      --clust_cutoff {{clust_cutoff|q}} --strictness {{strictness|q}} --min_population {{min_population|q}}
+      {{clustfcc_dir|q}}
+      &&
+      haddock3-analyse --is_cleaned True --inter True -m {{ module_nr|q }} -r output/
+    description: Recluster a HADDOCK run with FCC and different parameters.
+    job_application: haddock3
+    input_schema:
+      additionalProperties: false
+      properties:
+        module_nr:
+          type: number
+        clustfcc_dir:
+          type: string
+        clust_cutoff:
+          type: number
+        strictness:
+          type: number
+        min_population:
+          type: number
+      required:
+        - module_nr
+        - clustfcc_dir
+        - clust_cutoff
+        - strictness
+        - min_population
+      type: object
