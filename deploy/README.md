@@ -5,7 +5,7 @@
 
 ## Methods
 
-* [Haddock3 webapp with single worker and docker compose](arq/README.md)
+- [Haddock3 webapp with single worker and docker compose](arq/README.md)
 
 ## Versions
 

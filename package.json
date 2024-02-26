@@ -56,7 +56,7 @@
     "js-yaml": "^4.1.0",
     "jszip": "^3.10.1",
     "lucide-react": "^0.321.0",
-    "openapi-fetch": "^0.8.2",    
+    "openapi-fetch": "^0.8.2",
     "plotly.js": "^2.26.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

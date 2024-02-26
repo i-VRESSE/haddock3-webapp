@@ -8,7 +8,7 @@ services:
       dockerfile: deploy/Dockerfile
     restart: always
     entrypoint: /usr/bin/sh
-    command: ['-c', '/wait && npx prisma migrate deploy && npm run start']
+    command: ["-c", "/wait && npx prisma migrate deploy && npm run start"]
     depends_on:
       bartender:
         condition: service_started
