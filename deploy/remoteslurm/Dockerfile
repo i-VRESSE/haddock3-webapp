@@ -7,7 +7,7 @@
 # Run with:
 # docker run --publish 10022:22 ghcr.io/i-vresse/slurm
 
-FROM xenonmiddleware/slurm:20
+FROM ghcr.io/xenon-middleware/slurm:23
 
 ARG HADDOCK3_VERSION=main
 ARG GDOCK_VERSION=master
@@ -20,14 +20,20 @@ USER root
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
   apt-get install -y --no-install-recommends \
-  build-essential git ca-certificates curl libgfortran3 \
-  wget \
+  build-essential git ca-certificates curl libgfortran5 \
+  wget software-properties-common \
   &&  \
   apt-get clean && rm -rf /var/lib/apt/lists/* \
   && \
   pip install --upgrade pip
 
-# TODO install python 3.9 from mamba or src
+# python 3.9 + /usr/local/bin/pip ==========================================================================================================
+
+RUN add-apt-repository -y ppa:deadsnakes/ppa && \
+    DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt install -y python3.9 python3.9-dev python3.9-distutils && \
+    wget https://bootstrap.pypa.io/get-pip.py && \
+    python3.9 get-pip.py && \
+    rm get-pip.py
 
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
@@ -35,20 +41,20 @@ RUN git clone --recursive https://github.com/haddocking/haddock3.git . && git ch
 WORKDIR /opt/haddock3/src/fcc/src
 RUN make
 WORKDIR /opt/haddock3
-RUN pip install -r requirements.txt && python setup.py develop
+RUN /usr/local/bin/pip install -r requirements.txt && python setup.py develop
 COPY ./cns /opt/haddock3/bin/cns
 WORKDIR /
 ENV PYTHONPATH=/opt/haddock3/src
 
 # lightdock ==========================================================================================================
 
-RUN pip install lightdock==${LIGHTDOCK_VERSION}
+RUN /usr/local/bin/pip install lightdock==${LIGHTDOCK_VERSION}
 
 # gdock =============================================================================================================
 
 WORKDIR /opt/gdock
 RUN git clone https://github.com/gdocking/gdock.git . && git checkout ${GDOCK_VERSION}
-RUN python setup.py develop
+RUN python3.9 setup.py develop
 RUN bash install.sh /opt/gdock
 ENV GDOCK_PATH=/opt/gdock
 
