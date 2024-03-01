@@ -32,7 +32,6 @@ interactive_applications:
       &&
       haddock3-analyse  --is_cleaned True --inter True -m {{ module_nr|q }} -r output/
     description: Rescore a HADDOCK run with different weights.
-    job_application: haddock3
     input_schema:
       additionalProperties: false
       properties:
@@ -74,7 +73,6 @@ interactive_applications:
       &&
       haddock3-analyse --is_cleaned True --inter True -m {{ module_nr|q }} -r output/
     description: Recluster a HADDOCK run with RSMD and different parameters.
-    job_application: haddock3
     input_schema:
       additionalProperties: false
       properties:
@@ -104,7 +102,6 @@ interactive_applications:
       &&
       haddock3-analyse --is_cleaned True --inter True -m {{ module_nr|q }} -r output/
     description: Recluster a HADDOCK run with FCC and different parameters.
-    job_application: haddock3
     input_schema:
       additionalProperties: false
       properties:

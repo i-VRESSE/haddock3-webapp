@@ -4,18 +4,17 @@ destinations:
   slurm:
     scheduler:
       type: slurm
-      partition: <name of partition to submit jobs to>
       ssh_config:
-        hostname: <host with slurm installed>
-        username: <Username to connect with>
-        password: <Password to connect with. If absent uses default ssh keys.>
+        hostname: slurm
+        username: xenon
+        password: javagat
     filesystem:
       type: sftp
       ssh_config:
-        hostname: <host with slurm installed>
-        username: <Username to connect with>
-        password: <Password to connect with. If absent uses default ssh keys.>
-      entry: <root directory where files of jobs should reside>
+        hostname: slurm
+        username: xenon
+        password: javagat
+      entry: /home/xenon
 job_root_dir: /jobs
 destination_picker: bartender.picker:pick_first
 applications:

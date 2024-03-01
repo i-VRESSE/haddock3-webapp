@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  bartender:
+    volumes:
+      - type: bind
+        source: ../containerslurm/bartender-config.yaml
+        target: /opt/bartender/config.yaml
+    depends_on:
+      - slurm
+  slurm:
+    build:
+      context: ..
+      dockerfile: containerslurm/Dockerfile
+    privileged: true
+  
