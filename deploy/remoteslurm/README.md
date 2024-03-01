@@ -26,22 +26,22 @@ docker build -t slurmwithhaddock3 -f deploy/remoteslurm/Dockerfile deploy
 docker run -p 10022:22 slurmwithhaddock3
 ```
 
-And in the `bartender-config.yaml` change the `remoteslurm` block to 
+And in the `bartender-config.yaml` change the `remoteslurm` block to
 
 ```yaml
-    scheduler:
-      type: slurm
-      ssh_config:
-        hostname: localhost
-        port: 10022
-        username: xenon
-        password: javagat
-    filesystem:
-      type: sftp
-      ssh_config:
-        hostname: localhost
-        port: 10022
-        username: xenon
-        password: javagat
-      entry: /home/xenon
+scheduler:
+  type: slurm
+  ssh_config:
+    hostname: localhost
+    port: 10022
+    username: xenon
+    password: javagat
+filesystem:
+  type: sftp
+  ssh_config:
+    hostname: localhost
+    port: 10022
+    username: xenon
+    password: javagat
+  entry: /home/xenon
 ```
