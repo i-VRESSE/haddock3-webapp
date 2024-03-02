@@ -15,8 +15,13 @@ destinations:
         username: xenon
         password: javagat
       entry: /home/xenon
+  local:
+    scheduler:
+      type: memory
+    filesystem:
+      type: local
 job_root_dir: /jobs
-destination_picker: bartender.picker:pick_first
+destination_picker: /opt/bartender/mypicker.py:mypicker
 applications:
   haddock3:
     command_template: haddock3 workflow.cfg

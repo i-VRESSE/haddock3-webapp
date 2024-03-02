@@ -51,6 +51,9 @@ services:
       - type: bind
         source: ./bartender-config.yaml
         target: /opt/bartender/config.yaml
+      - type: bind
+        source: ./mypicker.py
+        target: /opt/bartender/mypicker.py
       - bartender-certs:/certs:ro
       - bartender-job-data:/jobs
       # To use a local private ssh key to login to the remote slurm machine
