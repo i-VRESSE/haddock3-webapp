@@ -23,18 +23,8 @@ RUN add-apt-repository -y ppa:deadsnakes/ppa && \
     DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt install -y python3.9 python3.9-dev python3.9-distutils && \
     wget https://bootstrap.pypa.io/get-pip.py && \
     python3.9 get-pip.py && \
-    rm get-pip.py
-
-# haddock3 ============================================================================================================
-WORKDIR /opt/haddock3
-RUN git clone --recursive https://github.com/haddocking/haddock3.git . && git checkout ${HADDOCK3_VERSION}
-WORKDIR /opt/haddock3/src/fcc/src
-RUN make
-WORKDIR /opt/haddock3
-RUN /usr/local/bin/pip install -r requirements.txt && python3.9 setup.py develop
-COPY cns /opt/haddock3/bin/cns
-WORKDIR /
-RUN echo 'export PYTHONPATH=/opt/haddock3/src' >> /etc/bash.bashrc
+    rm get-pip.py && \
+    pip install -U pip==23.3.2
 
 # lightdock ==========================================================================================================
 
@@ -47,3 +37,14 @@ RUN git clone https://github.com/gdocking/gdock.git . && git checkout ${GDOCK_VE
 RUN python3.9 setup.py develop
 RUN bash install.sh /opt/gdock
 ENV GDOCK_PATH=/opt/gdock
+
+# haddock3 ============================================================================================================
+WORKDIR /opt/haddock3
+RUN git clone --recursive https://github.com/haddocking/haddock3.git . && git checkout ${HADDOCK3_VERSION}
+WORKDIR /opt/haddock3/src/fcc/src
+RUN make
+WORKDIR /opt/haddock3
+RUN /usr/local/bin/pip install -r requirements.txt && /usr/local/bin/pip install . && \
+ mkdir -p /usr/local/lib/python3.9/bin
+COPY cns /usr/local/lib/python3.9/bin/cns
+WORKDIR /
