@@ -5,7 +5,12 @@ import { getBartenderToken } from "~/bartender-client/token.server";
 import { getJobById, jobIdFromParams } from "~/models/job.server";
 import { CompletedJobs } from "~/bartender-client/types";
 import { Button } from "~/components/ui/button";
-import { getClusters, getClusterInfo, isContactMapModule, ContactMapCluster } from "~/contactmap/contactmap.server";
+import {
+  getClusters,
+  getClusterInfo,
+  isContactMapModule,
+  ContactMapCluster,
+} from "~/contactmap/contactmap.server";
 import { Cluster } from "~/contactmap/Cluster.client";
 import { ClientOnly } from "~/components/ClientOnly";
 
@@ -18,13 +23,23 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     throw new Error("Job is not completed");
   }
 
-  const moduleInfo = await isContactMapModule(jobid, moduleIndex, bartenderToken);
+  const moduleInfo = await isContactMapModule(
+    jobid,
+    moduleIndex,
+    bartenderToken
+  );
   const clusterIds = await getClusters(moduleInfo, bartenderToken);
   if (params.cluster === undefined) {
-    return redirect(`/jobs/${jobid}/analysis/contactmap/${moduleIndex}/${clusterIds[0]}`);
+    return redirect(
+      `/jobs/${jobid}/analysis/contactmap/${moduleIndex}/${clusterIds[0]}`
+    );
   }
   const clusterId = params.cluster;
-  const cluster = await getClusterInfo(parseInt(clusterId), moduleInfo, bartenderToken);
+  const cluster = await getClusterInfo(
+    parseInt(clusterId),
+    moduleInfo,
+    bartenderToken
+  );
   return json({ moduleIndex, clusterIds, cluster, jobid });
 };
 
@@ -52,13 +67,18 @@ export default function ContactMapPage() {
           }
           return (
             <Button key={id} asChild variant="secondary">
-              <a href={id.toString()} title={`Show contact map plots for cluster ${id}`}>Cluster {id}</a>
+              <a
+                href={id.toString()}
+                title={`Show contact map plots for cluster ${id}`}
+              >
+                Cluster {id}
+              </a>
             </Button>
           );
         })}
       </div>
       <ClientOnly fallback={<p>Loading...</p>}>
-          {() => <Cluster cluster={cluster as ContactMapCluster} />}
+        {() => <Cluster cluster={cluster as ContactMapCluster} />}
       </ClientOnly>
     </>
   );

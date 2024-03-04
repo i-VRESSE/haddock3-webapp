@@ -1,10 +1,9 @@
-import { describe, test, expect } from 'vitest'
-import { parseReport } from './contactmap.server';
+import { describe, test, expect } from "vitest";
+import { parseReport } from "./contactmap.server";
 
-describe('parseReport', () => {
-    test('should return 11 clusters ordered by score', () => {
-
-        const content = `<div id="contactmap_report">
+describe("parseReport", () => {
+  test("should return 11 clusters ordered by score", () => {
+    const content = `<div id="contactmap_report">
 <ul>
     <li>
     <b>Cluster_4:</b> <a href="cluster4_contmap_chordchart.html" target="_blank">chordchart.html</a>, <a href="cluster4_contmap_heatmap.html" target="_blank">heatmap.html</a>, <a href="cluster4_contmap_contacts.tsv" target="_blank">contacts.tsv</a>, <a href="cluster4_contmap_heavyatoms_interchain_contacts.tsv" target="_blank">heavyatoms_interchain_contacts.tsv</a>, <a href="cluster4_contmap_interchain_contacts.tsv" target="_blank">interchain_contacts.tsv</a></li>
@@ -22,12 +21,9 @@ describe('parseReport', () => {
 </ul>
 </div>
 `;
-        const result = parseReport(content);
+    const result = parseReport(content);
 
-        const expected = [4,1,10,2,5,3,11,7,6,9,8]
-        expect(result).toEqual(expected)
-
-    })
-})
-
-
+    const expected = [4, 1, 10, 2, 5, 3, 11, 7, 6, 9, 8];
+    expect(result).toEqual(expected);
+  });
+});

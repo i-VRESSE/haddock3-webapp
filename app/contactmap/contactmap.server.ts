@@ -106,7 +106,6 @@ async function getChartData(
   return getPlotFromHtml(html, 1);
 }
 
-
 function downloadPath(jobid: number, module: ModuleInfo, filename: string) {
   return (
     `/jobs/${jobid}/files/` +

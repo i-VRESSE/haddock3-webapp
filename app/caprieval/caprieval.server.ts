@@ -6,7 +6,7 @@ import {
   listOutputFiles,
   getModuleIndexPadding,
   buildAnalyisPath,
-  fetchHtml
+  fetchHtml,
 } from "~/models/job.server";
 import type { PlotlyProps } from "~/components/PlotlyPlot";
 import type { DirectoryItem } from "~/bartender-client/types";

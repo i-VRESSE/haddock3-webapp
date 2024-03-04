@@ -309,7 +309,7 @@ export async function fetchHtml(
   moduleIndexPadding: number,
   moduleName = "caprieval",
   htmlFilename = "report.html",
-  isAnalysis = true,
+  isAnalysis = true
 ) {
   let prefix = buildAnalyisPath({
     moduleIndex: module,
