@@ -301,3 +301,37 @@ export async function jobHasWorkflow(jobid: number, bartenderToken: string) {
   );
   return response.status === 200;
 }
+export async function fetchHtml(
+  jobid: number,
+  module: number,
+  isInteractive: boolean,
+  bartenderToken: string,
+  moduleIndexPadding: number,
+  moduleName = "caprieval",
+  htmlFilename = "report.html",
+  isAnalysis = true,
+) {
+  let prefix = buildAnalyisPath({
+    moduleIndex: module,
+    moduleName,
+    isInteractive,
+    moduleIndexPadding,
+  });
+  if (!isAnalysis) {
+    prefix = buildPath({
+      moduleIndex: module,
+      moduleName,
+      isInteractive,
+      moduleIndexPadding,
+    });
+  }
+  const response = await getJobfile(
+    jobid,
+    `${prefix}${htmlFilename}`,
+    bartenderToken
+  );
+  if (!response.ok) {
+    throw new Error(`could not get ${htmlFilename}`);
+  }
+  return await response.text();
+}

@@ -6,6 +6,7 @@ import {
   listOutputFiles,
   getModuleIndexPadding,
   buildAnalyisPath,
+  fetchHtml
 } from "~/models/job.server";
 import type { PlotlyProps } from "~/components/PlotlyPlot";
 import type { DirectoryItem } from "~/bartender-client/types";
@@ -193,32 +194,6 @@ export async function getCaprievalData({
   const table = prefixTable(getTableFromHtml(thtml), structurePrefix);
 
   return { scatters, boxes, table };
-}
-
-async function fetchHtml(
-  jobid: number,
-  module: number,
-  isInteractive: boolean,
-  bartenderToken: string,
-  moduleIndexPadding: number,
-  moduleName = "caprieval",
-  htmlFilename = "report.html"
-) {
-  const prefix = buildAnalyisPath({
-    moduleIndex: module,
-    moduleName,
-    isInteractive,
-    moduleIndexPadding,
-  });
-  const response = await getJobfile(
-    jobid,
-    `${prefix}${htmlFilename}`,
-    bartenderToken
-  );
-  if (!response.ok) {
-    throw new Error(`could not get ${htmlFilename}`);
-  }
-  return await response.text();
 }
 
 export function getPlotFromHtml(html: string, plotId = 1) {
