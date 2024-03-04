@@ -17,7 +17,7 @@ destinations:
       entry: /home/xenon
   local:
     scheduler:
-      type: memory
+      type: eager
     filesystem:
       type: local
 job_root_dir: /jobs

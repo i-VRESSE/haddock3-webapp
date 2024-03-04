@@ -72,6 +72,7 @@ services:
       BARTENDER_DB_USER: postgres
       BARTENDER_DB_PASS: postgres
       BARTENDER_DB_BASE: postgres
+      BARTENDER_WORKERS_COUNT: 4
       BARTENDER_LOG_LEVEL: error
       BARTENDER_PUBLIC_KEY: /certs/public_key.pem
       WAIT_PATHS: /certs/private_key.pem

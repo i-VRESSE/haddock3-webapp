@@ -13,7 +13,9 @@
 
 The webapp version is what is currently checked out.
 
-Versions of bartender, haddock3, gdock and lightdock are defined in the start of the [./Dockerfile.bartenderhaddock3](./Dockerfile.bartenderhaddock3) file. They can be overwritten during build with
+Versions of bartender, haddock3, gdock and lightdock are defined in the start of the [./Dockerfile.bartenderhaddock3](./Dockerfile.bartenderhaddock3) file.
+A version can be a git tag, branch or commit hash.
+They can be overwritten during build with
 
 ```shell
 docker compose -f <docker compose file> build --build-arg HADDOCK3_VERSION=v3.0.0-beta.5

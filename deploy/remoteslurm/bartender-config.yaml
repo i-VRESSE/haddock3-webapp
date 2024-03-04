@@ -18,7 +18,7 @@ destinations:
       entry: <root directory where files of jobs should reside>
   local:
     scheduler:
-      type: memory
+      type: eager
     filesystem:
       type: local
 job_root_dir: /jobs

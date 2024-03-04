@@ -41,10 +41,11 @@ ENV GDOCK_PATH=/opt/gdock
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
 RUN git clone --recursive https://github.com/haddocking/haddock3.git . && git checkout ${HADDOCK3_VERSION}
-WORKDIR /opt/haddock3/src/fcc/src
-RUN make
-WORKDIR /opt/haddock3
+RUN cd src/fcc/src && make && cd .. && \
+    # pretend fcc is installed
+    ln -s $PWD /usr/local/lib/python3.9/dist-packages/fcc && \
+    touch __init__.py scripts/__init__.py
 RUN /usr/local/bin/pip install -r requirements.txt && /usr/local/bin/pip install . && \
- mkdir -p /usr/local/lib/python3.9/bin
+    mkdir -p /usr/local/lib/python3.9/bin
 COPY cns /usr/local/lib/python3.9/bin/cns
 WORKDIR /
