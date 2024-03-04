@@ -18,9 +18,9 @@
     "test": "vitest",
     "typecheck": "tsc",
     "setup": "prisma generate && prisma migrate deploy && prisma db seed",
-    "docker:dev": "docker compose -f docker-compose.dev.yml up",
-    "docker:devrm": "docker compose -f docker-compose.dev.yml rm -v",
-    "psql:dev": "docker compose -f docker-compose.dev.yml exec userdb psql -U postgres -d postgres"
+    "docker:dev": "docker compose -f deploy/docker-compose.dev.yml up",
+    "docker:devrm": "docker compose -f deploy/docker-compose.dev.yml rm -v",
+    "psql:dev": "docker compose -f deploy/docker-compose.dev.yml exec userdb psql -U postgres -d postgres"
   },
   "prettier": {},
   "eslintIgnore": [
@@ -56,6 +56,7 @@
     "js-yaml": "^4.1.0",
     "jszip": "^3.10.1",
     "lucide-react": "^0.321.0",
+    "openapi-fetch": "^0.8.2",
     "plotly.js": "^2.26.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -95,7 +96,6 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "happy-dom": "^9.20.3",
-    "openapi-fetch": "^0.8.2",
     "openapi-typescript": "^7.0.0-next.5",
     "prettier": "^2.8.7",
     "prettier-plugin-tailwindcss": "^0.2.7",

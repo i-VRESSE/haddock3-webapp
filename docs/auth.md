@@ -24,6 +24,8 @@ SESSION_SECRET=...
 
 A random secret string can be generated with `openssl rand -base64 32`.
 
+Or use `SESSIONS_SECRET_FILE` environment variable to read the secret from a file.
+
 ## Social logins
 
 To enable GitHub or Orcid or EGI Check-in login the web app needs following environment variables.

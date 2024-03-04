@@ -1,8 +1,12 @@
+# Docker file for haddock3-webapp
+
 # base node image
-FROM node:18-bullseye-slim as base
+FROM node:18-bookworm-slim as base
 
 # set for base and all layer that inherit from it
 ENV NODE_ENV production
+
+RUN apt update && apt install -y libssl3
 
 # Install all node_modules, including dev dependencies
 FROM base as deps
@@ -46,7 +50,13 @@ COPY --from=production-deps /myapp/node_modules /myapp/node_modules
 
 COPY --from=build /myapp/node_modules/.prisma /myapp/node_modules/.prisma
 COPY --from=build /myapp/build /myapp/build
+COPY --from=build /myapp/prisma /myapp/prisma
 COPY --from=build /myapp/public /myapp/public
+
 COPY --from=build /myapp/package.json /myapp/package.json
 
+COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
+
 ENTRYPOINT [ "npm", "run", "start" ]
+
+HEALTHCHECK --interval=30s --timeout=5s CMD curl --fail http://localhost:8080/ || exit 1
