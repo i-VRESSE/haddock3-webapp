@@ -13,4 +13,3 @@ services:
       context: ..
       dockerfile: containerslurm/Dockerfile
     privileged: true
-  
