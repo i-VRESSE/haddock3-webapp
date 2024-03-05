@@ -27,4 +27,4 @@ To remove all users and jobs run the following command:
 
 ```shell
 docker compose -f <docker compose file> down -v
-``` 
+```
