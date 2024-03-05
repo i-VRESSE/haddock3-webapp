@@ -20,3 +20,11 @@ They can be overwritten during build with
 ```shell
 docker compose -f <docker compose file> build --build-arg HADDOCK3_VERSION=v3.0.0-beta.5
 ```
+
+## Removal
+
+To remove all users and jobs run the following command:
+
+```shell
+docker compose -f <docker compose file> down -v
+``` 
