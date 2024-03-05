@@ -1,5 +1,5 @@
-import { getPlotFromHtml } from "~/caprieval/caprieval.server";
 import type { PlotlyProps } from "~/components/PlotlyPlot";
+import { getPlotFromHtml } from "~/lib/html";
 import { buildPath, fetchHtml, listOutputFiles } from "~/models/job.server";
 import { moduleInfo } from "~/models/module_utils";
 
@@ -41,16 +41,16 @@ export async function getClusters(
   module: ModuleInfo,
   bartenderToken: string
 ): Promise<number[]> {
-  const contents = await fetchHtml(
-    module.jobid,
-    module.index,
-    false,
+  const contents = await fetchHtml({
     bartenderToken,
-    module.indexPadding,
-    module.name,
-    "ContactMapReport.html",
-    false
-  );
+    jobid: module.jobid,
+    module: module.index,
+    moduleIndexPadding: module.indexPadding,
+    moduleName: module.name,
+    isInteractive: false,
+    htmlFilename: "ContactMapReport.html",
+    isAnalysis: false,
+  });
   return parseReport(contents);
 }
 
@@ -93,16 +93,16 @@ async function getChartData(
   filename: string
 ): Promise<PlotlyProps> {
   /// cluster4_contmap_chordchart.html
-  const html = await fetchHtml(
-    module.jobid,
-    module.index,
-    false,
+  const html = await fetchHtml({
     bartenderToken,
-    module.indexPadding,
-    module.name,
-    `cluster${clusterId}_${filename}.html`,
-    false
-  );
+    jobid: module.jobid,
+    module: module.index,
+    moduleIndexPadding: module.indexPadding,
+    moduleName: module.name,
+    isInteractive: false,
+    htmlFilename: `cluster${clusterId}_${filename}.html`,
+    isAnalysis: false,
+  });
   return getPlotFromHtml(html, 1);
 }
 

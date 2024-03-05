@@ -70,6 +70,9 @@ module.exports = {
         "plugin:import/recommended",
         "plugin:import/typescript",
       ],
+      rules: {
+        "max-params": ["error", 5],
+      },
     },
 
     // Node

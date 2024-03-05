@@ -301,16 +301,25 @@ export async function jobHasWorkflow(jobid: number, bartenderToken: string) {
   );
   return response.status === 200;
 }
-export async function fetchHtml(
-  jobid: number,
-  module: number,
-  isInteractive: boolean,
-  bartenderToken: string,
-  moduleIndexPadding: number,
+export async function fetchHtml({
+  jobid,
+  module,
+  isInteractive,
+  bartenderToken,
+  moduleIndexPadding,
   moduleName = "caprieval",
   htmlFilename = "report.html",
-  isAnalysis = true
-) {
+  isAnalysis = true,
+}: {
+  jobid: number;
+  module: number;
+  isInteractive: boolean;
+  bartenderToken: string;
+  moduleIndexPadding: number;
+  moduleName?: string;
+  htmlFilename?: string;
+  isAnalysis?: boolean;
+}) {
   let prefix = buildAnalyisPath({
     moduleIndex: module,
     moduleName,

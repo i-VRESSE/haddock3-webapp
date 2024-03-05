@@ -20,6 +20,7 @@ import type {
   StructureTable,
 } from "@i-vresse/haddock3-analysis-components";
 import { BartenderError } from "~/models/errors";
+import { getDataFromHtml, getPlotFromHtml } from "~/lib/html";
 
 // Package does not expose types, so extract them from the components
 export type Table =
@@ -81,27 +82,6 @@ export async function getCaprievalModuleInfo(
   return [moduleIndex, interactivness, pad];
 }
 
-export async function getReportHtml(
-  jobid: number,
-  module: number,
-  bartenderToken: string,
-  moduleIndexPadding: number,
-  isInteractive = false,
-  moduleName = "caprieval"
-) {
-  const shtml = await fetchHtml(
-    jobid,
-    module,
-    isInteractive,
-    bartenderToken,
-    moduleIndexPadding,
-    moduleName,
-    `report.html`
-  );
-  const table = getTableFromHtml(shtml);
-  return table;
-}
-
 export interface CaprievalData {
   scatters: PlotlyProps;
   boxes: PlotlyProps;
@@ -146,30 +126,30 @@ export async function getCaprievalData({
   moduleName?: string;
   structurePrefix?: string;
 }): Promise<CaprievalData> {
-  const shtml = await fetchHtml(
+  const shtml = await fetchHtml({
     jobid,
     module,
     isInteractive,
     bartenderToken,
     moduleIndexPadding,
     moduleName,
-    `${scatterSelection}.html`
-  );
+    htmlFilename: `${scatterSelection}.html`,
+  });
   const scatters = getPlotFromHtml(shtml, 1);
   let bhtml: string;
   if (scatterSelection === "report" && boxSelection === "report") {
     // if both are report, we can reuse the html
     bhtml = shtml;
   } else {
-    bhtml = await fetchHtml(
+    bhtml = await fetchHtml({
       jobid,
       module,
       isInteractive,
       bartenderToken,
       moduleIndexPadding,
       moduleName,
-      `${boxSelection}.html`
-    );
+      htmlFilename: `${boxSelection}.html`,
+    });
   }
   // plot id is always 1 for non-report plot as html file contains just one plot
   const bplotId = boxSelection === "report" ? 2 : 1;
@@ -181,42 +161,23 @@ export async function getCaprievalData({
   } else if (boxSelection === "report") {
     thtml = bhtml;
   } else {
-    thtml = await fetchHtml(
+    thtml = await fetchHtml({
       jobid,
       module,
       isInteractive,
       bartenderToken,
       moduleIndexPadding,
       moduleName,
-      `report.html`
-    );
+      htmlFilename: `report.html`,
+    });
   }
   const table = prefixTable(getTableFromHtml(thtml), structurePrefix);
 
   return { scatters, boxes, table };
 }
 
-export function getPlotFromHtml(html: string, plotId = 1) {
-  return getDataFromHtml<PlotlyProps>(html, `data${plotId}`);
-}
-
 export function getTableFromHtml(html: string, tableId = 2) {
   return getDataFromHtml<Table>(html, `datatable${tableId}`);
-}
-
-export function getDataFromHtml<T>(html: string, id: string) {
-  // this is very fragile, but much faster then using a HTML parser
-  // as order of attributes is not guaranteed
-  // see commit meessage of this line for benchmark
-  const re = new RegExp(
-    `<script id="${id}" type="application\\/json">([\\s\\S]*?)<\\/script>`
-  );
-  const a = html.match(re);
-  if (!a) {
-    throw new Error(`could not find script with id ${id}`);
-  }
-  const dataAsString = a[1].trim();
-  return JSON.parse(dataAsString) as T;
 }
 
 export function getLastCaprievalModule(files: DirectoryItem): [number, number] {
