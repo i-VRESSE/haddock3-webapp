@@ -22,7 +22,6 @@ import { ErrorMessages } from "../components/ErrorMessages";
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
-import { PostgresError } from "~/drizzle/db.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {
