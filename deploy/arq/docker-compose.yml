@@ -116,7 +116,6 @@ services:
     restart: "no"
 
 volumes:
-  # TODO try to use single postgres
   webapp-db-data:
   bartender-db-data:
   bartender-job-data:
