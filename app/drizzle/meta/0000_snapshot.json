@@ -1,5 +1,5 @@
 {
-  "id": "c8ba45d6-24b6-4155-a722-f02827122254",
+  "id": "ae77086d-4c4c-494f-b8de-b8d4495ade8b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -15,15 +15,15 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp(3)",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
-        "updatedAt": {
-          "name": "updatedAt",
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp(3)",
           "primaryKey": false,
           "notNull": true,
@@ -35,43 +35,43 @@
           "primaryKey": false,
           "notNull": true
         },
-        "passwordHash": {
-          "name": "passwordHash",
+        "password_hash": {
+          "name": "password_hash",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "isAdmin": {
-          "name": "isAdmin",
+        "is_admin": {
+          "name": "is_admin",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
           "default": false
         },
-        "bartenderToken": {
-          "name": "bartenderToken",
+        "bartender_token": {
+          "name": "bartender_token",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "default": "''"
         },
-        "bartenderTokenExpiresAt": {
-          "name": "bartenderTokenExpiresAt",
+        "bartender_token_expires_at": {
+          "name": "bartender_token_expires_at",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "default": 0
         },
-        "expertiseLevels": {
-          "name": "expertiseLevels",
-          "type": "expertiseLevel[]",
+        "expertise_levels": {
+          "name": "expertise_levels",
+          "type": "expertise_level[]",
           "primaryKey": false,
           "notNull": true,
           "default": []
         },
-        "preferredExpertiseLevel": {
-          "name": "preferredExpertiseLevel",
-          "type": "expertiseLevel",
+        "preferred_expertise_level": {
+          "name": "preferred_expertise_level",
+          "type": "expertise_level",
           "primaryKey": false,
           "notNull": false
         },
@@ -89,14 +89,16 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": ["email"]
+          "columns": [
+            "email"
+          ]
         }
       }
     }
   },
   "enums": {
-    "expertiseLevel": {
-      "name": "expertiseLevel",
+    "expertise_level": {
+      "name": "expertise_level",
       "values": {
         "easy": "easy",
         "expert": "expert",

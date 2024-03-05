@@ -8,33 +8,32 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-export const expertiseLevel = pgEnum("expertiseLevel", [
+export const expertiseLevel = pgEnum("expertise_level", [
   "easy",
   "expert",
   "guru",
 ]);
 
 export const users = pgTable("users", {
-  // TODO rename table columns CamelCase to under_scored?
   id: uuid("id").primaryKey().defaultRandom(),
-  createdAt: timestamp("createdAt", { precision: 3, mode: "string" })
+  createdAt: timestamp("created_at", { precision: 3, mode: "string" })
     .defaultNow()
     .notNull(),
-  updatedAt: timestamp("updatedAt", { precision: 3, mode: "string" })
+  updatedAt: timestamp("updated_at", { precision: 3, mode: "string" })
     .defaultNow()
     .notNull(),
   email: text("email").notNull().unique(),
-  passwordHash: text("passwordHash"),
-  isAdmin: boolean("isAdmin").default(false).notNull(),
-  bartenderToken: text("bartenderToken").default("").notNull(),
-  bartenderTokenExpiresAt: integer("bartenderTokenExpiresAt")
+  passwordHash: text("password_hash"),
+  isAdmin: boolean("is_admin").default(false).notNull(),
+  bartenderToken: text("bartender_token").default("").notNull(),
+  bartenderTokenExpiresAt: integer("bartender_token_expires_at")
     .default(0)
     .notNull(),
-  expertiseLevels: expertiseLevel("expertiseLevels")
+  expertiseLevels: expertiseLevel("expertise_levels")
     .array()
     .default([])
     .notNull(),
-  preferredExpertiseLevel: expertiseLevel("preferredExpertiseLevel"),
+  preferredExpertiseLevel: expertiseLevel("preferred_expertise_level"),
   photo: text("photo").notNull(),
 });
 
