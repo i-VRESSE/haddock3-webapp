@@ -12,20 +12,20 @@ services:
     depends_on:
       bartender:
         condition: service_started
-      webappdb:
+      db:
         condition: service_healthy
     ports:
       - "8080:8080"
     environment:
       BARTENDER_API_URL: "http://bartender:8000"
-      DATABASE_URL: postgresql://postgres:postgres@webappdb:5432/postgres
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/postgres
       BARTENDER_PRIVATE_KEY: /certs/private_key.pem
       SESSION_SECRET_FILE: /certs/session.secret
       WAIT_PATHS: /certs/private_key.pem
     volumes:
       - bartender-certs:/certs:ro
 
-  webappdb:
+  db:
     image: postgres:15.4-bullseye
     restart: always
     environment:
@@ -33,7 +33,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     volumes:
-      - webapp-db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     healthcheck:
       test: pg_isready -U postgres
       interval: 2s
@@ -54,13 +54,13 @@ services:
       - bartender-certs:/certs:ro
       - bartender-job-data:/jobs
     depends_on:
-      bartenderdb:
+      db:
         condition: service_healthy
       redis:
         condition: service_started
     environment:
       BARTENDER_HOST: 0.0.0.0
-      BARTENDER_DB_HOST: bartenderdb
+      BARTENDER_DB_HOST: db
       BARTENDER_DB_PORT: 5432
       BARTENDER_DB_USER: postgres
       BARTENDER_DB_PASS: postgres
@@ -69,21 +69,6 @@ services:
       BARTENDER_LOG_LEVEL: error
       BARTENDER_PUBLIC_KEY: /certs/public_key.pem
       WAIT_PATHS: /certs/private_key.pem
-
-  bartenderdb:
-    image: postgres:15.4-bullseye
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
-    volumes:
-      - bartender-db-data:/var/lib/postgresql/data
-    healthcheck:
-      test: pg_isready -U postgres
-      interval: 2s
-      timeout: 3s
-      retries: 40
 
   redis:
     image: redis:6.2.6
@@ -116,8 +101,6 @@ services:
     restart: "no"
 
 volumes:
-  # TODO try to use single postgres
-  webapp-db-data:
-  bartender-db-data:
+  db-data:
   bartender-job-data:
   bartender-certs:
