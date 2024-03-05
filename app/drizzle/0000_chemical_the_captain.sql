@@ -14,11 +14,9 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"bartenderToken" text DEFAULT '' NOT NULL,
 	"bartenderTokenExpiresAt" integer DEFAULT 0 NOT NULL,
 	-- manually changed expertiseLevel to "expertiseLevel"
-	-- manullay added default value as .default([]) does not work
+	-- manullay added default value as .default([]) does do anything
 	"expertiseLevels" "expertiseLevel"[] DEFAULT '{}' NOT NULL,
 	"preferredExpertiseLevel" "expertiseLevel",
 	"photo" text NOT NULL,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
---> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "users" ("email");

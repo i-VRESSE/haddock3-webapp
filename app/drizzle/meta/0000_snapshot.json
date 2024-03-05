@@ -1,5 +1,5 @@
 {
-  "id": "adf64535-608a-4eb3-bded-5f89c56fee2b",
+  "id": "c8ba45d6-24b6-4155-a722-f02827122254",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
@@ -66,7 +66,8 @@
           "name": "expertiseLevels",
           "type": "expertiseLevel[]",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": []
         },
         "preferredExpertiseLevel": {
           "name": "preferredExpertiseLevel",
@@ -81,13 +82,7 @@
           "notNull": true
         }
       },
-      "indexes": {
-        "User_email_key": {
-          "name": "User_email_key",
-          "columns": ["email"],
-          "isUnique": true
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
