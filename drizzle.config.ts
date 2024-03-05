@@ -6,8 +6,7 @@ export default {
   schema: [resolve(__dirname, "./app/drizzle/schema.server.ts")],
   dbCredentials: {
     connectionString:
-      process.env.DATABASE_URL ??
-      "<Please set DATABASE_URL env var>",
+      process.env.DATABASE_URL ?? "<Please set DATABASE_URL env var>",
   },
   // Print all statements
   verbose: true,
