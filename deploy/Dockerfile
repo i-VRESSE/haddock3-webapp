@@ -33,7 +33,6 @@ WORKDIR /myapp
 COPY --from=deps /myapp/node_modules /myapp/node_modules
 
 ADD . .
-RUN npx prisma generate
 RUN npm run build
 
 # Finally, build the production image with minimal footprint
@@ -48,9 +47,8 @@ WORKDIR /myapp
 
 COPY --from=production-deps /myapp/node_modules /myapp/node_modules
 
-COPY --from=build /myapp/node_modules/.prisma /myapp/node_modules/.prisma
 COPY --from=build /myapp/build /myapp/build
-COPY --from=build /myapp/prisma /myapp/prisma
+COPY --from=build /myapp/app/drizzle /myapp/app/drizzle
 COPY --from=build /myapp/public /myapp/public
 
 COPY --from=build /myapp/package.json /myapp/package.json

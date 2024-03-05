@@ -3,7 +3,7 @@ import type { ICatalog } from "@i-vresse/wb-core/dist/types";
 import easy from "./haddock3.easy.json";
 import expert from "./haddock3.expert.json";
 import guru from "./haddock3.guru.json";
-import type { ExpertiseLevel } from "@prisma/client";
+import type { ExpertiseLevel } from "~/drizzle/schema.server";
 import { JOB_OUTPUT_DIR } from "~/bartender-client/constants";
 import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog.js";
 

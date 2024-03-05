@@ -48,8 +48,9 @@ Picked Remix.
 - TypeOrm
 - Kysely
 - db client
+- Drizzle ORM
 
-Remix uses Prisma in their tutorial and blue stack, so we also picked Prisma to have least suprises.
+Picked Drizzle ORM because it is more SQL-like and has less magic than prisma like dts generation or rust backend.
 
 ## Validation
 

@@ -1,5 +1,5 @@
 import type { User } from "~/models/user.server";
-import type { ExpertiseLevel } from "@prisma/client";
+import type { ExpertiseLevel } from "~/drizzle/schema.server";
 import { TableCell, TableRow } from "~/components/ui/table";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
@@ -17,7 +17,7 @@ export const UserTableRow = ({
   onUpdate,
   submitting,
 }: IProps) => {
-  const usersExpertiseLevels = user.expertiseLevels;
+  const usersExpertiseLevels: ExpertiseLevel[] = user.expertiseLevels;
   return (
     <TableRow>
       <TableCell>{user.email}</TableCell>

@@ -12,7 +12,7 @@ import {
   parseWorkflowFromTable,
 } from "@i-vresse/wb-core/dist/toml.js";
 import { BartenderError, ForbiddenError, InvalidUploadError } from "./errors";
-import { ExpertiseLevel } from "@prisma/client";
+import type { ExpertiseLevel } from "~/drizzle/schema.server";
 import type { IFiles, IWorkflow } from "@i-vresse/wb-core/dist/types";
 import {
   Errors,
