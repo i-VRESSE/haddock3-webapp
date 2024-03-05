@@ -16,6 +16,3 @@ export const conn =
 if (process.env.NODE_ENV !== "production") globalForDb.conn = conn;
 
 export const db = drizzle(conn, { schema });
-
-// Need to reexport, as importing directly in route causes leaking server code to client
-export const PostgresError = postgres.PostgresError;
