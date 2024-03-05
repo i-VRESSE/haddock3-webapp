@@ -48,7 +48,6 @@ WORKDIR /myapp
 COPY --from=production-deps /myapp/node_modules /myapp/node_modules
 
 COPY --from=build /myapp/build /myapp/build
-# TODO check if migration can be run like this or that drizzle.config.ts is needed or ...
 COPY --from=build /myapp/app/drizzle /myapp/app/drizzle
 COPY --from=build /myapp/public /myapp/public
 
