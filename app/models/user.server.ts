@@ -76,7 +76,8 @@ async function firstUserShouldBeAdmin() {
     .select({
       id: users.id,
     })
-    .from(users).limit(1);
+    .from(users)
+    .limit(1);
   IS_FIRST_USER = result.length === 0;
   return IS_FIRST_USER;
 }
