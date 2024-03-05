@@ -11,6 +11,8 @@
     "strict": true,
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
+    // Required for drizzle-orm, see https://github.com/drizzle-team/drizzle-orm/issues/1207
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"]

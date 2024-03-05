@@ -1,52 +1,68 @@
 import bcryptjs from "bcryptjs";
-import { ExpertiseLevel } from "@prisma/client";
+import { count, eq, sql } from "drizzle-orm";
+import postgres from "postgres";
 
 import { generatePhoto } from "./generatePhoto";
-import { db } from "./db.server";
+import {
+  ExpertiseLevel,
+  expertiseLevel,
+  users,
+} from "../drizzle/schema.server";
+import { db } from "../drizzle/db.server";
 
 const { compare, hash } = bcryptjs;
 
-export interface User {
-  readonly id: string;
-  readonly email: string;
-  readonly expertiseLevels: ExpertiseLevel[];
-  readonly isAdmin: boolean;
-  readonly preferredExpertiseLevel: ExpertiseLevel | null;
-  readonly bartenderToken: string | null;
-  readonly bartenderTokenExpiresAt: number;
-  readonly photo: string;
-}
-
+const userSelect = {
+  id: users.id,
+  email: users.email,
+  expertiseLevels: users.expertiseLevels,
+  isAdmin: users.isAdmin,
+  preferredExpertiseLevel: users.preferredExpertiseLevel,
+  bartenderToken: users.bartenderToken,
+  bartenderTokenExpiresAt: users.bartenderTokenExpiresAt,
+  photo: users.photo,
+} as const;
+type FullUser = typeof users.$inferSelect;
+export type User = Omit<FullUser, "passwordHash" | "createdAt" | "updatedAt">;
 export type TokenLessUser = Omit<
   User,
   "bartenderToken" | "bartenderTokenExpiresAt"
 >;
 
-const userSelect = {
-  id: true,
-  email: true,
-  expertiseLevels: true,
-  isAdmin: true,
-  preferredExpertiseLevel: true,
-  bartenderToken: true,
-  bartenderTokenExpiresAt: true,
-  photo: true,
-} as const;
+export class EmailAlreadyRegisteredError extends Error {
+  constructor() {
+    super("Email already registered");
+  }
+}
 
 export async function register(email: string, password: string) {
   const isAdmin = await firstUserShouldBeAdmin();
-  const passwordHash = await hash(password, 10);
+  const SALT_LENGTH = 10;
+  const passwordHash = await hash(password, SALT_LENGTH);
   const photo = generatePhoto(email);
-  const user = await db.user.create({
-    data: {
-      email,
-      isAdmin,
-      passwordHash,
-      photo,
-    },
-    select: userSelect,
-  });
-  return user;
+  type NewUser = typeof users.$inferInsert;
+  const value: NewUser = {
+    email,
+    isAdmin,
+    passwordHash,
+    photo,
+  };
+
+  try {
+    const newUser = await db.insert(users).values(value).returning({
+      id: users.id,
+    });
+    return newUser[0];
+  } catch (error) {
+    if (error instanceof postgres.PostgresError) {
+      const uniqueConstraintErrorCode = "23505";
+      if (error.code === uniqueConstraintErrorCode) {
+        throw new EmailAlreadyRegisteredError();
+      }
+      throw error;
+    }
+    throw error;
+  }
 }
 
 let USER_COUNT_CACHE = 0;
@@ -55,7 +71,12 @@ async function firstUserShouldBeAdmin() {
   if (USER_COUNT_CACHE > 0) {
     return false;
   }
-  const userCount = await db.user.count();
+  const result = await db
+    .select({
+      count: count(users.id),
+    })
+    .from(users);
+  const userCount = result[0].count;
   if (userCount > 0) {
     USER_COUNT_CACHE = 1;
   }
@@ -75,18 +96,14 @@ export class WrongPasswordError extends Error {
 }
 
 export async function localLogin(email: string, password: string) {
-  const user = await db.user.findUnique({
-    where: {
-      email: email,
-    },
-    select: {
-      ...userSelect,
-      passwordHash: true,
-    },
-  });
-  if (!user) {
+  const foundUsers = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email));
+  if (foundUsers.length === 0) {
     throw new UserNotFoundError();
   }
+  const user = foundUsers[0];
   const { passwordHash, ...userWithoutPasswordHash } = user;
   if (!passwordHash) {
     throw new WrongPasswordError();
@@ -101,70 +118,55 @@ export async function localLogin(email: string, password: string) {
 
 export async function oauthregister(email: string, photo?: string) {
   const isAdmin = await firstUserShouldBeAdmin();
-  const user = await db.user.upsert({
-    where: {
-      email,
-    },
-    create: {
+  const user = await db
+    .insert(users)
+    .values({
       email,
       isAdmin,
       photo: photo ?? generatePhoto(email),
-    },
-    update: {},
-    select: {
-      id: true,
-    },
-  });
-  return user.id;
+    })
+    .onConflictDoNothing()
+    .returning({
+      id: users.id,
+    });
+  return user[0].id;
 }
 
-export async function getUserById(userId: string) {
-  const user = await db.user.findUnique({
-    where: {
-      id: userId,
-    },
-    select: userSelect,
-  });
-  if (!user) {
-    throw new Error("User not found");
+export async function getUserById(userId: string): Promise<User> {
+  const foundUsers = await db
+    .select(userSelect)
+    .from(users)
+    .where(eq(users.id, userId));
+  if (foundUsers.length === 0) {
+    throw new UserNotFoundError();
   }
-  return user;
+  return foundUsers[0];
 }
 
-export async function getUserByEmail(email: string) {
-  const user = await db.user.findUnique({
-    where: {
-      email: email,
-    },
-    select: userSelect,
-  });
-  if (!user) {
-    throw new Error("User not found");
+export async function getUserByEmail(email: string): Promise<User> {
+  const foundUsers = await db
+    .select(userSelect)
+    .from(users)
+    .where(eq(users.email, email));
+  if (foundUsers.length === 0) {
+    throw new UserNotFoundError();
   }
-  return user;
+  return foundUsers[0];
 }
 
 export function isSubmitAllowed(level: string) {
   return level !== "";
 }
 
-export async function listUsers(limit = 100, offset = 0) {
-  const users = await db.user.findMany({
-    select: userSelect,
-    take: limit,
-    skip: offset,
-  });
-  return users;
+export async function listUsers(limit = 100, offset = 0): Promise<User[]> {
+  return await db.select(userSelect).from(users).limit(limit).offset(offset);
 }
 
 export function listExpertiseLevels() {
-  const array = Array.from(Object.values(ExpertiseLevel));
-  if (array.length === 0) {
-    throw new Error("No expertise levels found");
-  }
-  // cast needed for valibot.enumpType
-  return array as [ExpertiseLevel, ...ExpertiseLevel[]];
+  return expertiseLevel.enumValues;
 }
+
+const now = sql<string>`now()`;
 
 export async function assignExpertiseLevel(
   userId: string,
@@ -176,94 +178,64 @@ export async function assignExpertiseLevel(
     ? user.preferredExpertiseLevel
     : level;
 
-  // TODO retain order should be easy,expert,guru
-  // now order is based on click order by admin
-  await db.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
+  // retain order should be easy,expert,guru
+  const expertiseLevels = expertiseLevel.enumValues.filter(
+    (l) => user.expertiseLevels.includes(l) || level === l
+  );
+
+  await db
+    .update(users)
+    .set({
       preferredExpertiseLevel,
-      expertiseLevels: {
-        push: level,
-      },
-    },
-    select: {
-      id: true,
-    },
-  });
+      expertiseLevels,
+      updatedAt: now,
+    })
+    .where(eq(users.id, userId));
 }
 
 export async function unassignExpertiseLevel(
   userId: string,
   level: ExpertiseLevel
 ) {
-  // set preferred level to the first remaining level if the preferred level is the one being removed
   const user = await getUserById(userId);
-  const remainingLevels = user.expertiseLevels
-    .map((level) => level)
-    .filter((name) => name !== level);
+  const remainingLevels = user.expertiseLevels.filter((name) => name !== level);
   let preferredExpertiseLevel = user.preferredExpertiseLevel;
+  // set preferred level to the first remaining level if the preferred level is the one being removed
   if (preferredExpertiseLevel === level) {
     preferredExpertiseLevel = remainingLevels[0] || null;
   }
 
-  await db.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
+  await db
+    .update(users)
+    .set({
       preferredExpertiseLevel,
-      expertiseLevels: {
-        set: remainingLevels,
-      },
-    },
-    select: {
-      id: true,
-    },
-  });
+      expertiseLevels: remainingLevels,
+      updatedAt: now,
+    })
+    .where(eq(users.id, userId));
 }
 
 export async function setPreferredExpertiseLevel(
   userId: string,
   preferredExpertiseLevel: ExpertiseLevel
 ) {
-  const user = await db.user.findUnique({
-    where: {
-      id: userId,
-    },
-    select: {
-      expertiseLevels: true,
-    },
-  });
-  if (!user) {
-    throw new Error("User not found");
-  }
-  await db.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
+  await db
+    .update(users)
+    .set({
       preferredExpertiseLevel,
-    },
-    select: {
-      id: true,
-    },
-  });
+      updatedAt: now,
+    })
+    .where(eq(users.id, userId));
 }
 
 export async function setIsAdmin(userId: string, isAdmin: boolean) {
-  await db.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
+  await db
+    .update(users)
+    .set({
       isAdmin,
-    },
-    select: {
-      id: true,
-    },
-  });
+      updatedAt: now,
+    })
+    .where(eq(users.id, userId));
 }
 
 export async function setBartenderToken(
@@ -271,16 +243,12 @@ export async function setBartenderToken(
   token: string,
   expireAt: number
 ) {
-  await db.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
+  await db
+    .update(users)
+    .set({
       bartenderToken: token,
       bartenderTokenExpiresAt: expireAt,
-    },
-    select: {
-      id: true,
-    },
-  });
+      // Dont update updatedNow as this is an internal operation
+    })
+    .where(eq(users.id, userId));
 }
