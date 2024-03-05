@@ -1,5 +1,5 @@
 import bcryptjs from "bcryptjs";
-import { count, eq, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import postgres from "postgres";
 
 import { generatePhoto } from "./generatePhoto";
@@ -65,22 +65,20 @@ export async function register(email: string, password: string) {
   }
 }
 
-let USER_COUNT_CACHE = 0;
+let IS_FIRST_USER = true;
 
 async function firstUserShouldBeAdmin() {
-  if (USER_COUNT_CACHE > 0) {
+  if (!IS_FIRST_USER) {
     return false;
   }
+
   const result = await db
     .select({
-      count: count(users.id),
+      id: users.id,
     })
-    .from(users);
-  const userCount = result[0].count;
-  if (userCount > 0) {
-    USER_COUNT_CACHE = 1;
-  }
-  return userCount === 0;
+    .from(users).limit(1);
+  IS_FIRST_USER = result.length === 0;
+  return IS_FIRST_USER;
 }
 
 export class UserNotFoundError extends Error {
