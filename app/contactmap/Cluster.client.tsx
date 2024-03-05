@@ -4,8 +4,7 @@ import type { ContactMapCluster } from "./contactmap.server";
 export function Cluster({ cluster }: { cluster: ContactMapCluster }) {
   return (
     <div>
-      <div>
-        {/* TODO make plots same size as in their source html file */}
+      <div className="flex">
         <PlotlyPlot
           data={cluster.chordchart.data}
           layout={cluster.chordchart.layout}
