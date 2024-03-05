@@ -7,7 +7,7 @@ export default {
   dbCredentials: {
     connectionString:
       process.env.DATABASE_URL ??
-      "postgresql://postgres:password@localhost:5432/drizit",
+      "<Please set DATABASE_URL env var>",
   },
   // Print all statements
   verbose: true,
