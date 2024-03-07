@@ -62,7 +62,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     isInteractive: showInteractiveVersion,
     bartenderToken,
     moduleIndexPadding,
-  }
+  };
   const defaultValues = await getParams({
     moduleIndex,
     ...info,
