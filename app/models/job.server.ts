@@ -301,6 +301,21 @@ export async function jobHasWorkflow(jobid: number, bartenderToken: string) {
   );
   return response.status === 200;
 }
+
+/**
+ * Fetches the HTML content for a job.
+ *
+ * @param jobid - The ID of the job.
+ * @param module - The module index.
+ * @param isInteractive - Indicates whether the interactive version of module should be used.
+ * @param bartenderToken - The token for accessing the bartender service.
+ * @param moduleIndexPadding - The padding for the module index.
+ * @param moduleName - The name of the module (default: "caprieval").
+ * @param htmlFilename - The name of the HTML file (default: "report.html").
+ * @param isAnalysis - Indicates whether file should be used from analysis/ directory. (default: true).
+ * @returns The HTML content of the job.
+ * @throws An error if the HTML content could not be fetched.
+ */
 export async function fetchHtml({
   jobid,
   module,
