@@ -2,8 +2,7 @@ import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
 import { getBartenderToken } from "~/bartender-client/token.server";
-import { getJobById, jobIdFromParams } from "~/models/job.server";
-import { CompletedJobs } from "~/bartender-client/types";
+import { getCompletedJobById, jobIdFromParams } from "~/models/job.server";
 import { Button } from "~/components/ui/button";
 import {
   getClusters,
@@ -18,10 +17,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobid = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "-1");
   const bartenderToken = await getBartenderToken(request);
-  const job = await getJobById(jobid, bartenderToken);
-  if (!CompletedJobs.has(job.state)) {
-    throw new Error("Job is not completed");
-  }
+  await getCompletedJobById(jobid, bartenderToken);
 
   const moduleInfo = await isContactMapModule(
     jobid,

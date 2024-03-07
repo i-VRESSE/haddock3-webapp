@@ -5,7 +5,7 @@ import { isSubmitAllowed } from "~/models/user.server";
 import { action } from "~/routes/builder";
 import { Link, useLoaderData } from "@remix-run/react";
 import { ClientOnly } from "~/components/ClientOnly";
-import { getJobById, jobIdFromParams } from "~/models/job.server";
+import { getCompletedJobById, jobIdFromParams } from "~/models/job.server";
 import { getUser } from "~/auth.server";
 import { getBartenderTokenByUser } from "~/bartender-client/token.server";
 import { Haddock3WorkflowBuilder } from "~/builder/Form.client";
@@ -18,7 +18,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const catalog = getCatalog(level ?? "easy");
   const token = await getBartenderTokenByUser(user);
   // Check that user can see job, otherwise throw 404
-  await getJobById(jobId, token);
+  await getCompletedJobById(jobId, token);
   // return same shape as loader in ~/routes/builder.tsx
   return {
     catalog,

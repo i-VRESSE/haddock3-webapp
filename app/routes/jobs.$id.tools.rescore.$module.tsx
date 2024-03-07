@@ -6,11 +6,10 @@ import { flatten, safeParse } from "valibot";
 import { getBartenderToken } from "~/bartender-client/token.server";
 import {
   jobIdFromParams,
-  getJobById,
   buildPath,
   listOutputFiles,
+  getCompletedJobById,
 } from "~/models/job.server";
-import { CompletedJobs } from "~/bartender-client/types";
 import { ClientOnly } from "~/components/ClientOnly";
 import { rescore } from "~/tools/rescore.server";
 import { moduleInfo } from "~/models/module_utils";
@@ -29,10 +28,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");
   const bartenderToken = await getBartenderToken(request);
-  const job = await getJobById(jobId, bartenderToken);
-  if (!CompletedJobs.has(job.state)) {
-    throw new Error("Job is not completed");
-  }
+  await getCompletedJobById(jobId, bartenderToken);
   const outputFiles = await listOutputFiles(jobId, bartenderToken, 1);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [moduleName, hasInteractiveVersion, moduleIndexPadding] = moduleInfo(
@@ -80,10 +76,7 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
   const bartenderToken = await getBartenderToken(request);
   const jobId = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");
-  const job = await getJobById(jobId, bartenderToken);
-  if (!CompletedJobs.has(job.state)) {
-    throw new Error("Job is not completed");
-  }
+  await getCompletedJobById(jobId, bartenderToken);
   const formData = await request.formData();
   const result = safeParse(WeightsSchema, Object.fromEntries(formData));
   if (!result.success) {

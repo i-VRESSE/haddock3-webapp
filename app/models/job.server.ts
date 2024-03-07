@@ -4,7 +4,7 @@ import {
   JOB_OUTPUT_DIR,
   WORKFLOW_CONFIG_FILENAME,
 } from "../bartender-client/constants";
-import type { DirectoryItem } from "~/bartender-client/types";
+import { CompletedJobs, type DirectoryItem } from "~/bartender-client/types";
 import { BartenderError } from "./errors";
 
 const BOOK_KEEPING_FILES = [
@@ -51,6 +51,17 @@ export async function getJobById(jobid: number, bartenderToken: string) {
     throw error;
   }
   return data;
+}
+
+export async function getCompletedJobById(
+  jobid: number,
+  bartenderToken: string
+) {
+  const job = await getJobById(jobid, bartenderToken);
+  if (!CompletedJobs.has(job.state)) {
+    throw new Error("Job is not completed");
+  }
+  return job;
 }
 
 export async function getJobStdout(jobid: number, bartenderToken: string) {
