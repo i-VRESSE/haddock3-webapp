@@ -80,3 +80,24 @@ To fetch catalogs from another branch then `main` in the workflow builder repo u
 ```shell
 WBTAG='someotherbranchname' npm run catalogs
 ```
+
+## Assigning jobs to another user
+
+Jobs stored in the bartender service has a submitter field, which is the user identifier of the user who submitted the job in the haddock3 web application.
+
+For example when you wiped the webapp database then you might want to assign the jobs of a previous user to yourself.
+
+Step 1 is to find out the user identifier of yourself. You can do this with
+
+```shell
+npm run psql:dev
+SELECT id FROM users WHERE email='<your email address>';
+```
+
+Step 2 is to update the submitter field of the jobs you want to assign to yourself. You can do this with
+
+```shell
+docker exec -ti <id/name of bartender postgresql container> psql -U bartender
+UPDATE job SET submitter='<your user identifier>' WHERE submitter='<user identifier of previous user>';
+# To take ownership of all jobs, drop the WHERE clause
+```
