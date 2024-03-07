@@ -4,10 +4,9 @@ import { Link, useLoaderData } from "@remix-run/react";
 
 import {
   jobIdFromParams,
-  getJobById,
   jobHasWorkflow,
+  getCompletedJobById,
 } from "~/models/job.server";
-import { CompletedJobs } from "~/bartender-client/types";
 import { ClientOnly } from "~/components/ClientOnly";
 import { getBartenderToken } from "~/bartender-client/token.server";
 import type { CaprievalData } from "~/caprieval/caprieval.server";
@@ -26,10 +25,7 @@ import { buttonVariants } from "~/components/ui/button";
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobid = jobIdFromParams(params);
   const bartenderToken = await getBartenderToken(request);
-  const job = await getJobById(jobid, bartenderToken);
-  if (!CompletedJobs.has(job.state)) {
-    throw new Error("Job is not completed");
-  }
+  const job = await getCompletedJobById(jobid, bartenderToken);
   const hasWorkflow = await jobHasWorkflow(jobid, bartenderToken);
 
   try {
@@ -52,9 +48,10 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   } catch (error) {
     if (
       error instanceof Error &&
-      error.message === "No caprieval scores found"
+      (error.message === "No caprieval module found" ||
+        error.message === "No caprieval scores found")
     ) {
-      return redirect("browse");
+      return redirect(`/jobs/${jobid}/browse`);
     }
     throw error;
   }

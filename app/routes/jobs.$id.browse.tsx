@@ -4,11 +4,10 @@ import { Link, useLoaderData } from "@remix-run/react";
 import { getBartenderToken } from "~/bartender-client/token.server";
 import {
   listOutputFiles,
-  getJobById,
   listInputFiles,
   jobIdFromParams,
+  getCompletedJobById,
 } from "~/models/job.server";
-import { CompletedJobs } from "~/bartender-client/types";
 import { JobStatus } from "~/components/JobStatus";
 import { ListFiles } from "~/browse/ListFiles";
 import { NonModuleOutputFiles } from "~/browse/NonModuleOutputFiles";
@@ -23,10 +22,7 @@ import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
   const token = await getBartenderToken(request);
-  const job = await getJobById(jobId, token);
-  if (!CompletedJobs.has(job.state)) {
-    throw new Error("Job is not completed");
-  }
+  const job = await getCompletedJobById(jobId, token);
   const inputFiles = await listInputFiles(jobId, token);
   const outputFiles = await listOutputFiles(jobId, token);
   let hasCaprieval = true;

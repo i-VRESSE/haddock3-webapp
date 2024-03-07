@@ -13,9 +13,9 @@ import { getBartenderToken } from "~/bartender-client/token.server";
 import { ErrorMessages } from "~/components/ErrorMessages";
 import {
   jobIdFromParams,
-  getJobById,
   buildPath,
   listOutputFiles,
+  getCompletedJobById,
 } from "~/models/job.server";
 import {
   Schema,
@@ -23,7 +23,6 @@ import {
   getParams,
   reclustfcc,
 } from "~/tools/reclustfcc.server";
-import { CompletedJobs } from "~/bartender-client/types";
 import { ClientOnly } from "~/components/ClientOnly";
 import { getModuleDescriptions } from "~/catalogs/descriptionsFromSchema";
 import { moduleInfo } from "~/models/module_utils";
@@ -51,10 +50,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobid = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");
   const bartenderToken = await getBartenderToken(request);
-  const job = await getJobById(jobid, bartenderToken);
-  if (!CompletedJobs.has(job.state)) {
-    throw new Error("Job is not completed");
-  }
+  await getCompletedJobById(jobid, bartenderToken);
   const outputFiles = await listOutputFiles(jobid, bartenderToken, 1);
   const [moduleName, hasInteractiveVersion, moduleIndexPadding] = moduleInfo(
     outputFiles,
@@ -64,29 +60,26 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     request.url,
     hasInteractiveVersion
   );
-  const defaultValues = await getParams({
+  const info = {
     jobid,
-    moduleIndex,
     isInteractive: showInteractiveVersion,
     bartenderToken,
     moduleIndexPadding,
+  };
+  const defaultValues = await getParams({
+    moduleIndex,
+    ...info,
   });
   const clusters = await getClusters({
-    jobid,
     moduleIndex,
-    isInteractive: showInteractiveVersion,
-    bartenderToken,
-    moduleIndexPadding,
+    ...info,
   });
   let caprievalData;
   if (showInteractiveVersion) {
     const { scatterSelection, boxSelection } = getPlotSelection(request.url);
     caprievalData = await getCaprievalData({
-      jobid,
       module: moduleIndex,
-      isInteractive: showInteractiveVersion,
-      bartenderToken,
-      moduleIndexPadding,
+      ...info,
       scatterSelection,
       boxSelection,
       moduleName: "clustfcc",
@@ -109,10 +102,7 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
   const bartenderToken = await getBartenderToken(request);
   const jobId = jobIdFromParams(params);
   const moduleIndex = parseInt(params.module ?? "");
-  const job = await getJobById(jobId, bartenderToken);
-  if (!CompletedJobs.has(job.state)) {
-    throw new Error("Job is not completed");
-  }
+  await getCompletedJobById(jobId, bartenderToken);
   const formData = await request.formData();
   const result = safeParse(Schema, Object.fromEntries(formData));
   if (!result.success) {

@@ -10,7 +10,8 @@
 
 A user can only submit jobs when he/she is logged in and has at least one expertise level.
 A super user can assign an expertise level to users at http://localhost:3000/admin/users.
-A super user can be made through the admin page (`/admin/users`) or by being the first registered user.
+A super user can be made through the admin page (`/admin/users`).
+The first registered user is automatically a super user and has all expertise levels.
 
 ## Session
 

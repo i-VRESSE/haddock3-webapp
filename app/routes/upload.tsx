@@ -65,9 +65,12 @@ function flattenValidationErrors(error: ValidationError) {
   return error.errors.map((e) => {
     let message = e.message;
     if (e.workflowPath) {
-      message = `Error in ${e.workflowPath}: ${message}`;
+      message = `Error in ${e.workflowPath}${e.instancePath}: ${message}`;
       if (e.params.additionalProperty) {
         message += `: ${e.params.additionalProperty}`;
+      }
+      if (e.params.allowedValues) {
+        message += `: ${e.params.allowedValues.join(", ")}`;
       }
     }
     return message;

@@ -49,18 +49,10 @@ BARTENDER_PUBLIC_KEY=public_key.pem
 
 ## Haddock3 application
 
-This web app expects that the following application is registered in bartender web service.
+This web app **requires** that certain applications and interactive applications are configured in the bartender web service.
+See [config-haddock3.yaml](https://github.com/i-VRESSE/bartender/blob/main/config-haddock3.yaml) for the required configuration.
 
-```yaml
-applications:
-  haddock3:
-    command: haddock3 $config
-    config: workflow.cfg
-```
-
-This allows the archive generated with the workflow builder to be submitted.
-
-The application should not have `allowed_roles` configured as the haddock3 web application will only allow users to submit jobs that have an expertise level and generate a bartender token without roles.
+If haddock3 command can not be found by bartender service in PATH then use an absolute path to it.
 
 ## Haddock3 catalogs
 
@@ -79,4 +71,25 @@ To fetch catalogs from another branch then `main` in the workflow builder repo u
 
 ```shell
 WBTAG='someotherbranchname' npm run catalogs
+```
+
+## Assigning jobs to another user
+
+The bartender service stores the user id of who submitted the job in the haddock3 web application.
+
+Reassigning jobs to another user can be done with the following steps.
+
+First is to find out the user identifier of yourself. You can do this with
+
+```shell
+npm run psql:dev
+SELECT id FROM users WHERE email='<your email address>';
+```
+
+Next is to update the submitter field of the jobs you want to assign to yourself. You can do this with
+
+```shell
+docker exec -ti <id/name of bartender postgresql container> psql -U bartender
+UPDATE job SET submitter='<your user identifier>' WHERE submitter='<user identifier of previous user>';
+# To take ownership of all jobs, drop the WHERE clause
 ```
