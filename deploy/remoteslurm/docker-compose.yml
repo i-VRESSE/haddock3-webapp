@@ -8,7 +8,7 @@ services:
       dockerfile: deploy/Dockerfile
     restart: always
     entrypoint: /usr/bin/sh
-    command: ["-c", "/wait && npx prisma migrate deploy && npm run start"]
+    command: ["-c", "/wait && npm run setup && npm run start"]
     depends_on:
       bartender:
         condition: service_started
@@ -102,7 +102,6 @@ services:
     restart: "no"
 
 volumes:
-  # Tried to use single postgres, but prisma complains about non-empty database (P3005 error).
   webapp-db-data:
   bartender-db-data:
   bartender-job-data:

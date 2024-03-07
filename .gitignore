@@ -12,8 +12,6 @@ node_modules
 /sessions
 /coverage
 
-/prisma/dev.db
-
 /private_key.pem
 /public_key.pem
 

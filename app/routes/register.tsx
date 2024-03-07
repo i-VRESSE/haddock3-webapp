@@ -15,9 +15,8 @@ import {
   safeParse,
   string,
 } from "valibot";
-import { Prisma } from "@prisma/client";
 import { authenticator } from "~/auth.server";
-import { register } from "~/models/user.server";
+import { EmailAlreadyRegisteredError, register } from "~/models/user.server";
 import { commitSession, getSession } from "~/session.server";
 import { ErrorMessages } from "../components/ErrorMessages";
 import { Label } from "~/components/ui/label";
@@ -62,15 +61,11 @@ export async function action({ request }: ActionFunctionArgs) {
     const headers = new Headers({ "Set-Cookie": await commitSession(session) });
     return redirect("/", { headers });
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      const uniqueConstraintErrorCode = "P2002";
-      if (error.code === uniqueConstraintErrorCode) {
-        const errors: FlatErrors = {
-          nested: { username: ["This email is already registered."] },
-        };
-        return json({ errors }, { status: 400 });
-      }
-      throw error;
+    if (error instanceof EmailAlreadyRegisteredError) {
+      const errors: FlatErrors = {
+        nested: { username: ["This email is already registered."] },
+      };
+      return json({ errors }, { status: 400 });
     }
     throw error;
   }

@@ -71,10 +71,8 @@ The database can be initialized with
 
 ```sh
 npm run setup
-# This will generate prisma client, create tables and insert seed data
+# This will create tables
 ```
-
-(You can reset database with `npx prisma migrate reset`.)
 
 Start [remix](https://remix.run) development server from your terminal with:
 
@@ -87,10 +85,7 @@ This will refresh & rebuild assets on file changes.
 ## Other development commands
 
 The database setup should be run only once for a fresh database.
-Whenever you change the `prisma/schema.prisma` file you need to
-
-1. Use [prisma migrate](https://www.prisma.io/docs/concepts/components/prisma-migrate) to generate a migration and to update the database.
-2. Run `npx prisma generate` to generate the prisma client.
+Whenever you change the `app/drizzle/schema.server.ts` file you need to run [npm run generate:migration](https://orm.drizzle.team/kit-docs/commands#generate-migrations) to generate a migration, edit generated `app/drizzle/*.sql` file if needed and then run `npm run setup` to apply migration to database.
 
 To format according to [prettier](https://prettier.io) run
 
