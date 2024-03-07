@@ -75,9 +75,9 @@ WBTAG='someotherbranchname' npm run catalogs
 
 ## Assigning jobs to another user
 
-Jobs stored in the bartender service have a submitter field, which is from the user who submitted the job in the haddock3 web application.
+The bartender service stores the user id of who submitted the job in the haddock3 web application.
 
-Reassigning can be useful for example when you wiped the webapp database then you might want to assign the jobs of a previous user to your new user id.
+Reassigning jobs to another user can be done with the following steps.
 
 First is to find out the user identifier of yourself. You can do this with
 
