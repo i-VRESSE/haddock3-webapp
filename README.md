@@ -127,6 +127,7 @@ npm run build
 Then run the app in production mode:
 
 ```sh
+export $(cat .env |grep -v '#' |xargs)
 npm start
 ```
 
