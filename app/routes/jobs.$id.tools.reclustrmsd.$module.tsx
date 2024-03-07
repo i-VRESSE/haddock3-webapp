@@ -57,29 +57,26 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     request.url,
     hasInteractiveVersion
   );
-  const defaultValues = await getParams({
+  const info = {
     jobid: jobId,
-    moduleIndex,
     isInteractive: showInteractiveVersion,
     bartenderToken,
     moduleIndexPadding,
+  }
+  const defaultValues = await getParams({
+    moduleIndex,
+    ...info,
   });
   const clusters = await getClusters({
-    jobid: jobId,
     moduleIndex,
-    isInteractive: showInteractiveVersion,
-    bartenderToken,
-    moduleIndexPadding,
+    ...info,
   });
   let caprievalData;
   if (showInteractiveVersion) {
     const { scatterSelection, boxSelection } = getPlotSelection(request.url);
     caprievalData = await getCaprievalData({
-      jobid: jobId,
       module: moduleIndex,
-      isInteractive: showInteractiveVersion,
-      bartenderToken,
-      moduleIndexPadding,
+      ...info,
       scatterSelection,
       boxSelection,
       moduleName: "clustrmsd",
