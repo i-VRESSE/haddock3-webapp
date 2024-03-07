@@ -4,7 +4,7 @@ import type { ContactMapCluster } from "./contactmap.server";
 export function Cluster({ cluster }: { cluster: ContactMapCluster }) {
   return (
     <div>
-      <div className="flex">
+      <div className="flex py-4">
         <PlotlyPlot
           data={cluster.chordchart.data}
           layout={cluster.chordchart.layout}
