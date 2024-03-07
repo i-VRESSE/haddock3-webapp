@@ -50,7 +50,8 @@ export async function register(email: string, password: string) {
   if (isAdmin) {
     // First user also gets all expertise levels
     value.expertiseLevels = expertiseLevel.enumValues;
-    value.preferredExpertiseLevel = expertiseLevel.enumValues[expertiseLevel.enumValues.length - 1];
+    value.preferredExpertiseLevel =
+      expertiseLevel.enumValues[expertiseLevel.enumValues.length - 1];
   }
   try {
     const newUser = await db.insert(users).values(value).returning({
