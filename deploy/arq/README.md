@@ -10,7 +10,7 @@ docker compose -f deploy/arq/docker-compose.yml up --build
 
 The haddock3 webapp should be running on http://localhost:8080
 
-Next steps are to go to http://localhost:8080/register to register as admin, give your self an expertise level at http://localhost:8080/admin/users and finally submit a job.
+Next steps are to go to http://localhost:8080/register to register as admin and finally submit a job.
 
 ## Configuration
 
