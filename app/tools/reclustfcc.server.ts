@@ -1,15 +1,6 @@
-import { buildPath, getJobfile } from "~/models/job.server";
+import { getParamsCfg } from "~/models/job.server";
 import { getClusterTsv } from "./recluster.server";
-import {
-  object,
-  number,
-  coerce,
-  finite,
-  type Output,
-  integer,
-  parse,
-} from "valibot";
-import { parse as parseTOML } from "@ltd/j-toml";
+import { object, number, coerce, finite, type Output, integer } from "valibot";
 import { createClient } from "~/models/config.server";
 
 export const Schema = object({
@@ -32,22 +23,15 @@ export async function getParams({
   moduleIndexPadding: number;
   isInteractive: boolean;
 }): Promise<Schema> {
-  const path = buildPath({
+  return await getParamsCfg({
+    jobid,
     moduleIndex,
-    isInteractive,
+    bartenderToken,
     moduleIndexPadding,
     moduleName: "clustfcc",
-    suffix: "params.cfg",
+    schema: Schema,
+    isInteractive,
   });
-  const response = await getJobfile(jobid, path, bartenderToken);
-  const body = await response.text();
-  let config = parseTOML(body, { bigint: false });
-  if (!isInteractive) {
-    // non-interactive has `[clustfcc]` section
-    config = config.clustfcc as typeof config;
-  }
-  const params = parse(Schema, config);
-  return params;
 }
 
 export async function getClusters(options: {

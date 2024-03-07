@@ -1,13 +1,19 @@
+import { Output, boolean, object } from "valibot";
 import type { PlotlyProps } from "~/components/PlotlyPlot";
 import { getPlotFromHtml } from "~/lib/html";
-import { buildPath, fetchHtml, listOutputFiles } from "~/models/job.server";
+import {
+  buildPath,
+  fetchHtml,
+  getParamsCfg,
+  listOutputFiles,
+} from "~/models/job.server";
 import { moduleInfo } from "~/models/module_utils";
 
 export interface ContactMapCluster {
   id: number;
   name: string;
-  chordchart: PlotlyProps;
-  heatmap: PlotlyProps;
+  chordchart?: PlotlyProps;
+  heatmap?: PlotlyProps;
   contacts: string;
   heavyatoms_interchain_contacts: string;
   interchain_contacts: string;
@@ -37,6 +43,35 @@ export async function isContactMapModule(
   return { indexPadding, name, jobid, index };
 }
 
+export const Schema = object({
+  // use underscore to match haddock3 naming
+  generate_chordchart: boolean(),
+  generate_heatmap: boolean(),
+});
+export type Schema = Output<typeof Schema>;
+
+export async function getParams({
+  jobid,
+  moduleIndex,
+  bartenderToken,
+  moduleIndexPadding,
+}: {
+  jobid: number;
+  moduleIndex: number;
+  bartenderToken: string;
+  moduleIndexPadding: number;
+}): Promise<Schema> {
+  return await getParamsCfg({
+    jobid,
+    moduleIndex,
+    bartenderToken,
+    moduleIndexPadding,
+    moduleName: "contactmap",
+    schema: Schema,
+    isInteractive: false,
+  });
+}
+
 export async function getClusters(
   module: ModuleInfo,
   bartenderToken: string
@@ -57,12 +92,27 @@ export async function getClusters(
 export async function getClusterInfo(
   clusterId: number,
   module: ModuleInfo,
-  bartenderToken: string
+  bartenderToken: string,
+  params: Schema
 ): Promise<ContactMapCluster> {
-  const [chordchart, heatmap] = await Promise.all([
-    getChartData(clusterId, module, bartenderToken, "contmap_chordchart"),
-    getChartData(clusterId, module, bartenderToken, "contmap_heatmap"),
-  ]);
+  let chordchart: PlotlyProps | undefined = undefined;
+  if (params.generate_chordchart) {
+    chordchart = await getChartData(
+      clusterId,
+      module,
+      bartenderToken,
+      "contmap_chordchart"
+    );
+  }
+  let heatmap: PlotlyProps | undefined = undefined;
+  if (params.generate_heatmap) {
+    heatmap = await getChartData(
+      clusterId,
+      module,
+      bartenderToken,
+      "contmap_heatmap"
+    );
+  }
   return {
     id: clusterId,
     name: `Cluster_${clusterId}`,

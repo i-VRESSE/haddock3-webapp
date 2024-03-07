@@ -1,4 +1,7 @@
 import type { Params } from "@remix-run/react";
+
+import { parse as parseTOML } from "@ltd/j-toml";
+
 import { createClient } from "./config.server";
 import {
   JOB_OUTPUT_DIR,
@@ -6,6 +9,7 @@ import {
 } from "../bartender-client/constants";
 import { CompletedJobs, type DirectoryItem } from "~/bartender-client/types";
 import { BartenderError } from "./errors";
+import { type Output, parse, BaseSchema } from "valibot";
 
 const BOOK_KEEPING_FILES = [
   "stderr.txt",
@@ -369,4 +373,39 @@ export async function fetchHtml({
     throw new Error(`could not get ${htmlFilename}`);
   }
   return await response.text();
+}
+
+export async function getParamsCfg<Schema extends BaseSchema>({
+  jobid,
+  moduleIndex,
+  bartenderToken,
+  moduleIndexPadding,
+  moduleName,
+  schema,
+  isInteractive = false,
+}: {
+  jobid: number;
+  moduleIndex: number;
+  bartenderToken: string;
+  moduleIndexPadding: number;
+  isInteractive: boolean;
+  moduleName: string;
+  schema: Schema;
+}): Promise<Output<Schema>> {
+  const path = buildPath({
+    moduleIndex,
+    isInteractive,
+    moduleIndexPadding,
+    moduleName,
+    suffix: "params.cfg",
+  });
+  const response = await getJobfile(jobid, path, bartenderToken);
+  const body = await response.text();
+  let config = parseTOML(body, { bigint: false });
+  if (!isInteractive) {
+    // non-interactive has `[<module name>]` section
+    config = config[moduleName] as typeof config;
+  }
+  const params = parse(schema, config);
+  return params;
 }

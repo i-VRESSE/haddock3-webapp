@@ -1,16 +1,7 @@
 import type { Output } from "valibot";
-import {
-  object,
-  coerce,
-  number,
-  optional,
-  picklist,
-  integer,
-  parse,
-} from "valibot";
-import { parse as parseTOML } from "@ltd/j-toml";
+import { object, coerce, number, optional, picklist, integer } from "valibot";
 
-import { buildPath, getJobfile } from "~/models/job.server";
+import { getParamsCfg } from "~/models/job.server";
 import { getClusterTsv } from "./recluster.server";
 import { createClient } from "~/models/config.server";
 
@@ -36,22 +27,15 @@ export async function getParams({
   moduleIndexPadding: number;
   isInteractive: boolean;
 }): Promise<Schema> {
-  const path = buildPath({
+  return await getParamsCfg({
+    jobid,
     moduleIndex,
-    isInteractive,
+    bartenderToken,
     moduleIndexPadding,
     moduleName: "clustrmsd",
-    suffix: "params.cfg",
+    schema: Schema,
+    isInteractive,
   });
-  const response = await getJobfile(jobid, path, bartenderToken);
-  const body = await response.text();
-  let config = parseTOML(body, { bigint: false });
-  if (!isInteractive) {
-    // non-interactive has `[clustrmsd]` section
-    config = config.clustrmsd as typeof config;
-  }
-  const params = parse(Schema, config);
-  return params;
 }
 
 export async function getClusters(options: {

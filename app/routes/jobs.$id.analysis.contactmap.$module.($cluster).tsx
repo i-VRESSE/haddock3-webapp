@@ -9,6 +9,7 @@ import {
   getClusterInfo,
   isContactMapModule,
   ContactMapCluster,
+  getParams,
 } from "~/contactmap/contactmap.server";
 import { Cluster } from "~/contactmap/Cluster.client";
 import { ClientOnly } from "~/components/ClientOnly";
@@ -24,6 +25,13 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     moduleIndex,
     bartenderToken
   );
+  const moduleParams = await getParams({
+    jobid,
+    moduleIndex,
+    bartenderToken,
+    moduleIndexPadding: moduleInfo.indexPadding,
+  });
+
   const clusterIds = await getClusters(moduleInfo, bartenderToken);
   if (params.cluster === undefined) {
     return redirect(
@@ -34,7 +42,8 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const cluster = await getClusterInfo(
     parseInt(clusterId),
     moduleInfo,
-    bartenderToken
+    bartenderToken,
+    moduleParams
   );
   return json({ moduleIndex, clusterIds, cluster, jobid });
 };

@@ -5,14 +5,18 @@ export function Cluster({ cluster }: { cluster: ContactMapCluster }) {
   return (
     <div>
       <div className="flex py-4">
-        <PlotlyPlot
-          data={cluster.chordchart.data}
-          layout={cluster.chordchart.layout}
-        />
-        <PlotlyPlot
-          data={cluster.heatmap.data}
-          layout={cluster.heatmap.layout}
-        />
+        {cluster.chordchart && (
+          <PlotlyPlot
+            data={cluster.chordchart.data}
+            layout={cluster.chordchart.layout}
+          />
+        )}
+        {cluster.heatmap && (
+          <PlotlyPlot
+            data={cluster.heatmap.data}
+            layout={cluster.heatmap.layout}
+          />
+        )}
       </div>
       <div className="flex flex-row gap-4">
         <span>Download:</span>
