@@ -76,17 +76,17 @@ export const OutputReport = ({
                 )}
                 {module.name === "contactmap" && (
                   <Link
-                    title="Recluster"
+                    title="Contact map report"
                     to={`/jobs/${jobid}/analysis/contactmap/${module.id}`}
                     className="dark:invert"
                   >
-                    &#128202;
+                    &#128208;
                   </Link>
                 )}
                 {module.report && (
                   <>
                     <a
-                      title="Analysis report"
+                      title="Caprieval analysis report"
                       target="_blank"
                       rel="noreferrer"
                       href={`/jobs/${jobid}/files/${module.report.path}`}
