@@ -1,7 +1,12 @@
-import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
+import {
+  json,
+  redirect,
+  type LoaderFunctionArgs,
+  ActionFunctionArgs,
+} from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
-import { getJobById, jobIdFromParams } from "~/models/job.server";
+import { deleteJob, getJobById, jobIdFromParams } from "~/models/job.server";
 import { getUser } from "~/auth.server";
 import { JobStatus } from "~/components/JobStatus";
 import { getBartenderTokenByUser } from "~/bartender-client/token.server";
@@ -20,6 +25,17 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   }
 
   return json({ job });
+};
+
+export const action = async ({ params, request }: ActionFunctionArgs) => {
+  if (request.method !== "DELETE") {
+    return json({ error: "Invalid method" }, { status: 405 });
+  }
+  const jobId = jobIdFromParams(params);
+  const user = await getUser(request);
+  const token = await getBartenderTokenByUser(user);
+  await deleteJob(jobId, token);
+  return null;
 };
 
 export default function JobPage() {

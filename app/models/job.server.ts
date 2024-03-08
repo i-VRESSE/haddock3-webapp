@@ -68,6 +68,20 @@ export async function getCompletedJobById(
   return job;
 }
 
+export async function deleteJob(jobid: number, bartenderToken: string) {
+  const client = createClient(bartenderToken);
+  const { error } = await client.DELETE("/api/job/{jobid}", {
+    params: {
+      path: {
+        jobid,
+      },
+    },
+  });
+  if (error) {
+    throw error;
+  }
+}
+
 export async function getJobStdout(jobid: number, bartenderToken: string) {
   const client = createClient(bartenderToken);
   const { response } = await client.GET("/api/job/{jobid}/stdout", {

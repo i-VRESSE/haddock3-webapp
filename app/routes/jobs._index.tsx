@@ -1,7 +1,8 @@
 import { json, type LoaderFunctionArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 
 import { getBartenderToken } from "~/bartender-client/token.server";
+import { Button } from "~/components/ui/button";
 import {
   Table,
   TableBody,
@@ -20,6 +21,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export default function JobPage() {
   const { jobs } = useLoaderData<typeof loader>();
+  const { submit, state } = useFetcher();
+
+  function deleteJob(id: number): void {
+    if (window.confirm("Are you sure you want to delete job?") === false) {
+      return;
+    }
+    submit({}, { method: "delete", action: `/jobs/${id}` });
+  }
+
   // TODO add pagination, usefull for large number of jobs
   return (
     <main>
@@ -31,6 +41,7 @@ export default function JobPage() {
             <TableHead>Name</TableHead>
             <TableHead>Created on</TableHead>
             <TableHead>Updated on</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -54,6 +65,17 @@ export default function JobPage() {
                 <Link to={`/jobs/${job.id}`}>
                   {new Date(job.updated_on).toUTCString()}
                 </Link>
+              </TableCell>
+              <TableCell>
+                <Button
+                  disabled={state === "submitting"}
+                  onClick={() => deleteJob(job.id)}
+                  variant="secondary"
+                  title="Delete/cancel job"
+                  size="sm"
+                >
+                  X
+                </Button>
               </TableCell>
             </TableRow>
           ))}
