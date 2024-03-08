@@ -66,21 +66,6 @@ export async function reclustfcc({
     module_nr: moduleIndex,
     ...params,
   };
-  // Second submit fails with  No such file or directory: 'output/09_clustfcc_interactive/io.json'\n
-  // workaround before second submit do `cp output/09_clustfcc/io.json output/09_clustfcc_interactive/io.json`
-  // nope still errors gives:
-  // returncode: 1,
-  // stderr: 'Traceback (most recent call last):\n' +
-  //   '  File "/home/stefanv/git/ivresse/haddock3/venv/bin/haddock3-re", line 33, in <module>\n' +
-  //   "    sys.exit(load_entry_point('haddock3', 'console_scripts', 'haddock3-re')())\n" +
-  //   '  File "/home/stefanv/git/ivresse/haddock3/src/haddock/clis/cli_re.py", line 57, in maincli\n' +
-  //   '    args.func(**cmd)\n' +
-  //   '  File "/home/stefanv/git/ivresse/haddock3/src/haddock/re/clustfcc.py", line 110, in reclustfcc\n' +
-  //   '    clustfcc_params["fraction_cutoff"] = fraction_cutoff\n' +
-  //   "TypeError: 'EmptyPath' object does not support item assignment\n",
-  // stdout: '[2023-11-03 13:11:01,180 clustfcc INFO] Reclustering output/09_clustfcc_interactive/\n' +
-  //   '[2023-11-03 13:11:02,112 clustfcc INFO] Previous clustering parameters: \n'
-  console.log(body);
   const client = createClient(bartenderToken);
   const { data, error } = await client.POST(
     "/api/job/{jobid}/interactive/reclustfcc",
@@ -96,12 +81,13 @@ export async function reclustfcc({
   if (error) {
     throw error;
   }
-  if (data.stdout.includes("cancelling unsuccesful analysis")) {
-    console.error(data);
-    throw new Error("unsuccesful analysis");
-  }
   if (data.returncode !== 0) {
     console.error(data);
     throw new Error(`reclustfcc failed with return code ${data.returncode}`);
+  }
+  // TODO remove this when https://github.com/haddocking/haddock3/issues/821 is fixed
+  if (data.stdout.includes("cancelling unsuccesful analysis")) {
+    console.error(data);
+    throw new Error("unsuccesful analysis");
   }
 }
