@@ -80,7 +80,7 @@ export async function reclustfcc({
   //   "TypeError: 'EmptyPath' object does not support item assignment\n",
   // stdout: '[2023-11-03 13:11:01,180 clustfcc INFO] Reclustering output/09_clustfcc_interactive/\n' +
   //   '[2023-11-03 13:11:02,112 clustfcc INFO] Previous clustering parameters: \n'
-
+  console.log(body);
   const client = createClient(bartenderToken);
   const { data, error } = await client.POST(
     "/api/job/{jobid}/interactive/reclustfcc",
@@ -95,6 +95,10 @@ export async function reclustfcc({
   );
   if (error) {
     throw error;
+  }
+  if (data.stdout.includes("cancelling unsuccesful analysis")) {
+    console.error(data);
+    throw new Error("unsuccesful analysis");
   }
   if (data.returncode !== 0) {
     console.error(data);
