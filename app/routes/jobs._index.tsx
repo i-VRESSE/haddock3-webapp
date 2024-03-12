@@ -17,11 +17,11 @@ import {
   XIcon,
   PencilIcon,
 } from "lucide-react";
-
 import { PropsWithChildren, useState } from "react";
 
 import { getBartenderToken } from "~/bartender-client/token.server";
 import { JobModelDTO } from "~/bartender-client/types";
+import { DataTablePagination } from "~/components/DataTablePagination";
 import { Button } from "~/components/ui/button";
 import {
   Table,
@@ -86,18 +86,29 @@ function ColumnHeader({
   );
 }
 
+type Submit = ReturnType<typeof useFetcher>["submit"];
+
+function deleteJob(id: number, submit: Submit): void {
+  if (window.confirm("Are you sure you want to delete job?") === false) {
+    return;
+  }
+  submit({}, { method: "delete", action: `/jobs/${id}` });
+}
+
 function RenameAction({
-  onRename,
+  submit,
+  job,
   disabled,
 }: {
-  onRename: () => void;
+  submit: Submit;
+  job: JobModelDTO;
   disabled: boolean;
 }) {
   return (
     <Button
       disabled={disabled}
       variant="ghost"
-      onClick={onRename}
+      onClick={() => renameJob(job.id, job.name, submit)}
       title="Rename job"
       size="icon"
     >
@@ -106,18 +117,30 @@ function RenameAction({
   );
 }
 
+function renameJob(id: number, name: string, submit: Submit): void {
+  const newName = window.prompt("Enter new name for the job", name);
+  if (newName === null) {
+    return;
+  }
+  const data = new FormData();
+  data.set("name", newName);
+  submit(data, { method: "post", action: `/jobs/${id}/name` });
+}
+
 function DeleteAction({
-  onDelete,
+  job,
+  submit,
   disabled,
 }: {
-  onDelete: () => void;
+  submit: Submit;
+  job: JobModelDTO;
   disabled: boolean;
 }) {
   return (
     <Button
       variant="ghost"
       disabled={disabled}
-      onClick={onDelete}
+      onClick={() => deleteJob(job.id, submit)}
       title="Delete/cancel job"
       size="icon"
     >
@@ -128,6 +151,7 @@ function DeleteAction({
 
 export default function JobsPage() {
   const { jobs } = useLoaderData<typeof loader>();
+  const { submit, state: fetcherState } = useFetcher();
   const columns = [
     columnHelper.accessor("id", {
       cell: ({ row }) => (
@@ -172,19 +196,21 @@ export default function JobsPage() {
       header: ({ column }) => <ColumnHeader column={column} title="Actions" />,
       cell: ({ row }) => {
         // job in new or staging_out state cannot be deleted, you have to wait for job to switch to another state
-        const disabled =
-          state === "submitting" ||
+        const deleteDisabled =
+          fetcherState === "submitting" ||
           row.original.state === "new" ||
           row.original.state === "staging_out";
         return (
           <div className="flex items-center justify-center">
             <RenameAction
-              disabled={state === "submitting"}
-              onRename={() => renameJob(row.original.id, row.original.name)}
+              disabled={fetcherState === "submitting"}
+              submit={submit}
+              job={row.original}
             />
             <DeleteAction
-              onDelete={() => deleteJob(row.original.id)}
-              disabled={disabled}
+              submit={submit}
+              job={row.original}
+              disabled={deleteDisabled}
             />
           </div>
         );
@@ -213,25 +239,6 @@ export default function JobsPage() {
       },
     },
   });
-
-  const { submit, state } = useFetcher();
-
-  function deleteJob(id: number): void {
-    if (window.confirm("Are you sure you want to delete job?") === false) {
-      return;
-    }
-    submit({}, { method: "delete", action: `/jobs/${id}` });
-  }
-
-  function renameJob(id: number, name: string): void {
-    const newName = window.prompt("Enter new name for the job", name);
-    if (newName === null) {
-      return;
-    }
-    const data = new FormData();
-    data.set("name", newName);
-    submit(data, { method: "post", action: `/jobs/${id}/name` });
-  }
 
   return (
     <main>
@@ -274,24 +281,7 @@ export default function JobsPage() {
           )}
         </TableBody>
       </Table>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div>
+      <DataTablePagination table={table} />
     </main>
   );
 }
