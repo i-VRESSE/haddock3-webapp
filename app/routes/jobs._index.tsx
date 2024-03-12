@@ -209,7 +209,7 @@ export default function JobsPage() {
     },
     initialState: {
       pagination: {
-        pageSize: 6,
+        pageSize: 10,
       },
     },
   });
