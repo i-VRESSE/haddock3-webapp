@@ -28,7 +28,7 @@ export function jobIdFromParams(params: Params) {
 
 export async function getJobs(bartenderToken: string, limit = 100, offset = 0) {
   const client = createClient(bartenderToken);
-  const {data, response} = await client.GET("/api/job/", {
+  const { data, response } = await client.GET("/api/job/", {
     params: {
       query: {
         limit,
@@ -37,11 +37,10 @@ export async function getJobs(bartenderToken: string, limit = 100, offset = 0) {
     },
   });
   if (!response.ok || !data) {
-    throw response
+    throw response;
   }
-  return data
+  return data;
 }
-
 
 export async function getJobById(jobid: number, bartenderToken: string) {
   const client = createClient(bartenderToken);
@@ -53,7 +52,7 @@ export async function getJobById(jobid: number, bartenderToken: string) {
     },
   });
   if (!response.ok || !data) {
-    throw response
+    throw response;
   }
   return data;
 }
@@ -180,7 +179,7 @@ export async function listInputFiles(jobid: number, bartenderToken: string) {
     },
   });
   if (!response.ok || !data) {
-    throw response
+    throw response;
   }
   const nonInputFiles = new Set([...BOOK_KEEPING_FILES, JOB_OUTPUT_DIR]);
   // TODO instead of filtering here add exclude parameter to bartender endpoint.
@@ -319,7 +318,7 @@ export async function updateJobName(
     body: name,
   });
   if (!response.ok) {
-    throw response
+    throw response;
   }
 }
 
