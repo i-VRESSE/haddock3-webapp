@@ -89,7 +89,25 @@ export interface paths {
     get: operations["retrieve_job"];
     put?: never;
     post?: never;
-    delete?: never;
+    /**
+     * Delete Job
+     * @description Delete a job.
+     *
+     *     Deletes job from database and filesystem.
+     *
+     *     When job is queued or running it will be canceled
+     *     and removed from the filesystem where the job is located.
+     *
+     *     Args:
+     *         jobid: The job identifier.
+     *         job_dao: The job DAO.
+     *         job: The job.
+     *         user: The current user.
+     *         job_dir: The job directory.
+     *         destination: The destination of the job.
+     *         job_root_dir: The root directory of all jobs.
+     */
+    delete: operations["delete_job"];
     options?: never;
     head?: never;
     patch?: never;
@@ -627,6 +645,35 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["JobModelDTO"];
         };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  delete_job: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        jobid: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Validation Error */
       422: {

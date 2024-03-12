@@ -48,4 +48,5 @@ RUN cd src/fcc/src && make && cd .. && \
 RUN /usr/local/bin/pip install -r requirements.txt && /usr/local/bin/pip install . && \
     mkdir -p /usr/local/lib/python3.9/bin
 COPY cns /usr/local/lib/python3.9/bin/cns
+RUN chmod +rx /usr/local/lib/python3.9/bin/cns
 WORKDIR /

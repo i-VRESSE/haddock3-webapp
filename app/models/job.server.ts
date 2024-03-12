@@ -28,7 +28,7 @@ export function jobIdFromParams(params: Params) {
 
 export async function getJobs(bartenderToken: string, limit = 100, offset = 0) {
   const client = createClient(bartenderToken);
-  const { data, error } = await client.GET("/api/job/", {
+  const { data, response } = await client.GET("/api/job/", {
     params: {
       query: {
         limit,
@@ -36,23 +36,23 @@ export async function getJobs(bartenderToken: string, limit = 100, offset = 0) {
       },
     },
   });
-  if (error) {
-    throw error;
+  if (!response.ok || !data) {
+    throw response;
   }
   return data;
 }
 
 export async function getJobById(jobid: number, bartenderToken: string) {
   const client = createClient(bartenderToken);
-  const { data, error } = await client.GET("/api/job/{jobid}", {
+  const { data, response } = await client.GET("/api/job/{jobid}", {
     params: {
       path: {
         jobid,
       },
     },
   });
-  if (error) {
-    throw error;
+  if (!response.ok || !data) {
+    throw response;
   }
   return data;
 }
@@ -66,6 +66,20 @@ export async function getCompletedJobById(
     throw new Error("Job is not completed");
   }
   return job;
+}
+
+export async function deleteJob(jobid: number, bartenderToken: string) {
+  const client = createClient(bartenderToken);
+  const { response } = await client.DELETE("/api/job/{jobid}", {
+    params: {
+      path: {
+        jobid,
+      },
+    },
+  });
+  if (!response.ok) {
+    throw response;
+  }
 }
 
 export async function getJobStdout(jobid: number, bartenderToken: string) {
@@ -154,7 +168,7 @@ export async function listOutputFiles(
 
 export async function listInputFiles(jobid: number, bartenderToken: string) {
   const client = createClient(bartenderToken);
-  const { data, error } = await client.GET("/api/job/{jobid}/directories", {
+  const { data, response } = await client.GET("/api/job/{jobid}/directories", {
     params: {
       path: {
         jobid,
@@ -164,8 +178,8 @@ export async function listInputFiles(jobid: number, bartenderToken: string) {
       },
     },
   });
-  if (error) {
-    throw error;
+  if (!response.ok || !data) {
+    throw response;
   }
   const nonInputFiles = new Set([...BOOK_KEEPING_FILES, JOB_OUTPUT_DIR]);
   // TODO instead of filtering here add exclude parameter to bartender endpoint.
@@ -295,7 +309,7 @@ export async function updateJobName(
   bartenderToken: string
 ) {
   const client = createClient(bartenderToken);
-  const { error } = await client.POST("/api/job/{jobid}/name", {
+  const { response } = await client.POST("/api/job/{jobid}/name", {
     params: {
       path: {
         jobid,
@@ -303,8 +317,8 @@ export async function updateJobName(
     },
     body: name,
   });
-  if (error) {
-    throw error;
+  if (!response.ok) {
+    throw response;
   }
 }
 
