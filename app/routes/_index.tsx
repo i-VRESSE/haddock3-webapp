@@ -11,6 +11,12 @@ const cards = [
     description: "Use the workflow builder to create and submit a job.",
   },
   {
+    target: "/scenarios",
+    image: builder_image,
+    title: "Scenarios",
+    description: "Explore and run predefined workflows.",
+  },
+  {
     target: "/upload",
     image: upload_image,
     title: "Upload",
