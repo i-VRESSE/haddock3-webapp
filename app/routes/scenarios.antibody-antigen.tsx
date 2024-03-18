@@ -6,6 +6,7 @@ import { ErrorMessages } from "~/components/ErrorMessages";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { Molecule3D } from "~/scenario-antibody-antigen/Molecule3D.client";
 import { Viewer } from "~/scenario-antibody-antigen/Viewer.client";
 
 function FormItem({
@@ -53,7 +54,7 @@ export default function AntibodyAntigenScenario() {
         </a>
       </p>
     <Form method="post">
-<div className="columns-2">
+<div className="grid gap-6 grid-cols-2">
     <div>
         <FormItem
             name="antibody"
@@ -113,11 +114,6 @@ export default function AntibodyAntigenScenario() {
         </FormItem>
 
     </div>
-    {Viewer !== undefined && 
-    <Viewer
-        antibodyFile={antibodyFile}
-    />
-}
 </div>
         
          <div className="mt-4">
@@ -125,6 +121,14 @@ export default function AntibodyAntigenScenario() {
         <Button variant="secondary">Refine in builder</Button>
             </div>   
       </Form>
+      {(Molecule3D !== undefined && antibodyFile) ?
+      <Molecule3D
+        file={antibodyFile}
+      />
+      :
+      <div className="relative w-[800px] h-[400px]">Loading...</div>
+
+    }
     </div>
   );
 }
