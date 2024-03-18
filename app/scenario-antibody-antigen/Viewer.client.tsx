@@ -1,6 +1,39 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Stage, type StructureComponent } from "ngl";
 
+/*
+import "molstar/lib/mol-plugin-ui/skin/light.scss";
+
+import pdb1 from "./4G6K_fv.pdb?url";
+
+      const trajectory =
+        await window.molstar.builders.structure.parseTrajectory(data, "pdb");
+      const model = await window.molstar.builders.structure.createModel(trajectory);
+      const structure = await window.molstar.builders.structure.createStructure(model);
+
+      // add 3D representation of the paratope selection with type=cartoon, colortheme=uniform, value=red, sizetheme=uniform
+      const paratropeResidues = [31, 32, 33, 34, 35, 52, 54, 55, 56, 100, 101, 102, 103, 104, 105, 106, 1031, 1032, 1049, 1050, 1053, 1091, 1092, 1093, 1094, 1096];
+      const rs = MolScriptBuilder.struct.atomProperty.macromolecular.label_seq_id
+      const expr = MolScriptBuilder.struct.generator.atomGroups({
+        'residue-test': MolScriptBuilder.core.logic.or(
+            paratropeResidues.map(r => MolScriptBuilder.core.rel.eq([rs(), r]))
+        ),
+      })
+      const paratopeComponent = await window.molstar.builders.structure.tryCreateComponentFromExpression(
+          structure, expr, 'paratope'
+      )
+      if (paratopeComponent) {
+        await window.molstar.builders.structure.representation.addRepresentation(
+            paratopeComponent, { type: 'cartoon', color: 'uniform', colorParams: { value: 0xFF0000 }, size: 'uniform' }
+            )
+      }
+      await window.molstar.builders.structure.hierarchy.applyPreset(
+        trajectory,
+        "default"
+      );
+
+*/
+
 export function Viewer({ antibodyFile }: { antibodyFile: File | undefined }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const stage = useRef<Stage | null>(null);
