@@ -17,7 +17,7 @@ const scenarios: Scenario[] = [
     url: "/scenarios/protein-protein",
     title: "Protein Protein",
     description: "Based on HADDOCK2.4 Protein Protein docking tutorial",
-  }
+  },
 ];
 
 function ScenarioCard({ url, title, description }: Scenario) {
@@ -37,7 +37,7 @@ export default function ScenariosIndex() {
   return (
     <main>
       <h1 className="text-3xl">Scenarios</h1>
-      <div className="flex flex-wrap justify-start p-24 gap-4">
+      <div className="flex flex-wrap justify-start gap-4 p-24">
         {scenarios.map((scenario) => (
           <ScenarioCard key={scenario.url} {...scenario} />
         ))}

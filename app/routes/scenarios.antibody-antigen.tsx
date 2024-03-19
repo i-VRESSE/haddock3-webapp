@@ -160,7 +160,8 @@ export default function AntibodyAntigenScenario() {
           href="https://www.bonvinlab.org/education/HADDOCK3/HADDOCK3-antibody-antigen/"
         >
           HADDOCK3 Antibody Antigen tutorial
-        </a>.
+        </a>
+        .
       </p>
       <form onSubmit={onSubmit}>
         <div className="grid grid-cols-2 gap-6">

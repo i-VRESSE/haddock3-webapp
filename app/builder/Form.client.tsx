@@ -35,8 +35,7 @@ const App = () => {
   }, [archive, activetCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    // TODO on builder page check for zip in browser storage and load it
-    // TODO check indexedb for saved workflow
+    // on builder page check for zip in browser storage and loads it
     if (activetCatalog.title === "") {
       return;
     }

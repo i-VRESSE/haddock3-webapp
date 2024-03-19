@@ -29,7 +29,7 @@ type Schema = Output<typeof Schema>;
 function generateWorkflow(data: Schema) {
   // Workflow based on
   // https://github.com/haddocking/haddock3/blob/main/examples/docking-protein-protein/docking-protein-protein-full.cfg
-  // changed to autohis=true 
+  // changed to autohis=true
   return `
 # ====================================================================
 # Protein-protein docking example with NMR-derived ambiguous interaction restraints
@@ -100,14 +100,14 @@ reference_fname = "${data.reference_fname.name}"
 }
 
 async function createZip(workflow: string, data: Schema) {
-    const zip = new JSZip();
-    zip.file(WORKFLOW_CONFIG_FILENAME, workflow);
-    zip.file(data.protein1.name, data.protein1);
-    zip.file(data.protein2.name, data.protein2);
-    zip.file(data.ambig_fname.name, data.ambig_fname);
-    zip.file(data.reference_fname.name, data.reference_fname);
-    return zip.generateAsync({ type: "blob" });
-  }
+  const zip = new JSZip();
+  zip.file(WORKFLOW_CONFIG_FILENAME, workflow);
+  zip.file(data.protein1.name, data.protein1);
+  zip.file(data.protein2.name, data.protein2);
+  zip.file(data.ambig_fname.name, data.ambig_fname);
+  zip.file(data.reference_fname.name, data.reference_fname);
+  return zip.generateAsync({ type: "blob" });
+}
 
 export default function ProteinProteinScenario() {
   const actionData = useActionData<typeof uploadaction>();
@@ -136,19 +136,20 @@ export default function ProteinProteinScenario() {
           href="https://www.bonvinlab.org/education/HADDOCK24/HADDOCK24-protein-protein-basic/"
         >
           HADDOCK2.4 Protein-protein docking tutorial
-        </a>
-        {" "}and the{" "}
+        </a>{" "}
+        and the{" "}
         <a
           target="_blank"
           rel="noreferrer"
           className="hover:underline"
           href="https://github.com/haddocking/haddock3/blob/main/examples/docking-protein-protein/docking-protein-protein-full.cfg"
-          >
-        HADDOCK3 example
-          </a>.
+        >
+          HADDOCK3 example
+        </a>
+        .
       </p>
       <form onSubmit={onSubmit}>
-      <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-6">
           <FormItem name="protein1" label="First protein structure">
             <PDBFileInput name="protein1" required />
             <FormDescription>
