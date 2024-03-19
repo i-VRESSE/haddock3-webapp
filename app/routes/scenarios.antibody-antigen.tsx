@@ -74,7 +74,7 @@ ambig_fname = "${data.ambig_fname.name}"
 # Restraints to keep the antibody chains together
 unambig_fname = "${data.unambig_fname.name}"
 # Turn off ramdom removal of restraints
-randremoval = false
+# randremoval = false
 
 [clustfcc]
 min_population = 10
@@ -91,13 +91,13 @@ reference_fname = "${data.reference_fname.name}"
 
 [flexref]
 # Acceptable percentage of model failures
-tolerance = 5
+# tolerance = 5
 # paratope to surface ambig restraints
 ambig_fname = "${data.ambig_fname.name}"
 # Restraints to keep the antibody chains together
 unambig_fname = "${data.unambig_fname.name}"
 # Turn off ramdom removal of restraints
-randremoval = false
+# randremoval = false
 
 [emref]
 # paratope to surface ambig restraints
@@ -105,7 +105,7 @@ ambig_fname = "${data.ambig_fname.name}"
 # Restraints to keep the antibody chains together
 unambig_fname = "${data.unambig_fname.name}"
 # Turn off ramdom removal of restraints
-randremoval = false
+# randremoval = false
 
 [clustfcc]
 
