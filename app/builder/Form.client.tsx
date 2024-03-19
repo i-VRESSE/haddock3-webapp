@@ -1,3 +1,6 @@
+import "./Form.css";
+import "./core2.css";
+
 import {
   CatalogPanel,
   NodePanel,
@@ -35,29 +38,25 @@ const App = () => {
   }, [archive, activetCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="workflow-builder-app">
-      <div className="page grid h-full w-full gap-2 p-4">
-        <div>
-          <CatalogPanel></CatalogPanel>
-        </div>
-        <div>
-          <WorkflowPanel>
-            <WorkflowUploadButton />
-          </WorkflowPanel>
-        </div>
-        <div>
-          <NodePanel />
-        </div>
+    <>
+      <div className="page">
+        <CatalogPanel></CatalogPanel>
+
+        <WorkflowPanel>
+          <WorkflowUploadButton />
+        </WorkflowPanel>
+
+        <NodePanel />
       </div>
-      <div className="page sticky inset-x-0 bottom-0 grid h-14">
+      <div className="page sticky inset-x-0 bottom-0 p-4">
         <div></div>
-        <div role="group" className="flex flex-row">
+        <div role="group" className="flex flex-row gap-4">
           <WorkflowSubmitButton submitAllowed={submitAllowed} />
           <WorkflowDownloadButton />
         </div>
         <FormActions />
       </div>
-    </div>
+    </>
   );
 };
 

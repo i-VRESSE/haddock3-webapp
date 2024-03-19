@@ -1,0 +1,105 @@
+/* Additional styles for core 2.0 */
+
+.workflow-builder-app {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Style workflow area section */
+.workflow-area {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Style form buttons */
+
+.btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-visual-panel,
+.btn-visual-node,
+.btn-catalog-node {
+  width: 100%;
+}
+
+.btn-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* hide commands by default */
+.btn-catalog-node .grip,
+.btn-visual-node .btn-group {
+  visibility: hidden;
+}
+
+/* show commands on hover */
+.btn-catalog-node:hover .grip,
+.btn-visual-node:hover .btn-group {
+  visibility: visible;
+}
+
+/* workflow toolbar */
+.btn-toolbar {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0rem;
+}
+
+.nav-tabs .nav-item {
+  padding: 0;
+}
+
+/* remove gap from dropdown group */
+.dropdown.btn-group {
+  gap: 0rem;
+}
+
+/* center + icon in the button */
+.array-item-add {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Show panel section is clickable */
+h5[id^="expander4"] {
+  cursor: pointer;
+}
+
+.justify-end {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.card {
+  overflow: hidden;
+}
+
+.card-body {
+  overflow: hidden;
+}
+
+.card-body .row {
+  overflow: auto;
+}
+
+fieldset {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+th {
+  padding: 0.25rem 0.5rem;
+  vertical-align: top;
+}
+
+tr .actions-th {
+  vertical-align: middle;
+}
