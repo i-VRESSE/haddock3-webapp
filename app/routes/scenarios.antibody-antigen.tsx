@@ -1,98 +1,32 @@
-import {
-  NavigateFunction,
-  SubmitFunction,
-  useActionData,
-  useNavigate,
-  useSubmit,
-} from "@remix-run/react";
+import { useActionData, useNavigate, useSubmit } from "@remix-run/react";
 import JSZip from "jszip";
-import { PropsWithChildren, useState } from "react";
-import { FlatErrors, Output, instance, mimeType, object, parse } from "valibot";
+import { Output, instance, object } from "valibot";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 
-import { ErrorMessages } from "~/components/ErrorMessages";
-import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { Viewer } from "~/scenario-antibody-antigen/Viewer.client";
 import { action as uploadaction } from "./upload";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "~/components/ui/dialog";
+import { FormItem } from "../scenarios/FormItem";
+import { FormDescription } from "../scenarios/FormDescription";
+import { PDBFileInput } from "../scenarios/PDBFileInput";
+import { ActionButtons, handleActionButton } from "~/scenarios/actions";
+import { parseFormData, pdbMimeType } from "~/scenarios/schema";
 
 export const action = uploadaction;
 
-function FormItem({
-  name,
-  label,
-  children,
-  errors,
-}: PropsWithChildren<{
-  name: string;
-  label: string;
-  errors?: FlatErrors;
-}>) {
-  return (
-    <div>
-      <Label htmlFor={name}>{label}</Label>
-      {children}
-      {errors && <ErrorMessages path={name} errors={errors} />}
-    </div>
-  );
-}
-
-function FormDescription({ children }: PropsWithChildren): JSX.Element {
-  return <p className="text-[0.8rem] text-muted-foreground">{children}</p>;
-}
-
-function PDBFileInput({
-  name,
-  required,
-}: {
-  name: string;
-  required?: boolean;
-}) {
-  const [file, setFile] = useState<File | undefined>(undefined);
-  const [open, setOpen] = useState(false);
-
-  function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-    event.preventDefault();
-    setFile(event.target.files?.[0]);
-  }
-
-  return (
-    <div className="flex">
-      <Input
-        type="file"
-        id={name}
-        name={name}
-        required={required}
-        accept=".pdb"
-        onChange={onChange}
-      />
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button
-            disabled={!file}
-            title="Preview in 3D"
-            variant="ghost"
-            size="icon"
-          >
-            👁
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-2/3 h-2/3 w-2/3">
-          {file !== undefined && open && <Viewer file={file} />}
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
+const Schema = object({
+  antibody: instance(File, "Antibody structure as PDB file", [pdbMimeType]),
+  antigen: instance(File, "Antibody structure as PDB file", [pdbMimeType]),
+  // restraints get type==='' so cannot check for file type
+  ambig_fname: instance(File, "Ambiguous restraints as TBL file"),
+  unambig_fname: instance(File, "Unambiguous restraints as TBL file"),
+  reference_fname: instance(File, "Reference structure as PDB file", [
+    pdbMimeType,
+  ]),
+});
+type Schema = Output<typeof Schema>;
 
 function generateWorkflow(data: Schema) {
-  // TODO create workflow.cfg with form data as values for filename fields
+  // create workflow.cfg with form data as values for filename fields
 
   // Workflow based on
   // scenario2a-NMR-epitope-pass-short.cfg
@@ -188,33 +122,6 @@ reference_fname = "${data.reference_fname.name}"
 `;
 }
 
-const pdbMimeType = mimeType<File>(
-  [
-    "chemical/x-pdb",
-    "chemical/x-pdbx",
-    "application/vnd.palm",
-    "application/x-aportisdoc",
-  ],
-  "Please select a PDB file"
-);
-
-const Schema = object({
-  antibody: instance(File, "Antibody molecules as PDB file", [pdbMimeType]),
-  antigen: instance(File, "Antibody molecules as PDB file", [pdbMimeType]),
-  // restraints get type==='' so cannot check for file type
-  ambig_fname: instance(File, "Ambiguous restraints as TBL file"),
-  unambig_fname: instance(File, "Unambiguous restraints as TBL file"),
-  reference_fname: instance(File, "Reference structure as PDB file", [
-    pdbMimeType,
-  ]),
-});
-type Schema = Output<typeof Schema>;
-
-function parseFormData(formData: FormData) {
-  const obj = Object.fromEntries(formData.entries());
-  return parse(Schema, obj);
-}
-
 async function createZip(workflow: string, data: Schema) {
   const zip = new JSZip();
   zip.file(WORKFLOW_CONFIG_FILENAME, workflow);
@@ -226,63 +133,6 @@ async function createZip(workflow: string, data: Schema) {
   return zip.generateAsync({ type: "blob" });
 }
 
-function doUpload(zipPromise: Promise<Blob>, submit: SubmitFunction) {
-  zipPromise.then((zip) => {
-    // TODO upload archive to server
-    const formData = new FormData();
-    formData.set("upload", zip);
-    submit(formData, {
-      method: "post",
-      encType: "multipart/form-data",
-    });
-  });
-}
-
-function onRefine(zipPromise: Promise<Blob>, navigate: NavigateFunction) {
-  // add zip to browsers indexeddb haddock3 db, zips object store, key workflow.zip
-  if (typeof indexedDB === "undefined") {
-    console.error("IndexedDB not supported, unable to save workflow.zip file.");
-    return;
-  }
-
-  const open = indexedDB.open("haddock3", 1);
-  open.onerror = function () {
-    console.error("Error opening indexeddb", open.error);
-  };
-  open.onupgradeneeded = function () {
-    const db = open.result;
-    db.createObjectStore("zips");
-  };
-  open.onblocked = function () {
-    console.error("Error opening indexeddb, blocked");
-  };
-  open.onsuccess = function () {
-    zipPromise.then((zip) => {
-      const db = open.result;
-      const tx = db.transaction("zips", "readwrite");
-      const zips = tx.objectStore("zips");
-      const putRequest = zips.put(zip, "workflow.zip");
-      putRequest.onerror = function () {
-        console.error("Error putting zip in indexeddb", putRequest.error);
-      };
-      putRequest.onsuccess = function () {
-        navigate("/builder");
-      };
-    });
-  };
-}
-
-function onDownload(zipPromise: Promise<Blob>) {
-  zipPromise.then((zip) => {
-    const url = URL.createObjectURL(zip);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "workflow.zip";
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-}
-
 export default function AntibodyAntigenScenario() {
   const actionData = useActionData<typeof uploadaction>();
   const submit = useSubmit();
@@ -292,25 +142,15 @@ export default function AntibodyAntigenScenario() {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const data = parseFormData(formData);
+    const data = parseFormData(formData, Schema);
     const workflow = generateWorkflow(data);
     const zipPromise = createZip(workflow, data);
-    // TODO validate zip against catalog, now done on server for kind=upload
-    // or on /builder page in devtools console for kind=refine
-    const nativeEvent = event.nativeEvent as SubmitEvent;
-    const kind = nativeEvent.submitter?.getAttribute("value");
-    if (kind === "refine") {
-      onRefine(zipPromise, navigate);
-    } else if (kind === "download") {
-      onDownload(zipPromise);
-    } else {
-      doUpload(zipPromise, submit);
-    }
+    handleActionButton(event.nativeEvent, zipPromise, navigate, submit);
   }
 
   return (
-    <div>
-      <h1 className="text-3xl">Antibody Antigen Scenario</h1>
+    <>
+      <h1 className="text-3xl">Antibody-antigen scenario</h1>
       <p>
         Based on{" "}
         <a
@@ -320,7 +160,7 @@ export default function AntibodyAntigenScenario() {
           href="https://www.bonvinlab.org/education/HADDOCK3/HADDOCK3-antibody-antigen/"
         >
           HADDOCK3 Antibody Antigen tutorial
-        </a>
+        </a>.
       </p>
       <form onSubmit={onSubmit}>
         <div className="grid grid-cols-2 gap-6">
@@ -372,26 +212,8 @@ export default function AntibodyAntigenScenario() {
             <p key={error}>{error}</p>
           ))}
         </div>
-        <div className="mt-4">
-          <Button type="submit" name="kind" value="upload">
-            Submit
-          </Button>
-          <Button type="reset" variant="secondary">
-            Reset
-          </Button>
-          <Button type="submit" name="kind" value="refine" variant="secondary">
-            Refine in builder
-          </Button>
-          <Button
-            type="submit"
-            variant="secondary"
-            name="kind"
-            value="download"
-          >
-            Download workfow.zip
-          </Button>
-        </div>
+        <ActionButtons />
       </form>
-    </div>
+    </>
   );
 }

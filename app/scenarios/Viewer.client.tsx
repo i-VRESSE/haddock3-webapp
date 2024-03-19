@@ -42,6 +42,7 @@ export function Viewer({ file }: { file: File | undefined }) {
       setIsLoaded(true);
     });
 
+    // TODO clean up messes up the rendering, need to figure out why
     // return () => {
     //   if (stage.current && file) {
     //     const comps = stage.current.getComponentsByName(file.name);
