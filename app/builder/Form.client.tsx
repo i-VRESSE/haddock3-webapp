@@ -34,6 +34,43 @@ const App = () => {
     }
   }, [archive, activetCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    // on builder page check for zip in browser storage and loads it
+    if (activetCatalog.title === "") {
+      return;
+    }
+    if (typeof indexedDB === "undefined") {
+      console.error(
+        "IndexedDB not supported, unable to save workflow.zip file."
+      );
+      return;
+    }
+    const open = indexedDB.open("haddock3", 1);
+    open.onsuccess = function () {
+      const db = open.result;
+      const tx = db.transaction("zips", "readwrite");
+      const zips = tx.objectStore("zips");
+      const request = zips.get("workflow.zip");
+      request.onsuccess = function () {
+        const zip: Blob = request.result;
+        console.log("zip", zip);
+        if (zip === undefined) {
+          return;
+        }
+        const url = URL.createObjectURL(zip);
+        loadWorkflowArchive(url)
+          .finally(() => {
+            URL.revokeObjectURL(url);
+          })
+          .catch((error) => {
+            console.error("Error loading workflow from indexeddb", error);
+          });
+        // remove zip from indexeddb so next visit to builder page loads nothing
+        zips.delete("workflow.zip");
+      };
+    };
+  }, [activetCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div className="workflow-builder-app">
       <div className="page grid h-full w-full gap-2 p-4">
