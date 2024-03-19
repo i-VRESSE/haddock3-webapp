@@ -23,7 +23,7 @@ type Schema = Output<typeof Schema>;
 function generateWorkflow(data: Schema) {
   // Workflow based on
   // https://github.com/haddocking/haddock3/blob/main/examples/docking-protein-protein/docking-protein-protein-full.cfg
-  // changed to autohis=true
+  // made valid for easy expertise level
   return `
 # ====================================================================
 # Protein-protein docking example with NMR-derived ambiguous interaction restraints
@@ -52,7 +52,6 @@ molecules =  [
 [topoaa]
 
 [rigidbody]
-tolerance = 5
 ambig_fname = "${data.ambig_fname.name}"
 sampling = 1000
 
@@ -66,14 +65,12 @@ select = 200
 reference_fname = "${data.reference_fname.name}"
 
 [flexref]
-tolerance = 5
 ambig_fname = "${data.ambig_fname.name}"
 
 [caprieval]
 reference_fname = "${data.reference_fname.name}"
 
 [emref]
-tolerance = 5
 ambig_fname = "${data.ambig_fname.name}"
 
 [caprieval]
