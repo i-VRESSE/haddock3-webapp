@@ -9,19 +9,17 @@ import { FormItem } from "../scenarios/FormItem";
 import { FormDescription } from "../scenarios/FormDescription";
 import { PDBFileInput } from "../scenarios/PDBFileInput";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
-import { parseFormData, pdbMimeType } from "~/scenarios/schema";
+import { parseFormData } from "~/scenarios/schema";
 
 export const action = uploadaction;
 
 const Schema = object({
-  antibody: instance(File, "Antibody structure as PDB file", [pdbMimeType]),
-  antigen: instance(File, "Antibody structure as PDB file", [pdbMimeType]),
+  antibody: instance(File, "Antibody structure as PDB file", []),
+  antigen: instance(File, "Antibody structure as PDB file", []),
   // restraints get type==='' so cannot check for file type
   ambig_fname: instance(File, "Ambiguous restraints as TBL file"),
   unambig_fname: instance(File, "Unambiguous restraints as TBL file"),
-  reference_fname: instance(File, "Reference structure as PDB file", [
-    pdbMimeType,
-  ]),
+  reference_fname: instance(File, "Reference structure as PDB file", []),
 });
 type Schema = Output<typeof Schema>;
 

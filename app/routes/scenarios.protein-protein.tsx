@@ -2,7 +2,7 @@ import { useActionData, useSubmit, useNavigate } from "@remix-run/react";
 import { action as uploadaction } from "./upload";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { object, instance, Output } from "valibot";
-import { parseFormData, pdbMimeType } from "~/scenarios/schema";
+import { parseFormData } from "~/scenarios/schema";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import JSZip from "jszip";
 import { FormDescription } from "~/scenarios/FormDescription";
@@ -13,16 +13,10 @@ import { Input } from "~/components/ui/input";
 export const action = uploadaction;
 
 const Schema = object({
-  protein1: instance(File, "First protein structure as PDB file", [
-    pdbMimeType,
-  ]),
-  protein2: instance(File, "Second protein structure as PDB file", [
-    pdbMimeType,
-  ]),
+  protein1: instance(File, "First protein structure as PDB file"),
+  protein2: instance(File, "Second protein structure as PDB file"),
   ambig_fname: instance(File, "Ambiguous restraints as TBL file"),
-  reference_fname: instance(File, "Reference structure as PDB file", [
-    pdbMimeType,
-  ]),
+  reference_fname: instance(File, "Reference structure as PDB file"),
 });
 type Schema = Output<typeof Schema>;
 
