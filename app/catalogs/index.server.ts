@@ -26,7 +26,7 @@ function loadCatalog(catalog: ICatalog) {
   ) {
     catalog.global.schema.properties.run_dir.default = JOB_OUTPUT_DIR;
   }
-  return prepareCatalog(catalog);
+  return HideExecutionParameters(prepareCatalog(catalog));
 }
 
 function loadCatalogs() {
@@ -35,4 +35,43 @@ function loadCatalogs() {
     expert: loadCatalog(expert as unknown as ICatalog),
     guru: loadCatalog(guru as unknown as ICatalog),
   } as const;
+}
+
+function HideExecutionParameters(catalog: ICatalog) {
+  const executionParameters = [
+    "run_dir",
+    "mode",
+    "ncores",
+    "max_cpus",
+    "batch_type",
+    "queue",
+    "queue_limit",
+    "concat",
+    "cns_exec",
+    "self_contained",
+    // Not really execution parameters, but we want to hide them as well
+    "postprocess",
+    "clean",
+  ];
+  const globalProps = catalog.global.schema.properties!;
+  for (const param of executionParameters) {
+    const prop = globalProps[param];
+    if (typeof prop === "boolean" || prop === undefined || prop === null) {
+      continue;
+    }
+    prop.description = undefined;
+  }
+  const uiSchema = Object.fromEntries(
+    executionParameters.map((param) => [
+      param,
+      {
+        "ui:widget": "hidden",
+      },
+    ])
+  );
+  catalog.global.uiSchema = {
+    ...catalog.global.uiSchema,
+    ...uiSchema,
+  };
+  return catalog;
 }
