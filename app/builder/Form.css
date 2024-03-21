@@ -64,9 +64,9 @@ Btn classes are copied from app/components/ui/button.tsx
   @apply list-inside;
 }
 
-.workflow-builder-app li {
+/* .workflow-builder-app li {
   @apply pl-2;
-}
+} */
 
 .workflow-builder-app .card {
   @apply rounded border border-border;
@@ -292,7 +292,7 @@ code .table {
   background: #fff
     url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e")
     right 0.75rem center / 8px 10px no-repeat;
-  background-color: var(--background, "#fff");
+  background-color: hsl(var(--background, "#fff"));
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
   -webkit-appearance: none;
@@ -335,10 +335,12 @@ code .table {
   line-break: auto;
   font-size: 0.875rem;
   word-wrap: break-word;
-  background-color: #fff;
+  background-color: hsl(var(--background, #fff));
   background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid;
+  border-color: hsl(var(--secondary, #ccc));
   border-radius: 0.3rem;
+  /* overflow: hidden; */
 }
 
 .fade {
@@ -349,7 +351,8 @@ code .table {
   padding: 0.5rem 0.75rem;
   margin-bottom: 0;
   font-size: 1rem;
-  background-color: #f7f7f7;
+  background-color: hsl(var(--secondary, #f7f7f7));
+  color: hsl(var(--secondary-foreground, #f4f4f4));
   border-bottom: 1px solid #ebebeb;
   border-top-left-radius: calc(0.3rem - 1px);
   border-top-right-radius: calc(0.3rem - 1px);
@@ -377,7 +380,8 @@ code .table {
 
 .bs-popover-auto[x-placement^="bottom"] > .arrow,
 .bs-popover-bottom > .arrow {
-  top: calc(-0.5rem - 1px);
+  top: calc(-0.5rem);
+  z-index: 1;
 }
 
 .popover .arrow::after,
@@ -392,18 +396,19 @@ code .table {
 .bs-popover-auto[x-placement^="bottom"] > .arrow::before,
 .bs-popover-bottom > .arrow::before {
   top: 0;
-  border-width: 0 0.5rem 0.5rem 0.5rem;
-  border-bottom-color: rgba(0, 0, 0, 0.25);
+  border-width: 0 0.55rem 0.55rem 0.55rem;
+  border-bottom-color: hsl(var(--secondary, #ccc));
 }
 
 .bs-popover-auto[x-placement^="bottom"] > .arrow::after,
 .bs-popover-bottom > .arrow::after {
   top: 1px;
   border-width: 0 0.5rem 0.5rem 0.5rem;
-  border-bottom-color: #fff;
+  border-bottom-color: hsl(var(--secondary, #ccc));
 }
 
 .popover-body {
   padding: 0.5rem 0.75rem;
-  color: #212529;
+  color: hsl(var(--foregrond, #212529));
+  background-color: hsl(var(--background, #fff));
 }

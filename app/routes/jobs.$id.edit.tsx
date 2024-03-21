@@ -9,7 +9,6 @@ import { getCompletedJobById, jobIdFromParams } from "~/models/job.server";
 import { getUser } from "~/auth.server";
 import { getBartenderTokenByUser } from "~/bartender-client/token.server";
 import { Haddock3WorkflowBuilder } from "~/builder/Form.client";
-import { haddock3Styles } from "~/builder/styles";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
@@ -30,16 +29,14 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
 export { action };
 
-export const links = () => [...haddock3Styles()];
-
 export default function EditPage() {
   const { jobId } = useLoaderData<typeof loader>();
   // TODO replace ClientOnly with Suspense,
   // see https://github.com/sergiodxa/remix-utils#clientonly
   // might need upgrade to remix v2
   return (
-    <main>
-      <p>
+    <main className="workflow-builder-app m-auto min-w-[50rem] max-w-[100rem]">
+      <p className="pb-4">
         Editing input of <Link to={`/jobs/${jobId}`}>job {jobId}</Link>
       </p>
       <ClientOnly fallback={<p>Loading...</p>}>

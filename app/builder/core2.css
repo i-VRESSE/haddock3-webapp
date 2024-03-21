@@ -23,6 +23,7 @@
 .btn-visual-node,
 .btn-catalog-node {
   width: 100%;
+  padding: 0.25rem 1rem;
 }
 
 .btn-group {
