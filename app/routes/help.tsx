@@ -72,7 +72,10 @@ export default function Help() {
         To submit a job you need to be logged in and have an expertise level
         assigned to you. The expertise level controls which parameters in each
         Haddock3 module you can set. For example the{" "}
-        <a href="https://www.bonvinlab.org/haddock3/modules/topology/haddock.modules.topology.topoaa.html#autohis">
+        <a
+          className="underline"
+          href="https://www.bonvinlab.org/haddock3/modules/topology/haddock.modules.topology.topoaa.html#autohis"
+        >
           autohis parameter
         </a>{" "}
         in the topaa module can only be set by users with an expertise level of
@@ -262,7 +265,7 @@ export default function Help() {
       <p className="py-2">
         The browse page has 4 columns:
         <ul className="list-inside list-disc">
-          <li>Job info - like its id when it ran, logs.</li>
+          <li>Job info - like its id, when it ran and logs.</li>
           <li>
             Input - The workflow and its datafiles that was used as the input
             for the job.
