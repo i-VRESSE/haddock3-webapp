@@ -12,7 +12,6 @@ import { ClientOnly } from "~/components/ClientOnly";
 import { getOptionalUser, mustBeAllowedToSubmit } from "~/auth.server";
 import { getBartenderTokenByUser } from "~/bartender-client/token.server";
 import { Haddock3WorkflowBuilder } from "~/builder/Form.client";
-import { haddock3Styles } from "~/builder/styles";
 import { parseUploadRequest } from "~/lib/parseUploadRequest.server";
 
 export const loader = async ({
@@ -45,13 +44,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return redirect(job_url);
 };
 
-export const links = () => [...haddock3Styles()];
-
 export default function Builder() {
   // TODO replace ClientOnly with Suspense,
   // see https://github.com/sergiodxa/remix-utils#clientonly
   return (
-    <main>
+    <main className="workflow-builder-app m-auto min-w-[50rem] max-w-[100rem]">
       <ClientOnly fallback={<p>Loading...</p>}>
         {() => <Haddock3WorkflowBuilder />}
       </ClientOnly>
