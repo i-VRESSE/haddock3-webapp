@@ -1,14 +1,21 @@
 import { useActionData, useSubmit, useNavigate } from "@remix-run/react";
+import { object, instance, Output } from "valibot";
+import JSZip from "jszip";
+import * as NGL from "ngl";
+
 import { action as uploadaction } from "./upload";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
-import { object, instance, Output } from "valibot";
 import { parseFormData } from "~/scenarios/schema";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
-import JSZip from "jszip";
 import { FormDescription } from "~/scenarios/FormDescription";
 import { FormItem } from "~/scenarios/FormItem";
-import { PDBFileInput } from "~/scenarios/PDBFileInput";
+import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import { Input } from "~/components/ui/input";
+import { useState } from "react";
+import { MolViewerDialog } from "~/scenarios/MolViewerDialog.client";
+import { type Molecule, chainsFromStructure } from "~/scenarios/Viewer.client";
+import { ChainSelect } from "~/scenarios/ChainSelect";
+import { ResiduesSelect } from "~/scenarios/ResiduesSelect";
 
 export const action = uploadaction;
 
@@ -115,6 +122,41 @@ export default function ProteinProteinScenario() {
     handleActionButton(event.nativeEvent, zipPromise, navigate, submit);
   }
 
+  const [protein1, setProtein1] = useState<Molecule | undefined>();
+  const [protein1chain, setProtein1Chain] = useState<string>("");
+  const [protein1ambigrestraints, setProtein1Ambigrestraints] = useState<
+    number[]
+  >([]);
+  function protein1Loaded(structure: NGL.Structure) {
+    const chains = chainsFromStructure(structure);
+    setProtein1({ structure, chains });
+  }
+
+  const [protein2, setProtein2] = useState<Molecule | undefined>();
+  const [protein2chain, setProtein2Chain] = useState<string>("");
+  const [protein2ambigrestraints, setProtein2Ambigrestraints] = useState<
+    number[]
+  >([]);
+  function protein2Loaded(structure: NGL.Structure) {
+    const chains = chainsFromStructure(structure);
+    setProtein2({ structure, chains });
+  }
+
+  const [reference, setReference] = useState<Molecule | undefined>();
+  function referenceLoaded(structure: NGL.Structure) {
+    const chains = chainsFromStructure(structure);
+    setReference({ structure, chains });
+  }
+
+  if (
+    MolViewerDialog === undefined ||
+    PDBFileInput === undefined ||
+    ResiduesSelect === undefined ||
+    ChainSelect === undefined
+  ) {
+    return <>Loading...</>;
+  }
+
   return (
     <>
       <h1 className="text-3xl">Protein-protein docking scenario</h1>
@@ -141,18 +183,88 @@ export default function ProteinProteinScenario() {
       </p>
       <form onSubmit={onSubmit}>
         <div className="grid grid-cols-2 gap-6">
-          <FormItem name="protein1" label="First protein structure">
-            <PDBFileInput name="protein1" required />
-            <FormDescription>
-              In example named data/e2aP_1F3G.pdb
-            </FormDescription>
-          </FormItem>
-          <FormItem name="protein2" label="Second protein structure">
-            <PDBFileInput name="protein2" required />
-            <FormDescription>
-              In example named data/hpr_ensemble.pdb
-            </FormDescription>
-          </FormItem>
+          <fieldset className="border border-solid border-primary p-3">
+            <legend className="">First protein</legend>
+            <FormItem name="protein1" label="Structure">
+              <div className="flex">
+                <PDBFileInput
+                  name="protein1"
+                  required
+                  onStructureLoad={protein1Loaded}
+                />
+                <MolViewerDialog structure={protein1?.structure} />
+              </div>
+              <FormDescription>
+                In example named data/e2aP_1F3G.pdb
+              </FormDescription>
+            </FormItem>
+            <FormItem name="protein1chain" label="Chain">
+              {protein1 ? (
+                <ChainSelect
+                  chains={Object.keys(protein1.chains)}
+                  onSelect={setProtein1Chain}
+                  selected={protein1chain}
+                />
+              ) : (
+                <p>Load a structure first</p>
+              )}
+            </FormItem>
+            <FormItem
+              name="protein1ambigrestraints"
+              label="Ambiguous restraints"
+            >
+              {protein1chain ? (
+                <ResiduesSelect
+                  options={protein1?.chains[protein1chain] || []}
+                  selected={protein1ambigrestraints}
+                  onChange={setProtein1Ambigrestraints}
+                />
+              ) : (
+                <p>Select a chain first</p>
+              )}
+            </FormItem>
+          </fieldset>
+          <fieldset className="border border-solid border-primary p-3">
+            <legend className="">Second protein</legend>
+            <FormItem name="protein2" label="Structure">
+              <div className="flex">
+                <PDBFileInput
+                  name="protein2"
+                  required
+                  onStructureLoad={protein2Loaded}
+                />
+                <MolViewerDialog structure={protein2?.structure} />
+              </div>
+              <FormDescription>
+                In example named data/hpr_ensemble.pdb
+              </FormDescription>
+            </FormItem>
+            <FormItem name="protein2chain" label="Chain">
+              {protein2 ? (
+                <ChainSelect
+                  chains={Object.keys(protein2.chains)}
+                  onSelect={setProtein2Chain}
+                  selected={protein2chain}
+                />
+              ) : (
+                <p>Load a structure first</p>
+              )}
+            </FormItem>
+            <FormItem
+              name="protein2ambigrestraints"
+              label="Ambiguous restraints"
+            >
+              {protein2chain ? (
+                <ResiduesSelect
+                  options={protein2?.chains[protein2chain] || []}
+                  selected={protein2ambigrestraints}
+                  onChange={setProtein2Ambigrestraints}
+                />
+              ) : (
+                <p>Select a chain first</p>
+              )}
+            </FormItem>
+          </fieldset>
           <FormItem name="ambig_fname" label="Ambiguous restraints">
             <Input
               type="file"
@@ -166,7 +278,13 @@ export default function ProteinProteinScenario() {
             </FormDescription>
           </FormItem>
           <FormItem name="reference_fname" label="Reference structure">
-            <PDBFileInput name="reference_fname" />
+            <div className="flex">
+              <PDBFileInput
+                name="reference_fname"
+                onStructureLoad={referenceLoaded}
+              />
+              <MolViewerDialog structure={reference?.structure} />
+            </div>
             <FormDescription>
               In example named data/e2a-hpr_1GGR.pdb
             </FormDescription>

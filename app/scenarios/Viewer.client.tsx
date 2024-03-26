@@ -1,7 +1,27 @@
 import { useEffect, useRef, useState } from "react";
-import { Stage } from "ngl";
+import { Stage, Structure } from "ngl";
 
-export function Viewer({ file }: { file: File | undefined }) {
+export type Residue = { resno: number; seq: string };
+type Chains = Record<string, Residue[]>;
+export type Molecule = { structure: Structure; chains: Chains };
+
+export function chainsFromStructure(structure: Structure) {
+  const chains: Chains = {};
+  structure.eachChain((c) => {
+    const chainName = c.chainname;
+    const residues: Residue[] = [];
+    c.eachResidue((r) => {
+      residues.push({
+        resno: r.resno,
+        seq: r.getResname1(),
+      });
+    });
+    chains[chainName] = residues;
+  });
+  return chains;
+}
+
+export function Viewer({ structure }: { structure: Structure }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const stage = useRef<Stage | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -26,21 +46,21 @@ export function Viewer({ file }: { file: File | undefined }) {
     }
     stage.current.setParameters({ backgroundColor });
 
-    if (stage.current === null || file === undefined) {
+    if (stage.current === null) {
       return;
     }
-    stage.current.loadFile(file, { ext: "pdb" }).then((o) => {
-      if (o === undefined) {
-        console.error("Could not load file");
-        return;
-      }
-      o.addRepresentation("cartoon", { sele: "protein" });
-      o.addRepresentation("ball+stick", { sele: "ligand" });
-      o.addRepresentation("base", { sele: "nucleic" });
+    stage.current.removeAllComponents();
+    const o = stage.current.addComponentFromObject(structure);
+    if (o === undefined) {
+      console.error("Could not load structure");
+      return;
+    }
+    o.addRepresentation("cartoon", { sele: "protein" });
+    o.addRepresentation("ball+stick", { sele: "ligand" });
+    o.addRepresentation("base", { sele: "nucleic" });
 
-      o.autoView();
-      setIsLoaded(true);
-    });
+    o.autoView();
+    setIsLoaded(true);
 
     // TODO clean up messes up the rendering, need to figure out why
     // return () => {
@@ -52,7 +72,7 @@ export function Viewer({ file }: { file: File | undefined }) {
     //     stage.current.dispose();
     //   }
     // };
-  }, [file, isLoaded]);
+  }, [structure, isLoaded]);
 
   return <div ref={viewportRef} className="h-full w-full"></div>;
 }
