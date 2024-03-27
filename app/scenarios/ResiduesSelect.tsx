@@ -2,7 +2,6 @@ import { ChangeEvent, useState } from "react";
 import { FormDescription } from "./FormDescription";
 import { Residue } from "./molecule.client";
 
-
 export function ResiduesSelect({
   options,
   selected,
