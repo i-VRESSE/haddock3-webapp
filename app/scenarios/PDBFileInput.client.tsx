@@ -1,5 +1,6 @@
-import { Structure, autoLoad } from "ngl";
+import { type Structure } from "ngl";
 import { Input } from "~/components/ui/input";
+import { loadStructure } from "./molecule.client";
 
 export function PDBFileInput({
   name,
@@ -8,7 +9,7 @@ export function PDBFileInput({
 }: {
   name: string;
   required?: boolean;
-  onStructureLoad: (structure: Structure) => void;
+  onStructureLoad: (structure: Structure, file: File) => void;
 }) {
   async function onChange(event: React.ChangeEvent<HTMLInputElement>) {
     event.preventDefault();
@@ -16,10 +17,8 @@ export function PDBFileInput({
     if (!file) {
       return;
     }
-    const structure: Structure = await autoLoad(file);
-    if (structure && onStructureLoad) {
-      onStructureLoad(structure);
-    }
+    const structure = await loadStructure(file);
+    onStructureLoad(structure, file);
   }
 
   return (

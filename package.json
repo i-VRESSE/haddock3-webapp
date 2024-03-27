@@ -13,6 +13,7 @@
     "dev": "remix dev --manual",
     "format": "prettier --write .",
     "generate-client": "node app/bartender-client/generate.mjs && npx prettier --write app/bartender-client/bartenderschema.d.ts",
+    "generate-client:restraints": "node app/haddock3-restraints-client/generate.mjs && npx prettier --write app/haddock3-restraints-client/schema.d.ts",
     "lint": "eslint  --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "remix-serve ./build/index.js",
     "test": "vitest",

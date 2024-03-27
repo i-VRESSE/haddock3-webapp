@@ -1,26 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Stage, Structure } from "ngl";
 
-export type Residue = { resno: number; seq: string };
-type Chains = Record<string, Residue[]>;
-export type Molecule = { structure: Structure; chains: Chains };
-
-export function chainsFromStructure(structure: Structure) {
-  const chains: Chains = {};
-  structure.eachChain((c) => {
-    const chainName = c.chainname;
-    const residues: Residue[] = [];
-    c.eachResidue((r) => {
-      residues.push({
-        resno: r.resno,
-        seq: r.getResname1(),
-      });
-    });
-    chains[chainName] = residues;
-  });
-  return chains;
-}
-
 export function Viewer({ structure }: { structure: Structure }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const stage = useRef<Stage | null>(null);
@@ -49,17 +29,28 @@ export function Viewer({ structure }: { structure: Structure }) {
     if (stage.current === null) {
       return;
     }
+    window.addEventListener(
+      "resize",
+      function () {
+        if (stage.current === null) {
+          return;
+        }
+        stage.current.handleResize();
+      },
+      false
+    );
     stage.current.removeAllComponents();
-    const o = stage.current.addComponentFromObject(structure);
-    if (o === undefined) {
+    const component = stage.current.addComponentFromObject(structure);
+    if (!component) {
       console.error("Could not load structure");
       return;
     }
-    o.addRepresentation("cartoon", { sele: "protein" });
-    o.addRepresentation("ball+stick", { sele: "ligand" });
-    o.addRepresentation("base", { sele: "nucleic" });
+    component.addRepresentation("cartoon", { sele: "polymer" });
+    component.addRepresentation("ball+stick", { sele: "ligand" });
+    component.addRepresentation("base", { sele: "nucleic" });
 
-    o.autoView();
+    component.autoView();
+
     setIsLoaded(true);
 
     // TODO clean up messes up the rendering, need to figure out why

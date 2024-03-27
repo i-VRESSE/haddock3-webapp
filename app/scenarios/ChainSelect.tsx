@@ -1,3 +1,7 @@
+import { useId } from "react";
+import { Label } from "~/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+
 export function ChainSelect({
   chains,
   onSelect,
@@ -7,21 +11,42 @@ export function ChainSelect({
   onSelect: (chain: string) => void;
   selected: string;
 }) {
-  // TODO if there is a single chain the select it
+  const id = useId();
+  if (chains.length === 1 && selected === "") {
+    selected = chains[0];
+    onSelect(selected);
+  }
+  if (chains.length > 5) {
+    return (
+      <select
+        className="w-full rounded bg-inherit p-1 text-inherit"
+        defaultValue={selected}
+        onChange={(e) => {
+          e.preventDefault();
+          onSelect(e.target.value);
+        }}
+      >
+        <option value="">Select a chain</option>
+        {chains.map((chain) => (
+          <option key={chain} value={chain}>
+            {chain}
+          </option>
+        ))}
+      </select>
+    );
+  }
   return (
-    <select
+    <RadioGroup
       defaultValue={selected}
-      onChange={(e) => {
-        e.preventDefault();
-        onSelect(e.target.value);
-      }}
+      onValueChange={onSelect}
+      className="grid-flow-col"
     >
-      <option value="">Select a chain</option>
       {chains.map((chain) => (
-        <option key={chain} value={chain}>
-          {chain}
-        </option>
+        <div key={chain} className="flex items-center space-x-2">
+          <RadioGroupItem value={chain} id={id + chain} />
+          <Label htmlFor={id + chain}>{chain}</Label>
+        </div>
       ))}
-    </select>
+    </RadioGroup>
   );
 }
