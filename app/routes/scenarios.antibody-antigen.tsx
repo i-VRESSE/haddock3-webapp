@@ -7,7 +7,7 @@ import { Input } from "~/components/ui/input";
 import { action as uploadaction } from "./upload";
 import { FormItem } from "../scenarios/FormItem";
 import { FormDescription } from "../scenarios/FormDescription";
-import { PDBFileInput } from "../scenarios/PDBFileInput";
+// import { PDBFileInput } from "../scenarios/PDBFileInput.client";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
 
@@ -164,13 +164,14 @@ export default function AntibodyAntigenScenario() {
       <form onSubmit={onSubmit}>
         <div className="grid grid-cols-2 gap-6">
           <FormItem name="antibody" label="Antibody">
-            <PDBFileInput name="antibody" required />
+            {/* <PDBFileInput name="antibody" required /> */}
             <FormDescription>
               In tutorial named pdbs/4G6K_clean.pdb
             </FormDescription>
           </FormItem>
           <FormItem name="antigen" label="Antigen">
-            <PDBFileInput name="antigen" required />
+            {/* TODO do similar thing as in protein-protein scenario */}
+            {/* <PDBFileInput name="antigen" required /> */}
             <FormDescription>
               In tutorial named pdbs/4I1B_clean.pdb
             </FormDescription>
@@ -200,7 +201,7 @@ export default function AntibodyAntigenScenario() {
             </FormDescription>
           </FormItem>
           <FormItem name="reference_fname" label="Reference structure">
-            <PDBFileInput name="reference_fname" />
+            {/* <PDBFileInput name="reference_fname" /> */}
             <FormDescription>
               In tutorial named pdbs/4G6M_matched.pdb
             </FormDescription>

@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Stage } from "ngl";
+import { Stage, Structure, StructureComponent } from "ngl";
 
-export function Viewer({ file }: { file: File | undefined }) {
+export function Viewer({
+  structure,
+  chain,
+}: {
+  structure: Structure;
+  chain?: string;
+}) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const stage = useRef<Stage | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -26,21 +32,28 @@ export function Viewer({ file }: { file: File | undefined }) {
     }
     stage.current.setParameters({ backgroundColor });
 
-    if (stage.current === null || file === undefined) {
+    if (stage.current === null) {
       return;
     }
-    stage.current.loadFile(file, { ext: "pdb" }).then((o) => {
-      if (o === undefined) {
-        console.error("Could not load file");
-        return;
-      }
-      o.addRepresentation("cartoon", { sele: "protein" });
-      o.addRepresentation("ball+stick", { sele: "ligand" });
-      o.addRepresentation("base", { sele: "nucleic" });
+    window.addEventListener(
+      "resize",
+      function () {
+        if (stage.current === null) {
+          return;
+        }
+        stage.current.handleResize();
+      },
+      false
+    );
+    stage.current.removeAllComponents();
+    const component = stage.current.addComponentFromObject(structure);
+    if (!component) {
+      console.error("Could not load structure");
+      return;
+    }
+    stage.current.defaultFileRepresentation(component);
 
-      o.autoView();
-      setIsLoaded(true);
-    });
+    setIsLoaded(true);
 
     // TODO clean up messes up the rendering, need to figure out why
     // return () => {
@@ -52,7 +65,19 @@ export function Viewer({ file }: { file: File | undefined }) {
     //     stage.current.dispose();
     //   }
     // };
-  }, [file, isLoaded]);
+  }, [structure, isLoaded]);
+
+  useEffect(() => {
+    if (stage.current === null) {
+      return;
+    }
+
+    stage.current.eachRepresentation((repr) => {
+      const selection = chain ? `:${chain}` : "";
+      // TODO figure out how to set selection
+      // repr.setSelection(selection);
+    });
+  }, [chain]);
 
   return <div ref={viewportRef} className="h-full w-full"></div>;
 }

@@ -1,14 +1,23 @@
+import { useState } from "react";
 import { useActionData, useSubmit, useNavigate } from "@remix-run/react";
-import { action as uploadaction } from "./upload";
-import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { object, instance, Output } from "valibot";
-import { parseFormData } from "~/scenarios/schema";
-import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import JSZip from "jszip";
+import NGL from "ngl";
+
+import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
+import { ActionButtons, handleActionButton } from "~/scenarios/actions";
+import { parseFormData } from "~/scenarios/schema";
 import { FormDescription } from "~/scenarios/FormDescription";
 import { FormItem } from "~/scenarios/FormItem";
-import { PDBFileInput } from "~/scenarios/PDBFileInput";
-import { Input } from "~/components/ui/input";
+import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
+import { MolViewerDialog } from "~/scenarios/MolViewerDialog.client";
+import { action as uploadaction } from "./upload";
+import {
+  ActPassSelection,
+  MoleculeSubForm,
+} from "~/scenarios/MoleculeSubForm.client";
+import { Molecule, chainsFromStructure } from "~/scenarios/molecule.client";
+import { client } from "~/haddock3-restraints-client/client";
 
 export const action = uploadaction;
 
@@ -85,9 +94,36 @@ top_models = 4
 reference_fname = "${data.reference_fname.name}"
 
 # ====================================================================
+`;
+}
 
+async function generateRestraintsFile(
+  protein1ActPass: ActPassSelection,
+  protein2ActPass: ActPassSelection
+) {
+  /*
 
-    `;
+  On CLI
+    haddock3-restraints --segid-one protein1activeResidues.chain --segid-two protein2activeResidues.chain active_passive_to_ambig protein1.actpass protein2.actpass > ambig.tbl
+  */
+  const { response } = await client.POST("/actpass_to_ambig", {
+    body: {
+      active1: protein1ActPass.active.resno,
+      active2: protein2ActPass.active.resno,
+      passive1: protein1ActPass.passive.resno,
+      passive2: protein2ActPass.passive.resno,
+      segid1: protein1ActPass.active.chain,
+      segid2: protein2ActPass.active.chain,
+    },
+    parseAs: "stream",
+  });
+  if (!response.ok) {
+    console.error(response);
+    throw new Error("Could not generate ambiguous restraints");
+  }
+
+  const blob = await response.blob();
+  return new File([blob], "ambig.tbl", { type: response.type });
 }
 
 async function createZip(workflow: string, data: Schema) {
@@ -105,14 +141,41 @@ export default function ProteinProteinScenario() {
   const submit = useSubmit();
   const navigate = useNavigate();
 
+  const [protein1ActPass, setProtein1ActPass] = useState<ActPassSelection>({
+    active: { chain: "", resno: [] },
+    passive: { chain: "", resno: [] },
+  });
+  const [protein2ActPass, setProtein2ActPass] = useState<ActPassSelection>({
+    active: { chain: "", resno: [] },
+    passive: { chain: "", resno: [] },
+  });
+
+  const [reference, setReference] = useState<Molecule | undefined>();
+  function referenceLoaded(structure: NGL.Structure, file: File) {
+    const chains = chainsFromStructure(structure);
+    setReference({ structure, chains, file });
+  }
+
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
-    const data = parseFormData(formData, Schema);
-    const workflow = generateWorkflow(data);
-    const zipPromise = createZip(workflow, data);
-    handleActionButton(event.nativeEvent, zipPromise, navigate, submit);
+    generateRestraintsFile(protein1ActPass, protein2ActPass)
+      .then((ambig_fname) => {
+        formData.set("ambig_fname", ambig_fname);
+        const data = parseFormData(formData, Schema);
+        const workflow = generateWorkflow(data);
+        const zipPromise = createZip(workflow, data);
+        handleActionButton(event.nativeEvent, zipPromise, navigate, submit);
+      })
+      .catch((error) => {
+        console.error(error);
+        // TODO: Show error to user
+      });
+  }
+
+  if (MolViewerDialog === undefined || PDBFileInput === undefined) {
+    return <>Loading...</>;
   }
 
   return (
@@ -141,37 +204,33 @@ export default function ProteinProteinScenario() {
       </p>
       <form onSubmit={onSubmit}>
         <div className="grid grid-cols-2 gap-6">
-          <FormItem name="protein1" label="First protein structure">
-            <PDBFileInput name="protein1" required />
-            <FormDescription>
-              In example named data/e2aP_1F3G.pdb
-            </FormDescription>
-          </FormItem>
-          <FormItem name="protein2" label="Second protein structure">
-            <PDBFileInput name="protein2" required />
-            <FormDescription>
-              In example named data/hpr_ensemble.pdb
-            </FormDescription>
-          </FormItem>
-          <FormItem name="ambig_fname" label="Ambiguous restraints">
-            <Input
-              type="file"
-              id="ambig_fname"
-              name="ambig_fname"
-              required
-              accept=".tbl"
-            />
-            <FormDescription>
-              In example named data/e2a-hpr_air.tbl
-            </FormDescription>
-          </FormItem>
-          <FormItem name="reference_fname" label="Reference structure">
-            <PDBFileInput name="reference_fname" />
-            <FormDescription>
-              In example named data/e2a-hpr_1GGR.pdb
-            </FormDescription>
-          </FormItem>
+          <MoleculeSubForm
+            name="protein1"
+            legend="First protein"
+            description="In example named data/e2a-hpr_1GGR.pdb"
+            actpass={protein1ActPass}
+            onActPassChange={setProtein1ActPass}
+          />
+          <MoleculeSubForm
+            name="protein2"
+            legend="Second protein"
+            description="In example named data/hpr_ensemble.pdb"
+            actpass={protein2ActPass}
+            onActPassChange={setProtein2ActPass}
+          />
         </div>
+        <FormItem name="reference_fname" label="Reference structure">
+          <div className="flex">
+            <PDBFileInput
+              name="reference_fname"
+              onStructureLoad={referenceLoaded}
+            />
+            <MolViewerDialog structure={reference?.structure} />
+          </div>
+          <FormDescription>
+            In example named data/e2a-hpr_1GGR.pdb
+          </FormDescription>
+        </FormItem>
         <div className="py-2 text-red-500">
           {actionData?.errors.map((error) => (
             <p key={error}>{error}</p>
