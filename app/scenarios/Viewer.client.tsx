@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { Stage, Structure } from "ngl";
+import { Stage, Structure, StructureComponent } from "ngl";
 
-export function Viewer({ structure }: { structure: Structure }) {
+export function Viewer({
+  structure,
+  chain,
+}: {
+  structure: Structure;
+  chain?: string;
+}) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const stage = useRef<Stage | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -45,11 +51,7 @@ export function Viewer({ structure }: { structure: Structure }) {
       console.error("Could not load structure");
       return;
     }
-    component.addRepresentation("cartoon", { sele: "polymer" });
-    component.addRepresentation("ball+stick", { sele: "ligand" });
-    component.addRepresentation("base", { sele: "nucleic" });
-
-    component.autoView();
+    stage.current.defaultFileRepresentation(component);
 
     setIsLoaded(true);
 
@@ -64,6 +66,18 @@ export function Viewer({ structure }: { structure: Structure }) {
     //   }
     // };
   }, [structure, isLoaded]);
+
+  useEffect(() => {
+    if (stage.current === null) {
+      return;
+    }
+
+    stage.current.eachRepresentation((repr) => {
+      const selection = chain ? `:${chain}` : "";
+      // TODO figure out how to set selection
+      // repr.setSelection(selection);
+    });
+  }, [chain]);
 
   return <div ref={viewportRef} className="h-full w-full"></div>;
 }

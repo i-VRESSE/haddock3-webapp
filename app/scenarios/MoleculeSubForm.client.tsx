@@ -98,7 +98,10 @@ export function MoleculeSubForm({
       </FormItem>
       <div className="h-[500px] w-full">
         {molecule ? (
-          <Viewer structure={molecule?.structure} />
+          <Viewer
+            structure={molecule?.structure}
+            chain={actpass.active.chain}
+          />
         ) : (
           <p>Load a structure first</p>
         )}
