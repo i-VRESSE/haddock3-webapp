@@ -10,7 +10,8 @@ Uses
 
 - [bartender](https://github.com/i-VRESSE/bartender) for job execution.
 - [workflow-builder](https://github.com/i-VRESSE/workflow-builder) to construct a Haddock3 workflow config file.
-- [haddock3](https://github.com/haddocking/haddock3) to compute
+- [haddock3](https://github.com/haddocking/haddock3) to compute and
+  - Its embedded restraints web service is also used.
 - [haddock3-analysis-components](https://github.com/i-VRESSE/haddock3-analysis-components) for analysis components.
 
 ```mermaid
@@ -54,6 +55,19 @@ openssl rsa -pubout -in private_key.pem -out public_key.pem
 
 The bartender web service should be running if you want to submit jobs.
 See [docs/bartender.md](docs/bartender.md) how to set it up.
+
+## Haddock3 restraints web service
+
+The scenario forms uses the [haddock3 restraints web service]() to calulate restraints based on given active residues and structures.
+
+For the web application to use this service, it needs to be running with
+
+```shell
+# Activated Python environment with haddock3, fastapi and uvicorn installed
+uvicorn --port 5000 haddock.clis.restraints.webservice:app
+```
+
+If not running on `http://localhost:5000` then set the `HADDOCK3_RESTRAINTS_URL` environment variable.
 
 ## Development
 
