@@ -1,11 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Stage, Structure } from "ngl";
 
-export function Viewer({
-  structure,
-}: {
-  structure: Structure;
-}) {
+export function Viewer({ structure }: { structure: Structure }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const stage = useRef<Stage | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);

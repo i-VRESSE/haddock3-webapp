@@ -43,7 +43,11 @@ export function ChainSelect({
     >
       {chains.map((chain) => (
         <div key={chain} className="flex items-center space-x-2">
-          <RadioGroupItem value={chain} id={id + chain} className="bg-inherit"/>
+          <RadioGroupItem
+            value={chain}
+            id={id + chain}
+            className="bg-inherit"
+          />
           <Label htmlFor={id + chain}>{chain}</Label>
         </div>
       ))}

@@ -21,19 +21,29 @@ function ImportResidues({
 }) {
   function doImport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.preventDefault();
-    const newSelection = window.prompt('Enter comma-separated residue numbers to import', selected.join(','))
+    const newSelection = window.prompt(
+      "Enter comma-separated residue numbers to import",
+      selected.join(",")
+    );
     if (newSelection) {
-      const newResidues = newSelection.split(',').map((r) => parseInt(r));
+      const newResidues = newSelection.split(",").map((r) => parseInt(r));
+      newResidues.sort();
       // TODO check if given residues are in options list
       onChange(newResidues);
     }
   }
   return (
-    <div className="flex gap-2 items-center">
-    <Input readOnly value={selected.join(',')} className="w-1/2 p-1" />
-    <Button variant="outline" size="sm" onClick={doImport}>Import</Button>
+    <div className="flex items-center gap-2">
+      <Input
+        readOnly
+        value={[...selected].sort().join(",")}
+        className="w-1/2 p-1"
+      />
+      <Button variant="outline" size="sm" onClick={doImport}>
+        Import
+      </Button>
     </div>
-  )
+  );
 }
 
 export function ResiduesSelect({
@@ -110,10 +120,7 @@ export function ResiduesSelect({
         (Hold Shift to select a range of residues)
       </FormDescription>
       {/* TODO add buttons to select all, none, invert */}
-      <ImportResidues
-        selected={selected}
-        onChange={onChange}
-      />
+      <ImportResidues selected={selected} onChange={onChange} />
     </>
   );
 }

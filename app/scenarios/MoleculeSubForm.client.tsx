@@ -30,7 +30,7 @@ export async function passiveFromActive(
     chain: activeResidues.chain,
     active: activeResidues.resno,
     surface: [],
-  }
+  };
   const { data, error } = await client.POST("/passive_from_active", {
     body,
   });
@@ -99,9 +99,7 @@ export function MoleculeSubForm({
       </FormItem>
       <div className="h-[500px] w-full">
         {molecule ? (
-          <Viewer
-            structure={molecule?.structure}
-          />
+          <Viewer structure={molecule?.structure} />
         ) : (
           <p>Load a structure first</p>
         )}
