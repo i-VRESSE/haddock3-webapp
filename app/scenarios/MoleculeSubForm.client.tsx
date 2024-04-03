@@ -25,13 +25,14 @@ export async function passiveFromActive(
   haddock3-restraints passive_from_active -c protein1activeResidues.chain protein1 protein1activeResidues.resno.join(',') >> protein1.actpass
 */
   const structure = await file.text();
+  const body = {
+    structure: btoa(structure),
+    chain: activeResidues.chain,
+    active: activeResidues.resno,
+    surface: [],
+  }
   const { data, error } = await client.POST("/passive_from_active", {
-    body: {
-      structure: btoa(structure),
-      chain: activeResidues.chain,
-      active: activeResidues.resno,
-      surface: [],
-    },
+    body,
   });
   if (error) {
     console.error(error);
@@ -100,7 +101,6 @@ export function MoleculeSubForm({
         {molecule ? (
           <Viewer
             structure={molecule?.structure}
-            chain={actpass.active.chain}
           />
         ) : (
           <p>Load a structure first</p>

@@ -2,6 +2,8 @@ import { ChangeEvent, useState } from "react";
 import { FormDescription } from "./FormDescription";
 import { Residue, SecondaryStructure } from "./molecule.client";
 import clsx from "clsx";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 
 const residueVariants: Record<SecondaryStructure, string> = {
   sheet: "bg-amber-200 dark:bg-amber-700",
@@ -9,6 +11,30 @@ const residueVariants: Record<SecondaryStructure, string> = {
   turn: "",
   "": "",
 };
+
+function ImportResidues({
+  selected,
+  onChange,
+}: {
+  selected: number[];
+  onChange: (selected: number[]) => void;
+}) {
+  function doImport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    e.preventDefault();
+    const newSelection = window.prompt('Enter comma-separated residue numbers to import', selected.join(','))
+    if (newSelection) {
+      const newResidues = newSelection.split(',').map((r) => parseInt(r));
+      // TODO check if given residues are in options list
+      onChange(newResidues);
+    }
+  }
+  return (
+    <div className="flex gap-2 items-center">
+    <Input readOnly value={selected.join(',')} className="w-1/2 p-1" />
+    <Button variant="outline" size="sm" onClick={doImport}>Import</Button>
+    </div>
+  )
+}
 
 export function ResiduesSelect({
   options,
@@ -84,6 +110,10 @@ export function ResiduesSelect({
         (Hold Shift to select a range of residues)
       </FormDescription>
       {/* TODO add buttons to select all, none, invert */}
+      <ImportResidues
+        selected={selected}
+        onChange={onChange}
+      />
     </>
   );
 }

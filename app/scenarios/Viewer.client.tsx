@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { Stage, Structure, StructureComponent } from "ngl";
+import { Stage, Structure } from "ngl";
 
 export function Viewer({
   structure,
-  chain,
 }: {
   structure: Structure;
-  chain?: string;
 }) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const stage = useRef<Stage | null>(null);
@@ -53,6 +51,8 @@ export function Viewer({
     }
     stage.current.defaultFileRepresentation(component);
 
+    stage.current.autoView();
+
     setIsLoaded(true);
 
     // TODO clean up messes up the rendering, need to figure out why
@@ -66,18 +66,6 @@ export function Viewer({
     //   }
     // };
   }, [structure, isLoaded]);
-
-  useEffect(() => {
-    if (stage.current === null) {
-      return;
-    }
-
-    stage.current.eachRepresentation((repr) => {
-      const selection = chain ? `:${chain}` : "";
-      // TODO figure out how to set selection
-      // repr.setSelection(selection);
-    });
-  }, [chain]);
 
   return <div ref={viewportRef} className="h-full w-full"></div>;
 }
