@@ -19,6 +19,8 @@ function ImportResidues({
   selected: number[];
   onChange: (selected: number[]) => void;
 }) {
+  const sortedResidues = [...selected].sort((a, b) => a - b).join(",");
+
   function doImport(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.preventDefault();
     const newSelection = window.prompt(
@@ -33,7 +35,7 @@ function ImportResidues({
   }
   return (
     <div className="flex items-center gap-2">
-      <Input readOnly value={selected.join(",")} className="w-1/2 p-1" />
+      <Input readOnly value={sortedResidues} className="w-1/2 p-1" />
       <Button variant="outline" size="sm" onClick={doImport}>
         Import
       </Button>

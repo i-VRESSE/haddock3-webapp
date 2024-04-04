@@ -8,7 +8,12 @@ import {
   useId,
   useState,
 } from "react";
-import { Stage, Structure, StructureComponent, autoLoad } from "ngl";
+import {
+  Stage,
+  Structure,
+  StructureComponent,
+  StructureRepresentationType,
+} from "ngl";
 
 function currentBackground() {
   let backgroundColor = "white";
@@ -36,20 +41,23 @@ export function NGLResidues({
   residues,
   color,
   opacity,
+  representation,
 }: {
   residues: number[];
   color: string;
   opacity: number;
+  representation: StructureRepresentationType;
 }) {
   const name = useId();
   const stage = useStage();
   const component = useComponent();
+
   useEffect(() => {
     const repr = stage.getRepresentationsByName(name).first;
     if (repr) {
       repr.dispose();
     }
-    component.addRepresentation("spacefill", {
+    component.addRepresentation(representation, {
       name,
       sele: "not all",
       color,
@@ -61,17 +69,16 @@ export function NGLResidues({
         repr.dispose();
       }
     };
-  }, [stage, component, color, opacity]);
+  }, [stage, component, color, opacity, name, representation]);
 
   useEffect(() => {
     const repr = stage.getRepresentationsByName(name).first;
     if (repr) {
       const sortedResidues = [...residues].sort((a, b) => a - b);
-      const sel = sortedResidues.length ? sortedResidues.join(",") : "not all";
-      console.log({ residues, sel });
+      const sel = sortedResidues.length ? sortedResidues.join(", ") : "not all";
       repr.setSelection(sel);
     }
-  }, [residues]);
+  }, [residues, name, stage]);
 
   return null;
 }
@@ -128,6 +135,7 @@ export function NGLComponent({
     } else {
       component.setSelection(`:${chain}`);
     }
+    stage.autoView();
     return () => {
       if (!component) {
         return;
@@ -183,15 +191,34 @@ export function Viewer({
   structure,
   chain,
   active,
+  passive,
 }: {
   structure: Structure;
   chain: string;
   active: number[];
+  passive: number[];
 }) {
   return (
     <NGLStage>
       <NGLComponent structure={structure} chain={chain}>
-        <NGLResidues residues={active} color="green" opacity={0.3} />
+        <NGLResidues
+          residues={active}
+          color="green"
+          opacity={1.0}
+          representation="ball+stick"
+        />
+        <NGLResidues
+          residues={active}
+          color="green"
+          opacity={0.3}
+          representation="spacefill"
+        />
+        <NGLResidues
+          residues={passive}
+          color="yellow"
+          opacity={0.3}
+          representation="spacefill"
+        />
       </NGLComponent>
     </NGLStage>
   );

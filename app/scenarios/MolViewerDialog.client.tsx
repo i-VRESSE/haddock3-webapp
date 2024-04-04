@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Structure } from "ngl";
 
 import { Button } from "~/components/ui/button";
-import { NGLComponent, NGLStage, Viewer } from "~/scenarios/Viewer.client";
+import { NGLComponent, NGLStage } from "~/scenarios/Viewer.client";
 import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 
 export function MolViewerDialog({ structure }: { structure?: Structure }) {

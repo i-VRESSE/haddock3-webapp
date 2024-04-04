@@ -39,6 +39,57 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/restrain_bodies": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Restrain Bodies */
+    post: operations["restrain_bodies_restrain_bodies_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/calc_accessibility": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Calculate Accessibility */
+    post: operations["calculate_accessibility_calc_accessibility_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/validate_tbl": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Validate Tbl */
+    post: operations["validate_tbl_validate_tbl_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -78,6 +129,20 @@ export interface components {
        */
       segid2: string;
     };
+    /** CalcAccessibilityRequest */
+    CalcAccessibilityRequest: {
+      /**
+       * Structure
+       * @description The structure file as base64 encoded string.
+       */
+      structure: string;
+      /**
+       * Cutoff
+       * @description Relative cutoff for sidechain accessibility.
+       * @default 0.4
+       */
+      cutoff: number;
+    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -107,6 +172,40 @@ export interface components {
        * @default []
        */
       surface: number[];
+    };
+    /** RestrainBodiesRequest */
+    RestrainBodiesRequest: {
+      /**
+       * Structure
+       * @description The structure file as base64 encoded string.
+       */
+      structure: string;
+      /**
+       * Exclude
+       * @description Chains to exclude from the calculation.
+       * @default []
+       */
+      exclude: string[];
+    };
+    /** ValidateTblRequest */
+    ValidateTblRequest: {
+      /**
+       * Tbl
+       * @description The TBL file as base64 encoded string.
+       */
+      tbl: string;
+      /**
+       * Pcs
+       * @description Flag to indicate if the TBL file is in PCS mode.
+       * @default false
+       */
+      pcs: boolean;
+      /**
+       * Quick
+       * @description Check global formatting before going line by line (opening/closing parenthesis and quotation marks.
+       * @default false
+       */
+      quick: boolean;
     };
     /** ValidationError */
     ValidationError: {
@@ -169,6 +268,107 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["ActPassToAmbigRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "text/plain": string;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  restrain_bodies_restrain_bodies_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RestrainBodiesRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "text/plain": string;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  calculate_accessibility_calc_accessibility_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CalcAccessibilityRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            [key: string]: number[] | undefined;
+          };
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  validate_tbl_validate_tbl_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ValidateTblRequest"];
       };
     };
     responses: {

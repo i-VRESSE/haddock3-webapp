@@ -1,9 +1,18 @@
 import { Structure, autoLoad } from "ngl";
 import ResidueProxy from "ngl/dist/declarations/proxy/residue-proxy";
 
-export type Residue = { resno: number; seq: string; sec: SecondaryStructure };
+export interface Residue {
+  resno: number;
+  seq: string;
+  sec: SecondaryStructure;
+  surface?: boolean;
+}
 export type Chains = Record<string, Residue[]>;
-export type Molecule = { structure: Structure; chains: Chains; file: File };
+export interface Molecule {
+  structure: Structure;
+  chains: Chains;
+  file: File;
+}
 
 export type SecondaryStructure = "sheet" | "helix" | "turn" | "";
 

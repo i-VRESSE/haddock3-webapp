@@ -6,9 +6,15 @@ import { FormItem } from "~/scenarios/FormItem";
 import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import { ChainSelect } from "~/scenarios/ChainSelect";
 import { ResiduesSelect } from "~/scenarios/ResiduesSelect";
-import { Molecule, chainsFromStructure } from "./molecule.client";
+import {
+  Chains,
+  Molecule,
+  Residue,
+  chainsFromStructure,
+} from "./molecule.client";
 import { Viewer } from "./Viewer.client";
 import { client } from "~/haddock3-restraints-client/client";
+import { Checkbox } from "~/components/ui/checkbox";
 
 export type ResidueSelection = { chain: string; resno: number[] };
 export type ActPassSelection = {
@@ -41,6 +47,40 @@ export async function passiveFromActive(
   return data;
 }
 
+async function calculateAccessibility(file: File, chains: Chains) {
+  const structure = await file.text();
+  const body = {
+    structure: btoa(structure),
+    cutoff: 0.4,
+  };
+  const { data, error } = await client.POST("/calc_accessibility", {
+    body,
+  });
+  if (error) {
+    console.error(error);
+    return;
+  }
+  Object.entries(data).forEach(([chain, surfaceResidues]) => {
+    if (!surfaceResidues) {
+      return;
+    }
+    chains[chain].forEach((residue: Residue) => {
+      residue.surface = surfaceResidues.includes(residue.resno);
+    });
+  });
+}
+
+function filterBuriedResidues(
+  chain: string,
+  residues: number[],
+  chains: Chains
+) {
+  return residues.filter((resno) => {
+    const residue = chains[chain].find((r) => r.resno === resno);
+    return residue && residue.surface;
+  });
+}
+
 export function MoleculeSubForm({
   name,
   legend,
@@ -55,9 +95,11 @@ export function MoleculeSubForm({
   onActPassChange: (actpass: ActPassSelection) => void;
 }) {
   const [molecule, setMolecule] = useState<Molecule | undefined>();
+  const [showPassive, setShowPassive] = useState(false);
 
-  function handleStructureLoad(structure: Structure, file: File) {
+  async function handleStructureLoad(structure: Structure, file: File) {
     const chains = chainsFromStructure(structure);
+    await calculateAccessibility(file, chains);
     setMolecule({ structure, chains, file });
   }
 
@@ -72,15 +114,31 @@ export function MoleculeSubForm({
   function handleActiveResiduesChange(activeResidues: number[]) {
     passiveFromActive(molecule!.file, {
       chain: actpass.active.chain,
-      resno: activeResidues,
+      resno: filterBuriedResidues(
+        actpass.active.chain,
+        activeResidues,
+        molecule!.chains
+      ),
     })
       .then((passiveResidues) => {
+        const filteredPassiveResidues = filterBuriedResidues(
+          actpass.passive.chain,
+          passiveResidues,
+          molecule!.chains
+        );
         onActPassChange({
           active: { chain: actpass.active.chain, resno: activeResidues },
-          passive: { chain: actpass.passive.chain, resno: passiveResidues },
+          passive: {
+            chain: actpass.passive.chain,
+            resno: filteredPassiveResidues,
+          },
         });
       })
       .catch((error) => {
+        onActPassChange({
+          active: { chain: actpass.active.chain, resno: activeResidues },
+          passive: { chain: actpass.passive.chain, resno: [] },
+        });
         console.error(error);
         // TODO show error to user
       });
@@ -88,7 +146,7 @@ export function MoleculeSubForm({
 
   return (
     <fieldset className="border border-solid border-primary p-3">
-      <legend className="">{legend}</legend>
+      <legend>{legend}</legend>
       <FormItem name={name} label="Structure">
         <PDBFileInput
           name={name}
@@ -103,6 +161,7 @@ export function MoleculeSubForm({
             structure={molecule?.structure}
             chain={actpass.active.chain}
             active={actpass.active.resno}
+            passive={showPassive ? actpass.passive.resno : []}
           />
         ) : (
           <p>Load a structure first</p>
@@ -121,11 +180,23 @@ export function MoleculeSubForm({
       </FormItem>
       <FormItem name={`${name}-active-residues`} label="Active residues">
         {actpass.active.chain ? (
-          <ResiduesSelect
-            options={molecule?.chains[actpass.active.chain] || []}
-            selected={actpass.active.resno}
-            onChange={handleActiveResiduesChange}
-          />
+          <>
+            <ResiduesSelect
+              options={molecule?.chains[actpass.active.chain] || []}
+              selected={actpass.active.resno}
+              onChange={handleActiveResiduesChange}
+            />
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="showpassive"
+                defaultChecked={showPassive}
+                onCheckedChange={() => setShowPassive(!showPassive)}
+              />
+              <label htmlFor="showpassive" className="">
+                Show passive restraints
+              </label>
+            </div>
+          </>
         ) : (
           <p>Select a chain first</p>
         )}
