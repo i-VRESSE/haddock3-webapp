@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Structure } from "ngl";
 
 import { Button } from "~/components/ui/button";
-import { Viewer } from "~/scenarios/Viewer.client";
+import { NGLComponent, NGLStage, Viewer } from "~/scenarios/Viewer.client";
 import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 
 export function MolViewerDialog({ structure }: { structure?: Structure }) {
@@ -21,7 +21,11 @@ export function MolViewerDialog({ structure }: { structure?: Structure }) {
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2/3 h-2/3 w-2/3">
-        {structure !== undefined && open && <Viewer structure={structure} />}
+        {structure !== undefined && open && (
+          <NGLStage>
+            <NGLComponent structure={structure} chain="" />
+          </NGLStage>
+        )}
       </DialogContent>
     </Dialog>
   );

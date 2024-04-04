@@ -11,8 +11,9 @@ import { hydrateRoot } from "react-dom/client";
 startTransition(() => {
   hydrateRoot(
     document,
-    <StrictMode>
-      <RemixBrowser />
-    </StrictMode>
+    // TODO renable when ngl useEffect tairdowns are fixed
+    // <StrictMode>
+    <RemixBrowser />
+    // </StrictMode>
   );
 });

@@ -1,67 +1,198 @@
-import { useEffect, useRef, useState } from "react";
-import { Stage, Structure } from "ngl";
+import {
+  ReactNode,
+  RefCallback,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useState,
+} from "react";
+import { Stage, Structure, StructureComponent, autoLoad } from "ngl";
 
-export function Viewer({ structure }: { structure: Structure }) {
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const stage = useRef<Stage | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+function currentBackground() {
+  let backgroundColor = "white";
+  if (document?.documentElement?.classList.contains("dark")) {
+    backgroundColor = "black";
+  } else if (document?.documentElement?.classList.contains("light")) {
+    backgroundColor = "white";
+  } else if (window?.matchMedia("(prefers-color-scheme: dark)").matches) {
+    backgroundColor = "black";
+  }
+  return backgroundColor;
+}
+
+const StageReactContext = createContext<Stage | undefined>(undefined);
+
+function useStage() {
+  const stage = useContext(StageReactContext);
+  if (!stage) {
+    throw new Error("useStage must be used within a StageProvider");
+  }
+  return stage;
+}
+
+export function NGLResidues({
+  residues,
+  color,
+  opacity,
+}: {
+  residues: number[];
+  color: string;
+  opacity: number;
+}) {
+  const name = useId();
+  const stage = useStage();
+  const component = useComponent();
+  useEffect(() => {
+    const repr = stage.getRepresentationsByName(name).first;
+    if (repr) {
+      repr.dispose();
+    }
+    component.addRepresentation("spacefill", {
+      name,
+      sele: "not all",
+      color,
+      opacity,
+    });
+    return () => {
+      const repr = stage.getRepresentationsByName(name).first;
+      if (repr) {
+        repr.dispose();
+      }
+    };
+  }, [stage, component, color, opacity]);
 
   useEffect(() => {
-    if (isLoaded) {
-      return;
+    const repr = stage.getRepresentationsByName(name).first;
+    if (repr) {
+      const sortedResidues = [...residues].sort((a, b) => a - b);
+      const sel = sortedResidues.length ? sortedResidues.join(",") : "not all";
+      console.log({ residues, sel });
+      repr.setSelection(sel);
     }
-    if (!viewportRef.current) {
-      return;
-    }
+  }, [residues]);
 
-    // Create Stage object
-    stage.current = new Stage(viewportRef.current);
-    let backgroundColor = "white";
-    if (document?.documentElement?.classList.contains("dark")) {
-      backgroundColor = "black";
-    } else if (document?.documentElement?.classList.contains("light")) {
-      backgroundColor = "white";
-    } else if (window?.matchMedia("(prefers-color-scheme: dark)").matches) {
-      backgroundColor = "black";
-    }
-    stage.current.setParameters({ backgroundColor });
+  return null;
+}
 
-    if (stage.current === null) {
-      return;
-    }
-    window.addEventListener(
-      "resize",
-      function () {
-        if (stage.current === null) {
-          return;
-        }
-        stage.current.handleResize();
-      },
-      false
+const NGLComponentContext = createContext<StructureComponent | undefined>(
+  undefined
+);
+
+export function useComponent() {
+  const component = useContext(NGLComponentContext);
+  if (!component) {
+    throw new Error(
+      "useNGLComponent must be used within a NGLComponentProvider"
     );
-    stage.current.removeAllComponents();
-    const component = stage.current.addComponentFromObject(structure);
+  }
+  return component;
+}
+
+export function NGLComponent({
+  structure,
+  chain,
+  children,
+}: {
+  structure: Structure;
+  chain: string;
+  children?: ReactNode;
+}) {
+  const stage = useStage();
+  const [component, setComponent] = useState<StructureComponent | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    const component = stage.addComponentFromObject(structure);
     if (!component) {
-      console.error("Could not load structure");
       return;
     }
-    stage.current.defaultFileRepresentation(component);
+    stage.defaultFileRepresentation(component);
+    stage.autoView();
+    setComponent(component as StructureComponent);
+    return () => {
+      if (component) {
+        stage.removeComponent(component);
+      }
+    };
+  }, [stage, structure]);
 
-    stage.current.autoView();
+  useEffect(() => {
+    if (!component) {
+      return;
+    }
+    if (chain === "") {
+      component.setSelection("");
+    } else {
+      component.setSelection(`:${chain}`);
+    }
+    return () => {
+      if (!component) {
+        return;
+      }
+      component.setSelection("");
+    };
+  }, [stage, chain, component]);
 
-    setIsLoaded(true);
+  return (
+    <>
+      {component && (
+        <NGLComponentContext.Provider value={component}>
+          {children}
+        </NGLComponentContext.Provider>
+      )}
+    </>
+  );
+}
 
-    // TODO clean up messes up the rendering, need to figure out why
-    // return () => {
-    //   if (stage.current && file) {
-    //     const comps = stage.current.getComponentsByName(file.name);
-    //     comps.dispose();
-    //   }
-    //   if (stage.current) {
-    //     stage.current.dispose();
-    //   }
-    // };
-  }, [structure, isLoaded]);
+export function NGLStage({ children }: { children: ReactNode }) {
+  const [stage, setStage] = useState<Stage>();
 
-  return <div ref={viewportRef} className="h-full w-full"></div>;
+  const stageElementRef: RefCallback<HTMLElement> = useCallback((element) => {
+    if (element) {
+      const backgroundColor = currentBackground();
+      const currentStage = new Stage(element, { backgroundColor });
+      setStage(currentStage);
+    }
+  }, []);
+
+  useEffect(() => {
+    return (): void => {
+      if (stage) {
+        stage.dispose();
+      }
+    };
+  }, [stage]);
+
+  return (
+    <>
+      {/* TODO make height and width configurable */}
+      <div ref={stageElementRef} className="h-full w-full" />
+      {stage && (
+        <StageReactContext.Provider value={stage}>
+          {children}
+        </StageReactContext.Provider>
+      )}
+    </>
+  );
+}
+
+export function Viewer({
+  structure,
+  chain,
+  active,
+}: {
+  structure: Structure;
+  chain: string;
+  active: number[];
+}) {
+  return (
+    <NGLStage>
+      <NGLComponent structure={structure} chain={chain}>
+        <NGLResidues residues={active} color="green" opacity={0.3} />
+      </NGLComponent>
+    </NGLStage>
+  );
 }

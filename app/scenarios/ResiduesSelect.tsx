@@ -27,18 +27,13 @@ function ImportResidues({
     );
     if (newSelection) {
       const newResidues = newSelection.split(",").map((r) => parseInt(r));
-      newResidues.sort();
       // TODO check if given residues are in options list
       onChange(newResidues);
     }
   }
   return (
     <div className="flex items-center gap-2">
-      <Input
-        readOnly
-        value={[...selected].sort().join(",")}
-        className="w-1/2 p-1"
-      />
+      <Input readOnly value={selected.join(",")} className="w-1/2 p-1" />
       <Button variant="outline" size="sm" onClick={doImport}>
         Import
       </Button>

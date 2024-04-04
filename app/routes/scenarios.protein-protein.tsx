@@ -175,7 +175,7 @@ export default function ProteinProteinScenario() {
   }
 
   if (MolViewerDialog === undefined || PDBFileInput === undefined) {
-    return <>Loading...</>;
+    return <div>Loading...</div>;
   }
 
   return (
