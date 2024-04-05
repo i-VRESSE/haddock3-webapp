@@ -12,6 +12,7 @@ export interface Molecule {
   structure: Structure;
   chains: Chains;
   file: File;
+  originalFile: File; // File not passed through the pdbtools preprocess pipeline
 }
 
 export type SecondaryStructure = "sheet" | "helix" | "turn" | "";

@@ -88,7 +88,11 @@ export function ResiduesSelect({
             <div
               key={r.resno}
               className="inline-block w-4 text-center font-mono"
-              title={`${r.resno}`}
+              title={
+                r.surface === false
+                  ? `${r.resno}, disabled due to not on surface`
+                  : `${r.resno}`
+              }
             >
               <label
                 htmlFor={`residue-${r.resno}`}
@@ -99,6 +103,7 @@ export function ResiduesSelect({
               <input
                 type="checkbox"
                 value={r.resno}
+                disabled={r.surface === false}
                 id={`residue-${r.resno}`}
                 checked={selected.includes(r.resno)}
                 onChange={(e) => handleChange(e, index)}

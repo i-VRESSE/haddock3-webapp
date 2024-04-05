@@ -90,6 +90,34 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/preprocess_pdb": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Preprocess Pdb
+     * @description Preprocess a PDB file.
+     *
+     *     Runs the following [pdbtools](http://www.bonvinlab.org/pdb-tools/) pipeline:
+     *
+     *     ```shell
+     *     cat pdb | pdb_tidy -strict | pdb_selchain -<from_chain> | pdb_chain -<to_chain> | pdb_fixinsert | pdb_selaltloc | pdb_tidy -strict
+     *     ```
+     *
+     *     The request body
+     */
+    post: operations["preprocess_pdb_preprocess_pdb_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -129,6 +157,15 @@ export interface components {
        */
       segid2: string;
     };
+    /** Body_preprocess_pdb_preprocess_pdb_post */
+    Body_preprocess_pdb_preprocess_pdb_post: {
+      /**
+       * Pdb
+       * Format: binary
+       * @description Gzip compressed PDB file to process
+       */
+      pdb: Blob;
+    };
     /** CalcAccessibilityRequest */
     CalcAccessibilityRequest: {
       /**
@@ -139,7 +176,6 @@ export interface components {
       /**
        * Cutoff
        * @description Relative cutoff for sidechain accessibility.
-       * @default 0.4
        */
       cutoff: number;
     };
@@ -369,6 +405,50 @@ export interface operations {
     requestBody: {
       content: {
         "application/json": components["schemas"]["ValidateTblRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "text/plain": string;
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  preprocess_pdb_preprocess_pdb_post: {
+    parameters: {
+      query: {
+        /**
+         * @description Chains to keep
+         * @example A
+         */
+        from_chain: string;
+        /**
+         * @description New chain identifier
+         * @example A
+         */
+        to_chain: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": components["schemas"]["Body_preprocess_pdb_preprocess_pdb_post"];
       };
     };
     responses: {

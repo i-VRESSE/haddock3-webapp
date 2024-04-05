@@ -1,4 +1,4 @@
-import { Structure } from "ngl";
+import { Structure, autoLoad } from "ngl";
 import { useState } from "react";
 
 import { FormDescription } from "~/scenarios/FormDescription";
@@ -24,7 +24,8 @@ export type ActPassSelection = {
 
 export async function passiveFromActive(
   file: File,
-  activeResidues: ResidueSelection
+  activeResidues: ResidueSelection,
+  surface: number[]
 ) {
   /*
   On CLI
@@ -35,7 +36,7 @@ export async function passiveFromActive(
     structure: btoa(structure),
     chain: activeResidues.chain,
     active: activeResidues.resno,
-    surface: [],
+    surface,
   };
   const { data, error } = await client.POST("/passive_from_active", {
     body,
@@ -70,6 +71,39 @@ async function calculateAccessibility(file: File, chains: Chains) {
   });
 }
 
+async function preprocessPdb(file: File, fromChain: string, toChain: string) {
+  const cs = new CompressionStream("gzip");
+  const compressedStream = file.stream().pipeThrough(cs);
+  // openapi-typescript does not transform request body with type=string+format=binary into blob
+  // so we cast it to string to avoid type errors, bypass the body serializer
+  // and use middleware to set the correct content type
+  const pdb = await new Response(compressedStream, {
+    headers: { "Content-Type": "application/gzip" },
+  }).blob();
+  const { error, data } = await client.POST("/preprocess_pdb", {
+    body: {
+      pdb,
+    },
+    bodySerializer(body) {
+      const fd = new FormData();
+      fd.append("pdb", body.pdb, file.name);
+      return fd;
+    },
+    params: {
+      query: {
+        from_chain: fromChain,
+        to_chain: toChain,
+      },
+    },
+    parseAs: "text",
+  });
+  if (error) {
+    console.error(error);
+    throw new Error("Could not preprocess pdb");
+  }
+  return new File([data], file.name, { type: file.type });
+}
+
 function filterBuriedResidues(
   chain: string,
   residues: number[],
@@ -87,39 +121,63 @@ export function MoleculeSubForm({
   description,
   actpass,
   onActPassChange,
+  targetChain,
 }: {
   name: string;
   legend: string;
   description: string;
   actpass: ActPassSelection;
   onActPassChange: (actpass: ActPassSelection) => void;
+  targetChain: string;
 }) {
   const [molecule, setMolecule] = useState<Molecule | undefined>();
   const [showPassive, setShowPassive] = useState(false);
+  const [showSurface, setShowSurface] = useState(false);
 
   async function handleStructureLoad(structure: Structure, file: File) {
     const chains = chainsFromStructure(structure);
-    await calculateAccessibility(file, chains);
-    setMolecule({ structure, chains, file });
+
+    setMolecule({ structure, chains, file, originalFile: file });
   }
 
-  function handleChainChange(chain: string) {
+  async function handleChainChange(chain: string) {
+    if (!molecule) {
+      return;
+    }
+    const processed = await preprocessPdb(
+      molecule.originalFile,
+      chain,
+      targetChain
+    );
+    const structure: Structure = await autoLoad(processed);
+    const chains = chainsFromStructure(structure);
+    await calculateAccessibility(processed, chains);
+    setMolecule({
+      structure,
+      chains,
+      file: processed,
+      originalFile: molecule.originalFile,
+    });
     const newSelection = {
-      active: { chain, resno: [] },
-      passive: { chain, resno: [] },
+      active: { chain: targetChain, resno: [] },
+      passive: { chain: targetChain, resno: [] },
     };
     onActPassChange(newSelection);
   }
 
   function handleActiveResiduesChange(activeResidues: number[]) {
-    passiveFromActive(molecule!.file, {
+    const surfaceResidues = molecule!.chains[targetChain]
+      .filter((r) => r.surface)
+      .map((r) => r.resno);
+    const activeSelection = {
       chain: actpass.active.chain,
       resno: filterBuriedResidues(
         actpass.active.chain,
         activeResidues,
         molecule!.chains
       ),
-    })
+    };
+    passiveFromActive(molecule!.file, activeSelection, surfaceResidues)
       .then((passiveResidues) => {
         const filteredPassiveResidues = filterBuriedResidues(
           actpass.passive.chain,
@@ -162,6 +220,13 @@ export function MoleculeSubForm({
             chain={actpass.active.chain}
             active={actpass.active.resno}
             passive={showPassive ? actpass.passive.resno : []}
+            surface={
+              showSurface
+                ? molecule.chains[targetChain]
+                    .filter((r) => r.surface)
+                    .map((r) => r.resno)
+                : []
+            }
           />
         ) : (
           <p>Load a structure first</p>
@@ -194,6 +259,17 @@ export function MoleculeSubForm({
               />
               <label htmlFor="showpassive" className="">
                 Show passive restraints
+              </label>
+              <Checkbox
+                id="showsurface"
+                disabled={
+                  !Object.keys(molecule!.chains).every((c) => c === targetChain)
+                }
+                defaultChecked={showSurface}
+                onCheckedChange={() => setShowSurface(!showSurface)}
+              />
+              <label htmlFor="showsurface" className="">
+                Show surface residues
               </label>
             </div>
           </>

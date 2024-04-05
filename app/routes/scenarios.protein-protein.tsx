@@ -62,6 +62,7 @@ molecules =  [
 
 [rigidbody]
 ambig_fname = "${data.ambig_fname.name}"
+# unambig = restrain bodies of all molecules, dont set if there are none
 sampling = 1000
 
 [caprieval]
@@ -129,6 +130,8 @@ async function generateRestraintsFile(
 async function createZip(workflow: string, data: Schema) {
   const zip = new JSZip();
   zip.file(WORKFLOW_CONFIG_FILENAME, workflow);
+  // TODO replace proteins with preprocessed versions
+  // also add remark inside that they were preprocessed
   zip.file(data.protein1.name, data.protein1);
   zip.file(data.protein2.name, data.protein2);
   zip.file(data.ambig_fname.name, data.ambig_fname);
@@ -153,7 +156,7 @@ export default function ProteinProteinScenario() {
   const [reference, setReference] = useState<Molecule | undefined>();
   function referenceLoaded(structure: NGL.Structure, file: File) {
     const chains = chainsFromStructure(structure);
-    setReference({ structure, chains, file });
+    setReference({ structure, chains, file, originalFile: file });
   }
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -210,6 +213,7 @@ export default function ProteinProteinScenario() {
             description="In example named data/e2a-hpr_1GGR.pdb"
             actpass={protein1ActPass}
             onActPassChange={setProtein1ActPass}
+            targetChain="A"
           />
           <MoleculeSubForm
             name="protein2"
@@ -217,6 +221,7 @@ export default function ProteinProteinScenario() {
             description="In example named data/hpr_ensemble.pdb"
             actpass={protein2ActPass}
             onActPassChange={setProtein2ActPass}
+            targetChain="B"
           />
         </div>
         <FormItem name="reference_fname" label="Reference structure">

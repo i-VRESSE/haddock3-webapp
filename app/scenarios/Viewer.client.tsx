@@ -112,6 +112,7 @@ export function NGLComponent({
   );
 
   useEffect(() => {
+    stage.getComponentsByName(structure.name).dispose();
     const component = stage.addComponentFromObject(structure);
     if (!component) {
       return;
@@ -192,11 +193,13 @@ export function Viewer({
   chain,
   active,
   passive,
+  surface,
 }: {
   structure: Structure;
   chain: string;
   active: number[];
   passive: number[];
+  surface: number[];
 }) {
   return (
     <NGLStage>
@@ -218,6 +221,12 @@ export function Viewer({
           color="yellow"
           opacity={0.3}
           representation="spacefill"
+        />
+        <NGLResidues
+          residues={surface}
+          color="orange"
+          opacity={0.7}
+          representation="surface"
         />
       </NGLComponent>
     </NGLStage>
