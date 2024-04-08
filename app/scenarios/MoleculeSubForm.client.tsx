@@ -1,5 +1,6 @@
 import { Structure, autoLoad } from "ngl";
 import { useState } from "react";
+import { strFromU8, gzip } from "fflate";
 
 import { FormDescription } from "~/scenarios/FormDescription";
 import { FormItem } from "~/scenarios/FormItem";
@@ -31,9 +32,9 @@ export async function passiveFromActive(
   On CLI
   haddock3-restraints passive_from_active -c protein1activeResidues.chain protein1 protein1activeResidues.resno.join(',') >> protein1.actpass
 */
-  const structure = await file.text();
+  const structure = await packAndEncode(file);
   const body = {
-    structure: btoa(structure),
+    structure,
     chain: activeResidues.chain,
     active: activeResidues.resno,
     surface,
@@ -49,9 +50,9 @@ export async function passiveFromActive(
 }
 
 async function calculateAccessibility(file: File, chains: Chains) {
-  const structure = await file.text();
+  const structure = await packAndEncode(file);
   const body = {
-    structure: btoa(structure),
+    structure,
     cutoff: 0.4,
   };
   const { data, error } = await client.POST("/calc_accessibility", {
@@ -71,29 +72,26 @@ async function calculateAccessibility(file: File, chains: Chains) {
   });
 }
 
+
+async function packAndEncode(file: File): Promise<string> {
+  const data = new Uint8Array(await file.arrayBuffer());
+  return new Promise((resolve, reject) => {
+    gzip(data, (err, data) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(btoa(strFromU8(data, true)));
+    });
+  });
+}
+
 async function preprocessPdb(file: File, fromChain: string, toChain: string) {
-  const cs = new CompressionStream("gzip");
-  const compressedStream = file.stream().pipeThrough(cs);
-  // openapi-typescript does not transform request body with type=string+format=binary into blob
-  // so we cast it to string to avoid type errors, bypass the body serializer
-  // and use middleware to set the correct content type
-  const pdb = await new Response(compressedStream, {
-    headers: { "Content-Type": "application/gzip" },
-  }).blob();
+  const structure = await packAndEncode(file);
   const { error, data } = await client.POST("/preprocess_pdb", {
     body: {
-      pdb,
-    },
-    bodySerializer(body) {
-      const fd = new FormData();
-      fd.append("pdb", body.pdb, file.name);
-      return fd;
-    },
-    params: {
-      query: {
-        from_chain: fromChain,
-        to_chain: toChain,
-      },
+      structure,
+      from_chain: fromChain,
+      to_chain: toChain,
     },
     parseAs: "text",
   });
