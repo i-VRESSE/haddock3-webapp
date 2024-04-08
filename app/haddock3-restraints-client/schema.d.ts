@@ -108,8 +108,6 @@ export interface paths {
      *     ```shell
      *     cat pdb | pdb_tidy -strict | pdb_selchain -<from_chain> | pdb_chain -<to_chain> | pdb_fixinsert | pdb_selaltloc | pdb_tidy -strict
      *     ```
-     *
-     *     The request body
      */
     post: operations["preprocess_pdb_preprocess_pdb_post"];
     delete?: never;
@@ -157,20 +155,11 @@ export interface components {
        */
       segid2: string;
     };
-    /** Body_preprocess_pdb_preprocess_pdb_post */
-    Body_preprocess_pdb_preprocess_pdb_post: {
-      /**
-       * Pdb
-       * Format: binary
-       * @description Gzip compressed PDB file to process
-       */
-      pdb: Blob;
-    };
     /** CalcAccessibilityRequest */
     CalcAccessibilityRequest: {
       /**
        * Structure
-       * @description The structure file as base64 encoded string.
+       * @description The structure file as a base64 encoded gzipped string.
        */
       structure: string;
       /**
@@ -184,11 +173,29 @@ export interface components {
       /** Detail */
       detail?: components["schemas"]["ValidationError"][];
     };
+    /** PDBPreprocessRequest */
+    PDBPreprocessRequest: {
+      /**
+       * Structure
+       * @description The structure file as a base64 encoded gzipped string.
+       */
+      structure: string;
+      /**
+       * From Chain
+       * @description Chains to keep
+       */
+      from_chain: string;
+      /**
+       * To Chain
+       * @description New chain identifier
+       */
+      to_chain: string;
+    };
     /** PassiveFromActiveRequest */
     PassiveFromActiveRequest: {
       /**
        * Structure
-       * @description The structure file as base64 encoded string.
+       * @description The structure file as a base64 encoded gzipped string.
        */
       structure: string;
       /**
@@ -213,7 +220,7 @@ export interface components {
     RestrainBodiesRequest: {
       /**
        * Structure
-       * @description The structure file as base64 encoded string.
+       * @description The structure file as a base64 encoded gzipped string.
        */
       structure: string;
       /**
@@ -227,7 +234,7 @@ export interface components {
     ValidateTblRequest: {
       /**
        * Tbl
-       * @description The TBL file as base64 encoded string.
+       * @description The TBL file as base64 encoded gzipped string.
        */
       tbl: string;
       /**
@@ -430,25 +437,14 @@ export interface operations {
   };
   preprocess_pdb_preprocess_pdb_post: {
     parameters: {
-      query: {
-        /**
-         * @description Chains to keep
-         * @example A
-         */
-        from_chain: string;
-        /**
-         * @description New chain identifier
-         * @example A
-         */
-        to_chain: string;
-      };
+      query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
     requestBody: {
       content: {
-        "multipart/form-data": components["schemas"]["Body_preprocess_pdb_preprocess_pdb_post"];
+        "application/json": components["schemas"]["PDBPreprocessRequest"];
       };
     };
     responses: {
