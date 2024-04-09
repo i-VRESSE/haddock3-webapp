@@ -132,7 +132,8 @@ export function ResiduesSelect({
         <span className={clsx("p-1 font-mono", residueVariants["sheet"])}>
           Sheet
         </span>{" "}
-        (Hold Shift to select a range of residues. Click residue in 3D viewer to select.)
+        (Hold Shift to select a range of residues. Click residue in 3D viewer to
+        select.)
       </FormDescription>
       {/* TODO add buttons to select all, none, invert */}
       <ImportResidues selected={selected} onChange={onImport} />
