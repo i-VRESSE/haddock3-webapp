@@ -12,10 +12,6 @@ export function ChainSelect({
   selected: string;
 }) {
   const id = useId();
-  if (chains.length === 1 && selected === "") {
-    selected = chains[0];
-    onSelect(selected);
-  }
   if (chains.length > 5) {
     return (
       <select
@@ -28,7 +24,7 @@ export function ChainSelect({
       >
         <option value="">Select a chain</option>
         {chains.map((chain) => (
-          <option key={chain} value={chain}>
+          <option key={`${id}-${chain}`} value={chain}>
             {chain}
           </option>
         ))}
@@ -42,7 +38,7 @@ export function ChainSelect({
       className="grid-flow-col"
     >
       {chains.map((chain) => (
-        <div key={chain} className="flex items-center space-x-2">
+        <div key={`${id}-${chain}`} className="flex items-center space-x-2">
           <RadioGroupItem
             value={chain}
             id={id + chain}

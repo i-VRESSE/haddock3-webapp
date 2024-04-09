@@ -36,7 +36,7 @@ export function chainsFromStructure(structure: Structure) {
   const chains: Chains = {};
   structure.eachChain((c) => {
     const chainName = c.chainname;
-    const residues: Residue[] = [];
+    let residues: Residue[] = [];
     c.eachResidue((r) => {
       residues.push({
         resno: r.resno,
@@ -44,6 +44,12 @@ export function chainsFromStructure(structure: Structure) {
         sec: secondaryStructureOfResidue(r),
       });
     });
+    // Same chain can be before+after TER line
+    // See https://github.com/haddocking/haddock3/blob/main/examples/data/1a2k_r_u.pdb
+    // to prevent 2 chains called A,A merge their residues
+    if (chains[chainName]) {
+      residues = chains[chainName].concat(residues);
+    }
     chains[chainName] = residues;
   });
   return chains;

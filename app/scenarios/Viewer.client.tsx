@@ -7,13 +7,17 @@ import {
   useEffect,
   useId,
   useState,
+  Component as ReactComponent,
+  ErrorInfo,
 } from "react";
 import {
+  PickingProxy,
   Stage,
   Structure,
   StructureComponent,
   StructureRepresentationType,
 } from "ngl";
+import { Button } from "~/components/ui/button";
 
 function currentBackground() {
   let backgroundColor = "white";
@@ -42,11 +46,16 @@ export function NGLResidues({
   color,
   opacity,
   representation,
+  pickable = false,
+  onPick,
 }: {
   residues: number[];
   color: string;
   opacity: number;
   representation: StructureRepresentationType;
+  hovered?: number[];
+  pickable?: boolean;
+  onPick?: (chain: string, residue: number) => void;
 }) {
   const name = useId();
   const stage = useStage();
@@ -79,6 +88,31 @@ export function NGLResidues({
       repr.setSelection(sel);
     }
   }, [residues, name, stage]);
+
+  const onClick = useCallback(
+    (pickinProxy: PickingProxy) => {
+      if (onPick && pickinProxy?.atom?.resno && pickinProxy?.atom?.chainname) {
+        onPick(pickinProxy.atom.chainname, pickinProxy.atom.resno);
+      }
+    },
+    [onPick]
+  );
+
+  useEffect(() => {
+    if (!onClick) {
+      return;
+    }
+    if (pickable) {
+      stage.signals.clicked.add(onClick);
+    } else {
+      stage.signals.clicked.remove(onClick);
+    }
+    return () => {
+      if (onClick) {
+        stage.signals.clicked.remove(onClick);
+      }
+    };
+  }, [stage, pickable, onClick]);
 
   return null;
 }
@@ -141,6 +175,12 @@ export function NGLComponent({
       if (!component) {
         return;
       }
+      const stagedComponent = stage.getComponentsByObject(
+        component.structure
+      ).first;
+      if (!stagedComponent) {
+        return;
+      }
       component.setSelection("");
     };
   }, [stage, chain, component]);
@@ -170,22 +210,66 @@ export function NGLStage({ children }: { children: ReactNode }) {
   useEffect(() => {
     return (): void => {
       if (stage) {
-        stage.dispose();
+        // stage.dispose();
       }
     };
   }, [stage]);
 
+  //  TODO make height and width configurable
   return (
-    <>
-      {/* TODO make height and width configurable */}
-      <div ref={stageElementRef} className="h-full w-full" />
+    <div className="relative h-full w-full overflow-hidden">
+      <div ref={stageElementRef} className="h-full w-full "></div>
       {stage && (
-        <StageReactContext.Provider value={stage}>
-          {children}
-        </StageReactContext.Provider>
+        <>
+          <div className="absolute right-2 top-2 z-10">
+            <Button
+              variant="ghost"
+              size="icon"
+              title="Center all"
+              className="h-5 w-5"
+              onClick={(e) => {
+                e.preventDefault();
+                stage.autoView();
+              }}
+            >
+              ◎
+            </Button>
+          </div>
+          <StageReactContext.Provider value={stage}>
+            {children}
+          </StageReactContext.Provider>
+        </>
       )}
-    </>
+    </div>
   );
+}
+
+class ErrorBoundary extends ReactComponent<
+  { children: ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    // Update state so the next render will show the fallback UI.
+    return { hasError: true };
+  }
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // You can also log the error to an error reporting service
+    console.error(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return <h1>Something went wrong. See DevTools console</h1>;
+    }
+
+    return this.props.children;
+  }
 }
 
 export function Viewer({
@@ -194,41 +278,61 @@ export function Viewer({
   active,
   passive,
   surface,
+  activePickable,
+  onActivePick,
+  higlightResidue,
 }: {
   structure: Structure;
   chain: string;
   active: number[];
   passive: number[];
   surface: number[];
+  activePickable?: boolean;
+  onActivePick?: (chain: string, residue: number) => void;
+  higlightResidue?: number | undefined;
 }) {
+  // TODO use theme to color residues so they are better visible in dark theme
+
   return (
-    <NGLStage>
-      <NGLComponent structure={structure} chain={chain}>
-        <NGLResidues
-          residues={active}
-          color="green"
-          opacity={1.0}
-          representation="ball+stick"
-        />
-        <NGLResidues
-          residues={active}
-          color="green"
-          opacity={0.3}
-          representation="spacefill"
-        />
-        <NGLResidues
-          residues={passive}
-          color="yellow"
-          opacity={0.3}
-          representation="spacefill"
-        />
-        <NGLResidues
-          residues={surface}
-          color="orange"
-          opacity={0.7}
-          representation="surface"
-        />
-      </NGLComponent>
-    </NGLStage>
+    <ErrorBoundary>
+      <NGLStage>
+        <NGLComponent structure={structure} chain={chain}>
+          {higlightResidue && (
+            <NGLResidues
+              residues={[higlightResidue]}
+              color="green"
+              opacity={1.0}
+              representation="spacefill"
+            />
+          )}
+          <NGLResidues
+            residues={active}
+            color="green"
+            opacity={1.0}
+            representation="ball+stick"
+            pickable={activePickable}
+            onPick={onActivePick}
+          />
+          <NGLResidues
+            residues={active}
+            color="green"
+            opacity={0.3}
+            representation="spacefill"
+          />
+          <NGLResidues
+            residues={passive}
+            color="yellow"
+            opacity={0.3}
+            representation="spacefill"
+          />
+          <NGLResidues
+            residues={surface}
+            color="orange"
+            opacity={0.1}
+            representation="spacefill"
+          />
+        </NGLComponent>
+      </NGLStage>
+    </ErrorBoundary>
   );
 }

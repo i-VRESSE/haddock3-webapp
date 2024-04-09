@@ -4,6 +4,7 @@ import { Residue, SecondaryStructure } from "./molecule.client";
 import clsx from "clsx";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { useTheme } from "remix-themes";
 
 const residueVariants: Record<SecondaryStructure, string> = {
   sheet: "bg-amber-200 dark:bg-amber-700",
@@ -29,7 +30,6 @@ function ImportResidues({
     );
     if (newSelection) {
       const newResidues = newSelection.split(",").map((r) => parseInt(r));
-      // TODO check if given residues are in options list
       onChange(newResidues);
     }
   }
@@ -47,12 +47,17 @@ export function ResiduesSelect({
   options,
   selected,
   onChange,
+  surface,
+  onHover,
 }: {
   options: Residue[];
   selected: number[];
   onChange: (selected: number[]) => void;
+  surface: number[];
+  onHover: (resno: number | undefined) => void;
 }) {
   const [lastChecked, setLastChecked] = useState<number | null>(null);
+  const [theme] = useTheme();
 
   function handleChange(e: ChangeEvent<HTMLInputElement>, index: number) {
     const residue = parseInt(e.target.value);
@@ -63,7 +68,7 @@ export function ResiduesSelect({
       const newSelected = [...selected];
       for (let i = start; i <= end; i++) {
         const resno = options[i].resno;
-        if (!newSelected.includes(resno)) {
+        if (!newSelected.includes(resno) && surface.includes(resno)) {
           newSelected.push(resno);
         }
       }
@@ -80,19 +85,26 @@ export function ResiduesSelect({
     }
   }
 
+  function onImport(selected: number[]) {
+    const filtered = selected.filter((r) => surface.includes(r));
+    onChange(filtered);
+  }
+
+  const style = { colorScheme: theme === "dark" ? "dark" : "light" };
   return (
     <>
-      <div>
+      <div onMouseLeave={() => onHover(undefined)}>
         {options.map((r, index) => {
           return (
             <div
               key={r.resno}
               className="inline-block w-4 text-center font-mono"
               title={
-                r.surface === false
-                  ? `${r.resno}, disabled due to not on surface`
-                  : `${r.resno}`
+                surface.includes(r.resno)
+                  ? `${r.resno}`
+                  : `${r.resno}, disabled due to not on surface`
               }
+              onMouseEnter={() => onHover(r.resno)}
             >
               <label
                 htmlFor={`residue-${r.resno}`}
@@ -102,8 +114,9 @@ export function ResiduesSelect({
               </label>
               <input
                 type="checkbox"
+                style={style}
                 value={r.resno}
-                disabled={r.surface === false}
+                disabled={surface.includes(r.resno) === false}
                 id={`residue-${r.resno}`}
                 checked={selected.includes(r.resno)}
                 onChange={(e) => handleChange(e, index)}
@@ -119,10 +132,10 @@ export function ResiduesSelect({
         <span className={clsx("p-1 font-mono", residueVariants["sheet"])}>
           Sheet
         </span>{" "}
-        (Hold Shift to select a range of residues)
+        (Hold Shift to select a range of residues. Click residue in 3D viewer to select.)
       </FormDescription>
       {/* TODO add buttons to select all, none, invert */}
-      <ImportResidues selected={selected} onChange={onChange} />
+      <ImportResidues selected={selected} onChange={onImport} />
     </>
   );
 }
