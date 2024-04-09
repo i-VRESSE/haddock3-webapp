@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useTheme } from "remix-themes";
+import { cn } from "~/lib/utils";
 
 const residueVariants: Record<SecondaryStructure, string> = {
   sheet: "bg-amber-200 dark:bg-amber-700",
@@ -49,12 +50,14 @@ export function ResiduesSelect({
   onChange,
   surface,
   onHover,
+  highlight,
 }: {
   options: Residue[];
   selected: number[];
   onChange: (selected: number[]) => void;
   surface: number[];
   onHover: (resno: number | undefined) => void;
+  highlight: number | undefined;
 }) {
   const [lastChecked, setLastChecked] = useState<number | null>(null);
   const [theme] = useTheme();
@@ -98,7 +101,13 @@ export function ResiduesSelect({
           return (
             <div
               key={r.resno}
-              className="inline-block w-4 text-center font-mono"
+              className={cn(
+                "inline-block w-4 text-center font-mono hover:bg-secondary hover:text-secondary-foreground",
+                {
+                  "bg-secondary text-secondary-foreground":
+                    highlight === r.resno,
+                }
+              )}
               title={
                 surface.includes(r.resno)
                   ? `${r.resno}`

@@ -48,6 +48,7 @@ export function NGLResidues({
   representation,
   pickable = false,
   onPick,
+  onHover,
 }: {
   residues: number[];
   color: string;
@@ -56,6 +57,7 @@ export function NGLResidues({
   hovered?: number[];
   pickable?: boolean;
   onPick?: (chain: string, residue: number) => void;
+  onHover?: (chain: string, residue: number) => void;
 }) {
   const name = useId();
   const stage = useStage();
@@ -113,6 +115,31 @@ export function NGLResidues({
       }
     };
   }, [stage, pickable, onClick]);
+
+  const onHoverCallback = useCallback(
+    (pickinProxy: PickingProxy) => {
+      if (onHover && pickinProxy?.atom?.resno && pickinProxy?.atom?.chainname) {
+        onHover(pickinProxy.atom.chainname, pickinProxy.atom.resno);
+      }
+    },
+    [onHover]
+  );
+
+  useEffect(() => {
+    if (!onHoverCallback) {
+      return;
+    }
+    if (pickable) {
+      stage.signals.hovered.add(onHoverCallback);
+    } else {
+      stage.signals.hovered.remove(onHoverCallback);
+    }
+    return () => {
+      if (onHoverCallback) {
+        stage.signals.hovered.remove(onHoverCallback);
+      }
+    };
+  }, [stage, pickable, onHoverCallback]);
 
   return null;
 }
@@ -281,6 +308,7 @@ export function Viewer({
   activePickable,
   onActivePick,
   higlightResidue,
+  onHover,
 }: {
   structure: Structure;
   chain: string;
@@ -290,6 +318,7 @@ export function Viewer({
   activePickable?: boolean;
   onActivePick?: (chain: string, residue: number) => void;
   higlightResidue?: number | undefined;
+  onHover?: (chain: string, residue: number) => void;
 }) {
   // TODO use theme to color residues so they are better visible in dark theme
 
@@ -312,6 +341,7 @@ export function Viewer({
             representation="ball+stick"
             pickable={activePickable}
             onPick={onActivePick}
+            onHover={onHover}
           />
           <NGLResidues
             residues={active}

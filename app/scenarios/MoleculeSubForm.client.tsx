@@ -378,7 +378,12 @@ function ResiduesSubForm({
   // gzipping and base64 encoding file can be slow, so we cache it
   // for example 8qg1 of 1.7Mb took 208ms
   const [safeFile, setSafeFile] = useState<string | undefined>(undefined);
-  const [hoveredResidue, setHoveredResidue] = useState<number | undefined>();
+  const [hoveredFrom2DResidue, setHoveredFrom2DResidue] = useState<
+    number | undefined
+  >();
+  const [hoveredFrom3DResidue, setHoveredFrom3DResidue] = useState<
+    number | undefined
+  >();
 
   useEffect(() => {
     const fetchSafeFile = async () => {
@@ -453,7 +458,8 @@ function ResiduesSubForm({
           surface={showSurface ? molecule.surfaceResidues : []}
           activePickable
           onActivePick={onActiveResiduePick}
-          higlightResidue={hoveredResidue}
+          higlightResidue={hoveredFrom2DResidue}
+          onHover={(_, residue) => setHoveredFrom3DResidue(residue)}
         />
       </div>
       <Label>Active residues</Label>
@@ -462,7 +468,8 @@ function ResiduesSubForm({
         selected={actpass.active.resno}
         onChange={handleActiveResiduesChange}
         surface={molecule.surfaceResidues}
-        onHover={setHoveredResidue}
+        onHover={setHoveredFrom2DResidue}
+        highlight={hoveredFrom3DResidue}
       />
       <div className="flex items-center space-x-2">
         <Checkbox
