@@ -18,8 +18,9 @@ Uses
 sequenceDiagram
     Web app->>+Web app: Login
     Web app->>+Builder: Construct workflow config
+    Web app->>+Haddock3 restraints web service: Calculate restraints
     Builder->>+Bartender: Submit job
-    Bartender->>+haddock3: Run
+    Bartender->>+haddock3 CLI: Run
     Web app->>+Bartender: State of job
     Web app->>+Bartender: Result of job
 ```
