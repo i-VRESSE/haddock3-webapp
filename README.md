@@ -59,7 +59,7 @@ See [docs/bartender.md](docs/bartender.md) how to set it up.
 
 ## Haddock3 restraints web service
 
-The scenario forms uses the [haddock3 restraints web service]() to calulate restraints based on given active residues and structures.
+The scenario forms uses the [haddock3 restraints web service](https://github.com/haddocking/haddock3/blob/main/src/haddock/clis/restraints/webservice.py). to calulate restraints based on given active residues and structures.
 
 For the web application to use this service, it needs to be running with
 
