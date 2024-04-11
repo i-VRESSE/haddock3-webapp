@@ -41,6 +41,7 @@ RUN pip install lightdock==${LIGHTDOCK_VERSION}
 
 WORKDIR /opt/gdock
 RUN git clone https://github.com/gdocking/gdock.git . && git checkout ${GDOCK_VERSION}
+RUN pip install matplotlib==3.8.4  # dont install 3.9.0rc2
 RUN python setup.py develop
 RUN bash install.sh /opt/gdock
 ENV GDOCK_PATH=/opt/gdock
