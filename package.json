@@ -83,6 +83,7 @@
   },
   "devDependencies": {
     "@ltd/j-toml": "^1.38.0",
+    "@playwright/test": "^1.43.0",
     "@remix-run/dev": "^2.5.1",
     "@tailwindcss/typography": "^0.5.9",
     "@testing-library/jest-dom": "^5.16.5",
@@ -92,6 +93,7 @@
     "@types/d3-dsv": "^3.0.2",
     "@types/eslint": "^8.37.0",
     "@types/js-yaml": "^4.0.5",
+    "@types/node": "^20.12.7",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@types/react-plotly.js": "^2.6.1",

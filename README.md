@@ -123,14 +123,7 @@ To check the Typescript types run
 npm run typecheck
 ```
 
-To run unit tests (`app/**/*.test.ts`) with [Vitest](https://vitest.dev) use
-
-```sh
-# In watch mode
-npm run test
-# or in single run mode with coverage
-npm run test -- run --coverage
-```
+For testing see [docs/testing.md](docs/testing.md).
 
 ## Deployment
 
