@@ -124,6 +124,7 @@ function rewriteConfig(table: ReturnType<typeof parse>) {
   table.mode = "local";
   table.postprocess = true;
   table.clean = true;
+  table.offline = false;
 
   const haddock3_ncores = getNCores();
   if (haddock3_ncores > 0) {
@@ -138,6 +139,17 @@ function rewriteConfig(table: ReturnType<typeof parse>) {
   delete table.concat;
   delete table.self_contained;
   delete table.cns_exec;
+
+  // force plot_matrix to true for clustfcc, clustrmsd modules
+  Object.entries(table).forEach(([key, value]) => {
+    if (typeof value === "object" && value !== null) {
+      const isModuleWithPlotMatrix = ["clustfcc", "clustrmsd"].includes(key);
+      if (isModuleWithPlotMatrix && typeof value === "object") {
+        (value as Record<string, boolean>).plot_matrix = true;
+      }
+    }
+  });
+
   return table;
 }
 
