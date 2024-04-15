@@ -159,6 +159,9 @@ function rewriteConfig(table: ReturnType<typeof parse>) {
  */
 function getNCores() {
   let haddock3_ncores = 0;
+  if (process.env.NODE_ENV === "test") {
+    return 1;
+  }
   if (
     process.env.HADDOCK3_NCORES !== undefined &&
     process.env.HADDOCK3_NCORES !== ""
