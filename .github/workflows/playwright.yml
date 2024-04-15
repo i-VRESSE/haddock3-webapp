@@ -17,6 +17,8 @@ jobs:
         run: npm ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+      - name: Fake cns
+        run: cp /usr/bin/uptime deploy/cns
       - name:
           Build arq deployment
           # TODO drop --build-arg once https://github.com/haddocking/haddock3/pull/841 is merged
