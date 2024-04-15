@@ -1,15 +1,21 @@
-import { useActionData, useNavigate, useSubmit } from "@remix-run/react";
+import { json, useActionData, useNavigate, useSubmit } from "@remix-run/react";
 import JSZip from "jszip";
 import { Output, instance, object } from "valibot";
-import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
+import { LoaderFunctionArgs } from "@remix-run/node";
 
+import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import { Input } from "~/components/ui/input";
 import { action as uploadaction } from "./upload";
 import { FormItem } from "../scenarios/FormItem";
 import { FormDescription } from "../scenarios/FormDescription";
-// import { PDBFileInput } from "../scenarios/PDBFileInput.client";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
+import { mustBeAllowedToSubmit } from "~/auth.server";
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  await mustBeAllowedToSubmit(request);
+  return json({});
+};
 
 export const action = uploadaction;
 
