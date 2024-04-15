@@ -76,6 +76,8 @@ run_dir = 'output'
 mode = 'local'
 postprocess = true
 clean = true
+offline = false
+ncores = 1
 `;
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
@@ -95,6 +97,8 @@ run_dir = 'output'
 mode = 'local'
 postprocess = true
 clean = true
+offline = false
+ncores = 1
 `;
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
@@ -119,8 +123,10 @@ cns_exec = '/usr/bin/cns'
 
 run_dir = 'output'
 mode = 'local'
+ncores = 1
 postprocess = true
 clean = true
+offline = false
 `;
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
@@ -144,6 +150,8 @@ run_dir = 'output'
 mode = 'local'
 postprocess = true
 clean = true
+offline = false
+ncores = 1
 
 [seletop]
 
