@@ -25,6 +25,8 @@ WORKDIR /opt/haddock3
 RUN git clone --recursive https://github.com/haddocking/haddock3.git . && git checkout ${HADDOCK3_VERSION}
 WORKDIR /opt/haddock3/src/fcc/src
 RUN make
+WORKDIR /opt/haddock3/src/fast-rmsdmatrix/src
+RUN chmod u+x Makefile && make fast-rmsdmatrix
 WORKDIR /opt/haddock3
 RUN pip install -r requirements.txt && python setup.py develop
 COPY ./cns /opt/haddock3/bin/cns
