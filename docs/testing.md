@@ -16,8 +16,16 @@ npm run test -- run --coverage
 To run end-to-end tests (`tests/*.spec.ts`) with [Playwright](https://playwright.dev) use
 
 ```sh
-docker compose -f deploy/arq/docker-compose.yml -p playwright build
+# TODO remove build-args when merged
+docker compose -f deploy/arq/docker-compose.yml -p playwright build --build-arg HADDOCK3_VERSION=web-service --build-arg HADDOCK3_GHORG=i-VRESSE
 # Make sure tests start in a fresh state
 docker compose -f deploy/arq/docker-compose.yml -p playwright down -v
+# Install browsers
+npx playwright install
+# Run tests on all browsers
 npx playwright test
+# or for interactive mode, use `await page.pause()` in tests
+npx playwright test --headed --timeout 0
+# or to run with webkit
+npx playwright test --project webkit
 ```
