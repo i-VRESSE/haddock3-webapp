@@ -22,7 +22,6 @@ export const action = uploadaction;
 const Schema = object({
   antibody: instance(File, "Antibody structure as PDB file", []),
   antigen: instance(File, "Antibody structure as PDB file", []),
-  // restraints get type==='' so cannot check for file type
   ambig_fname: instance(File, "Ambiguous restraints as TBL file"),
   unambig_fname: instance(File, "Unambiguous restraints as TBL file"),
   reference_fname: instance(File, "Reference structure as PDB file", []),
@@ -38,6 +37,7 @@ function generateWorkflow(data: Schema) {
   // from
   // https://www.bonvinlab.org/education/HADDOCK3/HADDOCK3-antibody-antigen/#setuprequirements
   // but made valid for easy expertise level
+
   return `
 # ====================================================================
 # Antibody-antigen docking example with restraints from the antibody

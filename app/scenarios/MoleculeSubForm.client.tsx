@@ -106,6 +106,9 @@ async function preprocessPdb(file: File, fromChain: string, toChain: string) {
       structure,
       from_chain: fromChain,
       to_chain: toChain,
+      // TODO make configureable from component
+      delhetatm: false,
+      keepcoord: false,
     },
     parseAs: "text",
   });
@@ -266,7 +269,7 @@ function LinkToFile({ file, children }: { file: File; children: ReactNode }) {
   }, [file]);
 
   return (
-    <a href={url} className="underline">
+    <a href={url} className="underline" download={file.name}>
       {children}
     </a>
   );

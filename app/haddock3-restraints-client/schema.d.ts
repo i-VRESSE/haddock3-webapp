@@ -190,6 +190,18 @@ export interface components {
        * @description New chain identifier
        */
       to_chain: string;
+      /**
+       * Delhetatm
+       * @description Delete HETATM records
+       * @default false
+       */
+      delhetatm: boolean;
+      /**
+       * Keepcoord
+       * @description Remove all non-coordinate records
+       * @default false
+       */
+      keepcoord: boolean;
     };
     /** PassiveFromActiveRequest */
     PassiveFromActiveRequest: {

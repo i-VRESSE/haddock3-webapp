@@ -162,8 +162,6 @@ async function generateAmbiguousRestraintsFile(
 async function createZip(workflow: string, data: Schema) {
   const zip = new JSZip();
   zip.file(WORKFLOW_CONFIG_FILENAME, workflow);
-  // TODO replace proteins with preprocessed versions
-  // also add remark inside that they were preprocessed
   zip.file(data.protein1.name, data.protein1);
   zip.file(data.protein2.name, data.protein2);
   zip.file(data.ambig_fname.name, data.ambig_fname);
