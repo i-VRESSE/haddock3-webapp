@@ -21,6 +21,8 @@ They can be overwritten during build with
 docker compose -f <docker compose file> build --build-arg HADDOCK3_VERSION=v3.0.0-beta.5
 ```
 
+Docker will not detect new commits to a branch, so it is recommended to use a commit hash.
+
 ## Removal
 
 To remove all users and jobs run the following command:

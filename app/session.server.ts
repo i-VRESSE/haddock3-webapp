@@ -17,7 +17,6 @@ export const sessionStorage = createCookieSessionStorage({
           readFileSync(process.env.SESSION_SECRET_FILE).toString()) ||
         "somebadsecret",
     ],
-    secure: process.env.NODE_ENV === "production",
   },
 });
 

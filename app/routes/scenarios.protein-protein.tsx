@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useActionData, useSubmit, useNavigate } from "@remix-run/react";
+import { useActionData, useSubmit, useNavigate, json } from "@remix-run/react";
 import { object, instance, Output, optional } from "valibot";
 import JSZip from "jszip";
 import NGL from "ngl";
+import { LoaderFunctionArgs } from "@remix-run/node";
 
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
@@ -19,6 +20,12 @@ import {
 import { Molecule, chainsFromStructure } from "~/scenarios/molecule.client";
 import { client } from "~/haddock3-restraints-client/client";
 import { ClientOnly } from "~/components/ClientOnly";
+import { mustBeAllowedToSubmit } from "~/auth.server";
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  await mustBeAllowedToSubmit(request);
+  return json({});
+};
 
 export const action = uploadaction;
 

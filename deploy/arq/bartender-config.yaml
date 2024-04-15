@@ -1,7 +1,7 @@
 # This file is the configuration file for the bartender service.
 # This configuration works for the webapp and the docker compose deployment.
 job_root_dir: /jobs
-destination_picker: bartender.picker:pick_first
+destination_picker: bartender.picker:pick_byname
 applications:
   haddock3:
     command_template: haddock3 workflow.cfg
@@ -15,12 +15,17 @@ applications:
       The run should have haddock3-clean and haddock3-analyse executed on it.
     command_template: mkdir -p output && mv * output || true
 destinations:
-  local:
+  haddock3:
     scheduler:
       type: arq
       redis_dsn: redis://redis:6379
       max_jobs: 1
       job_timeout: PT12H # 12 hours
+    filesystem:
+      type: local
+  runimport:
+    scheduler:
+      type: eager
     filesystem:
       type: local
 interactive_applications:
