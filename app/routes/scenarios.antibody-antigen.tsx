@@ -1,16 +1,30 @@
+import { useState } from "react";
 import { json, useActionData, useNavigate, useSubmit } from "@remix-run/react";
 import JSZip from "jszip";
-import { Output, instance, object } from "valibot";
+import { Output, instance, object, optional } from "valibot";
 import { LoaderFunctionArgs } from "@remix-run/node";
+import NGL from "ngl";
 
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
-import { Input } from "~/components/ui/input";
 import { action as uploadaction } from "./upload";
 import { FormItem } from "../scenarios/FormItem";
 import { FormDescription } from "../scenarios/FormDescription";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
 import { mustBeAllowedToSubmit } from "~/auth.server";
+import { ClientOnly } from "~/components/ClientOnly";
+import {
+  ActPassSelection,
+  MoleculeSubForm,
+} from "~/scenarios/MoleculeSubForm.client";
+import { AntigenSubForm, Flavour } from "~/scenarios/Antigen.client";
+import { Molecule, chainsFromStructure } from "~/scenarios/molecule.client";
+import { MolViewerDialog } from "~/scenarios/MolViewerDialog.client";
+import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
+import {
+  generateAmbiguousRestraintsFile,
+  generateUnAmbiguousRestraintsFile,
+} from "~/scenarios/restraintsFile";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -23,7 +37,7 @@ const Schema = object({
   antibody: instance(File, "Antibody structure as PDB file", []),
   antigen: instance(File, "Antibody structure as PDB file", []),
   ambig_fname: instance(File, "Ambiguous restraints as TBL file"),
-  unambig_fname: instance(File, "Unambiguous restraints as TBL file"),
+  unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
   reference_fname: instance(File, "Reference structure as PDB file", []),
 });
 type Schema = Output<typeof Schema>;
@@ -37,7 +51,10 @@ function generateWorkflow(data: Schema) {
   // from
   // https://www.bonvinlab.org/education/HADDOCK3/HADDOCK3-antibody-antigen/#setuprequirements
   // but made valid for easy expertise level
-
+  const unambig_line = data.unambig_fname
+    ? `# Restraints to keep the antibody chains together
+unambig_fname = "${data.unambig_fname.name}"`
+    : "";
   return `
 # ====================================================================
 # Antibody-antigen docking example with restraints from the antibody
@@ -77,8 +94,7 @@ molecules =  [
 sampling = 200
 # paratope to surface ambig restraints
 ambig_fname = "${data.ambig_fname.name}"
-# Restraints to keep the antibody chains together
-unambig_fname = "${data.unambig_fname.name}"
+${unambig_line}
 # Turn off ramdom removal of restraints
 # randremoval = false
 
@@ -100,16 +116,14 @@ reference_fname = "${data.reference_fname.name}"
 # tolerance = 5
 # paratope to surface ambig restraints
 ambig_fname = "${data.ambig_fname.name}"
-# Restraints to keep the antibody chains together
-unambig_fname = "${data.unambig_fname.name}"
+${unambig_line}
 # Turn off ramdom removal of restraints
 # randremoval = false
 
 [emref]
 # paratope to surface ambig restraints
 ambig_fname = "${data.ambig_fname.name}"
-# Restraints to keep the antibody chains together
-unambig_fname = "${data.unambig_fname.name}"
+${unambig_line}
 # Turn off ramdom removal of restraints
 # randremoval = false
 
@@ -132,7 +146,9 @@ async function createZip(workflow: string, data: Schema) {
   zip.file(data.antibody.name, data.antibody);
   zip.file(data.antigen.name, data.antigen);
   zip.file(data.ambig_fname.name, data.ambig_fname);
-  zip.file(data.unambig_fname.name, data.unambig_fname);
+  if (data.unambig_fname) {
+    zip.file(data.unambig_fname.name, data.unambig_fname);
+  }
   zip.file(data.reference_fname.name, data.reference_fname);
   return zip.generateAsync({ type: "blob" });
 }
@@ -142,10 +158,59 @@ export default function AntibodyAntigenScenario() {
   const submit = useSubmit();
   const navigate = useNavigate();
 
-  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+  const [antibodyActPass, seAntibodyActPass] = useState<ActPassSelection>({
+    active: { chain: "", resno: [] },
+    passive: { chain: "", resno: [] },
+    bodyRestraints: "",
+  });
+  const [antigenActPass, setAntigen2ActPass] = useState<ActPassSelection>({
+    active: { chain: "", resno: [] },
+    passive: { chain: "", resno: [] },
+    bodyRestraints: "",
+  });
+  const [antigenFlavour, setAntigenFlavour] = useState<Flavour>("actpass");
+  const [reference, setReference] = useState<Molecule | undefined>();
+  function referenceLoaded(structure: NGL.Structure, file: File) {
+    const chains = chainsFromStructure(structure);
+    setReference({ structure, chains, file, originalFile: file });
+  }
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
+
+    let antigenSelection = antigenActPass;
+    if (antigenFlavour === "pass") {
+      // in the ResidueSubForm the user selected residues are stored as active
+      // and the computed surface neighbouring residues are stored as passive
+      // here we store all those residues as passive
+      antigenSelection = {
+        active: { chain: antibodyActPass.active.chain, resno: [] },
+        passive: {
+          chain: antibodyActPass.passive.chain,
+          resno: [
+            ...antigenActPass.active.resno,
+            ...antigenActPass.passive.resno,
+          ],
+        },
+        bodyRestraints: antigenActPass.bodyRestraints,
+      };
+    }
+    const ambig_fname = await generateAmbiguousRestraintsFile(
+      antibodyActPass,
+      antigenSelection
+    );
+    formData.set("ambig_fname", ambig_fname);
+
+    const unambig_fname = generateUnAmbiguousRestraintsFile(
+      antibodyActPass.bodyRestraints,
+      antigenSelection.bodyRestraints
+    );
+    if (unambig_fname) {
+      formData.set("unambig_fname", unambig_fname);
+    }
+
     const data = parseFormData(formData, Schema);
     const workflow = generateWorkflow(data);
     const zipPromise = createZip(workflow, data);
@@ -167,59 +232,61 @@ export default function AntibodyAntigenScenario() {
         </a>
         .
       </p>
-      <form onSubmit={onSubmit}>
-        <div className="grid grid-cols-2 gap-6">
-          <FormItem name="antibody" label="Antibody">
-            {/* <PDBFileInput name="antibody" required /> */}
-            <FormDescription>
-              In tutorial named pdbs/4G6K_clean.pdb
-            </FormDescription>
-          </FormItem>
-          <FormItem name="antigen" label="Antigen">
-            {/* TODO do similar thing as in protein-protein scenario */}
-            {/* <PDBFileInput name="antigen" required /> */}
-            <FormDescription>
-              In tutorial named pdbs/4I1B_clean.pdb
-            </FormDescription>
-          </FormItem>
-          <FormItem name="ambig_fname" label="Ambiguous restraints">
-            <Input
-              type="file"
-              id="ambig_fname"
-              name="ambig_fname"
-              required
-              accept=".tbl"
-            />
-            <FormDescription>
-              In tutorial named restraints/ambig-paratope-NMR-epitope-pass.tbl
-            </FormDescription>
-          </FormItem>
-          <FormItem name="unambig_fname" label="Unambiguous restraints">
-            <Input
-              type="file"
-              id="unambig_fname"
-              name="unambig_fname"
-              required
-              accept=".tbl"
-            />
-            <FormDescription>
-              In tutorial named restraints/antibody-unambig.tbl
-            </FormDescription>
-          </FormItem>
-          <FormItem name="reference_fname" label="Reference structure">
-            {/* <PDBFileInput name="reference_fname" /> */}
-            <FormDescription>
-              In tutorial named pdbs/4G6M_matched.pdb
-            </FormDescription>
-          </FormItem>
-        </div>
-        <div className="py-2 text-red-500">
-          {actionData?.errors.map((error) => (
-            <p key={error}>{error}</p>
-          ))}
-        </div>
-        <ActionButtons />
-      </form>
+      <ClientOnly fallback={<p>Loading...</p>}>
+        {() => (
+          <form onSubmit={onSubmit}>
+            <div className="grid grid-cols-2 gap-6">
+              {/* TODO nice to have, color residues that are in Complementarity-determining regions (CDRs) */}
+              <MoleculeSubForm
+                name="antibody"
+                legend="Antibody"
+                description="In tutorial named pdbs/4G6K_clean.pdb"
+                actpass={antibodyActPass}
+                onActPassChange={seAntibodyActPass}
+                targetChain="A"
+                preprocessPipeline="delhetatmkeepcoord"
+                accessibilityCutoff={0.15}
+              />
+              <div>
+                <AntigenSubForm
+                  name="antigen"
+                  legend="Antigen"
+                  description="In tutorial named pdbs/4I1B_clean.pdb"
+                  actpass={antigenActPass}
+                  onActPassChange={setAntigen2ActPass}
+                  targetChain="B"
+                  preprocessPipeline="delhetatmkeepcoord"
+                  accessibilityCutoff={0.15}
+                  antigenFlavour={antigenFlavour}
+                  onFlavourChange={setAntigenFlavour}
+                />
+              </div>
+            </div>
+            <div>
+              {/* either using the NMR identified residues as active in HADDOCK, 
+            or combining those with the surface neighbors and use this combination as passive only. */}
+            </div>
+            <FormItem name="reference_fname" label="Reference structure">
+              <div className="flex">
+                <PDBFileInput
+                  name="reference_fname"
+                  onStructureLoad={referenceLoaded}
+                />
+                <MolViewerDialog structure={reference?.structure} />
+              </div>
+              <FormDescription>
+                In tutorial named pdbs/4G6M_matched.pdb
+              </FormDescription>
+            </FormItem>
+            <div className="py-2 text-red-500">
+              {actionData?.errors.map((error) => (
+                <p key={error}>{error}</p>
+              ))}
+            </div>
+            <ActionButtons />
+          </form>
+        )}
+      </ClientOnly>
     </>
   );
 }

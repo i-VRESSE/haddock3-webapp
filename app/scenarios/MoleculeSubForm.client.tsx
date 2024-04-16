@@ -1,11 +1,12 @@
 import { Structure, autoLoad } from "ngl";
 import { useState, useEffect, ReactNode, useRef } from "react";
 import { strFromU8, gzip } from "fflate";
+import { useTheme } from "remix-themes";
 
-import { FormDescription } from "~/scenarios/FormDescription";
-import { FormItem } from "~/scenarios/FormItem";
-import { ChainSelect } from "~/scenarios/ChainSelect";
-import { ResiduesSelect } from "~/scenarios/ResiduesSelect";
+import { FormDescription } from "./FormDescription";
+import { FormItem } from "./FormItem";
+import { ChainSelect } from "./ChainSelect";
+import { ResiduesSelect } from "./ResiduesSelect";
 import { Residue, chainsFromStructure } from "./molecule.client";
 import { Viewer } from "./Viewer.client";
 import {
@@ -14,7 +15,6 @@ import {
 } from "~/haddock3-restraints-client/client";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
-import { useTheme } from "remix-themes";
 import { Label } from "~/components/ui/label";
 
 export type ResidueSelection = { chain: string; resno: number[] };
@@ -77,11 +77,12 @@ function flattenErrorResponses(response: HTTPValidationError): string {
 }
 
 async function calculateAccessibility(
-  structure: string
+  structure: string,
+  cutoff = 0.4
 ): Promise<[Record<string, number[]>, undefined | string]> {
   const body = {
     structure,
-    cutoff: 0.4,
+    cutoff,
   };
   const { data, error } = await client.POST("/calc_accessibility", {
     body,
@@ -99,16 +100,32 @@ async function calculateAccessibility(
   return [residues, undefined];
 }
 
-async function preprocessPdb(file: File, fromChain: string, toChain: string) {
+const pipelines = {
+  "": {
+    delhetatm: false,
+    keepcoord: false,
+  },
+  delhetatmkeepcoord: {
+    delhetatm: true,
+    keepcoord: true,
+  },
+} as const;
+export type PreprocessPipeline = keyof typeof pipelines;
+
+async function preprocessPdb(
+  file: File,
+  fromChain: string,
+  toChain: string,
+  preprocessPipeline: PreprocessPipeline = ""
+) {
   const structure = await jsonSafeFile(file);
+
   const { error, data } = await client.POST("/preprocess_pdb", {
     body: {
       structure,
       from_chain: fromChain,
       to_chain: toChain,
-      // TODO make configureable from component
-      delhetatm: false,
-      keepcoord: false,
+      ...pipelines[preprocessPipeline],
     },
     parseAs: "text",
   });
@@ -136,14 +153,24 @@ async function restrainBodies(structure: string) {
   return data;
 }
 
-async function calclulateRestraints(
+export async function calclulateRestraints(
   file: File,
   userSelectedChain: string,
-  targetChain: string
+  targetChain: string,
+  preprocessPipeline: PreprocessPipeline = "",
+  accessibilityCutoff = 0.4
 ) {
-  const processed = await preprocessPdb(file, userSelectedChain, targetChain);
+  const processed = await preprocessPdb(
+    file,
+    userSelectedChain,
+    targetChain,
+    preprocessPipeline
+  );
   const safeProcessed = await jsonSafeFile(processed);
-  const [surfaceResidues, error] = await calculateAccessibility(safeProcessed);
+  const [surfaceResidues, error] = await calculateAccessibility(
+    safeProcessed,
+    accessibilityCutoff
+  );
   const bodyRestraints = await restrainBodies(safeProcessed);
   let errors: Molecule["errors"] = undefined;
   if (error) {
@@ -164,7 +191,7 @@ function filterOutBuriedResidues(
   return residues.filter((resno) => surfaceResidues.includes(resno));
 }
 
-function MoleculeSubFormWrapper({
+export function MoleculeSubFormWrapper({
   legend,
   description,
   children,
@@ -182,7 +209,7 @@ function MoleculeSubFormWrapper({
   );
 }
 
-function UserStructure({
+export function UserStructure({
   name,
   onChange,
 }: {
@@ -275,7 +302,7 @@ function LinkToFile({ file, children }: { file: File; children: ReactNode }) {
   );
 }
 
-interface Molecule {
+export interface Molecule {
   userFile: File;
   userChains: string[];
   userSelectedChain: string;
@@ -290,20 +317,16 @@ interface Molecule {
   structure: Structure;
 }
 
-function ProcessedStructure({
+export function ProcessedStructure({
   molecule,
   bodyRestraints,
 }: {
   molecule: Molecule;
   bodyRestraints: string;
 }) {
-  function onUserChainSelect(event: React.ChangeEvent<HTMLSelectElement>) {
-    event.preventDefault();
-    console.log(event.target.value);
-    // TODO implement
-  }
   const [theme] = useTheme();
   const style = { colorScheme: theme === "dark" ? "dark" : "light" };
+  // TODO allow another pdb file to be chosen or a different chain to be selected
   return (
     <>
       <div>
@@ -314,19 +337,7 @@ function ProcessedStructure({
           </LinkToFile>
         </div>
         <div>
-          Selected chain
-          <select
-            defaultValue={molecule.userSelectedChain}
-            className="rounded bg-inherit p-1 text-inherit"
-            onChange={onUserChainSelect}
-          >
-            {molecule.userChains.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>{" "}
-          has been filtered{" "}
+          Selected chain <b>{molecule.userSelectedChain}</b> has been filtered{" "}
           {molecule.userSelectedChain !== molecule.targetChain && (
             <span>
               and renamed to <b>{molecule.targetChain}</b>
@@ -353,7 +364,7 @@ function ProcessedStructure({
   );
 }
 
-function HiddenFileInput({ name, file }: { name: string; file: File }) {
+export function HiddenFileInput({ name, file }: { name: string; file: File }) {
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -367,14 +378,18 @@ function HiddenFileInput({ name, file }: { name: string; file: File }) {
   return <input ref={ref} type="file" name={name} className="hidden" />;
 }
 
-function ResiduesSubForm({
+export function ResiduesSubForm({
   molecule,
   actpass,
   onActPassChange,
+  label = "Active residues",
+  children,
 }: {
   molecule: Molecule;
   actpass: ActPassSelection;
   onActPassChange: (actpass: ActPassSelection) => void;
+  label?: string;
+  children?: ReactNode;
 }) {
   const [showPassive, setShowPassive] = useState(false);
   const [showSurface, setShowSurface] = useState(false);
@@ -465,7 +480,8 @@ function ResiduesSubForm({
           onHover={(_, residue) => setHoveredFrom3DResidue(residue)}
         />
       </div>
-      <Label>Active residues</Label>
+      {children}
+      <Label>{label}</Label>
       <ResiduesSelect
         options={molecule.residues || []}
         selected={actpass.active.resno}
@@ -493,7 +509,7 @@ function ResiduesSubForm({
   );
 }
 
-function RestraintsErrors({ errors }: { errors: Molecule["errors"] }) {
+export function RestraintsErrors({ errors }: { errors: Molecule["errors"] }) {
   if (!errors) {
     return null;
   }
@@ -517,6 +533,8 @@ export function MoleculeSubForm({
   actpass,
   onActPassChange,
   targetChain,
+  preprocessPipeline = "",
+  accessibilityCutoff = 0.4,
 }: {
   name: string;
   legend: string;
@@ -524,6 +542,8 @@ export function MoleculeSubForm({
   actpass: ActPassSelection;
   onActPassChange: (actpass: ActPassSelection) => void;
   targetChain: string;
+  preprocessPipeline?: PreprocessPipeline;
+  accessibilityCutoff?: number;
 }) {
   const [molecule, setMolecule] = useState<Molecule | undefined>();
 
@@ -532,7 +552,13 @@ export function MoleculeSubForm({
     chain: string,
     chains: string[]
   ) {
-    const restraints = await calclulateRestraints(file, chain, targetChain);
+    const restraints = await calclulateRestraints(
+      file,
+      chain,
+      targetChain,
+      preprocessPipeline,
+      accessibilityCutoff
+    );
 
     const structure: Structure = await autoLoad(restraints.file);
     const residues = chainsFromStructure(structure)[targetChain];
