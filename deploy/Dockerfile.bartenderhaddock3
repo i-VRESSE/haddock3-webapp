@@ -4,7 +4,7 @@ FROM python:3.9-slim-bookworm
 ARG HADDOCK3_GHORG=haddocking
 ARG HADDOCK3_VERSION=main
 ARG BARTENDER_VERSION=main
-ARG GDOCK_VERSION=master
+ARG GDOCK_VERSION=main
 ARG LIGHTDOCK_VERSION=0.9.4
 
 COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
