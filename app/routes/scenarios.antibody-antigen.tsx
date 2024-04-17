@@ -3,7 +3,6 @@ import { json, useActionData, useNavigate, useSubmit } from "@remix-run/react";
 import JSZip from "jszip";
 import { Output, instance, object, optional } from "valibot";
 import { LoaderFunctionArgs } from "@remix-run/node";
-import NGL from "ngl";
 
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import { action as uploadaction } from "./upload";
@@ -18,8 +17,6 @@ import {
   MoleculeSubForm,
 } from "~/scenarios/MoleculeSubForm.client";
 import { AntigenSubForm, Flavour } from "~/scenarios/Antigen.client";
-import { Molecule, chainsFromStructure } from "~/scenarios/molecule.client";
-import { MolViewerDialog } from "~/scenarios/MolViewerDialog.client";
 import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import {
   generateAmbiguousRestraintsFile,
@@ -171,11 +168,6 @@ export default function AntibodyAntigenScenario() {
     bodyRestraints: "",
   });
   const [antigenFlavour, setAntigenFlavour] = useState<Flavour>("actpass");
-  const [reference, setReference] = useState<Molecule | undefined>();
-  function referenceLoaded(structure: NGL.Structure, file: File) {
-    const chains = chainsFromStructure(structure);
-    setReference({ structure, chains, file, originalFile: file });
-  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -264,13 +256,7 @@ export default function AntibodyAntigenScenario() {
             or combining those with the surface neighbors and use this combination as passive only. */}
             </div>
             <FormItem name="reference_fname" label="Reference structure">
-              <div className="flex">
-                <PDBFileInput
-                  name="reference_fname"
-                  onStructureLoad={referenceLoaded}
-                />
-                <MolViewerDialog structure={reference?.file} />
-              </div>
+              <PDBFileInput name="reference_fname" />
               <FormDescription>
                 In tutorial named pdbs/4G6M_matched.pdb
               </FormDescription>

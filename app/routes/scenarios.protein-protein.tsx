@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useActionData, useSubmit, useNavigate, json } from "@remix-run/react";
 import { object, instance, Output, optional } from "valibot";
 import JSZip from "jszip";
-import NGL from "ngl";
 import { LoaderFunctionArgs } from "@remix-run/node";
 
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
@@ -11,13 +10,11 @@ import { parseFormData } from "~/scenarios/schema";
 import { FormDescription } from "~/scenarios/FormDescription";
 import { FormItem } from "~/scenarios/FormItem";
 import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
-import { MolViewerDialog } from "~/scenarios/MolViewerDialog.client";
 import { action as uploadaction } from "./upload";
 import {
   ActPassSelection,
   MoleculeSubForm,
 } from "~/scenarios/MoleculeSubForm.client";
-import { Molecule, chainsFromStructure } from "~/scenarios/molecule.client";
 import { ClientOnly } from "~/components/ClientOnly";
 import { mustBeAllowedToSubmit } from "~/auth.server";
 import {
@@ -147,12 +144,6 @@ export default function ProteinProteinScenario() {
     bodyRestraints: "",
   });
 
-  const [reference, setReference] = useState<Molecule | undefined>();
-  function referenceLoaded(structure: NGL.Structure, file: File) {
-    const chains = chainsFromStructure(structure);
-    setReference({ structure, chains, file, originalFile: file });
-  }
-
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -224,13 +215,7 @@ export default function ProteinProteinScenario() {
               />
             </div>
             <FormItem name="reference_fname" label="Reference structure">
-              <div className="flex">
-                <PDBFileInput
-                  name="reference_fname"
-                  onStructureLoad={referenceLoaded}
-                />
-                <MolViewerDialog structure={reference?.file} />
-              </div>
+              <PDBFileInput name="reference_fname" />
               <FormDescription>
                 In example named data/e2a-hpr_1GGR.pdb
               </FormDescription>
