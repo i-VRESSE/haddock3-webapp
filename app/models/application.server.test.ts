@@ -160,4 +160,34 @@ select = 5
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
   });
+
+  test('plot_matrix should be set to true for clustfcc and clustrmsd modules', async () => {
+    const input_config = `\
+[clustfcc]
+[clustrmsd]
+`;
+    const archive = await prepareArchive(input_config);
+
+    const result = await rewriteConfigInArchive(archive, ["easy"]);
+
+    const expected_config = `\
+
+run_dir = 'output'
+mode = 'local'
+postprocess = true
+clean = true
+offline = false
+ncores = 1
+
+[clustfcc]
+
+plot_matrix = true
+
+[clustrmsd]
+
+plot_matrix = true
+`;
+    const output_config = await retrieveConfigFromArchive(result);
+    assert.equal(output_config, expected_config);
+  })
 });
