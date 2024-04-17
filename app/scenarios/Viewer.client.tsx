@@ -19,6 +19,7 @@ import {
   StructureRepresentationType,
 } from "ngl";
 import { Button } from "~/components/ui/button";
+import { useTheme } from "remix-themes";
 
 function currentBackground() {
   let backgroundColor = "white";
@@ -349,8 +350,11 @@ export function Viewer({
   higlightResidue?: number | undefined;
   onHover?: (chain: string, residue: number) => void;
 }) {
-  // TODO use theme to color residues so they are better visible in dark theme
-
+  const [theme] = useTheme();
+  const isDark = theme === "dark";
+  const activeColor = isDark ? "yellow" : "green";
+  const passiveColor = isDark ? "green" : "yellow";
+  const opacity = isDark ? 0.7 : 0.3;
   return (
     <ErrorBoundary>
       <NGLStage>
@@ -358,14 +362,14 @@ export function Viewer({
           {higlightResidue && (
             <NGLResidues
               residues={[higlightResidue]}
-              color="green"
+              color={activeColor}
               opacity={1.0}
               representation="spacefill"
             />
           )}
           <NGLResidues
             residues={active}
-            color="green"
+            color={activeColor}
             opacity={1.0}
             representation="ball+stick"
             pickable={activePickable}
@@ -374,21 +378,21 @@ export function Viewer({
           />
           <NGLResidues
             residues={active}
-            color="green"
-            opacity={0.3}
+            color={activeColor}
+            opacity={opacity}
             representation="spacefill"
           />
           <NGLResidues
             residues={passive}
-            color="yellow"
-            opacity={0.3}
+            color={passiveColor}
+            opacity={opacity}
             representation="spacefill"
           />
           <NGLResidues
             residues={surface}
             color="orange"
-            opacity={0.1}
-            representation="surface"
+            opacity={isDark ? 0.5 : 0.1}
+            representation="spacefill"
           />
         </NGLComponent>
       </NGLStage>
