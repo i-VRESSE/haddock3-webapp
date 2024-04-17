@@ -17,16 +17,17 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 
-export type ResidueSelection = { chain: string; resno: number[] };
 export type ActPassSelection = {
-  active: ResidueSelection;
-  passive: ResidueSelection;
+  active: number[];
+  passive: number[];
+  chain: string;
   bodyRestraints: string;
 };
 
 export async function passiveFromActive(
   structure: string,
-  activeResidues: ResidueSelection,
+  chain: string,
+  activeResidues: number[],
   surface: number[],
 ) {
   /*
@@ -35,8 +36,8 @@ export async function passiveFromActive(
 */
   const body = {
     structure,
-    chain: activeResidues.chain,
-    active: activeResidues.resno,
+    chain,
+    active: activeResidues,
     surface,
   };
   const { data, error } = await client.POST("/passive_from_active", {
@@ -412,30 +413,30 @@ export function ResiduesSubForm({
     if (!molecule) {
       return;
     }
-    const activeSelection = {
-      chain: actpass.active.chain,
-      resno: filterOutBuriedResidues(activeResidues, molecule.surfaceResidues),
-    };
+    const activeSelection = filterOutBuriedResidues(
+      activeResidues,
+      molecule.surfaceResidues,
+    );
     try {
       const structure =
         safeFile === undefined ? await jsonSafeFile(molecule.file) : safeFile;
       const passiveResidues = await passiveFromActive(
         structure,
+        molecule.targetChain,
         activeSelection,
         molecule.surfaceResidues,
       );
       onActPassChange({
-        active: { chain: actpass.active.chain, resno: activeResidues },
-        passive: {
-          chain: actpass.passive.chain,
-          resno: passiveResidues,
-        },
+        active: activeResidues,
+        passive: passiveResidues,
+        chain: molecule.targetChain,
         bodyRestraints: actpass.bodyRestraints,
       });
     } catch (error) {
       onActPassChange({
-        active: { chain: actpass.active.chain, resno: activeResidues },
-        passive: { chain: actpass.passive.chain, resno: [] },
+        active: activeResidues,
+        passive: [],
+        chain: molecule.targetChain,
         bodyRestraints: actpass.bodyRestraints,
       });
       console.log(error);
@@ -445,12 +446,12 @@ export function ResiduesSubForm({
 
   function onActiveResiduePick(chain: string, resno: number) {
     if (
-      actpass.active.chain !== chain ||
+      molecule.targetChain !== chain ||
       !molecule.surfaceResidues.includes(resno)
     ) {
       return;
     }
-    const activeResidues = actpass.active.resno;
+    const activeResidues = actpass.active;
     const index = activeResidues.indexOf(resno);
     if (index === -1) {
       handleActiveResiduesChange([...activeResidues, resno]);
@@ -467,9 +468,9 @@ export function ResiduesSubForm({
       <div className="h-[500px] w-full">
         <Viewer
           structure={molecule.file}
-          chain={actpass.active.chain}
-          active={actpass.active.resno}
-          passive={showPassive ? actpass.passive.resno : []}
+          chain={molecule.targetChain}
+          active={actpass.active}
+          passive={showPassive ? actpass.passive : []}
           surface={showSurface ? molecule.surfaceResidues : []}
           activePickable
           onActivePick={onActiveResiduePick}
@@ -481,7 +482,7 @@ export function ResiduesSubForm({
       <Label>{label}</Label>
       <ResiduesSelect
         options={molecule.residues || []}
-        selected={actpass.active.resno}
+        selected={actpass.active}
         onChange={handleActiveResiduesChange}
         surface={molecule.surfaceResidues}
         onHover={setHoveredFrom2DResidue}
@@ -573,8 +574,9 @@ export function MoleculeSubForm({
     }
     setMolecule(newMolecule);
     const newSelection = {
-      active: { chain: targetChain, resno: [] },
-      passive: { chain: targetChain, resno: [] },
+      active: [],
+      passive: [],
+      chain: targetChain,
       bodyRestraints: restraints.bodyRestraints,
     };
     onActPassChange(newSelection);

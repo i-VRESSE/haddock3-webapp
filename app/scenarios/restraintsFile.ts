@@ -13,12 +13,12 @@ export async function generateAmbiguousRestraintsFile(
   */
   const { response } = await client.POST("/actpass_to_ambig", {
     body: {
-      active1: selection1.active.resno,
-      active2: selection2.active.resno,
-      passive1: selection1.passive.resno,
-      passive2: selection2.passive.resno,
-      segid1: selection1.active.chain,
-      segid2: selection2.active.chain,
+      active1: selection1.active,
+      active2: selection2.active,
+      passive1: selection1.passive,
+      passive2: selection2.passive,
+      segid1: selection1.chain,
+      segid2: selection2.chain,
     },
     parseAs: "stream",
   });

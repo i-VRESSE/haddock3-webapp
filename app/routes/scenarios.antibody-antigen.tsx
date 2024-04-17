@@ -159,13 +159,15 @@ export default function AntibodyAntigenScenario() {
   const navigate = useNavigate();
 
   const [antibodyActPass, seAntibodyActPass] = useState<ActPassSelection>({
-    active: { chain: "", resno: [] },
-    passive: { chain: "", resno: [] },
+    active: [],
+    passive: [],
+    chain: "",
     bodyRestraints: "",
   });
   const [antigenActPass, setAntigen2ActPass] = useState<ActPassSelection>({
-    active: { chain: "", resno: [] },
-    passive: { chain: "", resno: [] },
+    active: [],
+    passive: [],
+    chain: "",
     bodyRestraints: "",
   });
   const [antigenFlavour, setAntigenFlavour] = useState<Flavour>("actpass");
@@ -186,14 +188,9 @@ export default function AntibodyAntigenScenario() {
       // and the computed surface neighbouring residues are stored as passive
       // here we store all those residues as passive
       antigenSelection = {
-        active: { chain: antibodyActPass.active.chain, resno: [] },
-        passive: {
-          chain: antibodyActPass.passive.chain,
-          resno: [
-            ...antigenActPass.active.resno,
-            ...antigenActPass.passive.resno,
-          ],
-        },
+        active: [],
+        passive: [...antigenActPass.active, ...antigenActPass.passive],
+        chain: antigenActPass.chain,
         bodyRestraints: antigenActPass.bodyRestraints,
       };
     }

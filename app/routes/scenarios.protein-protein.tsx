@@ -135,13 +135,15 @@ export default function ProteinProteinScenario() {
   const navigate = useNavigate();
 
   const [protein1ActPass, setProtein1ActPass] = useState<ActPassSelection>({
-    active: { chain: "", resno: [] },
-    passive: { chain: "", resno: [] },
+    active: [],
+    passive: [],
+    chain: "",
     bodyRestraints: "",
   });
   const [protein2ActPass, setProtein2ActPass] = useState<ActPassSelection>({
-    active: { chain: "", resno: [] },
-    passive: { chain: "", resno: [] },
+    active: [],
+    passive: [],
+    chain: "",
     bodyRestraints: "",
   });
 

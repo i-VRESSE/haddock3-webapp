@@ -126,8 +126,9 @@ export function AntigenSubForm({
     }
     setMolecule(newMolecule);
     const newSelection = {
-      active: { chain: targetChain, resno: [] },
-      passive: { chain: targetChain, resno: [] },
+      active: [],
+      passive: [],
+      chain: targetChain,
       bodyRestraints: restraints.bodyRestraints,
     };
     onActPassChange(newSelection);
@@ -141,18 +142,17 @@ export function AntigenSubForm({
     onFlavourChange(flavour);
     if (flavour === "surf") {
       const newSelection = {
-        active: { chain: actpass.active.chain, resno: [] },
-        passive: {
-          chain: actpass.passive.chain,
-          resno: molecule.surfaceResidues,
-        },
+        active: [],
+        passive: molecule.surfaceResidues,
+        chain: targetChain,
         bodyRestraints: actpass.bodyRestraints,
       };
       onActPassChange(newSelection);
     } else {
       const newSelection = {
-        active: { chain: actpass.active.chain, resno: [] },
-        passive: { chain: actpass.passive.chain, resno: [] },
+        active: [],
+        passive: [],
+        chain: targetChain,
         bodyRestraints: actpass.bodyRestraints,
       };
       onActPassChange(newSelection);
@@ -183,7 +183,7 @@ export function AntigenSubForm({
           <div className="h-[500px] w-full">
             <Viewer
               structure={molecule.file}
-              chain={actpass.active.chain}
+              chain={molecule.targetChain}
               active={[]}
               passive={[]}
               surface={molecule.surfaceResidues}
