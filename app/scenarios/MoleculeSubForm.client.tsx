@@ -217,7 +217,6 @@ export function UserStructure({
   onChange: (file: File, chain: string, chains: string[]) => void;
 }) {
   const [chains, setChains] = useState<string[]>([]);
-  const [structure, setStructure] = useState<Structure | undefined>();
   const [file, setFile] = useState<File | undefined>();
 
   async function onFileChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -237,7 +236,6 @@ export function UserStructure({
       }
       chains.push(c.chainname);
     });
-    setStructure(structure);
     setChains(chains);
     setFile(file);
     if (chains.length === 1) {
@@ -264,9 +262,9 @@ export function UserStructure({
           onChange={onFileChange}
         />
         <div className="h-[500px] w-full">
-          {structure && (
+          {file && (
             <Viewer
-              structure={structure}
+              structure={file}
               chain={""}
               active={[]}
               passive={[]}
@@ -314,7 +312,6 @@ export interface Molecule {
     accessibility?: string;
     passiveFromActive?: string;
   };
-  structure: Structure;
 }
 
 export function ProcessedStructure({
@@ -469,7 +466,7 @@ export function ResiduesSubForm({
     <>
       <div className="h-[500px] w-full">
         <Viewer
-          structure={molecule.structure}
+          structure={molecule.file}
           chain={actpass.active.chain}
           active={actpass.active.resno}
           passive={showPassive ? actpass.passive.resno : []}
@@ -568,7 +565,6 @@ export function MoleculeSubForm({
       userSelectedChain: chain,
       targetChain,
       residues,
-      structure,
       file: restraints.file,
       surfaceResidues: restraints.surfaceResidues,
     };

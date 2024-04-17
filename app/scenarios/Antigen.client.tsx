@@ -118,7 +118,6 @@ export function AntigenSubForm({
       userSelectedChain: chain,
       targetChain,
       residues,
-      structure,
       file: restraints.file,
       surfaceResidues: restraints.surfaceResidues,
     };
@@ -138,12 +137,6 @@ export function AntigenSubForm({
     if (!molecule) {
       return;
     }
-
-    // rendering ngl fails when we switch flavours,
-    // the structure.atomStore.x is undefined while it was set when pdb file was loaded
-    // so as a hacky workaround we load the structure from file again
-    const newStructure: Structure = await autoLoad(molecule.file);
-    setMolecule({ ...molecule, structure: newStructure });
 
     onFlavourChange(flavour);
     if (flavour === "surf") {
@@ -189,7 +182,7 @@ export function AntigenSubForm({
         <div>
           <div className="h-[500px] w-full">
             <Viewer
-              structure={molecule.structure}
+              structure={molecule.file}
               chain={actpass.active.chain}
               active={[]}
               passive={[]}

@@ -227,7 +227,7 @@ export default function ProteinProteinScenario() {
                   name="reference_fname"
                   onStructureLoad={referenceLoaded}
                 />
-                <MolViewerDialog structure={reference?.structure} />
+                <MolViewerDialog structure={reference?.file} />
               </div>
               <FormDescription>
                 In example named data/e2a-hpr_1GGR.pdb

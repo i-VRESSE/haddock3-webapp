@@ -272,7 +272,7 @@ export default function AntibodyAntigenScenario() {
                   name="reference_fname"
                   onStructureLoad={referenceLoaded}
                 />
-                <MolViewerDialog structure={reference?.structure} />
+                <MolViewerDialog structure={reference?.file} />
               </div>
               <FormDescription>
                 In tutorial named pdbs/4G6M_matched.pdb

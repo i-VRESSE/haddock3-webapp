@@ -1,12 +1,10 @@
 import { useState } from "react";
 
-import { Structure } from "ngl";
-
 import { Button } from "~/components/ui/button";
 import { NGLComponent, NGLStage } from "~/scenarios/Viewer.client";
 import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 
-export function MolViewerDialog({ structure }: { structure?: Structure }) {
+export function MolViewerDialog({ structure }: { structure?: File }) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>

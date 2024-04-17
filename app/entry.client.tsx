@@ -5,15 +5,14 @@
  */
 
 import { RemixBrowser } from "@remix-run/react";
-import { startTransition } from "react";
+import { StrictMode, startTransition } from "react";
 import { hydrateRoot } from "react-dom/client";
 
 startTransition(() => {
   hydrateRoot(
     document,
-    // TODO renable when ngl useEffect tairdowns are fixed
-    // <StrictMode>
-    <RemixBrowser />
-    // </StrictMode>
+    <StrictMode>
+      <RemixBrowser />
+    </StrictMode>
   );
 });

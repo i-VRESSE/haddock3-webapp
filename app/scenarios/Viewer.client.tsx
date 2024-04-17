@@ -11,6 +11,7 @@ import {
   ErrorInfo,
 } from "react";
 import {
+  Component,
   PickingProxy,
   Stage,
   Structure,
@@ -144,6 +145,30 @@ export function NGLResidues({
   return null;
 }
 
+function isValidStructure(
+  structure: Structure | undefined
+): structure is Structure {
+  // Removing component of structure in stage
+  // will modifies the structure so it contains no atoms, but the count does not reflect that
+  return structure !== undefined && structure.atomStore.x !== undefined;
+}
+
+function isStructureComponent(
+  component: Component
+): component is StructureComponent {
+  return (component as StructureComponent).structure !== undefined;
+}
+
+function stageHasValidStructure(stage: Stage, name: string): boolean {
+  const component = stage.getComponentsByName(name).first;
+  if (!component) {
+    return false;
+  }
+  return (
+    isStructureComponent(component) && isValidStructure(component.structure)
+  );
+}
+
 const NGLComponentContext = createContext<StructureComponent | undefined>(
   undefined
 );
@@ -163,7 +188,7 @@ export function NGLComponent({
   chain,
   children,
 }: {
-  structure: Structure;
+  structure: File;
   chain: string;
   children?: ReactNode;
 }) {
@@ -173,18 +198,19 @@ export function NGLComponent({
   );
 
   useEffect(() => {
-    stage.getComponentsByName(structure.name).dispose();
-    const component = stage.addComponentFromObject(structure);
-    if (!component) {
-      return;
-    }
-    stage.defaultFileRepresentation(component);
-    stage.autoView();
-    setComponent(component as StructureComponent);
-    return () => {
-      if (component) {
-        stage.removeComponent(component);
+    async function loadStructure() {
+      stage.getComponentsByName(structure.name).dispose();
+      const newComponent = await stage.loadFile(structure);
+      if (!newComponent) {
+        return;
       }
+      stage.defaultFileRepresentation(newComponent);
+      stage.autoView();
+      setComponent(newComponent as StructureComponent);
+    }
+    loadStructure();
+    return () => {
+      stage.getComponentsByName(structure.name).dispose();
     };
   }, [stage, structure]);
 
@@ -200,6 +226,9 @@ export function NGLComponent({
     stage.autoView();
     return () => {
       if (!component) {
+        return;
+      }
+      if (!stageHasValidStructure(stage, component.name)) {
         return;
       }
       const stagedComponent = stage.getComponentsByObject(
@@ -310,7 +339,7 @@ export function Viewer({
   higlightResidue,
   onHover,
 }: {
-  structure: Structure;
+  structure: File;
   chain: string;
   active: number[];
   passive: number[];
@@ -359,7 +388,7 @@ export function Viewer({
             residues={surface}
             color="orange"
             opacity={0.1}
-            representation="spacefill"
+            representation="surface"
           />
         </NGLComponent>
       </NGLStage>
