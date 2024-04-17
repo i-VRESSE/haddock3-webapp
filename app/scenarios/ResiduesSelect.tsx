@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useId, useState } from "react";
 import { FormDescription } from "./FormDescription";
 import { Residue, SecondaryStructure } from "./molecule.client";
 import clsx from "clsx";
@@ -44,6 +44,57 @@ function ImportResidues({
   );
 }
 
+function ResidueCheckbox({
+  resno,
+  sec,
+  seq,
+  highlight,
+  checked,
+  disabled,
+  onHover,
+  onChange,
+}: {
+  resno: number;
+  sec: SecondaryStructure;
+  seq: string;
+  highlight: boolean;
+  checked: boolean;
+  disabled: boolean;
+  onHover: () => void;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+}) {
+  const id = useId();
+  const [theme] = useTheme();
+  const style = { colorScheme: theme === "dark" ? "dark" : "light" };
+
+  return (
+    <div
+      key={resno}
+      className={cn(
+        "inline-block w-4 text-center font-mono hover:bg-secondary hover:text-secondary-foreground",
+        {
+          "bg-secondary text-secondary-foreground": highlight,
+        },
+      )}
+      title={disabled ? `${resno}, disabled due to not on surface` : `${resno}`}
+      onMouseEnter={onHover}
+    >
+      <label htmlFor={id} className={residueVariants[sec]}>
+        {seq}
+      </label>
+      <input
+        type="checkbox"
+        style={style}
+        value={resno}
+        disabled={disabled}
+        id={id}
+        checked={checked}
+        onChange={onChange}
+      />
+    </div>
+  );
+}
+
 export function ResiduesSelect({
   options,
   selected,
@@ -60,7 +111,6 @@ export function ResiduesSelect({
   highlight: number | undefined;
 }) {
   const [lastChecked, setLastChecked] = useState<number | null>(null);
-  const [theme] = useTheme();
 
   function handleChange(e: ChangeEvent<HTMLInputElement>, index: number) {
     const residue = parseInt(e.target.value);
@@ -93,46 +143,47 @@ export function ResiduesSelect({
     onChange(filtered);
   }
 
-  const style = { colorScheme: theme === "dark" ? "dark" : "light" };
+  const chunkSize = 10;
+  const initialArray: Residue[][] = [];
+  const chunks = options.reduce((resultArray, item, index) => {
+    const chunkIndex = Math.floor(index / chunkSize);
+
+    if (!resultArray[chunkIndex]) {
+      resultArray[chunkIndex] = []; // start a new chunk
+    }
+
+    resultArray[chunkIndex].push(item);
+
+    return resultArray;
+  }, initialArray);
   return (
     <>
-      <div onMouseLeave={() => onHover(undefined)}>
-        {options.map((r, index) => {
-          return (
-            <div
-              key={r.resno}
-              className={cn(
-                "inline-block w-4 text-center font-mono hover:bg-secondary hover:text-secondary-foreground",
-                {
-                  "bg-secondary text-secondary-foreground":
-                    highlight === r.resno,
-                },
-              )}
-              title={
-                surface.includes(r.resno)
-                  ? `${r.resno}`
-                  : `${r.resno}, disabled due to not on surface`
-              }
-              onMouseEnter={() => onHover(r.resno)}
+      <div className="flex flex-row flex-wrap">
+        {chunks.map((chunk, cindex) => (
+          <div key={cindex}>
+            <p
+              className="text-[0.5rem] text-muted-foreground"
+              title={chunk[0].resno.toString()}
             >
-              <label
-                htmlFor={`residue-${r.resno}`}
-                className={residueVariants[r.sec]}
-              >
-                {r.seq}
-              </label>
-              <input
-                type="checkbox"
-                style={style}
-                value={r.resno}
-                disabled={surface.includes(r.resno) === false}
-                id={`residue-${r.resno}`}
-                checked={selected.includes(r.resno)}
-                onChange={(e) => handleChange(e, index)}
-              />
+              {chunk[0].resno}
+            </p>
+            <div onMouseLeave={() => onHover(undefined)}>
+              {chunk.map((r, index) => (
+                <ResidueCheckbox
+                  key={r.resno}
+                  resno={r.resno}
+                  sec={r.sec}
+                  seq={r.seq}
+                  highlight={highlight === r.resno}
+                  checked={selected.includes(r.resno)}
+                  disabled={!surface.includes(r.resno)}
+                  onHover={() => onHover(r.resno)}
+                  onChange={(e) => handleChange(e, cindex * chunkSize + index)}
+                />
+              ))}
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
       <FormDescription>
         <span className={clsx("p-1 font-mono", residueVariants["helix"])}>
