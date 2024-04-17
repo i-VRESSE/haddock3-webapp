@@ -24,7 +24,7 @@ import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import {
   generateAmbiguousRestraintsFile,
   generateUnAmbiguousRestraintsFile,
-} from "~/scenarios/restraintsFile";
+} from "~/scenarios/restraints";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);

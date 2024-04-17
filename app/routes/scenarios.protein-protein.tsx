@@ -23,7 +23,7 @@ import { mustBeAllowedToSubmit } from "~/auth.server";
 import {
   generateAmbiguousRestraintsFile,
   generateUnAmbiguousRestraintsFile,
-} from "../scenarios/restraintsFile";
+} from "../scenarios/restraints";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);

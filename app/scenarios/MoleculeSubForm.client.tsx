@@ -1,6 +1,6 @@
 import { Structure, autoLoad } from "ngl";
 import { useState, useEffect, ReactNode, useRef } from "react";
-import { strFromU8, gzip } from "fflate";
+
 import { useTheme } from "remix-themes";
 
 import { FormDescription } from "./FormDescription";
@@ -9,13 +9,17 @@ import { ChainSelect } from "./ChainSelect";
 import { ResiduesSelect } from "./ResiduesSelect";
 import { Residue, chainsFromStructure } from "./molecule.client";
 import { Viewer } from "./Viewer.client";
-import {
-  HTTPValidationError,
-  client,
-} from "~/haddock3-restraints-client/client";
+
 import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import {
+  RestraintsErrors,
+  PreprocessPipeline,
+  calclulateRestraints,
+  jsonSafeFile,
+  passiveFromActive,
+} from "./restraints";
 
 export type ActPassSelection = {
   active: number[];
@@ -23,167 +27,6 @@ export type ActPassSelection = {
   chain: string;
   bodyRestraints: string;
 };
-
-export async function passiveFromActive(
-  structure: string,
-  chain: string,
-  activeResidues: number[],
-  surface: number[],
-) {
-  /*
-  On CLI
-  haddock3-restraints passive_from_active -c protein1activeResidues.chain protein1 protein1activeResidues.resno.join(',') >> protein1.actpass
-*/
-  const body = {
-    structure,
-    chain,
-    active: activeResidues,
-    surface,
-  };
-  const { data, error } = await client.POST("/passive_from_active", {
-    body,
-  });
-  if (error) {
-    console.error(error);
-    throw new Error("Could not calculate passive restraints");
-  }
-  return data;
-}
-
-async function jsonSafeFile(file: File): Promise<string> {
-  const data = new Uint8Array(await file.arrayBuffer());
-  return new Promise((resolve, reject) => {
-    gzip(data, (err, data) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(btoa(strFromU8(data, true)));
-    });
-  });
-}
-
-function flattenErrorResponses(response: HTTPValidationError): string {
-  if (response === undefined) {
-    return "";
-  }
-  if (typeof response.detail === "string") {
-    return response.detail;
-  }
-  if (response.detail) {
-    return response.detail.reduce((acc, detail) => {
-      return acc + detail.msg + "\n";
-    }, "");
-  }
-  throw new Error("Could not flatten error response");
-}
-
-async function calculateAccessibility(
-  structure: string,
-  cutoff = 0.4,
-): Promise<[Record<string, number[]>, undefined | string]> {
-  const body = {
-    structure,
-    cutoff,
-  };
-  const { data, error } = await client.POST("/calc_accessibility", {
-    body,
-  });
-  if (error) {
-    console.error(error);
-    return [{}, flattenErrorResponses(error)];
-  }
-  const residues = Object.fromEntries(
-    Object.entries(data).map(([chain, residues]) => [
-      chain,
-      residues === undefined ? [] : residues,
-    ]),
-  );
-  return [residues, undefined];
-}
-
-const pipelines = {
-  "": {
-    delhetatm: false,
-    keepcoord: false,
-  },
-  delhetatmkeepcoord: {
-    delhetatm: true,
-    keepcoord: true,
-  },
-} as const;
-export type PreprocessPipeline = keyof typeof pipelines;
-
-async function preprocessPdb(
-  file: File,
-  fromChain: string,
-  toChain: string,
-  preprocessPipeline: PreprocessPipeline = "",
-) {
-  const structure = await jsonSafeFile(file);
-
-  const { error, data } = await client.POST("/preprocess_pdb", {
-    body: {
-      structure,
-      from_chain: fromChain,
-      to_chain: toChain,
-      ...pipelines[preprocessPipeline],
-    },
-    parseAs: "text",
-  });
-  if (error) {
-    console.error(error);
-    throw new Error("Could not preprocess pdb");
-  }
-  return new File([data], `processed-${fromChain}2${toChain}-${file.name}`, {
-    type: file.type,
-  });
-}
-
-async function restrainBodies(structure: string) {
-  const { error, data } = await client.POST("/restrain_bodies", {
-    body: { structure, exclude: [] },
-    parseAs: "text",
-  });
-  if (error) {
-    console.error(error);
-    throw new Error("Could not restrain bodies");
-  }
-  if (typeof data !== "string") {
-    return "";
-  }
-  return data;
-}
-
-export async function calclulateRestraints(
-  file: File,
-  userSelectedChain: string,
-  targetChain: string,
-  preprocessPipeline: PreprocessPipeline = "",
-  accessibilityCutoff = 0.4,
-) {
-  const processed = await preprocessPdb(
-    file,
-    userSelectedChain,
-    targetChain,
-    preprocessPipeline,
-  );
-  const safeProcessed = await jsonSafeFile(processed);
-  const [surfaceResidues, error] = await calculateAccessibility(
-    safeProcessed,
-    accessibilityCutoff,
-  );
-  const bodyRestraints = await restrainBodies(safeProcessed);
-  let errors: Molecule["errors"] = undefined;
-  if (error) {
-    errors = { accessibility: error };
-  }
-  return {
-    surfaceResidues: surfaceResidues[targetChain] ?? [],
-    bodyRestraints,
-    file: processed,
-    errors,
-  };
-}
 
 function filterOutBuriedResidues(
   residues: number[],
@@ -309,10 +152,7 @@ export interface Molecule {
   targetChain: string;
   residues: Residue[];
   surfaceResidues: number[];
-  errors?: {
-    accessibility?: string;
-    passiveFromActive?: string;
-  };
+  errors?: RestraintsErrors;
 }
 
 export function ProcessedStructure({
@@ -507,7 +347,11 @@ export function ResiduesSubForm({
   );
 }
 
-export function RestraintsErrors({ errors }: { errors: Molecule["errors"] }) {
+export function RestraintsErrorsReport({
+  errors,
+}: {
+  errors: Molecule["errors"];
+}) {
   if (!errors) {
     return null;
   }
@@ -592,7 +436,7 @@ export function MoleculeSubForm({
             bodyRestraints={actpass.bodyRestraints}
           />
           {molecule.errors ? (
-            <RestraintsErrors errors={molecule.errors} />
+            <RestraintsErrorsReport errors={molecule.errors} />
           ) : (
             <ResiduesSubForm
               actpass={actpass}

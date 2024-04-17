@@ -7,16 +7,15 @@ import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import {
   ActPassSelection,
-  PreprocessPipeline,
   Molecule,
-  calclulateRestraints,
   ResiduesSubForm,
   MoleculeSubFormWrapper,
   HiddenFileInput,
   ProcessedStructure,
-  RestraintsErrors,
   UserStructure,
+  RestraintsErrorsReport,
 } from "./MoleculeSubForm.client";
+import { PreprocessPipeline, calclulateRestraints } from "./restraints";
 
 export type Flavour = "surf" | "pass" | "actpass";
 function AntigenFlavourPicker({
@@ -218,7 +217,7 @@ export function AntigenSubForm({
             bodyRestraints={actpass.bodyRestraints}
           />
           {molecule.errors ? (
-            <RestraintsErrors errors={molecule.errors} />
+            <RestraintsErrorsReport errors={molecule.errors} />
           ) : (
             subform
           )}
