@@ -51,7 +51,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     if (error instanceof ValiError) {
       return json(
         { errors: error.issues.map((i) => i.message) },
-        { status: 422 }
+        { status: 422 },
       );
     }
     if (error instanceof ForbiddenError) {
@@ -122,9 +122,7 @@ export default function UploadPage() {
           />
         </div>
         <div className="py-2 text-red-500">
-          {actionData?.errors.map((error) => (
-            <p key={error}>{error}</p>
-          ))}
+          {actionData?.errors.map((error) => <p key={error}>{error}</p>)}
         </div>
         <Button type="submit" disabled={state === "submitting"}>
           {state === "submitting" ? "Submitting job ..." : "Submit job"}

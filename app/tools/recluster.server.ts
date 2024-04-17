@@ -23,7 +23,7 @@ interface IOJsonFile {
         { "py/type": string },
         {
           "py/tuple": string[];
-        }
+        },
       ];
     };
   }[];
@@ -62,7 +62,7 @@ async function getIoJson({
 
 function appendPath(
   rows: RawClusterRow[],
-  inputs: IOJsonFile["input"]
+  inputs: IOJsonFile["input"],
 ): ClusterRow[] {
   const name2path = new Map<string, string>();
   for (const input of inputs) {

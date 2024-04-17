@@ -29,7 +29,7 @@ export async function rescore({
         },
       },
       body,
-    }
+    },
   );
   if (error) {
     throw error;

@@ -44,7 +44,7 @@ const App = () => {
     }
     if (typeof indexedDB === "undefined") {
       console.error(
-        "IndexedDB not supported, unable to save workflow.zip file."
+        "IndexedDB not supported, unable to save workflow.zip file.",
       );
       return;
     }

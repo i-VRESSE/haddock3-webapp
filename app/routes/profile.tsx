@@ -31,7 +31,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   if (result.success) {
     await setPreferredExpertiseLevel(
       userId,
-      result.output.preferredExpertiseLevel
+      result.output.preferredExpertiseLevel,
     );
   } else {
     const errors = result.issues;
@@ -44,7 +44,7 @@ export default function Page() {
   const user = useUser();
   const submit = useSubmit();
   const handleChangePreferredExpertiseLevel = (
-    event: React.ChangeEvent<HTMLFormElement>
+    event: React.ChangeEvent<HTMLFormElement>,
   ) => {
     submit(event.currentTarget);
   };

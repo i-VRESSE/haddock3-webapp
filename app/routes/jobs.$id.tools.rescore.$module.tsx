@@ -33,11 +33,11 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [moduleName, hasInteractiveVersion, moduleIndexPadding] = moduleInfo(
     outputFiles,
-    moduleIndex
+    moduleIndex,
   );
   const showInteractiveVersion = shouldShowInteractiveVersion(
     request.url,
-    hasInteractiveVersion
+    hasInteractiveVersion,
   );
   const weights = await getWeights({
     jobid: jobId,
@@ -87,7 +87,7 @@ export const action = async ({ request, params }: LoaderFunctionArgs) => {
   const outputFiles = await listOutputFiles(jobId, bartenderToken, 1);
   const [moduleName, , moduleIndexPadding] = moduleInfo(
     outputFiles,
-    moduleIndex
+    moduleIndex,
   );
   const capriDir = buildPath({
     moduleIndex,

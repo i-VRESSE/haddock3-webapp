@@ -15,7 +15,7 @@ export function NonModuleOutputFiles({
     return {
       ...files,
       children: files.children?.filter(
-        (i) => nonmodules.has(i.name) || !i.is_dir
+        (i) => nonmodules.has(i.name) || !i.is_dir,
       ),
     };
   }, [files]);

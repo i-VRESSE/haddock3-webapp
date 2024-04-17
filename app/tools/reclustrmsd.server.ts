@@ -81,7 +81,7 @@ export async function reclustrmsd({
         },
       },
       body,
-    }
+    },
   );
   if (error) {
     throw error;

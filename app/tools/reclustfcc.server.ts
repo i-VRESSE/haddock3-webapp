@@ -76,7 +76,7 @@ export async function reclustfcc({
         },
       },
       body,
-    }
+    },
   );
   if (error) {
     throw error;

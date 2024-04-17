@@ -39,9 +39,9 @@ const RegisterSchema = object(
   [
     custom(
       ({ password, password2 }) => password === password2,
-      "The passwords do not match."
+      "The passwords do not match.",
     ),
-  ]
+  ],
 );
 
 export async function action({ request }: ActionFunctionArgs) {

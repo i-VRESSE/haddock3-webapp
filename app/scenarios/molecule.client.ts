@@ -18,7 +18,7 @@ export interface Molecule {
 export type SecondaryStructure = "sheet" | "helix" | "turn" | "";
 
 function secondaryStructureOfResidue(
-  residue: ResidueProxy
+  residue: ResidueProxy,
 ): SecondaryStructure {
   if (residue.isSheet()) {
     return "sheet";

@@ -23,7 +23,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const moduleInfo = await isContactMapModule(
     jobid,
     moduleIndex,
-    bartenderToken
+    bartenderToken,
   );
   const moduleParams = await getParams({
     jobid,
@@ -35,7 +35,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const clusterIds = await getClusters(moduleInfo, bartenderToken);
   if (params.cluster === undefined) {
     return redirect(
-      `/jobs/${jobid}/analysis/contactmap/${moduleIndex}/${clusterIds[0]}`
+      `/jobs/${jobid}/analysis/contactmap/${moduleIndex}/${clusterIds[0]}`,
     );
   }
   const clusterId = params.cluster;
@@ -43,7 +43,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     parseInt(clusterId),
     moduleInfo,
     bartenderToken,
-    moduleParams
+    moduleParams,
   );
   return json({ moduleIndex, clusterIds, cluster, jobid });
 };

@@ -158,13 +158,13 @@ export default function ProteinProteinScenario() {
 
     const ambig_fname = await generateAmbiguousRestraintsFile(
       protein1ActPass,
-      protein2ActPass
+      protein2ActPass,
     );
     formData.set("ambig_fname", ambig_fname);
 
     const unambig_fname = generateUnAmbiguousRestraintsFile(
       protein1ActPass.bodyRestraints,
-      protein2ActPass.bodyRestraints
+      protein2ActPass.bodyRestraints,
     );
     if (unambig_fname) {
       formData.set("unambig_fname", unambig_fname);
@@ -234,9 +234,7 @@ export default function ProteinProteinScenario() {
               </FormDescription>
             </FormItem>
             <div className="py-2 text-destructive-foreground">
-              {actionData?.errors.map((error) => (
-                <p key={error}>{error}</p>
-              ))}
+              {actionData?.errors.map((error) => <p key={error}>{error}</p>)}
             </div>
             <ActionButtons />
           </form>

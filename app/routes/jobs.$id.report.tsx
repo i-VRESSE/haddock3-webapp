@@ -32,7 +32,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [module, _, moduleIndexPadding] = await getCaprievalModuleInfo(
       jobid,
-      bartenderToken
+      bartenderToken,
     );
     const { scatterSelection, boxSelection } = getPlotSelection(request.url);
     const caprievalData = await getCaprievalData({

@@ -27,7 +27,7 @@ function ImportResidues({
     e.preventDefault();
     const newSelection = window.prompt(
       "Enter comma-separated residue numbers to import",
-      selected.join(",")
+      selected.join(","),
     );
     if (newSelection) {
       const newResidues = newSelection.split(",").map((r) => parseInt(r));
@@ -106,7 +106,7 @@ export function ResiduesSelect({
                 {
                   "bg-secondary text-secondary-foreground":
                     highlight === r.resno,
-                }
+                },
               )}
               title={
                 surface.includes(r.resno)

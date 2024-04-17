@@ -34,7 +34,7 @@ describe("files2modules", () => {
         is_file: false,
       };
       expect(files2modules(item)).toEqual([]);
-    }
+    },
   );
 
   it("should split child dir into module id and name", () => {

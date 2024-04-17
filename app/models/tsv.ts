@@ -3,7 +3,7 @@ import { autoType, tsvParse } from "d3-dsv";
 export function parseTsv<TRow>(
   body: string,
   dropComments = false,
-  dropEmptyLines = false
+  dropEmptyLines = false,
 ) {
   let lines = body;
   if (dropEmptyLines) {

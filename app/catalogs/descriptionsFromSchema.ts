@@ -3,7 +3,7 @@ import guru from "./haddock3.guru.json";
 
 function descriptionsFromSchema(
   schema: ICatalog["global"]["schema"],
-  whitelist: string[]
+  whitelist: string[],
 ) {
   const descriptions: Record<
     string,

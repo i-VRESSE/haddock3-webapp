@@ -71,7 +71,7 @@ export async function getWeights({
 export async function getCaprievalModuleInfo(
   jobid: number,
   bartenderToken: string,
-  moduleIndex: number = -1
+  moduleIndex: number = -1,
 ): Promise<[number, boolean, number]> {
   const files = await listOutputFiles(jobid, bartenderToken, 1);
   if (moduleIndex === -1) {
@@ -93,10 +93,10 @@ export function getPlotSelection(url: string) {
   const scatterSelection = params.get("ss") || "report";
   const boxSelection = params.get("bs") || "report";
   const ScatterSchema = picklist(
-    Object.keys(CAPRIEVAL_SCATTERPLOT_CHOICES) as [string, ...string[]]
+    Object.keys(CAPRIEVAL_SCATTERPLOT_CHOICES) as [string, ...string[]],
   );
   const BoxSchema = picklist(
-    Object.keys(CAPRIEVAL_BOXPLOT_CHOICES) as [string, ...string[]]
+    Object.keys(CAPRIEVAL_BOXPLOT_CHOICES) as [string, ...string[]],
   );
   // TODO present nice error message
   return {
@@ -201,7 +201,7 @@ export function getLastCaprievalModule(files: DirectoryItem): [number, number] {
 
 export function buildBestRankedPath(
   module: number,
-  moduleIndexPadding: number
+  moduleIndexPadding: number,
 ) {
   // output/analysis/12_caprieval_analysis/summary.tgz
   return buildAnalyisPath({
@@ -222,7 +222,7 @@ function prefixTable(table: Table, structurePrefix: string) {
             return [key, `${structurePrefix}${value}`];
           }
           return [key, value];
-        })
+        }),
       ) as Cluster;
     });
   } else {

@@ -199,13 +199,13 @@ export default function AntibodyAntigenScenario() {
     }
     const ambig_fname = await generateAmbiguousRestraintsFile(
       antibodyActPass,
-      antigenSelection
+      antigenSelection,
     );
     formData.set("ambig_fname", ambig_fname);
 
     const unambig_fname = generateUnAmbiguousRestraintsFile(
       antibodyActPass.bodyRestraints,
-      antigenSelection.bodyRestraints
+      antigenSelection.bodyRestraints,
     );
     if (unambig_fname) {
       formData.set("unambig_fname", unambig_fname);
@@ -279,9 +279,7 @@ export default function AntibodyAntigenScenario() {
               </FormDescription>
             </FormItem>
             <div className="py-2 text-red-500">
-              {actionData?.errors.map((error) => (
-                <p key={error}>{error}</p>
-              ))}
+              {actionData?.errors.map((error) => <p key={error}>{error}</p>)}
             </div>
             <ActionButtons />
           </form>

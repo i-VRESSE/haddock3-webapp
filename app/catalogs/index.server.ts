@@ -81,7 +81,7 @@ function hideExecutionParameters(catalog: ICatalog) {
       {
         "ui:widget": "hidden",
       },
-    ])
+    ]),
   );
   catalog.global.uiSchema = {
     ...catalog.global.uiSchema,

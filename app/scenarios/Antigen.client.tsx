@@ -100,14 +100,14 @@ export function AntigenSubForm({
   async function onUserStructureAndChainSelect(
     file: File,
     chain: string,
-    chains: string[]
+    chains: string[],
   ) {
     const restraints = await calclulateRestraints(
       file,
       chain,
       targetChain,
       preprocessPipeline,
-      accessibilityCutoff
+      accessibilityCutoff,
     );
 
     const structure: Structure = await autoLoad(restraints.file);

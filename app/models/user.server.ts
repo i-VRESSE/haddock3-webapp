@@ -174,7 +174,7 @@ const now = sql<string>`now()`;
 
 export async function assignExpertiseLevel(
   userId: string,
-  level: ExpertiseLevel
+  level: ExpertiseLevel,
 ) {
   // set preferred level to the assigned level if no preferred level is set
   const user = await getUserById(userId);
@@ -184,7 +184,7 @@ export async function assignExpertiseLevel(
 
   // retain order should be easy,expert,guru
   const expertiseLevels = expertiseLevel.enumValues.filter(
-    (l) => user.expertiseLevels.includes(l) || level === l
+    (l) => user.expertiseLevels.includes(l) || level === l,
   );
 
   await db
@@ -199,7 +199,7 @@ export async function assignExpertiseLevel(
 
 export async function unassignExpertiseLevel(
   userId: string,
-  level: ExpertiseLevel
+  level: ExpertiseLevel,
 ) {
   const user = await getUserById(userId);
   const remainingLevels = user.expertiseLevels.filter((name) => name !== level);
@@ -221,7 +221,7 @@ export async function unassignExpertiseLevel(
 
 export async function setPreferredExpertiseLevel(
   userId: string,
-  preferredExpertiseLevel: ExpertiseLevel
+  preferredExpertiseLevel: ExpertiseLevel,
 ) {
   await db
     .update(users)
@@ -245,7 +245,7 @@ export async function setIsAdmin(userId: string, isAdmin: boolean) {
 export async function setBartenderToken(
   userId: string,
   token: string,
-  expireAt: number
+  expireAt: number,
 ) {
   await db
     .update(users)

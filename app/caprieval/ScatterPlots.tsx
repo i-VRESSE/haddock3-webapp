@@ -36,7 +36,7 @@ export function ScatterPlots({
                 <SelectItem key={value} value={value}>
                   {label}
                 </SelectItem>
-              )
+              ),
             )}
           </SelectContent>
         </Select>

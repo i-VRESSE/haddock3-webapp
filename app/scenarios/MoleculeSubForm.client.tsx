@@ -27,7 +27,7 @@ export type ActPassSelection = {
 export async function passiveFromActive(
   structure: string,
   activeResidues: ResidueSelection,
-  surface: number[]
+  surface: number[],
 ) {
   /*
   On CLI
@@ -78,7 +78,7 @@ function flattenErrorResponses(response: HTTPValidationError): string {
 
 async function calculateAccessibility(
   structure: string,
-  cutoff = 0.4
+  cutoff = 0.4,
 ): Promise<[Record<string, number[]>, undefined | string]> {
   const body = {
     structure,
@@ -95,7 +95,7 @@ async function calculateAccessibility(
     Object.entries(data).map(([chain, residues]) => [
       chain,
       residues === undefined ? [] : residues,
-    ])
+    ]),
   );
   return [residues, undefined];
 }
@@ -116,7 +116,7 @@ async function preprocessPdb(
   file: File,
   fromChain: string,
   toChain: string,
-  preprocessPipeline: PreprocessPipeline = ""
+  preprocessPipeline: PreprocessPipeline = "",
 ) {
   const structure = await jsonSafeFile(file);
 
@@ -158,18 +158,18 @@ export async function calclulateRestraints(
   userSelectedChain: string,
   targetChain: string,
   preprocessPipeline: PreprocessPipeline = "",
-  accessibilityCutoff = 0.4
+  accessibilityCutoff = 0.4,
 ) {
   const processed = await preprocessPdb(
     file,
     userSelectedChain,
     targetChain,
-    preprocessPipeline
+    preprocessPipeline,
   );
   const safeProcessed = await jsonSafeFile(processed);
   const [surfaceResidues, error] = await calculateAccessibility(
     safeProcessed,
-    accessibilityCutoff
+    accessibilityCutoff,
   );
   const bodyRestraints = await restrainBodies(safeProcessed);
   let errors: Molecule["errors"] = undefined;
@@ -186,7 +186,7 @@ export async function calclulateRestraints(
 
 function filterOutBuriedResidues(
   residues: number[],
-  surfaceResidues: number[]
+  surfaceResidues: number[],
 ) {
   return residues.filter((resno) => surfaceResidues.includes(resno));
 }
@@ -422,7 +422,7 @@ export function ResiduesSubForm({
       const passiveResidues = await passiveFromActive(
         structure,
         activeSelection,
-        molecule.surfaceResidues
+        molecule.surfaceResidues,
       );
       onActPassChange({
         active: { chain: actpass.active.chain, resno: activeResidues },
@@ -547,14 +547,14 @@ export function MoleculeSubForm({
   async function onUserStructureAndChainSelect(
     file: File,
     chain: string,
-    chains: string[]
+    chains: string[],
   ) {
     const restraints = await calclulateRestraints(
       file,
       chain,
       targetChain,
       preprocessPipeline,
-      accessibilityCutoff
+      accessibilityCutoff,
     );
 
     const structure: Structure = await autoLoad(restraints.file);

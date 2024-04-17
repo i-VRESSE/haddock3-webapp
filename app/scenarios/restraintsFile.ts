@@ -4,7 +4,7 @@ import { client } from "~/haddock3-restraints-client/client";
 export async function generateAmbiguousRestraintsFile(
   selection1: ActPassSelection,
   selection2: ActPassSelection,
-  filename = "ambig.tbl"
+  filename = "ambig.tbl",
 ) {
   /*
  
@@ -34,7 +34,7 @@ export async function generateAmbiguousRestraintsFile(
 
 export function generateUnAmbiguousRestraintsFile(
   body_restraints1: string,
-  body_restraints2: string
+  body_restraints2: string,
 ) {
   const lines: string[] = [];
   if (body_restraints1 === "" && body_restraints2 === "") {

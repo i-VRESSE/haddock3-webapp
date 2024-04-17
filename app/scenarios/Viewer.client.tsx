@@ -98,7 +98,7 @@ export function NGLResidues({
         onPick(pickinProxy.atom.chainname, pickinProxy.atom.resno);
       }
     },
-    [onPick]
+    [onPick],
   );
 
   useEffect(() => {
@@ -123,7 +123,7 @@ export function NGLResidues({
         onHover(pickinProxy.atom.chainname, pickinProxy.atom.resno);
       }
     },
-    [onHover]
+    [onHover],
   );
 
   useEffect(() => {
@@ -146,7 +146,7 @@ export function NGLResidues({
 }
 
 function isValidStructure(
-  structure: Structure | undefined
+  structure: Structure | undefined,
 ): structure is Structure {
   // Removing component of structure in stage
   // will modifies the structure so it contains no atoms, but the count does not reflect that
@@ -154,7 +154,7 @@ function isValidStructure(
 }
 
 function isStructureComponent(
-  component: Component
+  component: Component,
 ): component is StructureComponent {
   return (component as StructureComponent).structure !== undefined;
 }
@@ -170,14 +170,14 @@ function stageHasValidStructure(stage: Stage, name: string): boolean {
 }
 
 const NGLComponentContext = createContext<StructureComponent | undefined>(
-  undefined
+  undefined,
 );
 
 export function useComponent() {
   const component = useContext(NGLComponentContext);
   if (!component) {
     throw new Error(
-      "useNGLComponent must be used within a NGLComponentProvider"
+      "useNGLComponent must be used within a NGLComponentProvider",
     );
   }
   return component;
@@ -194,7 +194,7 @@ export function NGLComponent({
 }) {
   const stage = useStage();
   const [component, setComponent] = useState<StructureComponent | undefined>(
-    undefined
+    undefined,
   );
 
   useEffect(() => {
@@ -232,7 +232,7 @@ export function NGLComponent({
         return;
       }
       const stagedComponent = stage.getComponentsByObject(
-        component.structure
+        component.structure,
       ).first;
       if (!stagedComponent) {
         return;

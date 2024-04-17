@@ -51,11 +51,11 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const outputFiles = await listOutputFiles(jobId, bartenderToken, 1);
   const [moduleName, hasInteractiveVersion, moduleIndexPadding] = moduleInfo(
     outputFiles,
-    moduleIndex
+    moduleIndex,
   );
   const showInteractiveVersion = shouldShowInteractiveVersion(
     request.url,
-    hasInteractiveVersion
+    hasInteractiveVersion,
   );
   const info = {
     jobid: jobId,
