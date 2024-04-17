@@ -6,14 +6,15 @@
 2. Show user uploaded pdb file in ngl
 3. Uses ngl to parse chains from file
 4. Select chain
-5. Preprocess pdb file: select chain | rename chain to A or B | fix insertion codes | select alt loc
-6. Parse chains/residues from preprocessed file
-7. Uses restraints calculate_accessibility endpoint to get surface residues
-8. Show processed pdb file in ngl
-9. Select an active redidue
-10. Uses restraints passive_from_active endpoint to get passive residues
-11. Repeat steps 7-8 until satisfied
-12. Steps 1-9 for second pdb file
-13. Uses actpass_to_ambig endpoint to generate ambig tbl file
-14. Uses restrain bodies endpoint of both pdb files to generate unambig tbl file
-15. Create archive with workflow, processed pdb files and tbl files
+5. Preprocess pdb file with pdbtools via haddock3 restaints web service
+6. Compute bodies contraints of chain
+7. Parse chains/residues from preprocessed file
+8. Uses restraints calculate_accessibility endpoint to get surface residues
+9. Show processed pdb file in ngl
+10. Select an active redidue
+11. Uses restraints passive_from_active endpoint to get passive residues
+12. Repeat steps 7-8 until satisfied
+13. Steps 1-9 for second pdb file
+14. Uses actpass_to_ambig endpoint to generate ambig tbl file
+15. Concatenate body contraints of both chains and if not empty use as unambig tbl file
+16. Create archive with workflow, processed pdb files and tbl files

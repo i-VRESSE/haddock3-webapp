@@ -71,6 +71,8 @@ uvicorn --port 5000 haddock.clis.restraints.webservice:app
 
 If not running on `http://localhost:5000` then set the `HADDOCK3_RESTRAINTS_URL` environment variable.
 
+See [docs/scenarios.md](docs/scenarios.md) for more information on how the web application uses the restraints web service.
+
 ## Development
 
 You need to have a PostgreSQL database running. The easiest way is to use Docker:
