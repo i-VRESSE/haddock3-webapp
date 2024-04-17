@@ -33,12 +33,12 @@ authenticator.use(
   new FormStrategy(async ({ form }) => {
     const { email, password } = parse(
       CredentialsSchema,
-      Object.fromEntries(form)
+      Object.fromEntries(form),
     );
     const user = await localLogin(email, password);
     return user.id;
   }),
-  "user-pass"
+  "user-pass",
 );
 
 // remix-auth-github is not compatible with the remix v2
@@ -119,7 +119,7 @@ if (
       verify: StrategyVerifyCallback<
         User,
         OAuth2StrategyVerifyParams<OAuth2Profile>
-      >
+      >,
     ) {
       const domain = options.isSandBox ? "sandbox.orcid.org" : "orcid.org";
       const AUTHORIZE_ENDPOINT = `https://${domain}/oauth/authorize`;
@@ -134,7 +134,7 @@ if (
           authorizationURL: AUTHORIZE_ENDPOINT,
           tokenURL: ACCESS_TOKEN_ENDPOINT,
         },
-        verify
+        verify,
       );
       this.profileEndpoint = PROFILE_ENDPOINT;
       this.emailsEndpoint = EMAILS_ENDPOINT;
@@ -153,7 +153,7 @@ if (
           headers: {
             Accept: "application/orcid+json",
           },
-        }
+        },
       );
       const emails: { email: { email: string }[] } =
         await emailsResponse.json();
@@ -192,7 +192,7 @@ if (
       const photo = profile.photos ? profile.photos![0].value : undefined;
       const userId = await oauthregister(primaryEmail, photo);
       return userId;
-    }
+    },
   );
 
   authenticator.use(orcidStrategy);
@@ -223,7 +223,7 @@ export async function getUser(request: Request) {
 }
 
 export async function getOptionalClientUser(
-  request: Request
+  request: Request,
 ): Promise<null | TokenLessUser> {
   const user = await getOptionalUser(request);
   if (!user) {

@@ -15,7 +15,7 @@ export function doUpload(zipPromise: Promise<Blob>, submit: SubmitFunction) {
 
 export function onRefine(
   zipPromise: Promise<Blob>,
-  navigate: NavigateFunction
+  navigate: NavigateFunction,
 ) {
   // add zip to browsers indexeddb haddock3 db, zips object store, key workflow.zip
   if (typeof indexedDB === "undefined") {
@@ -65,7 +65,7 @@ export function handleActionButton(
   event: Event,
   zipPromise: Promise<Blob>,
   navigate: NavigateFunction,
-  submit: SubmitFunction
+  submit: SubmitFunction,
 ) {
   const submitEvent = event as SubmitEvent;
   const kind = submitEvent.submitter?.getAttribute("value");

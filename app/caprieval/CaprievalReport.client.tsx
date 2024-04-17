@@ -44,7 +44,7 @@ export const CaprievalReport = ({ scatters, boxes, table }: CaprievalData) => {
               prev.set("ss", s);
               return prev;
             },
-            { preventScrollReset: true }
+            { preventScrollReset: true },
           )
         }
       />
@@ -58,7 +58,7 @@ export const CaprievalReport = ({ scatters, boxes, table }: CaprievalData) => {
               prev.set("bs", s);
               return prev;
             },
-            { preventScrollReset: true }
+            { preventScrollReset: true },
           )
         }
       />

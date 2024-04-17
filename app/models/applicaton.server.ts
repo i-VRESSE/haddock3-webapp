@@ -33,13 +33,13 @@ import { NodeOnDiskFile } from "@remix-run/node";
 export async function submitJob(
   rawFormData: FormData,
   accessToken: string,
-  expertiseLevels: ExpertiseLevel[]
+  expertiseLevels: ExpertiseLevel[],
 ) {
   const Schema = object({
     upload: instance(NodeOnDiskFile, [
       mimeType(
         ["application/zip", "application/x-zip-compressed"],
-        "Please upload a zip file"
+        "Please upload a zip file",
       ),
     ]),
     kind: optional(picklist(["run", "workflow"]), "workflow"),
@@ -55,7 +55,7 @@ export async function submitJob(
 async function submitHaddock3Job(
   upload: File,
   accessToken: string,
-  expertiseLevels: ExpertiseLevel[]
+  expertiseLevels: ExpertiseLevel[],
 ) {
   const rewritten_blob = await rewriteConfigInArchive(upload, expertiseLevels);
   const rewritten_upload = new File([rewritten_blob], upload.name, {
@@ -74,11 +74,11 @@ async function submitHaddock3Job(
 async function submitRunImportJob(
   upload: File,
   accessToken: string,
-  expertiseLevels: ExpertiseLevel[]
+  expertiseLevels: ExpertiseLevel[],
 ) {
   if (!expertiseLevels.includes("guru")) {
     throw new ForbiddenError(
-      "You don't have permission to submit run import jobs"
+      "You don't have permission to submit run import jobs",
     );
   }
   const client = createClient(accessToken);
@@ -96,7 +96,7 @@ async function getJobByRedirect(response: Response, accessToken: string) {
       `Unable to submit job: ${response.status} ${
         response.statusText
       } ${await response.text()}`,
-      { cause: response }
+      { cause: response },
     );
   }
 
@@ -124,6 +124,7 @@ function rewriteConfig(table: ReturnType<typeof parse>) {
   table.mode = "local";
   table.postprocess = true;
   table.clean = true;
+  table.offline = false;
 
   const haddock3_ncores = getNCores();
   if (haddock3_ncores > 0) {
@@ -138,6 +139,17 @@ function rewriteConfig(table: ReturnType<typeof parse>) {
   delete table.concat;
   delete table.self_contained;
   delete table.cns_exec;
+
+  // force plot_matrix to true for clustfcc, clustrmsd modules
+  Object.entries(table).forEach(([key, value]) => {
+    if (typeof value === "object" && value !== null) {
+      const isModuleWithPlotMatrix = ["clustfcc", "clustrmsd"].includes(key);
+      if (isModuleWithPlotMatrix && typeof value === "object") {
+        (value as Record<string, boolean>).plot_matrix = true;
+      }
+    }
+  });
+
   return table;
 }
 
@@ -147,6 +159,9 @@ function rewriteConfig(table: ReturnType<typeof parse>) {
  */
 function getNCores() {
   let haddock3_ncores = 0;
+  if (process.env.NODE_ENV === "test") {
+    return 1;
+  }
   if (
     process.env.HADDOCK3_NCORES !== undefined &&
     process.env.HADDOCK3_NCORES !== ""
@@ -154,7 +169,7 @@ function getNCores() {
     haddock3_ncores = parseInt(process.env.HADDOCK3_NCORES);
     if (isNaN(haddock3_ncores)) {
       throw new Error(
-        `HADDOCK3_NCORES env var is not a number: ${process.env.HADDOCK3_NCORES}`
+        `HADDOCK3_NCORES env var is not a number: ${process.env.HADDOCK3_NCORES}`,
       );
     }
   }
@@ -176,7 +191,7 @@ function parseToml(toml: string) {
 
 export async function rewriteConfigInArchive(
   upload: Blob,
-  expertiseLevels: ExpertiseLevel[]
+  expertiseLevels: ExpertiseLevel[],
 ) {
   const zip = new JSZip();
   // Tried to give upload blob directly to loadAsync, but failed with
@@ -193,7 +208,7 @@ export async function rewriteConfigInArchive(
   const config_file = zip.file(WORKFLOW_CONFIG_FILENAME);
   if (config_file === null) {
     throw new InvalidUploadError(
-      `Unable to find ${WORKFLOW_CONFIG_FILENAME} in archive`
+      `Unable to find ${WORKFLOW_CONFIG_FILENAME} in archive`,
     );
   }
   const config_body = await config_file.async("string");
@@ -208,7 +223,7 @@ export async function rewriteConfigInArchive(
   await validateWorkflowAgainstExpertiseLevels(
     new_config,
     expertiseLevels,
-    zip
+    zip,
   );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -225,7 +240,7 @@ export async function rewriteConfigInArchive(
 async function validateWorkflowAgainstExpertiseLevels(
   workflow: IWorkflow,
   expertiseLevels: ExpertiseLevel[],
-  zip: JSZip
+  zip: JSZip,
 ) {
   const files = await filesFromZip(zip);
   let errors: Errors = [];
@@ -254,7 +269,7 @@ async function filesFromZip(zip: JSZip): Promise<IFiles> {
       return;
     }
     blobs.push(
-      file.async("blob").then((blob) => blob2dataurl(blob, relativePath))
+      file.async("blob").then((blob) => blob2dataurl(blob, relativePath)),
     );
   });
   const dataurls = await Promise.all(blobs);
@@ -263,7 +278,7 @@ async function filesFromZip(zip: JSZip): Promise<IFiles> {
 
 async function blob2dataurl(
   value: Blob,
-  path: string
+  path: string,
 ): Promise<[string, string]> {
   const base64 = Buffer.from(await value.arrayBuffer()).toString("base64");
   const dataurl = `data:${value.type};name=${path};base64,${base64}`;

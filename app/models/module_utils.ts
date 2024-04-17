@@ -3,7 +3,7 @@ import { getModuleIndexPadding } from "~/models/job.server";
 
 export function hasInteractiveVersion(
   moduleIndex: number,
-  files: DirectoryItem
+  files: DirectoryItem,
 ) {
   const moduleIndexPadding = getModuleIndexPadding(files);
   const moduleIndexPadded = moduleIndex
@@ -49,7 +49,7 @@ function nameOfModule(moduleIndex: number, files: DirectoryItem) {
  */
 export function moduleInfo(
   files: DirectoryItem,
-  moduleIndex: number
+  moduleIndex: number,
 ): [string, boolean, number] {
   const moduleName = nameOfModule(moduleIndex, files);
   const pad = getModuleIndexPadding(files);

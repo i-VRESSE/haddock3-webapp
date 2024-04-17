@@ -17,3 +17,7 @@ node_modules
 
 Caddyfile
 /deploy/cns
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright

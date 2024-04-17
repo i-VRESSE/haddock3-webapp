@@ -43,7 +43,7 @@ export default function JobPage() {
     useLoaderData<typeof loader>();
 
   const hasWorkflow = inputFiles.children?.some(
-    (file) => file.is_file && file.name === WORKFLOW_CONFIG_FILENAME
+    (file) => file.is_file && file.name === WORKFLOW_CONFIG_FILENAME,
   );
   return (
     <main className="flex flex-row gap-16">

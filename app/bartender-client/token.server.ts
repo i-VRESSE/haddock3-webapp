@@ -17,7 +17,7 @@ export class TokenGenerator {
   constructor(
     privateKeyFilename: string,
     issuer = "haddock3-webapp",
-    lifespan = "8h"
+    lifespan = "8h",
   ) {
     this.privateKeyFilename = privateKeyFilename;
     this.issuer = issuer;

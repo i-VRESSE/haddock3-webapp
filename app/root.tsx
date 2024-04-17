@@ -137,9 +137,9 @@ export function ErrorBoundary() {
   if (isRouteErrorResponse(error)) {
     return (
       <BoundaryShell title="Unhandled Thrown Response!">
-        <h1 style={{ fontFamily: "system-ui, sans-serif", padding: "2rem" }}>
+        <h2 style={{ fontFamily: "system-ui, sans-serif", padding: "2rem" }}>
           {error.status} {error.statusText}
-        </h1>
+        </h2>
       </BoundaryShell>
     );
   }
@@ -152,8 +152,8 @@ export function ErrorBoundary() {
       error == null
         ? "Unknown Error"
         : typeof error === "object" && "toString" in error
-        ? error.toString()
-        : JSON.stringify(error);
+          ? error.toString()
+          : JSON.stringify(error);
     errorInstance = new Error(errorString);
   }
 

@@ -11,15 +11,17 @@ Uses
 
 - [bartender](https://github.com/i-VRESSE/bartender) for job execution.
 - [workflow-builder](https://github.com/i-VRESSE/workflow-builder) to construct a Haddock3 workflow config file.
-- [haddock3](https://github.com/haddocking/haddock3) to compute
+- [haddock3](https://github.com/haddocking/haddock3) to compute and
+  - Its embedded restraints web service is also used.
 - [haddock3-analysis-components](https://github.com/i-VRESSE/haddock3-analysis-components) for analysis components.
 
 ```mermaid
 sequenceDiagram
     Web app->>+Web app: Login
     Web app->>+Builder: Construct workflow config
+    Web app->>+Haddock3 restraints web service: Calculate restraints
     Builder->>+Bartender: Submit job
-    Bartender->>+haddock3: Run
+    Bartender->>+haddock3 CLI: Run
     Web app->>+Bartender: State of job
     Web app->>+Bartender: Result of job
 ```
@@ -55,6 +57,21 @@ openssl rsa -pubout -in private_key.pem -out public_key.pem
 
 The bartender web service should be running if you want to submit jobs.
 See [docs/bartender.md](docs/bartender.md) how to set it up.
+
+## Haddock3 restraints web service
+
+The scenario forms uses the [haddock3 restraints web service](https://github.com/haddocking/haddock3/blob/main/src/haddock/clis/restraints/webservice.py). to calulate restraints based on given active residues and structures.
+
+For the web application to use this service, it needs to be running with
+
+```shell
+# Activated Python environment with haddock3, fastapi and uvicorn installed
+uvicorn --port 5000 haddock.clis.restraints.webservice:app
+```
+
+If not running on `http://localhost:5000` then set the `HADDOCK3_RESTRAINTS_URL` environment variable.
+
+See [docs/scenarios.md](docs/scenarios.md) for more information on how the web application uses the restraints web service.
 
 ## Development
 
@@ -108,14 +125,7 @@ To check the Typescript types run
 npm run typecheck
 ```
 
-To run unit tests (`app/**/*.test.ts`) with [Vitest](https://vitest.dev) use
-
-```sh
-# In watch mode
-npm run test
-# or in single run mode with coverage
-npm run test -- run --coverage
-```
+For testing see [docs/testing.md](docs/testing.md).
 
 ## Deployment
 

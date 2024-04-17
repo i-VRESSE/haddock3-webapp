@@ -14,7 +14,7 @@ export function files2modules(files: DirectoryItem) {
   return files.children
     .filter(
       (i) =>
-        i.is_dir && !nonmodules.has(i.name) && !i.name.endsWith("_interactive")
+        i.is_dir && !nonmodules.has(i.name) && !i.name.endsWith("_interactive"),
     )
     .map((output) => {
       const report = analyisRoot?.children

@@ -26,7 +26,7 @@ function loadCatalog(catalog: ICatalog) {
   ) {
     catalog.global.schema.properties.run_dir.default = JOB_OUTPUT_DIR;
   }
-  return HideExecutionParameters(prepareCatalog(catalog));
+  return hideExecutionParameters(alwaysPlotMatrix(prepareCatalog(catalog)));
 }
 
 function loadCatalogs() {
@@ -37,7 +37,20 @@ function loadCatalogs() {
   } as const;
 }
 
-function HideExecutionParameters(catalog: ICatalog) {
+function alwaysPlotMatrix(catalog: ICatalog) {
+  for (const nodes of Object.values(catalog.nodes)) {
+    if (
+      nodes.schema.properties &&
+      nodes.schema.properties.plot_matrix &&
+      typeof nodes.schema.properties.plot_matrix === "object"
+    ) {
+      nodes.schema.properties.plot_matrix.default = true;
+    }
+  }
+  return catalog;
+}
+
+function hideExecutionParameters(catalog: ICatalog) {
   const executionParameters = [
     "run_dir",
     "mode",
@@ -52,6 +65,7 @@ function HideExecutionParameters(catalog: ICatalog) {
     // Not really execution parameters, but we want to hide them as well
     "postprocess",
     "clean",
+    "offline",
   ];
   const globalProps = catalog.global.schema.properties!;
   for (const param of executionParameters) {
@@ -67,7 +81,7 @@ function HideExecutionParameters(catalog: ICatalog) {
       {
         "ui:widget": "hidden",
       },
-    ])
+    ]),
   );
   catalog.global.uiSchema = {
     ...catalog.global.uiSchema,

@@ -1,9 +1,10 @@
 # Dockerfile for bartender web service with haddock3, lightdock, gdock executables.
 FROM python:3.9-slim-bookworm
 
+ARG HADDOCK3_GHORG=haddocking
 ARG HADDOCK3_VERSION=main
 ARG BARTENDER_VERSION=main
-ARG GDOCK_VERSION=master
+ARG GDOCK_VERSION=main
 ARG LIGHTDOCK_VERSION=0.9.4
 
 COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
@@ -22,7 +23,7 @@ RUN apt-get update && \
 
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
-RUN git clone --recursive https://github.com/haddocking/haddock3.git . && git checkout ${HADDOCK3_VERSION}
+RUN git clone --recursive https://github.com/${HADDOCK3_GHORG}/haddock3.git . && git checkout ${HADDOCK3_VERSION}
 WORKDIR /opt/haddock3/src/fcc/src
 RUN make
 WORKDIR /opt/haddock3/src/fast-rmsdmatrix/src

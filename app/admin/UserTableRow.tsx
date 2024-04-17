@@ -51,7 +51,7 @@ export const UserTableRow = ({
                         expertiseLevel,
                         usersExpertiseLevels.includes(expertiseLevel)
                           ? "false"
-                          : "true"
+                          : "true",
                       );
                       onUpdate(data);
                     }}

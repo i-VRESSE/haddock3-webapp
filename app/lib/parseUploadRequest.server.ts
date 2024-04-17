@@ -12,11 +12,11 @@ export async function parseUploadRequest(request: Request) {
       file: ({ filename }) => filename,
     }),
     // parse everything else into memory
-    unstable_createMemoryUploadHandler()
+    unstable_createMemoryUploadHandler(),
   );
   const formData = await unstable_parseMultipartFormData(
     request,
-    uploadHandler
+    uploadHandler,
   );
   return formData;
 }

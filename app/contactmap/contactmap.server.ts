@@ -29,13 +29,13 @@ interface ModuleInfo {
 export async function isContactMapModule(
   jobid: number,
   index: number,
-  bartenderToken: string
+  bartenderToken: string,
 ) {
   const outputFiles = await listOutputFiles(jobid, bartenderToken, 1);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [name, hasInteractiveVersion, indexPadding] = moduleInfo(
     outputFiles,
-    index
+    index,
   );
   if (name !== "contactmap") {
     throw new Error(`Module ${index} is not a contactmap`);
@@ -74,7 +74,7 @@ export async function getParams({
 
 export async function getClusters(
   module: ModuleInfo,
-  bartenderToken: string
+  bartenderToken: string,
 ): Promise<number[]> {
   const contents = await fetchHtml({
     bartenderToken,
@@ -93,7 +93,7 @@ export async function getClusterInfo(
   clusterId: number,
   module: ModuleInfo,
   bartenderToken: string,
-  params: Schema
+  params: Schema,
 ): Promise<ContactMapCluster> {
   let chordchart: PlotlyProps | undefined = undefined;
   if (params.generate_chordchart) {
@@ -101,7 +101,7 @@ export async function getClusterInfo(
       clusterId,
       module,
       bartenderToken,
-      "contmap_chordchart"
+      "contmap_chordchart",
     );
   }
   let heatmap: PlotlyProps | undefined = undefined;
@@ -110,7 +110,7 @@ export async function getClusterInfo(
       clusterId,
       module,
       bartenderToken,
-      "contmap_heatmap"
+      "contmap_heatmap",
     );
   }
   return {
@@ -119,17 +119,17 @@ export async function getClusterInfo(
     contacts: downloadPath(
       module.jobid,
       module,
-      `cluster${clusterId}_contmap_contacts.tsv`
+      `cluster${clusterId}_contmap_contacts.tsv`,
     ),
     heavyatoms_interchain_contacts: downloadPath(
       module.jobid,
       module,
-      `cluster${clusterId}_heavyatoms_interchain_contacts.tsv`
+      `cluster${clusterId}_heavyatoms_interchain_contacts.tsv`,
     ),
     interchain_contacts: downloadPath(
       module.jobid,
       module,
-      `cluster${clusterId}_interchain_contacts.tsv`
+      `cluster${clusterId}_interchain_contacts.tsv`,
     ),
     chordchart,
     heatmap,
@@ -140,7 +140,7 @@ async function getChartData(
   clusterId: number,
   module: ModuleInfo,
   bartenderToken: string,
-  filename: string
+  filename: string,
 ): Promise<PlotlyProps> {
   /// cluster4_contmap_chordchart.html
   const html = await fetchHtml({

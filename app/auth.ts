@@ -13,7 +13,7 @@ export function useMatchesData(id: string) {
   const matchingRoutes = useMatches();
   const route = useMemo(
     () => matchingRoutes.find((route) => route.id === id),
-    [matchingRoutes, id]
+    [matchingRoutes, id],
   );
   return route?.data as Record<string, unknown> | undefined;
 }
@@ -38,7 +38,7 @@ export function useUser() {
   const maybeUser = useOptionalUser();
   if (!maybeUser) {
     throw new Error(
-      "No user found in root loader, but user is required by useUser. If user is optional, try useOptionalUser instead."
+      "No user found in root loader, but user is required by useUser. If user is optional, try useOptionalUser instead.",
     );
   }
   return maybeUser;
@@ -56,9 +56,12 @@ export function useIsLoggedIn(): boolean {
 export function availableSocialLogins() {
   return Object.keys(process.env)
     .filter(
-      (key) => key.startsWith("HADDOCK3WEBAPP_") && key.endsWith("_CLIENT_ID")
+      (key) => key.startsWith("HADDOCK3WEBAPP_") && key.endsWith("_CLIENT_ID"),
     )
     .map((key) =>
-      key.replace("HADDOCK3WEBAPP_", "").replace("_CLIENT_ID", "").toLowerCase()
+      key
+        .replace("HADDOCK3WEBAPP_", "")
+        .replace("_CLIENT_ID", "")
+        .toLowerCase(),
     );
 }

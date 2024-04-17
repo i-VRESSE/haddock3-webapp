@@ -59,7 +59,7 @@ export async function getJobById(jobid: number, bartenderToken: string) {
 
 export async function getCompletedJobById(
   jobid: number,
-  bartenderToken: string
+  bartenderToken: string,
 ) {
   const job = await getJobById(jobid, bartenderToken);
   if (!CompletedJobs.has(job.state)) {
@@ -111,7 +111,7 @@ export async function getJobStderr(jobid: number, bartenderToken: string) {
 export async function getJobfile(
   jobid: number,
   path: string,
-  bartenderToken: string
+  bartenderToken: string,
 ) {
   const client = createClient(bartenderToken);
   const { response } = await client.GET("/api/job/{jobid}/files/{path}", {
@@ -130,7 +130,7 @@ export async function listFilesAt(
   jobid: number,
   path: string,
   bartenderToken: string,
-  maxDepth = 1
+  maxDepth = 1,
 ) {
   const client = createClient(bartenderToken);
   const { data, error } = await client.GET(
@@ -148,7 +148,7 @@ export async function listFilesAt(
           max_depth: maxDepth,
         },
       },
-    }
+    },
   );
   if (error) {
     throw new BartenderError(`Unable to list files at ${path}`, {
@@ -161,7 +161,7 @@ export async function listFilesAt(
 export async function listOutputFiles(
   jobid: number,
   bartenderToken: string,
-  maxDepth = 3
+  maxDepth = 3,
 ) {
   return listFilesAt(jobid, JOB_OUTPUT_DIR, bartenderToken, maxDepth);
 }
@@ -228,7 +228,7 @@ export async function getOutputArchive(jobid: number, bartenderToken: string) {
 export async function getSubDirectoryAsArchive(
   jobid: number,
   path: string,
-  bartenderToken: string
+  bartenderToken: string,
 ) {
   const client = createClient(bartenderToken);
   const { response } = await client.GET("/api/job/{jobid}/archive/{path}", {
@@ -251,7 +251,7 @@ export function getModuleIndexPadding(files: DirectoryItem) {
     throw new Error("No modules found");
   }
   const nrModules = files.children.filter(
-    (c) => c.is_dir && c.name.includes("_")
+    (c) => c.is_dir && c.name.includes("_"),
   ).length;
   return Math.ceil(Math.log10(nrModules));
 }
@@ -306,7 +306,7 @@ export function buildAnalyisPath({
 export async function updateJobName(
   jobid: number,
   name: string,
-  bartenderToken: string
+  bartenderToken: string,
 ) {
   const client = createClient(bartenderToken);
   const { response } = await client.POST("/api/job/{jobid}/name", {
@@ -326,7 +326,7 @@ export async function jobHasWorkflow(jobid: number, bartenderToken: string) {
   const response = await getJobfile(
     jobid,
     WORKFLOW_CONFIG_FILENAME,
-    bartenderToken
+    bartenderToken,
   );
   return response.status === 200;
 }
@@ -381,7 +381,7 @@ export async function fetchHtml({
   const response = await getJobfile(
     jobid,
     `${prefix}${htmlFilename}`,
-    bartenderToken
+    bartenderToken,
   );
   if (!response.ok) {
     throw new Error(`could not get ${htmlFilename}`);
