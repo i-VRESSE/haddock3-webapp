@@ -161,7 +161,7 @@ select = 5
     assert.equal(output_config, expected_config);
   });
 
-  test('plot_matrix should be set to true for clustfcc and clustrmsd modules', async () => {
+  test("plot_matrix should be set to true for clustfcc and clustrmsd modules", async () => {
     const input_config = `\
 [clustfcc]
 [clustrmsd]
@@ -189,5 +189,5 @@ plot_matrix = true
 `;
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
-  })
+  });
 });
