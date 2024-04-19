@@ -98,7 +98,7 @@ function flattenErrorResponses(response: HTTPValidationError): string {
 
 async function calculateAccessibility(
   structure: string,
-  cutoff = 0.4, // TODO make configurable by user
+  cutoff = 0.15, // TODO make configurable by user
 ): Promise<[Record<string, number[]>, undefined | string]> {
   const body = {
     structure,
