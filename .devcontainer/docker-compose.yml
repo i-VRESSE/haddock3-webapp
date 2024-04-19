@@ -1,0 +1,146 @@
+version: "3.9"
+
+services:
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+    depends_on:
+      bartender:
+        condition: service_started
+      webappdb:
+        condition: service_healthy
+      h3restraints:
+        condition: service_started
+    ports:
+      - "3000:3000"
+    environment:
+      BARTENDER_API_URL: "http://bartender:8000"
+      DATABASE_URL: postgresql://postgres:postgres@webappdb:5432/postgres
+      BARTENDER_PRIVATE_KEY: /certs/private_key.pem
+      SESSION_SECRET_FILE: /certs/session.secret
+      WAIT_PATHS: /certs/private_key.pem
+      HADDOCK3_RESTRAINTS_URL: "http://h3restraints:5000"
+    env_file:
+      - path: ../.env
+        required: false
+    volumes:
+      - bartender-certs:/certs:ro
+      - ..:/workspace:cached
+
+  webappdb:
+    image: postgres:15.4-bullseye
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - webapp-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  # below is same as in deploy/arq/docker-compose.yml,
+  # but paths are relative to the /.devcontainer/ directory
+  bartender:
+    image: ghcr.io/i-vresse/bartender
+    build:
+      context: ../deploy
+      dockerfile: ./Dockerfile.bartenderhaddock3
+      args:
+        HADDOCK3_VERSION: web-service
+        HADDOCK3_GHORG: i-VRESSE
+    restart: always
+    command: sh -c '/wait && alembic upgrade head && bartender serve'
+    volumes:
+      - type: bind
+        source: ../deploy/arq/bartender-config.yaml
+        target: /opt/bartender/config.yaml
+      - bartender-certs:/certs:ro
+      - bartender-job-data:/jobs
+    depends_on:
+      bartenderdb:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      BARTENDER_HOST: 0.0.0.0
+      BARTENDER_DB_HOST: bartenderdb
+      BARTENDER_DB_PORT: 5432
+      BARTENDER_DB_USER: postgres
+      BARTENDER_DB_PASS: postgres
+      BARTENDER_DB_BASE: postgres
+      BARTENDER_WORKERS_COUNT: 4
+      BARTENDER_LOG_LEVEL: error
+      BARTENDER_PUBLIC_KEY: /certs/public_key.pem
+      WAIT_PATHS: /certs/private_key.pem
+
+  bartenderdb:
+    image: postgres:15.4-bullseye
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - bartender-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+  redis:
+    image: redis:6.2.6
+    restart: always
+
+  bartenderworker:
+    image: ghcr.io/i-vresse/bartender
+    build:
+      context: ../deploy
+      dockerfile: ./Dockerfile.bartenderhaddock3
+      args:
+        HADDOCK3_VERSION: web-service
+        HADDOCK3_GHORG: i-VRESSE
+    restart: always
+    command: sh -c 'bartender perform'
+    volumes:
+      - type: bind
+        source: ../deploy/arq/bartender-config.yaml
+        target: /opt/bartender/config.yaml
+      - bartender-job-data:/jobs
+    depends_on:
+      redis:
+        condition: service_started
+
+  certmaker:
+    image: ghcr.io/i-vresse/certmaker
+    build:
+      context: ../deploy/
+      dockerfile: ./Dockerfile.openssl
+    volumes:
+      - bartender-certs:/certs
+    working_dir: /certs
+    restart: "no"
+
+  h3restraints:
+    image: ghcr.io/i-vresse/bartender
+    build:
+      context: ../deploy
+      dockerfile: ./Dockerfile.bartenderhaddock3
+      args:
+        HADDOCK3_VERSION: web-service
+        HADDOCK3_GHORG: i-VRESSE
+    restart: always
+    command: sh -c 'uvicorn --host 0.0.0.0 --port 5000 haddock.clis.restraints.webservice:app'
+
+volumes:
+  webapp-db-data:
+  bartender-db-data:
+  bartender-job-data:
+  bartender-certs:

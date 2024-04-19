@@ -66,9 +66,13 @@ function AntigenFlavourPicker({
       </div>
     </RadioGroup>
   );
-  // TODO maybe??, add other combinations like
+  // TODO add other combinations like
   // - selected residues as active and no surface residues
   // - selected residues as passive and no surface residues
+  // - 2 select residues checkboxes for active passive, residue can not be both passive and active
+  // or split in multiple steps:
+  // 1. Select surface, active, passive
+  // 1. Checkbox Add neighbours as passive
 }
 
 export function AntigenSubForm({
