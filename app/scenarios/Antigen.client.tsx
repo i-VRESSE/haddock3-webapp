@@ -17,6 +17,7 @@ import {
 } from "./MoleculeSubForm.client";
 import { PreprocessPipeline, calclulateRestraints } from "./restraints";
 
+// TODO give flavour choices for each moleculesubform
 export type Flavour = "surf" | "pass" | "actpass";
 function AntigenFlavourPicker({
   value,
