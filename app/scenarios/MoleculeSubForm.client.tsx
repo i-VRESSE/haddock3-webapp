@@ -6,7 +6,7 @@ import { useTheme } from "remix-themes";
 import { FormDescription } from "./FormDescription";
 import { FormItem } from "./FormItem";
 import { ChainSelect } from "./ChainSelect";
-import { ResiduesSelect } from "./ResiduesSelect";
+import { ResiduesSelect, ResidueSelection } from "./ResiduesSelect";
 import { Residue, chainsFromStructure } from "./molecule.client";
 import { Viewer } from "./Viewer.client";
 
@@ -20,6 +20,7 @@ import {
   jsonSafeFile,
   passiveFromActive,
 } from "./restraints";
+import { RestraintsBase, RestraintsBasePicker } from "./RestraintsBasePicker";
 
 export type ActPassSelection = {
   active: number[];
@@ -96,7 +97,7 @@ export function UserStructure({
   const myname = name + "-user";
   return (
     <>
-      <FormItem name={name} label="Structure">
+      <FormItem name={myname} label="Structure">
         <Input
           type="file"
           id={myname}
@@ -219,14 +220,18 @@ export function HiddenFileInput({ name, file }: { name: string; file: File }) {
 export function ResiduesSubForm({
   molecule,
   actpass,
+  restraintsBase,
   onActPassChange,
-  label = "Active residues",
+  disabled,
   children,
+  label = "Residues",
 }: {
   molecule: Molecule;
   actpass: ActPassSelection;
-  onActPassChange: (actpass: ActPassSelection) => void;
+  restraintsBase: RestraintsBase;
+  onActPassChange?: (actpass: ActPassSelection) => void;
   label?: string;
+  disabled: boolean;
   children?: ReactNode;
 }) {
   const [showPassive, setShowPassive] = useState(false);
@@ -257,6 +262,9 @@ export function ResiduesSubForm({
       activeResidues,
       molecule.surfaceResidues,
     );
+    if (!onActPassChange) {
+      return;
+    }
     try {
       const structure =
         safeFile === undefined ? await jsonSafeFile(molecule.file) : safeFile;
@@ -284,6 +292,45 @@ export function ResiduesSubForm({
     }
   }
 
+  async function handleResidueChange(newSelection: ResidueSelection) {
+    if (!molecule) {
+      return;
+    }
+    if (!onActPassChange) {
+      return;
+    }
+    if (
+      ["act", "actpass"].includes(restraintsBase.kind) &&
+      restraintsBase.activeNeighbours
+    ) {
+      const structure =
+        safeFile === undefined ? await jsonSafeFile(molecule.file) : safeFile;
+      const derivedPassiveResidues = await passiveFromActive(
+        structure,
+        molecule.targetChain,
+        newSelection.act,
+        molecule.surfaceResidues,
+      );
+      newSelection.pass = Array.from(
+        new Set([...newSelection.pass, ...derivedPassiveResidues]),
+      );
+      // TODO when passive contains user and derived residues,
+      // user can no longer change a passive to active unles you first uncheck passive
+    }
+    if (
+      ["act", "actpass"].includes(restraintsBase.kind) &&
+      restraintsBase.passiveNeighbours
+    ) {
+      // TODO implement and make sure it does get stuck in infinite loop
+    }
+    onActPassChange({
+      active: newSelection.act,
+      passive: newSelection.pass,
+      chain: molecule.targetChain,
+      bodyRestraints: actpass.bodyRestraints,
+    });
+  }
+
   function onActiveResiduePick(chain: string, resno: number) {
     if (
       molecule.targetChain !== chain ||
@@ -291,6 +338,7 @@ export function ResiduesSubForm({
     ) {
       return;
     }
+
     const activeResidues = actpass.active;
     const index = activeResidues.indexOf(resno);
     if (index === -1) {
@@ -310,7 +358,7 @@ export function ResiduesSubForm({
           structure={molecule.file}
           chain={molecule.targetChain}
           active={actpass.active}
-          passive={showPassive ? actpass.passive : []}
+          passive={actpass.passive}
           surface={showSurface ? molecule.surfaceResidues : []}
           activePickable
           onActivePick={onActiveResiduePick}
@@ -321,10 +369,18 @@ export function ResiduesSubForm({
       {children}
       <Label>{label}</Label>
       <ResiduesSelect
-        options={molecule.residues || []}
-        selected={actpass.active}
-        onChange={handleActiveResiduesChange}
-        surface={molecule.surfaceResidues}
+        options={molecule.residues}
+        onChange={handleResidueChange}
+        disabledPassive={disabled}
+        disabledActive={disabled}
+        showActive={["act", "actpass"].includes(restraintsBase.kind)}
+        showPassive={
+          ["pass", "actpass"].includes(restraintsBase.kind) || showPassive
+        }
+        selected={{
+          act: actpass.active,
+          pass: actpass.passive,
+        }}
         onHover={setHoveredFrom2DResidue}
         highlight={hoveredFrom3DResidue}
       />
@@ -401,9 +457,11 @@ export function MoleculeSubForm({
       preprocessPipeline,
       accessibilityCutoff,
     );
-
     const structure: Structure = await autoLoad(restraints.file);
     const residues = chainsFromStructure(structure)[targetChain];
+    residues.forEach((residue) => {
+      residue.surface = restraints.surfaceResidues.includes(residue.resno);
+    });
     const newMolecule: Molecule = {
       userFile: file,
       userChains: chains,
@@ -426,6 +484,69 @@ export function MoleculeSubForm({
     onActPassChange(newSelection);
   }
 
+  function onRestraintsBaseChange(restraintsBase: RestraintsBase) {
+    if (!molecule) {
+      return;
+    }
+    setrestraintsBase(restraintsBase);
+    if (restraintsBase.kind === "surf") {
+      onActPassChange({
+        active: [],
+        passive: molecule.surfaceResidues,
+        chain: targetChain,
+        bodyRestraints: actpass.bodyRestraints,
+      });
+    } else {
+      onActPassChange({
+        active: [],
+        passive: [],
+        chain: targetChain,
+        bodyRestraints: actpass.bodyRestraints,
+      });
+    }
+  }
+
+  const [restraintsBase, setrestraintsBase] = useState<RestraintsBase>({
+    kind: "surf",
+    activeNeighbours: false,
+    passiveNeighbours: false,
+  });
+
+  const restraintsBasePicker = (
+    <RestraintsBasePicker
+      value={restraintsBase}
+      onChange={onRestraintsBaseChange}
+    />
+  );
+  let subform = null;
+  if (molecule) {
+    if (restraintsBase.kind === "surf") {
+      subform = (
+        <ResiduesSubForm
+          actpass={actpass}
+          molecule={molecule}
+          disabled={true}
+          restraintsBase={restraintsBase}
+        >
+          {restraintsBasePicker}
+        </ResiduesSubForm>
+      );
+    }
+    if (["act", "pass", "actpass"].includes(restraintsBase.kind)) {
+      subform = (
+        <ResiduesSubForm
+          actpass={actpass}
+          molecule={molecule}
+          disabled={false}
+          onActPassChange={onActPassChange}
+          restraintsBase={restraintsBase}
+        >
+          {restraintsBasePicker}
+        </ResiduesSubForm>
+      );
+    }
+  }
+
   return (
     <MoleculeSubFormWrapper legend={legend} description={description}>
       {molecule ? (
@@ -438,11 +559,7 @@ export function MoleculeSubForm({
           {molecule.errors ? (
             <RestraintsErrorsReport errors={molecule.errors} />
           ) : (
-            <ResiduesSubForm
-              actpass={actpass}
-              molecule={molecule}
-              onActPassChange={onActPassChange}
-            />
+            subform
           )}
         </>
       ) : (
