@@ -29,3 +29,5 @@ npx playwright test --headed --timeout 0
 # or to run with webkit
 npx playwright test --project webkit
 ```
+
+Playwright can not be run when you are inside a devcontainer. You need to run it on your host machine.

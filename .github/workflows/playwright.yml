@@ -19,9 +19,15 @@ jobs:
         run: npx playwright install --with-deps
       - name: Fake cns
         run: cp /usr/bin/uptime deploy/cns
-      - name:
-          Build arq deployment
+      - name:  Build arq deployment
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: i-VRESSE
+          password: "${{ secrets.GITHUB_TOKEN }}"
+          registry: docker.pkg.github.com
+          compose_file: deploy/arq/docker-compose.yml
           # TODO drop --build-arg once https://github.com/haddocking/haddock3/pull/841 is merged
-        run: docker compose -f deploy/arq/docker-compose.yml -p playwright build --build-arg HADDOCK3_VERSION=web-service --build-arg HADDOCK3_GHORG=i-VRESSE
+          build_extra_args: HADDOCK3_VERSION=web-service --build-arg HADDOCK3_GHORG=i-VRESSE
+          push_git_tag: true
       - name: Run Playwright tests
         run: npx playwright test
