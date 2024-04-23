@@ -5,7 +5,9 @@
 cd ../..
 # Need cns executable in deploy directory, so it can be copied into the Docker image
 cp <cns executable> deploy/cns
-docker compose -f deploy/arq/docker-compose.yml up --build
+# TODO merge build and up commands when https://github.com/haddocking/haddock3/pull/841 is nerged
+docker compose -f deploy/arq/docker-compose.yml build --build-arg HADDOCK3_VERSION=web-service --build-arg HADDOCK3_GHORG=i-VRESSE
+docker compose -f deploy/arq/docker-compose.yml up
 ```
 
 The haddock3 webapp should be running on http://localhost:8080
