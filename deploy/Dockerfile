@@ -1,4 +1,7 @@
 # Docker file for haddock3-webapp
+LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/Dockerfile
+LABEL org.opencontainers.image.licenses=Apache-2.0
+LABEL org.opencontainers.image.description="Haddock3 webapplication image."
 
 # base node image
 FROM node:18-bookworm-slim as base

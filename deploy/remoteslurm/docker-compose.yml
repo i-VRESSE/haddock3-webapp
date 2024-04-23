@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   webapp:
-    image: ghcr.io/i-vresse/haddock3-webapp
+    image: ghcr.io/i-vresse/haddock3-webapp:${WEBAPP_TAG:-latest}
     build:
       context: ../..
       dockerfile: deploy/Dockerfile
@@ -44,7 +44,7 @@ services:
       retries: 40
 
   bartender:
-    image: ghcr.io/i-vresse/bartender
+    image: ghcr.io/i-vresse/bartender:${BARTENDER_TAG:-latest}
     build:
       context: ..
       dockerfile: ./Dockerfile.bartenderhaddock3
@@ -105,7 +105,7 @@ services:
     restart: "no"
 
   h3restraints:
-    image: ghcr.io/i-vresse/bartender
+    image: ghcr.io/i-vresse/bartender:${BARTENDER_TAG:-latest}
     build:
       context: ..
       dockerfile: ./Dockerfile.bartenderhaddock3
