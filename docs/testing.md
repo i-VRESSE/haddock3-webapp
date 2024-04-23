@@ -31,3 +31,11 @@ npx playwright test --project webkit
 ```
 
 Playwright can not be run when you are inside a devcontainer. You need to run it on your host machine.
+
+## Component testing and development
+
+Use [Storybook](https://storybook.js.org) to develop and test components in isolation.
+
+```sh
+npm run storybook
+```

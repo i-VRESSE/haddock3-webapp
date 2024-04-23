@@ -21,3 +21,5 @@ Caddyfile
 /playwright-report/
 /blob-report/
 /playwright
+
+*storybook.log
