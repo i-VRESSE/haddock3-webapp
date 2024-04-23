@@ -19,9 +19,8 @@ jobs:
         run: npx playwright install --with-deps
       - name: Fake cns
         run: cp /usr/bin/uptime deploy/cns
-      - name:
-          Build arq deployment
-          # TODO drop --build-arg once https://github.com/haddocking/haddock3/pull/841 is merged
+      - name: Build arq deployment
+        # TODO drop --build-arg once https://github.com/haddocking/haddock3/pull/841 is merged
         run: docker compose -f deploy/arq/docker-compose.yml -p playwright build --build-arg HADDOCK3_VERSION=web-service --build-arg HADDOCK3_GHORG=i-VRESSE
       - name: Run Playwright tests
         run: npx playwright test

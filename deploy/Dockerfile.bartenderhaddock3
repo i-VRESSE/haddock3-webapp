@@ -1,5 +1,8 @@
 # Dockerfile for bartender web service with haddock3, lightdock, gdock executables.
 FROM python:3.9-slim-bookworm
+LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/Dockerfile.bartenderhaddock3
+LABEL org.opencontainers.image.licenses=Apache-2.0
+LABEL org.opencontainers.image.description="bartender web service with haddock3, lightdock, gdock executables. Image does not contain real cns executable, downstream should copy it to /opt/haddock3/bin/cns."
 
 ARG HADDOCK3_GHORG=haddocking
 ARG HADDOCK3_VERSION=main

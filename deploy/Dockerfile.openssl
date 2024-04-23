@@ -1,7 +1,14 @@
+# Docker image that generates a rsa private/public key pair on startup.
+
+# The service with the public key (/certs/public_key.pem) can trust the service with the private key (/certs/private_key.pem).
 FROM alpine:3.19
+LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/Dockerfile.openssl
+LABEL org.opencontainers.image.licenses=Apache-2.0
+LABEL org.opencontainers.image.description="Generates a rsa private/public key pair on startup"
 
 RUN apk add --no-cache openssl
 
 CMD (test -e private_key.pem || openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048) && \
     (test -e public_key.pem || openssl rsa -pubout -in private_key.pem -out public_key.pem) && \
-    (test -e session.secret || openssl rand -hex 32 > session.secret)
+    (test -e session.secret || openssl rand -hex 32 > session.secret) && \
+    chmod +r /certs/private_key.pem

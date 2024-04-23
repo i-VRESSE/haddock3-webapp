@@ -2,13 +2,11 @@ version: "3.9"
 
 services:
   webapp:
-    image: ghcr.io/i-vresse/haddock3-webapp:${WEBAPP_TAG:-latest}
     build:
-      context: ../..
-      dockerfile: deploy/Dockerfile
-    restart: always
-    entrypoint: /usr/bin/sh
-    command: ["-c", "/wait && npm run setup && npm run start"]
+      context: .
+      dockerfile: Dockerfile
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
     depends_on:
       bartender:
         condition: service_started
@@ -17,7 +15,7 @@ services:
       h3restraints:
         condition: service_started
     ports:
-      - "8080:8080"
+      - "3000:3000"
     environment:
       BARTENDER_API_URL: "http://bartender:8000"
       DATABASE_URL: postgresql://postgres:postgres@webappdb:5432/postgres
@@ -25,8 +23,12 @@ services:
       SESSION_SECRET_FILE: /certs/session.secret
       WAIT_PATHS: /certs/private_key.pem
       HADDOCK3_RESTRAINTS_URL: "http://h3restraints:5000"
+    env_file:
+      - path: ../.env
+        required: false
     volumes:
       - bartender-certs:/certs:ro
+      - ..:/workspace:cached
 
   webappdb:
     image: postgres:15.4-bullseye
@@ -43,31 +45,29 @@ services:
       timeout: 3s
       retries: 40
 
+  # below is same as in deploy/arq/docker-compose.yml,
+  # but paths are relative to the /.devcontainer/ directory
   bartender:
     image: ghcr.io/i-vresse/bartender:${BARTENDER_TAG:-latest}
     build:
-      context: ..
+      context: ../deploy
       dockerfile: ./Dockerfile.bartenderhaddock3
+      args:
+        HADDOCK3_VERSION: web-service
+        HADDOCK3_GHORG: i-VRESSE
     restart: always
     command: sh -c '/wait && alembic upgrade head && bartender serve'
     volumes:
       - type: bind
-        source: ./bartender-config.yaml
+        source: ../deploy/arq/bartender-config.yaml
         target: /opt/bartender/config.yaml
-      - type: bind
-        source: ./mypicker.py
-        target: /opt/bartender/mypicker.py
       - bartender-certs:/certs:ro
       - bartender-job-data:/jobs
-      # To use a local private ssh key to login to the remote slurm machine
-      # uncomment the following lines
-      # The key should not have a passphrase.
-      # - type: bind
-      #   source: ~/.ssh/id_rsa
-      #   target: /home/bartender/.ssh/id_rsa
     depends_on:
       bartenderdb:
         condition: service_healthy
+      redis:
+        condition: service_started
     environment:
       BARTENDER_HOST: 0.0.0.0
       BARTENDER_DB_HOST: bartenderdb
@@ -95,9 +95,33 @@ services:
       timeout: 3s
       retries: 40
 
-  certmaker:
+  redis:
+    image: redis:6.2.6
+    restart: always
+
+  bartenderworker:
+    image: ghcr.io/i-vresse/bartender:${BARTENDER_TAG:-latest}
     build:
-      context: ..
+      context: ../deploy
+      dockerfile: ./Dockerfile.bartenderhaddock3
+      args:
+        HADDOCK3_VERSION: web-service
+        HADDOCK3_GHORG: i-VRESSE
+    restart: always
+    command: sh -c 'bartender perform'
+    volumes:
+      - type: bind
+        source: ../deploy/arq/bartender-config.yaml
+        target: /opt/bartender/config.yaml
+      - bartender-job-data:/jobs
+    depends_on:
+      redis:
+        condition: service_started
+
+  certmaker:
+    image: ghcr.io/i-vresse/certmaker:${CERTMAKER_TAG:-latest}
+    build:
+      context: ../deploy/
       dockerfile: ./Dockerfile.openssl
     volumes:
       - bartender-certs:/certs
@@ -107,8 +131,11 @@ services:
   h3restraints:
     image: ghcr.io/i-vresse/bartender:${BARTENDER_TAG:-latest}
     build:
-      context: ..
+      context: ../deploy
       dockerfile: ./Dockerfile.bartenderhaddock3
+      args:
+        HADDOCK3_VERSION: web-service
+        HADDOCK3_GHORG: i-VRESSE
     restart: always
     command: sh -c 'uvicorn --host 0.0.0.0 --port 5000 haddock.clis.restraints.webservice:app'
 

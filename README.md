@@ -75,7 +75,20 @@ See [docs/scenarios.md](docs/scenarios.md) for more information on how the web a
 
 ## Development
 
-You need to have a PostgreSQL database running. The easiest way is to use Docker:
+### Develop inside devcontainer
+
+You can develop inside a [devcontainer](https://containers.dev/) inside Visual Studio Code. The devcontainer includes all services required by the webapp.
+You just have to supply the cns executable as `./deploy/cns` file, see [deployment](deploy/README.md), before building/starting the containers.
+
+### Development outside devcontainer
+
+To develop the webapp ouside a devcontainer you have the following services running:
+
+1. PostgreSQL database for user management
+2. [Bartender web service](https://github.com/i-VRESSE/bartender/) for job executation and input/output storage.
+3. [Haddock3 restraints web service]() for calculating restraints on scenario pages.
+
+The PostgreSQL database can be started in a container with
 
 ```sh
 npm run docker:dev
@@ -85,12 +98,14 @@ npm run docker:dev
 (You can get a psql shell with `npm run psql:dev`)
 (On CTRL-C the database is stopped. To remove container and volume use `npm run docker:devrm`)
 
-The database can be initialized with
+The database must be initialized with
 
 ```sh
 npm run setup
 # This will create tables
 ```
+
+## Start development server
 
 Start [remix](https://remix.run) development server from your terminal with:
 

@@ -1,0 +1,18 @@
+{
+  "name": "Haddock3 webapp",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "webapp",
+  "workspaceFolder": "/workspace",
+  "postCreateCommand": "bash -i -c 'npm install && npm run setup'",
+  "forwardPorts": [3000],
+  "shutdownAction": "stopCompose",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "YoavBls.pretty-ts-errors",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}

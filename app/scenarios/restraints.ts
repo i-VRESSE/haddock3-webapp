@@ -59,6 +59,7 @@ export async function passiveFromActive(
   chain: string,
   activeResidues: number[],
   surface: number[],
+  // TODO make cutoff configurable by user
 ) {
   /*
   On CLI
@@ -97,7 +98,7 @@ function flattenErrorResponses(response: HTTPValidationError): string {
 
 async function calculateAccessibility(
   structure: string,
-  cutoff = 0.4,
+  cutoff = 0.15, // TODO make configurable by user
 ): Promise<[Record<string, number[]>, undefined | string]> {
   const body = {
     structure,
