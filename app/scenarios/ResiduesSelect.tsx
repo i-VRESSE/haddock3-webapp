@@ -137,7 +137,7 @@ function ResidueCheckbox({
           type="checkbox"
           style={style}
           value={resno}
-          disabled={activeDisabled || passiveChecked}
+          disabled={activeDisabled}
           id={id + "act"}
           checked={activeChecked}
           onChange={onActiveChange}
@@ -216,9 +216,15 @@ export function ResiduesSelect({
       }
     }
     if (actpass === "act") {
+      // Active should take precedence over passive.
+      // For example given passive is selected,
+      // then selecting same residue as active should remove it from passive.
+      const passiveWithoutAlsoActive = selected.pass.filter(
+        (r) => !newSelected.includes(r),
+      );
       onChange({
         act: newSelected,
-        pass: selected.pass,
+        pass: passiveWithoutAlsoActive,
       });
     } else {
       onChange({
@@ -260,14 +266,6 @@ export function ResiduesSelect({
 
     return resultArray;
   }, initialArray);
-
-  console.log({
-    options,
-    surface,
-    disabledActive,
-    disabledPassive,
-    chunk0: chunks[0],
-  });
 
   return (
     <>
