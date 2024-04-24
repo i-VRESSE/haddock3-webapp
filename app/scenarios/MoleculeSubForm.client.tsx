@@ -364,6 +364,7 @@ export function ResiduesSubForm({
           onActivePick={onActiveResiduePick}
           higlightResidue={hoveredFrom2DResidue}
           onHover={(_, residue) => setHoveredFrom3DResidue(residue)}
+          onMouseLeave={() => setHoveredFrom3DResidue(undefined)}
         />
       </div>
       {children}

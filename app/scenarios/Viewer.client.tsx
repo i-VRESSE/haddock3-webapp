@@ -253,7 +253,13 @@ export function NGLComponent({
   );
 }
 
-export function NGLStage({ children }: { children: ReactNode }) {
+export function NGLStage({
+  onMouseLeave,
+  children,
+}: {
+  children: ReactNode;
+  onMouseLeave: () => void;
+}) {
   const [stage, setStage] = useState<Stage>();
 
   const stageElementRef: RefCallback<HTMLElement> = useCallback((element) => {
@@ -274,7 +280,10 @@ export function NGLStage({ children }: { children: ReactNode }) {
 
   //  TODO make height and width configurable
   return (
-    <div className="relative h-full w-full overflow-hidden">
+    <div
+      className="relative h-full w-full overflow-hidden"
+      onMouseLeave={onMouseLeave}
+    >
       <div ref={stageElementRef} className="h-full w-full "></div>
       {stage && (
         <>
@@ -339,6 +348,7 @@ export function Viewer({
   onActivePick,
   higlightResidue,
   onHover,
+  onMouseLeave = () => {},
 }: {
   structure: File;
   chain: string;
@@ -349,6 +359,7 @@ export function Viewer({
   onActivePick?: (chain: string, residue: number) => void;
   higlightResidue?: number | undefined;
   onHover?: (chain: string, residue: number) => void;
+  onMouseLeave: () => void;
 }) {
   const [theme] = useTheme();
   const isDark = theme === "dark";
@@ -357,7 +368,7 @@ export function Viewer({
   const opacity = isDark ? 0.7 : 0.3;
   return (
     <ErrorBoundary>
-      <NGLStage>
+      <NGLStage onMouseLeave={onMouseLeave}>
         <NGLComponent structure={structure} chain={chain}>
           {higlightResidue && (
             <NGLResidues
