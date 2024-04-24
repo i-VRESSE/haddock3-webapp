@@ -5,8 +5,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useTheme } from "remix-themes";
 import { cn } from "~/lib/utils";
-import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
-import { Label } from "~/components/ui/label";
+import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 
 const residueVariants: Record<"act" | "pass" | "highlight" | "", string> = {
   act: "bg-green-100 dark:bg-green-700",
@@ -64,15 +63,21 @@ function ImportResidues({
           Import
         </Button>
       )}
-      <Button
-        size="icon"
-        variant="ghost"
-        onClick={() => navigator.clipboard.writeText(sortedResidues)}
-        title="Copy residues to clipboard"
-      >
-        <CopyToClipBoardIcon />
-      </Button>
+      <CopyButton content={sortedResidues} />
     </div>
+  );
+}
+
+export function CopyButton({ content }: { content: string }) {
+  return (
+    <Button
+      size="icon"
+      variant="ghost"
+      onClick={() => navigator.clipboard.writeText(content)}
+      title="Copy residues to clipboard"
+    >
+      <CopyToClipBoardIcon />
+    </Button>
   );
 }
 
@@ -340,65 +345,60 @@ export function ResiduesSelect({
   );
 }
 
-type ActPass = "act" | "pass";
+export type ActPass = "act" | "pass";
+
+export function PickIn3D({
+  value,
+  onChange,
+}: {
+  value: ActPass;
+  onChange: (value: ActPass) => void;
+}) {
+  return (
+    <div className="flex flex-row items-center gap-1">
+      <div>3D viewer picks</div>
+      <ToggleGroup type="single" defaultValue={value} onValueChange={onChange}>
+        <ToggleGroupItem
+          value="act"
+          className="data-[state=on]:bg-green-100"
+          aria-label="Picking in 3D viewer will select active"
+          title="Picking in 3D viewer will select active"
+        >
+          A
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="pass"
+          className="data-[state=on]:bg-yellow-100"
+          aria-label="Picking in 3D will viwer select passive"
+          title="Picking in 3D will viwer select passive"
+        >
+          P
+        </ToggleGroupItem>
+      </ToggleGroup>
+    </div>
+  );
+}
 
 function ResiduesHeader({
-  showActive = false,
-  showPassive = false,
-  showPicker = false,
-  pick,
-  onPickChange,
+  showActive,
+  showPassive,
 }: {
-  showActive?: boolean;
-  showPassive?: boolean;
-  showPicker?: boolean;
-  pick?: ActPass;
-  onPickChange?: (pick: ActPass) => void;
+  showActive: boolean;
+  showPassive: boolean;
 }) {
-  const id = useId();
-  if (showActive && showPassive && showPicker && onPickChange) {
-    return (
-      <div>
-        <p className="text-[0.5rem]">&nbsp;</p>
-        <RadioGroup
-          className="inline-block text-start font-mono"
-          defaultValue={pick}
-          onValueChange={(v) => onPickChange(v as ActPass)}
-        >
-          <div title="Amino aced sequence">&nbsp;</div>
-          <div title="Active" className="bg-green-100 dark:bg-green-700 pr-1">
-            <RadioGroupItem value="act" id={id + "act"} />
-            <Label htmlFor={id + "act"}>Active</Label>
-          </div>
-          <div
-            title="Passive"
-            className="bg-yellow-100 dark:bg-yellow-700 pr-1"
-          >
-            <RadioGroupItem value="pass" id={id + "pass"} />
-            <Label htmlFor={id + "pass"}>Passive</Label>
-          </div>
-        </RadioGroup>
-      </div>
-    );
-  }
-
   return (
     <div>
       <p className="text-[0.5rem]">&nbsp;</p>
       <div className="inline-block text-start font-mono">
-        <div title="Amino aced sequence">&nbsp;</div>
+        <div title="Amino aced sequence">
+          {/* use non breaking whitespace to prevent layout shifts */}
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </div>
         {showActive && (
-          <div title="Active" className="bg-green-100 dark:bg-green-700 pr-1">
-            Active
-          </div>
+          <div className={cn("pr-1", residueVariants["act"])}>Active</div>
         )}
         {showPassive && (
-          <div
-            title="Passive"
-            className="bg-yellow-100 dark:bg-yellow-700 pr-1"
-          >
-            Passive
-          </div>
+          <div className={cn("pr-1", residueVariants["pass"])}>Passive</div>
         )}
       </div>
     </div>

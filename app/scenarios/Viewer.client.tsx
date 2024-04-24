@@ -254,11 +254,11 @@ export function NGLComponent({
 }
 
 export function NGLStage({
-  onMouseLeave,
+  onMouseLeave = () => {},
   children,
 }: {
   children: ReactNode;
-  onMouseLeave: () => void;
+  onMouseLeave?: () => void;
 }) {
   const [stage, setStage] = useState<Stage>();
 
@@ -344,8 +344,9 @@ export function Viewer({
   active,
   passive,
   surface,
-  activePickable,
-  onActivePick,
+  neighbours = [],
+  pickable = false,
+  onPick,
   higlightResidue,
   onHover,
   onMouseLeave = () => {},
@@ -355,11 +356,12 @@ export function Viewer({
   active: number[];
   passive: number[];
   surface: number[];
-  activePickable?: boolean;
-  onActivePick?: (chain: string, residue: number) => void;
+  neighbours?: number[];
+  pickable?: boolean;
+  onPick?: (chain: string, residue: number) => void;
   higlightResidue?: number | undefined;
   onHover?: (chain: string, residue: number) => void;
-  onMouseLeave: () => void;
+  onMouseLeave?: () => void;
 }) {
   const [theme] = useTheme();
   const isDark = theme === "dark";
@@ -383,8 +385,8 @@ export function Viewer({
             color={activeColor}
             opacity={1.0}
             representation="ball+stick"
-            pickable={activePickable}
-            onPick={onActivePick}
+            pickable={pickable}
+            onPick={onPick}
             onHover={onHover}
           />
           <NGLResidues
@@ -395,6 +397,12 @@ export function Viewer({
           />
           <NGLResidues
             residues={passive}
+            color={passiveColor}
+            opacity={opacity}
+            representation="spacefill"
+          />
+          <NGLResidues
+            residues={neighbours}
             color={passiveColor}
             opacity={opacity}
             representation="spacefill"

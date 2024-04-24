@@ -157,12 +157,14 @@ export default function AntibodyAntigenScenario() {
   const [antibodyActPass, seAntibodyActPass] = useState<ActPassSelection>({
     active: [],
     passive: [],
+    neighbours: [],
     chain: "",
     bodyRestraints: "",
   });
   const [antigenActPass, setAntigen2ActPass] = useState<ActPassSelection>({
     active: [],
     passive: [],
+    neighbours: [],
     chain: "",
     bodyRestraints: "",
   });

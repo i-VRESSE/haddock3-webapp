@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { FormItem } from "./FormItem";
 
 export function LabeledRadioGroupItem({
   value,
@@ -28,17 +29,23 @@ export function LabeledRadioGroup<T extends string>({
   choices: [T, string][];
   onChange: (value: T) => void;
 }) {
+  const name = useId();
   return (
-    <RadioGroup
-      defaultValue={value}
-      onValueChange={(value) => onChange(value as T)}
-      className="pt-2"
+    <FormItem
+      label="How would you like to select residues for restraints?"
+      name={name}
     >
-      {choices.map(([value, label]) => (
-        <LabeledRadioGroupItem value={value} key={value}>
-          {label}
-        </LabeledRadioGroupItem>
-      ))}
-    </RadioGroup>
+      <RadioGroup
+        defaultValue={value}
+        onValueChange={(value) => onChange(value as T)}
+        className="pt-2"
+      >
+        {choices.map(([value, label]) => (
+          <LabeledRadioGroupItem value={value} key={value}>
+            {label}
+          </LabeledRadioGroupItem>
+        ))}
+      </RadioGroup>
+    </FormItem>
   );
 }

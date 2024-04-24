@@ -19,6 +19,7 @@ export const Surface: Story = {
     actpass: {
       active: [],
       passive: [],
+      neighbours: [],
       chain: "A",
       bodyRestraints: "",
     },

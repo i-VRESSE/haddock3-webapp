@@ -49,12 +49,17 @@ export function RestraintsBasePicker({
   value: RestraintsBase;
   onChange: (value: RestraintsBase) => void;
 }) {
+  function onKindChange(kind: Kind) {
+    if (kind === "act") {
+      onChange({ kind, activeNeighbours: true, passiveNeighbours: false });
+      return;
+    }
+    onChange({ kind, activeNeighbours: false, passiveNeighbours: false });
+  }
+
   return (
     <>
-      <KindRadioGroup
-        value={value.kind}
-        onChange={(kind) => onChange({ ...value, kind })}
-      />
+      <KindRadioGroup value={value.kind} onChange={onKindChange} />
       {value.kind === "act" && (
         <LabeledCheckbox
           value={value.activeNeighbours}

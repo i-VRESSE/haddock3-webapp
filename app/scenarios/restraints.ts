@@ -20,8 +20,8 @@ export async function generateAmbiguousRestraintsFile(
     body: {
       active1: selection1.active,
       active2: selection2.active,
-      passive1: selection1.passive,
-      passive2: selection2.passive,
+      passive1: [...selection1.passive, ...selection1.neighbours],
+      passive2: [...selection2.passive, ...selection2.neighbours],
       segid1: selection1.chain,
       segid2: selection2.chain,
     },
