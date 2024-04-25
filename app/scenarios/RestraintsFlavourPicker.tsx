@@ -15,7 +15,7 @@ import { LabeledRadioGroup } from "./LabeledRadioGroup";
 
 export type Kind = "surf" | "act" | "pass" | "actpass";
 
-export interface RestraintsBase {
+export interface RestraintsFlavour {
   kind: Kind;
   activeNeighbours: boolean;
   passiveNeighbours: boolean;
@@ -42,12 +42,12 @@ function KindRadioGroup({
   );
 }
 
-export function RestraintsBasePicker({
+export function RestraintsFlavourPicker({
   value = { kind: "act", activeNeighbours: true, passiveNeighbours: false },
   onChange,
 }: {
-  value: RestraintsBase;
-  onChange: (value: RestraintsBase) => void;
+  value: RestraintsFlavour;
+  onChange: (value: RestraintsFlavour) => void;
 }) {
   function onKindChange(kind: Kind) {
     if (kind === "act") {

@@ -23,7 +23,7 @@ import {
   jsonSafeFile,
   passiveFromActive,
 } from "./restraints";
-import { RestraintsBase, RestraintsBasePicker } from "./RestraintsBasePicker";
+import { RestraintsFlavour, RestraintsFlavourPicker } from "./RestraintsFlavourPicker";
 import { LabeledCheckbox } from "./LabeledCheckbox";
 
 export type ActPassSelection = {
@@ -221,23 +221,23 @@ async function computeNeighbours({
   surface,
   active,
   passive,
-  restraintsBase,
+  restraintsFlavour,
 }: {
   structure: string;
   chain: string;
   surface: number[];
   active: number[];
   passive: number[];
-  restraintsBase: RestraintsBase;
+  restraintsFlavour: RestraintsFlavour;
 }): Promise<number[]> {
-  if (!restraintsBase.activeNeighbours && !restraintsBase.passiveNeighbours) {
+  if (!restraintsFlavour.activeNeighbours && !restraintsFlavour.passiveNeighbours) {
     return [];
   }
   let derivedActive: number[] = [];
-  if (restraintsBase.activeNeighbours) {
+  if (restraintsFlavour.activeNeighbours) {
     derivedActive = active;
   }
-  if (restraintsBase.passiveNeighbours) {
+  if (restraintsFlavour.passiveNeighbours) {
     derivedActive = derivedActive.concat(passive);
   }
   return passiveFromActive(structure, chain, derivedActive, surface);
@@ -277,7 +277,7 @@ function toggleResidue(
 export function ResiduesSubForm({
   molecule,
   actpass,
-  restraintsBase,
+  restraintsFlavour,
   onActPassChange,
   disabled,
   children,
@@ -285,7 +285,7 @@ export function ResiduesSubForm({
 }: {
   molecule: Molecule;
   actpass: ActPassSelection;
-  restraintsBase: RestraintsBase;
+  restraintsFlavour: RestraintsFlavour;
   onActPassChange?: (actpass: ActPassSelection) => void;
   label?: string;
   disabled: boolean;
@@ -313,13 +313,13 @@ export function ResiduesSubForm({
   }, [molecule.file]);
 
   useEffect(() => {
-    if (restraintsBase.kind === "pass") {
+    if (restraintsFlavour.kind === "pass") {
       setPicker3D("pass");
     }
-    if (restraintsBase.kind === "act") {
+    if (restraintsFlavour.kind === "act") {
       setPicker3D("act");
     }
-  }, [restraintsBase, setPicker3D]);
+  }, [restraintsFlavour, setPicker3D]);
 
   async function handle2DResidueChange(newSelection: ResidueSelection) {
     if (!onActPassChange || !safeFile) {
@@ -331,7 +331,7 @@ export function ResiduesSubForm({
       surface: molecule.surfaceResidues,
       active: newSelection.act,
       passive: newSelection.pass,
-      restraintsBase,
+      restraintsFlavour,
     });
     onActPassChange({
       active: newSelection.act,
@@ -363,7 +363,7 @@ export function ResiduesSubForm({
           passive={actpass.passive}
           surface={showSurface ? molecule.surfaceResidues : []}
           neighbours={showNeighbours ? actpass.neighbours : []}
-          pickable={restraintsBase.kind !== "surf"}
+          pickable={restraintsFlavour.kind !== "surf"}
           onPick={handle3DResiduePick}
           higlightResidue={hoveredFrom2DResidue}
           onHover={(_, residue) => setHoveredFrom3DResidue(residue)}
@@ -378,8 +378,8 @@ export function ResiduesSubForm({
         onChange={handle2DResidueChange}
         disabledPassive={disabled}
         disabledActive={disabled}
-        showActive={["act", "actpass"].includes(restraintsBase.kind)}
-        showPassive={["pass", "actpass", "surf"].includes(restraintsBase.kind)}
+        showActive={["act", "actpass"].includes(restraintsFlavour.kind)}
+        showPassive={["pass", "actpass", "surf"].includes(restraintsFlavour.kind)}
         selected={{
           act: actpass.active,
           pass: actpass.passive,
@@ -388,9 +388,9 @@ export function ResiduesSubForm({
         highlight={hoveredFrom3DResidue}
       />
       <div className="">
-        {(restraintsBase.activeNeighbours ||
-          restraintsBase.passiveNeighbours) &&
-          restraintsBase.kind !== "surf" && (
+        {(restraintsFlavour.activeNeighbours ||
+          restraintsFlavour.passiveNeighbours) &&
+          restraintsFlavour.kind !== "surf" && (
             <LabeledCheckbox value={showNeighbours} onChange={setShowNeigbours}>
               Show computed passive neighbours
             </LabeledCheckbox>
@@ -406,10 +406,10 @@ export function ResiduesSubForm({
             <CopyButton content={actpass.neighbours.join(",")} />
           </div>
         )}
-        {restraintsBase.kind === "actpass" && (
+        {restraintsFlavour.kind === "actpass" && (
           <PickIn3D value={picker3D} onChange={setPicker3D} />
         )}
-        {restraintsBase.kind !== "surf" && (
+        {restraintsFlavour.kind !== "surf" && (
           <LabeledCheckbox value={showSurface} onChange={setShowSurface}>
             Show surface residues
           </LabeledCheckbox>
@@ -452,15 +452,15 @@ function ResiduesSubFormWrapper({
   onActPassChange: (actpass: ActPassSelection) => void;
   targetChain: string;
 }) {
-  const [restraintsBase, setrestraintsBase] = useState<RestraintsBase>({
+  const [restraintsFlavour, setrestraintsFlavour] = useState<RestraintsFlavour>({
     kind: "act",
     activeNeighbours: true,
     passiveNeighbours: false,
   });
 
-  function onRestraintsBaseChange(restraintsBase: RestraintsBase) {
-    setrestraintsBase(restraintsBase);
-    if (restraintsBase.kind === "surf") {
+  function onRestraintsFlavourChange(restraintsFlavour: RestraintsFlavour) {
+    setrestraintsFlavour(restraintsFlavour);
+    if (restraintsFlavour.kind === "surf") {
       onActPassChange({
         active: [],
         passive: molecule.surfaceResidues,
@@ -479,20 +479,20 @@ function ResiduesSubFormWrapper({
     }
   }
 
-  const disabled = restraintsBase.kind === "surf";
+  const disabled = restraintsFlavour.kind === "surf";
 
   return (
     <>
-      <RestraintsBasePicker
-        value={restraintsBase}
-        onChange={onRestraintsBaseChange}
+      <RestraintsFlavourPicker
+        value={restraintsFlavour}
+        onChange={onRestraintsFlavourChange}
       />
       <ResiduesSubForm
         actpass={actpass}
         molecule={molecule}
         disabled={disabled}
         onActPassChange={onActPassChange}
-        restraintsBase={restraintsBase}
+        restraintsFlavour={restraintsFlavour}
       ></ResiduesSubForm>
     </>
   );
