@@ -31,6 +31,7 @@ export const Surface: Story = {
     selected: {
       act: [],
       pass: [1],
+      neighbours: [],
     },
     onChange: fn(),
     onHover: fn(),
@@ -62,6 +63,7 @@ export const ActiveOnly: Story = {
     selected: {
       act: [3],
       pass: [],
+      neighbours: [],
     },
     onChange: fn(),
     onHover: fn(),
@@ -93,6 +95,7 @@ export const PassiveOnly: Story = {
     selected: {
       act: [],
       pass: [1],
+      neighbours: [],
     },
     onChange: fn(),
     onHover: fn(),
@@ -131,6 +134,7 @@ export const ActiveAndDisabledPassive: Story = {
     selected: {
       act: [3],
       pass: [1, 4],
+      neighbours: [],
     },
     onChange: fn(),
     onHover: fn(),
@@ -169,6 +173,7 @@ export const ActiveAndPassive: Story = {
     selected: {
       act: [3],
       pass: [1],
+      neighbours: [],
     },
     onChange: fn(),
     onHover: fn(),
@@ -188,6 +193,7 @@ export const LongList: Story = {
     selected: {
       act: [43, 111],
       pass: [51, 78],
+      neighbours: [],
     },
     onChange: fn(),
     onHover: fn(),

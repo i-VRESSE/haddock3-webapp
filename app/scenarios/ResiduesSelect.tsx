@@ -7,7 +7,9 @@ import { useTheme } from "remix-themes";
 import { cn } from "~/lib/utils";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 
-const residueVariants: Record<"act" | "pass" | "highlight" | "", string> = {
+type Variant = "act" | "pass" | "highlight" | "";
+
+const residueVariants: Record<Variant, string> = {
   act: "bg-green-100 dark:bg-green-700",
   pass: "bg-yellow-100 dark:bg-yellow-700",
   highlight: "bg-secondary dark:bg-secondary-foreground",
@@ -57,13 +59,13 @@ function ImportResidues({
   }
   return (
     <div className="flex items-center gap-1">
-      <Input readOnly value={sortedResidues} className="w-1/2 p-1" />
+      <Input readOnly value={sortedResidues} className="w-32 p-1" />
+      <CopyButton content={sortedResidues} />
       {!disabled && (
         <Button variant="outline" size="sm" onClick={doImport}>
           Import
         </Button>
       )}
-      <CopyButton content={sortedResidues} />
     </div>
   );
 }
@@ -74,7 +76,7 @@ export function CopyButton({ content }: { content: string }) {
       size="icon"
       variant="ghost"
       onClick={() => navigator.clipboard.writeText(content)}
-      title="Copy residues to clipboard"
+      title="Copy list of residues to clipboard"
     >
       <CopyToClipBoardIcon />
     </Button>
@@ -89,6 +91,7 @@ function ResidueCheckbox({
   highlight,
   activeChecked,
   passiveChecked,
+  neighbourChecked,
   activeDisabled,
   passiveDisabled,
   onHover,
@@ -102,6 +105,7 @@ function ResidueCheckbox({
   highlight: boolean; // External component wants us to highlight this residue
   activeChecked: boolean;
   passiveChecked: boolean;
+  neighbourChecked: boolean;
   activeDisabled: boolean;
   passiveDisabled: boolean;
   onHover: () => void; // We want external component to know we are hovering
@@ -116,8 +120,8 @@ function ResidueCheckbox({
     htmlFor = id + "pass";
   }
 
-  let variant: "act" | "pass" | "highlight" | "" = "";
-  if (passiveChecked) {
+  let variant: Variant = "";
+  if (passiveChecked || neighbourChecked) {
     variant = "pass";
   }
   if (activeChecked) {
@@ -153,9 +157,9 @@ function ResidueCheckbox({
           type="checkbox"
           style={style}
           value={resno}
-          disabled={passiveDisabled || activeChecked}
+          disabled={passiveDisabled || activeChecked || neighbourChecked}
           id={id + "pass"}
-          checked={passiveChecked}
+          checked={passiveChecked || neighbourChecked}
           onChange={onPassiveChange}
         />
       )}
@@ -168,6 +172,10 @@ export interface ResidueSelection {
   pass: number[];
 }
 
+export interface ResidueNeighbourSelection extends ResidueSelection {
+  neighbours: number[];
+}
+
 export function ResiduesSelect({
   options,
   selected,
@@ -176,16 +184,18 @@ export function ResiduesSelect({
   disabledActive = false,
   showPassive = false,
   showActive = false,
+  showNeighbours = false,
   onHover,
   highlight,
 }: {
   options: Residue[];
-  selected: ResidueSelection;
+  selected: ResidueNeighbourSelection;
   onChange: (selected: ResidueSelection) => void;
   disabledPassive?: boolean;
   disabledActive?: boolean;
   showPassive?: boolean;
   showActive?: boolean;
+  showNeighbours?: boolean;
   onHover: (resno: number | undefined) => void;
   highlight: number | undefined;
 }) {
@@ -275,7 +285,10 @@ export function ResiduesSelect({
   return (
     <>
       <div className="flex flex-row flex-wrap">
-        <ResiduesHeader showActive={showActive} showPassive={showPassive} />
+        <ResiduesHeader
+          showActive={showActive}
+          showPassive={showPassive || showNeighbours}
+        />
         {chunks.map((chunk, cindex) => (
           <div key={cindex}>
             <p
@@ -307,7 +320,8 @@ export function ResiduesSelect({
                     handleChange(e, cindex * chunkSize + index, "pass")
                   }
                   showActive={showActive}
-                  showPassive={showPassive}
+                  showPassive={showPassive || showNeighbours}
+                  neighbourChecked={selected.neighbours.includes(r.resno)}
                 />
               ))}
             </div>

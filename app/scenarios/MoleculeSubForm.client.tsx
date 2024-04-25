@@ -23,7 +23,10 @@ import {
   jsonSafeFile,
   passiveFromActive,
 } from "./restraints";
-import { RestraintsFlavour, RestraintsFlavourPicker } from "./RestraintsFlavourPicker";
+import {
+  RestraintsFlavour,
+  RestraintsFlavourPicker,
+} from "./RestraintsFlavourPicker";
 import { LabeledCheckbox } from "./LabeledCheckbox";
 
 export type ActPassSelection = {
@@ -230,7 +233,10 @@ async function computeNeighbours({
   passive: number[];
   restraintsFlavour: RestraintsFlavour;
 }): Promise<number[]> {
-  if (!restraintsFlavour.activeNeighbours && !restraintsFlavour.passiveNeighbours) {
+  if (
+    !restraintsFlavour.activeNeighbours &&
+    !restraintsFlavour.passiveNeighbours
+  ) {
     return [];
   }
   let derivedActive: number[] = [];
@@ -313,13 +319,14 @@ export function ResiduesSubForm({
   }, [molecule.file]);
 
   useEffect(() => {
+    setShowNeigbours(false);
     if (restraintsFlavour.kind === "pass") {
       setPicker3D("pass");
     }
-    if (restraintsFlavour.kind === "act") {
+    if (["act", "actpass"].includes(restraintsFlavour.kind)) {
       setPicker3D("act");
     }
-  }, [restraintsFlavour, setPicker3D]);
+  }, [restraintsFlavour, setPicker3D, setShowNeigbours]);
 
   async function handle2DResidueChange(newSelection: ResidueSelection) {
     if (!onActPassChange || !safeFile) {
@@ -376,13 +383,17 @@ export function ResiduesSubForm({
       <ResiduesSelect
         options={molecule.residues}
         onChange={handle2DResidueChange}
-        disabledPassive={disabled}
+        disabledPassive={disabled || restraintsFlavour.kind === "act"}
         disabledActive={disabled}
         showActive={["act", "actpass"].includes(restraintsFlavour.kind)}
-        showPassive={["pass", "actpass", "surf"].includes(restraintsFlavour.kind)}
+        showPassive={["pass", "actpass", "surf"].includes(
+          restraintsFlavour.kind,
+        )}
+        showNeighbours={showNeighbours}
         selected={{
           act: actpass.active,
           pass: actpass.passive,
+          neighbours: actpass.neighbours,
         }}
         onHover={setHoveredFrom2DResidue}
         highlight={hoveredFrom3DResidue}
@@ -397,11 +408,10 @@ export function ResiduesSubForm({
           )}
         {showNeighbours && (
           <div className="flex items-center gap-1">
-            <Label>Computed neighbours</Label>
             <Input
               readOnly
               value={actpass.neighbours.join(",")}
-              className="w-1/2 p-1"
+              className="w-32 p-1"
             />
             <CopyButton content={actpass.neighbours.join(",")} />
           </div>
@@ -452,11 +462,13 @@ function ResiduesSubFormWrapper({
   onActPassChange: (actpass: ActPassSelection) => void;
   targetChain: string;
 }) {
-  const [restraintsFlavour, setrestraintsFlavour] = useState<RestraintsFlavour>({
-    kind: "act",
-    activeNeighbours: true,
-    passiveNeighbours: false,
-  });
+  const [restraintsFlavour, setrestraintsFlavour] = useState<RestraintsFlavour>(
+    {
+      kind: "act",
+      activeNeighbours: true,
+      passiveNeighbours: false,
+    },
+  );
 
   function onRestraintsFlavourChange(restraintsFlavour: RestraintsFlavour) {
     setrestraintsFlavour(restraintsFlavour);
