@@ -257,12 +257,18 @@ function toggleResidue(
       newSelection.act = newSelection.act.filter((r) => r !== resno);
     } else {
       newSelection.act = [...newSelection.act, resno];
+      newSelection.pass = current.passive.filter(
+        (r) => !newSelection.act.includes(r),
+      );
     }
   } else {
     if (newSelection.pass.includes(resno)) {
       newSelection.pass = newSelection.pass.filter((r) => r !== resno);
     } else {
       newSelection.pass = [...newSelection.pass, resno];
+      newSelection.act = current.active.filter(
+        (r) => !newSelection.pass.includes(r),
+      );
     }
   }
   return newSelection;
@@ -336,7 +342,7 @@ export function ResiduesSubForm({
     });
   }
 
-  function onActiveResiduePick(chain: string, resno: number) {
+  function handle3DResiduePick(chain: string, resno: number) {
     if (
       molecule.targetChain !== chain ||
       !molecule.surfaceResidues.includes(resno)
@@ -358,7 +364,7 @@ export function ResiduesSubForm({
           surface={showSurface ? molecule.surfaceResidues : []}
           neighbours={showNeighbours ? actpass.neighbours : []}
           pickable={restraintsBase.kind !== "surf"}
-          onPick={onActiveResiduePick}
+          onPick={handle3DResiduePick}
           higlightResidue={hoveredFrom2DResidue}
           onHover={(_, residue) => setHoveredFrom3DResidue(residue)}
           onMouseLeave={() => setHoveredFrom3DResidue(undefined)}
