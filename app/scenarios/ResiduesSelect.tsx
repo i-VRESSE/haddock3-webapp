@@ -206,7 +206,7 @@ export function ResiduesSelect({
     if (ne.shiftKey && lastChecked !== null) {
       const start = Math.min(lastChecked, index);
       const end = Math.max(lastChecked, index);
-      const newSelected = [...selected.pass];
+      newSelected = [...selected[actpass]];
       for (let i = start; i <= end; i++) {
         const resno = options[i].resno;
         if (!newSelected.includes(resno) && surface.includes(resno)) {
