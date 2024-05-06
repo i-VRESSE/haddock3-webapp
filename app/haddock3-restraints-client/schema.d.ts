@@ -31,7 +31,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Calculate Actpass To Ambig */
+    /**
+     * Calculate Actpass To Ambig
+     * @description Get the passive residues.
+     */
     post: operations["calculate_actpass_to_ambig_actpass_to_ambig_post"];
     delete?: never;
     options?: never;
@@ -48,7 +51,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Restrain Bodies */
+    /**
+     * Restrain Bodies
+     * @description Create distance restraints to lock several chains together.
+     */
     post: operations["restrain_bodies_restrain_bodies_post"];
     delete?: never;
     options?: never;
@@ -65,7 +71,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Calculate Accessibility */
+    /**
+     * Calculate Accessibility
+     * @description Calculate the accessibility of the side chains and apply a cutoff.
+     */
     post: operations["calculate_accessibility_calc_accessibility_post"];
     delete?: never;
     options?: never;
@@ -107,6 +116,12 @@ export interface paths {
      *
      *     ```shell
      *     cat pdb | pdb_tidy -strict | pdb_selchain -<from_chain> | pdb_chain -<to_chain> | pdb_fixinsert | pdb_selaltloc | pdb_tidy -strict
+     *     ```
+     *
+     *     or with `delhetatm` and `keepcoord` set to true:
+     *
+     *     ```shell
+     *     cat pdb | pdb_tidy -strict | pdb_selchain -<from_chain> | pdb_chain -<to_chain> | pdb_delhetatm |         pdb_fixinsert | pdb_keepcoord | pdb_selaltloc | pdb_tidy -strict
      *     ```
      */
     post: operations["preprocess_pdb_preprocess_pdb_post"];
@@ -227,6 +242,12 @@ export interface components {
        * @default []
        */
       surface: number[];
+      /**
+       * Radius
+       * @description The radius from active.
+       * @default 6.5
+       */
+      radius: number;
     };
     /** RestrainBodiesRequest */
     RestrainBodiesRequest: {
