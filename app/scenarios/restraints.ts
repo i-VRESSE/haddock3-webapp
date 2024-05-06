@@ -70,6 +70,7 @@ export async function passiveFromActive(
     chain,
     active: activeResidues,
     surface,
+    radius: 6.5,
   };
   const { data, error } = await client.POST("/passive_from_active", {
     body,
