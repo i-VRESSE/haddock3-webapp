@@ -365,8 +365,8 @@ export function Viewer({
 }) {
   const [theme] = useTheme();
   const isDark = theme === "dark";
-  const activeColor = isDark ? "yellow" : "green";
-  const passiveColor = isDark ? "green" : "yellow";
+  const activeColor = isDark ? "green" : "lime";
+  const passiveColor = isDark ? "orange" : "yellow";
   const opacity = isDark ? 0.7 : 0.3;
   return (
     <ErrorBoundary>
@@ -409,7 +409,7 @@ export function Viewer({
           />
           <NGLResidues
             residues={surface}
-            color="orange"
+            color={isDark ? "sky" : "orange"}
             opacity={isDark ? 0.5 : 0.1}
             representation="spacefill"
           />
