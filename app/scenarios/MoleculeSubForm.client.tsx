@@ -1,6 +1,7 @@
 import { Structure, autoLoad } from "ngl";
 import { useState, useEffect, ReactNode, useRef } from "react";
 import { useTheme } from "remix-themes";
+import { SlidersHorizontal } from "lucide-react";
 
 import { FormDescription } from "./FormDescription";
 import { FormItem } from "./FormItem";
@@ -22,12 +23,18 @@ import {
   calclulateRestraints,
   jsonSafeFile,
   passiveFromActive,
+  calculateAccessibility,
 } from "./restraints";
 import {
   RestraintsFlavour,
   RestraintsFlavourPicker,
 } from "./RestraintsFlavourPicker";
 import { LabeledCheckbox } from "./LabeledCheckbox";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
 
 export type ActPassSelection = {
   active: number[];
@@ -154,6 +161,7 @@ export interface Molecule {
   targetChain: string;
   residues: Residue[];
   surfaceResidues: number[];
+  // TODO dont store surface twice in surfaceResidues and residues[n].surface
   errors?: RestraintsErrors;
 }
 
@@ -225,6 +233,7 @@ async function computeNeighbours({
   active,
   passive,
   restraintsFlavour,
+  radius,
 }: {
   structure: string;
   chain: string;
@@ -232,6 +241,7 @@ async function computeNeighbours({
   active: number[];
   passive: number[];
   restraintsFlavour: RestraintsFlavour;
+  radius: number;
 }): Promise<number[]> {
   if (
     !restraintsFlavour.activeNeighbours &&
@@ -246,7 +256,7 @@ async function computeNeighbours({
   if (restraintsFlavour.passiveNeighbours) {
     derivedActive = derivedActive.concat(passive);
   }
-  return passiveFromActive(structure, chain, derivedActive, surface);
+  return passiveFromActive(structure, chain, derivedActive, surface, radius);
 }
 
 function toggleResidue(
@@ -287,6 +297,7 @@ export function ResiduesSubForm({
   onActPassChange,
   disabled,
   children,
+  setSurfaceResidues,
   label = "Residues",
 }: {
   molecule: Molecule;
@@ -295,9 +306,12 @@ export function ResiduesSubForm({
   onActPassChange?: (actpass: ActPassSelection) => void;
   label?: string;
   disabled: boolean;
+  setSurfaceResidues: (surfaceResidues: number[]) => void;
   children?: ReactNode;
 }) {
   const [showNeighbours, setShowNeigbours] = useState(false);
+  const [surfaceCutoff, setSurfaceCutoff] = useState(0.15);
+  const [neighourRadius, setNeighourRadius] = useState(6.5);
   const [showSurface, setShowSurface] = useState(false);
   // gzipping and base64 encoding file can be slow, so we cache it
   // for example 8qg1 of 1.7Mb took 208ms
@@ -339,6 +353,7 @@ export function ResiduesSubForm({
       active: newSelection.act,
       passive: newSelection.pass,
       restraintsFlavour,
+      radius: neighourRadius,
     });
     onActPassChange({
       active: newSelection.act,
@@ -358,6 +373,37 @@ export function ResiduesSubForm({
     }
     const newSelection = toggleResidue(resno, picker3D, actpass);
     handle2DResidueChange(newSelection);
+  }
+
+  async function onNeighourRadiusChange(radius: number) {
+    if (!onActPassChange || !safeFile) {
+      return;
+    }
+    // TODO show user ws call is running
+    const neighbours = await computeNeighbours({
+      structure: safeFile,
+      chain: molecule.targetChain,
+      surface: molecule.surfaceResidues,
+      active: actpass.active,
+      passive: actpass.passive,
+      restraintsFlavour,
+      radius: neighourRadius,
+    });
+    onActPassChange({
+      ...actpass,
+      neighbours,
+    });
+    setNeighourRadius(radius);
+  }
+
+  async function onSurfaceCutoffChange(cutoff: number) {
+    if (!safeFile) {
+      return;
+    }
+    // TODO show user ws call is running
+    const surfaceResidues = await calculateAccessibility(safeFile, cutoff);
+    setSurfaceResidues(surfaceResidues[0][molecule.targetChain] || []);
+    setSurfaceCutoff(cutoff);
   }
 
   return (
@@ -424,9 +470,76 @@ export function ResiduesSubForm({
             Show surface residues
           </LabeledCheckbox>
         )}
+        <MoleculeSettings
+          surfaceCutoff={surfaceCutoff}
+          setSurfaceCutoff={onSurfaceCutoffChange}
+          neighourRadius={neighourRadius}
+          setNeighourRadius={onNeighourRadiusChange}
+        />
         {/* TODO show none/surface/buried radio group? */}
       </div>
     </>
+  );
+}
+
+function MoleculeSettings({
+  surfaceCutoff,
+  setSurfaceCutoff,
+  neighourRadius,
+  setNeighourRadius,
+}: {
+  surfaceCutoff: number;
+  setSurfaceCutoff: (cutoff: number) => void;
+  neighourRadius: number;
+  setNeighourRadius: (radius: number) => void;
+}) {
+  const [cutoff, setcutoff] = useState(surfaceCutoff);
+  const [radius, setradius] = useState(neighourRadius);
+  const [theme] = useTheme();
+  const style = { colorScheme: theme === "dark" ? "dark" : "light" };
+
+  function onOpenChange(open: boolean) {
+    if (!open) {
+      if (cutoff !== surfaceCutoff) {
+        setSurfaceCutoff(cutoff);
+      } 
+      if (radius !== neighourRadius) {
+        setNeighourRadius(radius);
+      }
+    }
+  }
+
+  return (
+    <Popover onOpenChange={onOpenChange}>
+      <PopoverTrigger>
+        <SlidersHorizontal />
+      </PopoverTrigger>
+      <PopoverContent>
+        <FormItem name="surface-cutoff" label="Surface cutoff">
+          <Input
+            type="number"
+            step="0.01"
+            min="0.0"
+            max="10"
+            value={cutoff}
+            style={style}
+            onChange={(e) => setcutoff(Number(e.target.value))}
+          />
+        </FormItem>
+        <FormItem name="neighbour-radius" label="Neighbour radius">
+          <Input
+            type="number"
+            step="0.1"
+            min="0.0"
+            max="1000"
+            value={radius}
+            style={style}
+            onChange={(e) => setradius(Number(e.target.value))}
+          />
+        </FormItem>
+        (Close popover to commit changes)
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -456,11 +569,13 @@ function ResiduesSubFormWrapper({
   actpass,
   onActPassChange,
   targetChain,
+  setSurfaceResidues,
 }: {
   molecule: Molecule;
   actpass: ActPassSelection;
   onActPassChange: (actpass: ActPassSelection) => void;
   targetChain: string;
+  setSurfaceResidues: (surfaceResidues: number[]) => void;
 }) {
   const [restraintsFlavour, setrestraintsFlavour] = useState<RestraintsFlavour>(
     {
@@ -505,6 +620,7 @@ function ResiduesSubFormWrapper({
         disabled={disabled}
         onActPassChange={onActPassChange}
         restraintsFlavour={restraintsFlavour}
+        setSurfaceResidues={setSurfaceResidues}
       ></ResiduesSubForm>
     </>
   );
@@ -571,6 +687,16 @@ export function MoleculeSubForm({
     onActPassChange(newSelection);
   }
 
+  function setMoleculeSurfaceResidues(surfaceResidues: number[]) {
+    if (molecule) {
+      const residues = molecule.residues.map((residue) => {
+        residue.surface = surfaceResidues.includes(residue.resno);
+        return residue;
+      });
+      setMolecule({ ...molecule, residues, surfaceResidues });
+    }
+  }
+
   return (
     <MoleculeSubFormWrapper legend={legend} description={description}>
       {molecule ? (
@@ -588,6 +714,7 @@ export function MoleculeSubForm({
               actpass={actpass}
               onActPassChange={onActPassChange}
               targetChain={targetChain}
+              setSurfaceResidues={setMoleculeSurfaceResidues}
             />
           )}
         </>

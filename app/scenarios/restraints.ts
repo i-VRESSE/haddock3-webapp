@@ -59,7 +59,7 @@ export async function passiveFromActive(
   chain: string,
   activeResidues: number[],
   surface: number[],
-  // TODO make cutoff configurable by user
+  radius: number,
 ) {
   /*
   On CLI
@@ -70,7 +70,7 @@ export async function passiveFromActive(
     chain,
     active: activeResidues,
     surface,
-    radius: 6.5,
+    radius,
   };
   const { data, error } = await client.POST("/passive_from_active", {
     body,
@@ -97,9 +97,9 @@ function flattenErrorResponses(response: HTTPValidationError): string {
   throw new Error("Could not flatten error response");
 }
 
-async function calculateAccessibility(
+export async function calculateAccessibility(
   structure: string,
-  cutoff = 0.15, // TODO make configurable by user
+  cutoff = 0.15,
 ): Promise<[Record<string, number[]>, undefined | string]> {
   const body = {
     structure,
