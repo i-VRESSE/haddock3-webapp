@@ -9,8 +9,10 @@ import {
   useState,
   Component as ReactComponent,
   ErrorInfo,
+  useMemo,
 } from "react";
 import {
+  ColormakerRegistry,
   Component,
   PickingProxy,
   Stage,
@@ -338,12 +340,164 @@ class ErrorBoundary extends ReactComponent<
   }
 }
 
+/**
+ * Use single surface to display multiple colors
+ */
+export function NGLSurface({
+  active = [],
+  passive = [],
+  neighbours = [],
+  highlight = undefined,
+  activeColor = "green",
+  passiveColor = "yellow",
+  neighboursColor = "orange",
+  highlightColor = "red",
+  defaultColor = "white",
+  pickable = false,
+  onPick,
+  onHover,
+}: {
+  active: number[];
+  passive: number[];
+  neighbours: number[];
+  highlight?: number;
+  activeColor?: string;
+  passiveColor?: string;
+  defaultColor?: string;
+  highlightColor?: string;
+  neighboursColor?: string;
+  pickable?: boolean;
+  onPick?: (chain: string, residue: number) => void;
+  onHover?: (chain: string, residue: number) => void;
+}) {
+  const name = useId();
+
+  const schemeId = useMemo(() => {
+    const oldSchemeId = Object.keys(ColormakerRegistry.schemes).find((key) =>
+      key.endsWith(`|${name}`),
+    );
+    if (oldSchemeId) {
+      ColormakerRegistry.removeScheme(oldSchemeId);
+    }
+    return ColormakerRegistry.addSelectionScheme(
+      [
+        [highlightColor, `${highlight}` ?? "not all", undefined],
+        [activeColor, active.join(", "), undefined],
+        [passiveColor, passive.join(", "), undefined],
+        [neighboursColor, neighbours.join(", "), undefined],
+        [defaultColor, "*", undefined],
+      ],
+      name,
+    );
+  }, [
+    active,
+    activeColor,
+    defaultColor,
+    highlight,
+    highlightColor,
+    name,
+    neighbours,
+    neighboursColor,
+    passive,
+    passiveColor,
+  ]);
+
+  const stage = useStage();
+  const component = useComponent();
+
+  useEffect(() => {
+    const repr = stage.getRepresentationsByName(name).first;
+    if (repr) {
+      repr.dispose();
+    }
+    component.addRepresentation("surface", {
+      name,
+      color: defaultColor,
+    });
+    return () => {
+      const repr = stage.getRepresentationsByName(name).first;
+      if (repr) {
+        repr.dispose();
+      }
+    };
+  }, [name, defaultColor, stage, component]);
+
+  useEffect(() => {
+    const repr = stage.getRepresentationsByName(name).first;
+    if (repr) {
+      repr.setColor(schemeId);
+    }
+  }, [schemeId, name, stage]);
+
+  const onClick = useCallback(
+    (pickinProxy: PickingProxy) => {
+      if (onPick && pickinProxy?.atom?.resno && pickinProxy?.atom?.chainname) {
+        onPick(pickinProxy.atom.chainname, pickinProxy.atom.resno);
+      }
+    },
+    [onPick],
+  );
+
+  useEffect(() => {
+    if (!onClick) {
+      return;
+    }
+    if (pickable) {
+      stage.signals.clicked.add(onClick);
+    } else {
+      stage.signals.clicked.remove(onClick);
+    }
+    return () => {
+      if (onClick) {
+        stage.signals.clicked.remove(onClick);
+      }
+    };
+  }, [stage, pickable, onClick]);
+
+  const onHoverCallback = useCallback(
+    (pickinProxy: PickingProxy) => {
+      if (onHover && pickinProxy?.atom?.resno && pickinProxy?.atom?.chainname) {
+        onHover(pickinProxy.atom.chainname, pickinProxy.atom.resno);
+      }
+    },
+    [onHover],
+  );
+
+  useEffect(() => {
+    if (!onHoverCallback) {
+      return;
+    }
+    if (pickable) {
+      stage.signals.hovered.add(onHoverCallback);
+    } else {
+      stage.signals.hovered.remove(onHoverCallback);
+    }
+    return () => {
+      if (onHoverCallback) {
+        stage.signals.hovered.remove(onHoverCallback);
+      }
+    };
+  }, [stage, pickable, onHoverCallback]);
+
+  return null;
+}
+
+export function SimpleViewer({ structure }: { structure: File }) {
+  return (
+    <ErrorBoundary>
+      <NGLStage>
+        <NGLComponent structure={structure} chain="" />
+      </NGLStage>
+    </ErrorBoundary>
+  );
+}
+
 export function Viewer({
   structure,
   chain,
   active,
   passive,
-  renderSelectionAs,
+  renderSelectionAs = "surface",
   surface,
   neighbours = [],
   pickable = false,
@@ -357,7 +511,7 @@ export function Viewer({
   active: number[];
   passive: number[];
   surface: number[];
-  renderSelectionAs: StructureRepresentationType;
+  renderSelectionAs?: StructureRepresentationType;
   neighbours?: number[];
   pickable?: boolean;
   onPick?: (chain: string, residue: number) => void;
@@ -369,52 +523,78 @@ export function Viewer({
   const isDark = theme === "dark";
   const activeColor = isDark ? "green" : "lime";
   const passiveColor = isDark ? "orange" : "yellow";
-  const opacity = isDark ? 0.7 : 0.5;
+  const opacity = 0.5;
+
+  let representations = <></>;
+  if (renderSelectionAs === "surface") {
+    representations = (
+      <NGLSurface
+        active={active}
+        passive={passive}
+        neighbours={neighbours}
+        highlight={higlightResidue}
+        activeColor={activeColor}
+        passiveColor={passiveColor}
+        neighboursColor={passiveColor}
+        defaultColor={"white"}
+        pickable={pickable}
+        onPick={onPick}
+        onHover={onHover}
+      />
+    );
+  } else {
+    representations = (
+      <>
+        {higlightResidue && (
+          <NGLResidues
+            residues={[higlightResidue]}
+            color={activeColor}
+            opacity={1.0}
+            representation={renderSelectionAs}
+          />
+        )}
+        <NGLResidues
+          residues={[]}
+          color={activeColor}
+          opacity={1.0}
+          representation="ball+stick"
+          pickable={pickable}
+          onPick={onPick}
+          onHover={onHover}
+        />
+        <NGLResidues
+          residues={active}
+          color={activeColor}
+          opacity={opacity}
+          representation={renderSelectionAs}
+        />
+        <NGLResidues
+          residues={passive}
+          color={passiveColor}
+          opacity={opacity}
+          representation={renderSelectionAs}
+        />
+        <NGLResidues
+          residues={neighbours}
+          color={passiveColor}
+          opacity={opacity}
+          representation={renderSelectionAs}
+        />
+        <NGLResidues
+          residues={surface}
+          color={"white"}
+          opacity={opacity}
+          representation={renderSelectionAs}
+        />
+      </>
+    );
+  }
+
   return (
     <ErrorBoundary>
       <NGLStage onMouseLeave={onMouseLeave}>
         <NGLComponent structure={structure} chain={chain}>
-          {higlightResidue && (
-            <NGLResidues
-              residues={[higlightResidue]}
-              color={activeColor}
-              opacity={1.0}
-              representation="spacefill"
-            />
-          )}
-          <NGLResidues
-            residues={active}
-            color={activeColor}
-            opacity={1.0}
-            representation="ball+stick"
-            pickable={pickable}
-            onPick={onPick}
-            onHover={onHover}
-          />
-          <NGLResidues
-            residues={active}
-            color={activeColor}
-            opacity={opacity}
-            representation={renderSelectionAs}
-          />
-          <NGLResidues
-            residues={passive}
-            color={passiveColor}
-            opacity={opacity}
-            representation={renderSelectionAs}
-          />
-          <NGLResidues
-            residues={neighbours}
-            color={passiveColor}
-            opacity={opacity}
-            representation={renderSelectionAs}
-          />
-          <NGLResidues
-            residues={surface}
-            color={"sky"}
-            opacity={0.5}
-            representation="surface"
-          />
+          {representations}
         </NGLComponent>
       </NGLStage>
     </ErrorBoundary>

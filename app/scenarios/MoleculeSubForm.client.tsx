@@ -14,7 +14,7 @@ import {
   CopyButton,
 } from "./ResiduesSelect";
 import { Residue, chainsFromStructure } from "./molecule.client";
-import { Viewer } from "./Viewer.client";
+import { SimpleViewer, Viewer } from "./Viewer.client";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import {
@@ -36,7 +36,6 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
-import { on } from "events";
 import { LabeledRadioGroup } from "./LabeledRadioGroup";
 
 export type ActPassSelection = {
@@ -118,15 +117,7 @@ export function UserStructure({
           onChange={onFileChange}
         />
         <div className="h-[500px] w-full">
-          {file && (
-            <Viewer
-              structure={file}
-              chain={""}
-              active={[]}
-              passive={[]}
-              surface={[]}
-            />
-          )}
+          {file && <SimpleViewer structure={file} />}
         </div>
       </FormItem>
       <FormItem name={`${name}-chain`} label="Chain">
@@ -318,7 +309,7 @@ export function ResiduesSubForm({
   const [showSurface, setShowSurface] = useState(false);
   const [showBuried, setShowBuried] = useState(false);
   const [renderSelectionAs, setRenderSelectionAs] =
-    useState<RenderAs>("spacefill");
+    useState<StructureRepresentationType>("surface");
   // gzipping and base64 encoding file can be slow, so we cache it
   // for example 8qg1 of 1.7Mb took 208ms
   const [safeFile, setSafeFile] = useState<string | undefined>(undefined);
@@ -418,6 +409,17 @@ export function ResiduesSubForm({
       setShowBuried(false);
       setShowSurface(true);
     } else {
+      if (onActPassChange) {
+        // Force selection redraw
+        // TODO maybe needed in other places,
+        // TODO dont use force, but some hook
+        onActPassChange({
+          ...actpass,
+          active: [...actpass.active],
+          passive: [...actpass.passive],
+          neighbours: [...actpass.neighbours],
+        });
+      }
       setShowSurface(false);
       setShowBuried(false);
     }
@@ -493,14 +495,15 @@ export function ResiduesSubForm({
           <PickIn3D value={picker3D} onChange={setPicker3D} />
         )}
         <div className="flex flex-row gap-4 py-2">
-          {restraintsFlavour.kind !== "surf" && (
-            <ShowSurfaceBuriedToggles
-              surface={showSurface}
-              setSurface={setShowSurface}
-              buried={showBuried}
-              setBuried={setShowBuried}
-            />
-          )}
+          {restraintsFlavour.kind !== "surf" &&
+            renderSelectionAs !== "surface" && (
+              <ShowSurfaceBuriedToggles
+                surface={showSurface}
+                setSurface={setShowSurface}
+                buried={showBuried}
+                setBuried={setShowBuried}
+              />
+            )}
         </div>
         <MoleculeSettings
           surfaceCutoff={surfaceCutoff}
@@ -545,7 +548,7 @@ function ShowSurfaceBuriedToggles({
       <Label htmlFor={id}>Show</Label>
       <ToggleGroup
         type="single"
-        defaultValue={value}
+        value={value}
         onValueChange={onValueChange}
         id={id}
         className="border"
@@ -621,6 +624,8 @@ function MoleculeSettings({
           value={renderSelectionAs}
           choices={[
             ["spacefill", "Spacefill"],
+            ["ball+stick", "Ball+stick"],
+            ["licorice", "Licorice"],
             ["surface", "Surface"],
           ]}
           onChange={onRenderSelectionAsChange}
