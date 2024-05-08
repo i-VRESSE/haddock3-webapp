@@ -343,6 +343,7 @@ export function Viewer({
   chain,
   active,
   passive,
+  renderSelectionAs,
   surface,
   neighbours = [],
   pickable = false,
@@ -356,6 +357,7 @@ export function Viewer({
   active: number[];
   passive: number[];
   surface: number[];
+  renderSelectionAs: StructureRepresentationType;
   neighbours?: number[];
   pickable?: boolean;
   onPick?: (chain: string, residue: number) => void;
@@ -393,19 +395,19 @@ export function Viewer({
             residues={active}
             color={activeColor}
             opacity={opacity}
-            representation="spacefill"
+            representation={renderSelectionAs}
           />
           <NGLResidues
             residues={passive}
             color={passiveColor}
             opacity={opacity}
-            representation="spacefill"
+            representation={renderSelectionAs}
           />
           <NGLResidues
             residues={neighbours}
             color={passiveColor}
             opacity={opacity}
-            representation="spacefill"
+            representation={renderSelectionAs}
           />
           <NGLResidues
             residues={surface}

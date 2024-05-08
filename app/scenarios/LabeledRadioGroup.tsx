@@ -24,17 +24,16 @@ export function LabeledRadioGroup<T extends string>({
   value,
   choices,
   onChange,
+  label = "How would you like to select residues for restraints?",
 }: {
   value: T;
   choices: [T, string][];
   onChange: (value: T) => void;
+  label?: string;
 }) {
   const name = useId();
   return (
-    <FormItem
-      label="How would you like to select residues for restraints?"
-      name={name}
-    >
+    <FormItem label={label} name={name}>
       <RadioGroup
         defaultValue={value}
         onValueChange={(value) => onChange(value as T)}

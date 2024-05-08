@@ -1,5 +1,5 @@
-import { Structure, autoLoad } from "ngl";
-import { useState, useEffect, ReactNode, useRef } from "react";
+import { Structure, StructureRepresentationType, autoLoad } from "ngl";
+import { useState, useEffect, ReactNode, useRef, useId } from "react";
 import { useTheme } from "remix-themes";
 import { SlidersHorizontal } from "lucide-react";
 
@@ -36,6 +36,8 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import { on } from "events";
+import { LabeledRadioGroup } from "./LabeledRadioGroup";
 
 export type ActPassSelection = {
   active: number[];
@@ -315,6 +317,8 @@ export function ResiduesSubForm({
   const [neighourRadius, setNeighourRadius] = useState(6.5);
   const [showSurface, setShowSurface] = useState(false);
   const [showBuried, setShowBuried] = useState(false);
+  const [renderSelectionAs, setRenderSelectionAs] =
+    useState<RenderAs>("spacefill");
   // gzipping and base64 encoding file can be slow, so we cache it
   // for example 8qg1 of 1.7Mb took 208ms
   const [safeFile, setSafeFile] = useState<string | undefined>(undefined);
@@ -408,6 +412,17 @@ export function ResiduesSubForm({
     setSurfaceCutoff(cutoff);
   }
 
+  function onRenderSelectionAsChange(value: StructureRepresentationType) {
+    setRenderSelectionAs(value);
+    if (value === "surface") {
+      setShowBuried(false);
+      setShowSurface(true);
+    } else {
+      setShowSurface(false);
+      setShowBuried(false);
+    }
+  }
+
   let surfaceOrBuriedResidues: number[] = [];
   if (showSurface) {
     surfaceOrBuriedResidues = molecule.surfaceResidues;
@@ -425,6 +440,7 @@ export function ResiduesSubForm({
           chain={molecule.targetChain}
           active={actpass.active}
           passive={actpass.passive}
+          renderSelectionAs={renderSelectionAs}
           surface={surfaceOrBuriedResidues}
           neighbours={showNeighbours ? actpass.neighbours : []}
           pickable={restraintsFlavour.kind !== "surf"}
@@ -491,6 +507,8 @@ export function ResiduesSubForm({
           setSurfaceCutoff={onSurfaceCutoffChange}
           neighourRadius={neighourRadius}
           setNeighourRadius={onNeighourRadiusChange}
+          renderSelectionAs={renderSelectionAs}
+          onRenderSelectionAsChange={onRenderSelectionAsChange}
         />
         {/* TODO show none/surface/buried radio group? */}
       </div>
@@ -509,6 +527,7 @@ function ShowSurfaceBuriedToggles({
   buried: boolean;
   setBuried: (show: boolean) => void;
 }) {
+  const id = useId();
   let value: "" | "surface" | "buried" = "";
   if (surface) {
     value = "surface";
@@ -523,12 +542,12 @@ function ShowSurfaceBuriedToggles({
 
   return (
     <div className="flex items-center space-x-2">
-      <Label htmlFor="showsurfaceburied">Show</Label>
+      <Label htmlFor={id}>Show</Label>
       <ToggleGroup
         type="single"
         defaultValue={value}
         onValueChange={onValueChange}
-        id="showsurfaceburied"
+        id={id}
         className="border"
       >
         <ToggleGroupItem value="surface">Surface</ToggleGroupItem>
@@ -543,11 +562,15 @@ function MoleculeSettings({
   setSurfaceCutoff,
   neighourRadius,
   setNeighourRadius,
+  renderSelectionAs,
+  onRenderSelectionAsChange,
 }: {
   surfaceCutoff: number;
   setSurfaceCutoff: (cutoff: number) => void;
   neighourRadius: number;
   setNeighourRadius: (radius: number) => void;
+  renderSelectionAs: StructureRepresentationType;
+  onRenderSelectionAsChange: (value: StructureRepresentationType) => void;
 }) {
   const [cutoff, setcutoff] = useState(surfaceCutoff);
   const [radius, setradius] = useState(neighourRadius);
@@ -593,7 +616,16 @@ function MoleculeSettings({
             onChange={(e) => setradius(Number(e.target.value))}
           />
         </FormItem>
-        (Close popover to commit changes)
+        <LabeledRadioGroup
+          label="Render selection as"
+          value={renderSelectionAs}
+          choices={[
+            ["spacefill", "Spacefill"],
+            ["surface", "Surface"],
+          ]}
+          onChange={onRenderSelectionAsChange}
+        />
+        <span>(Close popover to commit changes)</span>
       </PopoverContent>
     </Popover>
   );
