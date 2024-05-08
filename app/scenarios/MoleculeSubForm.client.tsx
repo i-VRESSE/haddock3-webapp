@@ -502,7 +502,7 @@ function MoleculeSettings({
     if (!open) {
       if (cutoff !== surfaceCutoff) {
         setSurfaceCutoff(cutoff);
-      } 
+      }
       if (radius !== neighourRadius) {
         setNeighourRadius(radius);
       }
