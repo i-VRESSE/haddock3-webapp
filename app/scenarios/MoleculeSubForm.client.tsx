@@ -445,8 +445,9 @@ export function ResiduesSubForm({
           renderSelectionAs={renderSelectionAs}
           surface={surfaceOrBuriedResidues}
           neighbours={showNeighbours ? actpass.neighbours : []}
-          pickable={restraintsFlavour.kind !== "surf"}
-          onPick={handle3DResiduePick}
+          onPick={
+            restraintsFlavour.kind === "surf" ? undefined : handle3DResiduePick
+          }
           higlightResidue={hoveredFrom2DResidue}
           onHover={(_, residue) => setHoveredFrom3DResidue(residue)}
           onMouseLeave={() => setHoveredFrom3DResidue(undefined)}

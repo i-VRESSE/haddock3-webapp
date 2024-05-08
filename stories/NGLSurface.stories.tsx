@@ -4,15 +4,16 @@ import { useMemo } from "react";
 import { NGLComponent, NGLStage, NGLSurface } from "~/scenarios/Viewer.client";
 
 function SurfaceViewer(
-  props: { structure: File } & Parameters<typeof NGLSurface>[0],
+  props: { structure: File } & Parameters<typeof NGLSurface>[0] &
+    Parameters<typeof NGLStage>[0],
 ) {
-  const { structure, ...surfaceprops } = props;
+  const { structure, onHover, onMouseLeave, onPick, ...surfaceprops } = props;
   // File does not change
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const cacheStructure = useMemo(() => structure, []);
   return (
     <div className="h-[500px] w-full">
-      <NGLStage>
+      <NGLStage onHover={onHover} onMouseLeave={onMouseLeave} onPick={onPick}>
         <NGLComponent structure={cacheStructure} chain={"A"}>
           <NGLSurface {...surfaceprops} />
         </NGLComponent>
@@ -97,12 +98,11 @@ export const Pickable: Story = {
     passiveColor: "yellow",
     neighboursColor: "orange",
     defaultColor: "white",
-    pickable: true,
     onPick: fn(),
   },
 };
 
-export const WithHover: Story = {
+export const Hoverable: Story = {
   loaders,
   args: {
     active: [932, 935, 936, 949, 950, 952, 958],
@@ -112,7 +112,7 @@ export const WithHover: Story = {
     passiveColor: "yellow",
     neighboursColor: "orange",
     defaultColor: "white",
-    pickable: true,
     onHover: fn(),
+    onMouseLeave: fn(),
   },
 };

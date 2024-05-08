@@ -50,18 +50,12 @@ export function NGLResidues({
   color,
   opacity,
   representation,
-  pickable = false,
-  onPick,
-  onHover,
 }: {
   residues: number[];
   color: string;
   opacity: number;
   representation: StructureRepresentationType;
   hovered?: number[];
-  pickable?: boolean;
-  onPick?: (chain: string, residue: number) => void;
-  onHover?: (chain: string, residue: number) => void;
 }) {
   const name = useId();
   const stage = useStage();
@@ -94,56 +88,6 @@ export function NGLResidues({
       repr.setSelection(sel);
     }
   }, [residues, name, stage]);
-
-  const onClick = useCallback(
-    (pickinProxy: PickingProxy) => {
-      if (onPick && pickinProxy?.atom?.resno && pickinProxy?.atom?.chainname) {
-        onPick(pickinProxy.atom.chainname, pickinProxy.atom.resno);
-      }
-    },
-    [onPick],
-  );
-
-  useEffect(() => {
-    if (!onClick) {
-      return;
-    }
-    if (pickable) {
-      stage.signals.clicked.add(onClick);
-    } else {
-      stage.signals.clicked.remove(onClick);
-    }
-    return () => {
-      if (onClick) {
-        stage.signals.clicked.remove(onClick);
-      }
-    };
-  }, [stage, pickable, onClick]);
-
-  const onHoverCallback = useCallback(
-    (pickinProxy: PickingProxy) => {
-      if (onHover && pickinProxy?.atom?.resno && pickinProxy?.atom?.chainname) {
-        onHover(pickinProxy.atom.chainname, pickinProxy.atom.resno);
-      }
-    },
-    [onHover],
-  );
-
-  useEffect(() => {
-    if (!onHoverCallback) {
-      return;
-    }
-    if (pickable) {
-      stage.signals.hovered.add(onHoverCallback);
-    } else {
-      stage.signals.hovered.remove(onHoverCallback);
-    }
-    return () => {
-      if (onHoverCallback) {
-        stage.signals.hovered.remove(onHoverCallback);
-      }
-    };
-  }, [stage, pickable, onHoverCallback]);
 
   return null;
 }
@@ -257,9 +201,13 @@ export function NGLComponent({
 
 export function NGLStage({
   onMouseLeave = () => {},
+  onPick,
+  onHover,
   children,
 }: {
   children: ReactNode;
+  onPick?: (chain: string, residue: number, componentName: string) => void;
+  onHover?: (chain: string, residue: number, componentName: string) => void;
   onMouseLeave?: () => void;
 }) {
   const [stage, setStage] = useState<Stage>();
@@ -279,6 +227,57 @@ export function NGLStage({
       }
     };
   }, [stage]);
+
+  const onClick = useCallback(
+    (pickinProxy: PickingProxy) => {
+      if (onPick && pickinProxy?.atom?.resno && pickinProxy?.atom?.chainname) {
+        onPick(
+          pickinProxy.atom.chainname,
+          pickinProxy.atom.resno,
+          pickinProxy.component.name,
+        );
+      }
+    },
+    [onPick],
+  );
+
+  useEffect(() => {
+    if (!onClick || !stage) {
+      return;
+    }
+    stage.signals.clicked.add(onClick);
+    return () => {
+      if (onClick) {
+        stage.signals.clicked.remove(onClick);
+      }
+    };
+  }, [stage, onClick]);
+
+  const onHoverCallback = useCallback(
+    (pickinProxy: PickingProxy) => {
+      if (onHover && pickinProxy?.atom?.resno && pickinProxy?.atom?.chainname) {
+        // TODO use pickProxy.shiftKey to select range of residues?
+        onHover(
+          pickinProxy.atom.chainname,
+          pickinProxy.atom.resno,
+          pickinProxy.component.name,
+        );
+      }
+    },
+    [onHover],
+  );
+
+  useEffect(() => {
+    if (!onHoverCallback || !stage) {
+      return;
+    }
+    stage.signals.hovered.add(onHoverCallback);
+    return () => {
+      if (onHoverCallback) {
+        stage.signals.hovered.remove(onHoverCallback);
+      }
+    };
+  }, [stage, onHoverCallback]);
 
   //  TODO make height and width configurable
   return (
@@ -341,21 +340,18 @@ class ErrorBoundary extends ReactComponent<
 }
 
 /**
- * Use single surface to display multiple colors
+ * Use single surface to display multiple colors of residue sets
  */
 export function NGLSurface({
   active = [],
   passive = [],
   neighbours = [],
-  highlight = undefined,
+  highlight,
   activeColor = "green",
   passiveColor = "yellow",
   neighboursColor = "orange",
   highlightColor = "red",
   defaultColor = "white",
-  pickable = false,
-  onPick,
-  onHover,
 }: {
   active: number[];
   passive: number[];
@@ -366,9 +362,6 @@ export function NGLSurface({
   defaultColor?: string;
   highlightColor?: string;
   neighboursColor?: string;
-  pickable?: boolean;
-  onPick?: (chain: string, residue: number) => void;
-  onHover?: (chain: string, residue: number) => void;
 }) {
   const name = useId();
 
@@ -429,56 +422,6 @@ export function NGLSurface({
     }
   }, [schemeId, name, stage]);
 
-  const onClick = useCallback(
-    (pickinProxy: PickingProxy) => {
-      if (onPick && pickinProxy?.atom?.resno && pickinProxy?.atom?.chainname) {
-        onPick(pickinProxy.atom.chainname, pickinProxy.atom.resno);
-      }
-    },
-    [onPick],
-  );
-
-  useEffect(() => {
-    if (!onClick) {
-      return;
-    }
-    if (pickable) {
-      stage.signals.clicked.add(onClick);
-    } else {
-      stage.signals.clicked.remove(onClick);
-    }
-    return () => {
-      if (onClick) {
-        stage.signals.clicked.remove(onClick);
-      }
-    };
-  }, [stage, pickable, onClick]);
-
-  const onHoverCallback = useCallback(
-    (pickinProxy: PickingProxy) => {
-      if (onHover && pickinProxy?.atom?.resno && pickinProxy?.atom?.chainname) {
-        onHover(pickinProxy.atom.chainname, pickinProxy.atom.resno);
-      }
-    },
-    [onHover],
-  );
-
-  useEffect(() => {
-    if (!onHoverCallback) {
-      return;
-    }
-    if (pickable) {
-      stage.signals.hovered.add(onHoverCallback);
-    } else {
-      stage.signals.hovered.remove(onHoverCallback);
-    }
-    return () => {
-      if (onHoverCallback) {
-        stage.signals.hovered.remove(onHoverCallback);
-      }
-    };
-  }, [stage, pickable, onHoverCallback]);
-
   return null;
 }
 
@@ -500,9 +443,8 @@ export function Viewer({
   renderSelectionAs = "surface",
   surface,
   neighbours = [],
-  pickable = false,
-  onPick,
   higlightResidue,
+  onPick,
   onHover,
   onMouseLeave = () => {},
 }: {
@@ -513,9 +455,8 @@ export function Viewer({
   surface: number[];
   renderSelectionAs?: StructureRepresentationType;
   neighbours?: number[];
-  pickable?: boolean;
-  onPick?: (chain: string, residue: number) => void;
   higlightResidue?: number | undefined;
+  onPick?: (chain: string, residue: number) => void;
   onHover?: (chain: string, residue: number) => void;
   onMouseLeave?: () => void;
 }) {
@@ -537,9 +478,6 @@ export function Viewer({
         passiveColor={passiveColor}
         neighboursColor={passiveColor}
         defaultColor={"white"}
-        pickable={pickable}
-        onPick={onPick}
-        onHover={onHover}
       />
     );
   } else {
@@ -553,15 +491,6 @@ export function Viewer({
             representation={renderSelectionAs}
           />
         )}
-        <NGLResidues
-          residues={[]}
-          color={activeColor}
-          opacity={1.0}
-          representation="ball+stick"
-          pickable={pickable}
-          onPick={onPick}
-          onHover={onHover}
-        />
         <NGLResidues
           residues={active}
           color={activeColor}
@@ -592,7 +521,7 @@ export function Viewer({
 
   return (
     <ErrorBoundary>
-      <NGLStage onMouseLeave={onMouseLeave}>
+      <NGLStage onMouseLeave={onMouseLeave} onHover={onHover} onPick={onPick}>
         <NGLComponent structure={structure} chain={chain}>
           {representations}
         </NGLComponent>
