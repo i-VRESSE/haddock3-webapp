@@ -1,7 +1,6 @@
 import { Structure, StructureRepresentationType, autoLoad } from "ngl";
-import { useState, useEffect, ReactNode, useRef, useId } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { useTheme } from "remix-themes";
-import { SlidersHorizontal } from "lucide-react";
 
 import { FormDescription } from "./FormDescription";
 import { FormItem } from "./FormItem";
@@ -30,13 +29,10 @@ import {
   RestraintsFlavourPicker,
 } from "./RestraintsFlavourPicker";
 import { LabeledCheckbox } from "./LabeledCheckbox";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
-import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
-import { LabeledRadioGroup } from "./LabeledRadioGroup";
+import { ShowSurfaceBuriedToggles } from "./ShowSurfaceBuriedToggles";
+import { HiddenFileInput } from "./HiddenFileInput";
+import { LinkToFile } from "./LinkToFile";
+import { MoleculeSettings } from "./MoleculeSettings";
 
 export type ActPassSelection = {
   active: number[];
@@ -131,22 +127,6 @@ export function UserStructure({
   );
 }
 
-function LinkToFile({ file, children }: { file: File; children: ReactNode }) {
-  const [url, setUrl] = useState("#");
-
-  useEffect(() => {
-    const url = URL.createObjectURL(file);
-    setUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
-
-  return (
-    <a href={url} className="underline" download={file.name}>
-      {children}
-    </a>
-  );
-}
-
 export interface Molecule {
   userFile: File;
   userChains: string[];
@@ -204,20 +184,6 @@ export function ProcessedStructure({
       </div>
     </>
   );
-}
-
-export function HiddenFileInput({ name, file }: { name: string; file: File }) {
-  const ref = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (ref.current) {
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      ref.current.files = dataTransfer.files;
-    }
-  }, [file]);
-
-  return <input ref={ref} type="file" name={name} className="hidden" />;
 }
 
 async function computeNeighbours({
@@ -517,123 +483,6 @@ export function ResiduesSubForm({
         {/* TODO show none/surface/buried radio group? */}
       </div>
     </>
-  );
-}
-
-function ShowSurfaceBuriedToggles({
-  surface,
-  setSurface,
-  buried,
-  setBuried,
-}: {
-  surface: boolean;
-  setSurface: (show: boolean) => void;
-  buried: boolean;
-  setBuried: (show: boolean) => void;
-}) {
-  const id = useId();
-  let value: "" | "surface" | "buried" = "";
-  if (surface) {
-    value = "surface";
-  } else if (buried) {
-    value = "buried";
-  }
-
-  function onValueChange(value: string) {
-    setSurface(value === "surface");
-    setBuried(value === "buried");
-  }
-
-  return (
-    <div className="flex items-center space-x-2">
-      <Label htmlFor={id}>Show</Label>
-      <ToggleGroup
-        type="single"
-        value={value}
-        onValueChange={onValueChange}
-        id={id}
-        className="border"
-      >
-        <ToggleGroupItem value="surface">Surface</ToggleGroupItem>
-        <ToggleGroupItem value="buried">Buried</ToggleGroupItem>
-      </ToggleGroup>
-    </div>
-  );
-}
-
-function MoleculeSettings({
-  surfaceCutoff,
-  setSurfaceCutoff,
-  neighourRadius,
-  setNeighourRadius,
-  renderSelectionAs,
-  onRenderSelectionAsChange,
-}: {
-  surfaceCutoff: number;
-  setSurfaceCutoff: (cutoff: number) => void;
-  neighourRadius: number;
-  setNeighourRadius: (radius: number) => void;
-  renderSelectionAs: StructureRepresentationType;
-  onRenderSelectionAsChange: (value: StructureRepresentationType) => void;
-}) {
-  const [cutoff, setcutoff] = useState(surfaceCutoff);
-  const [radius, setradius] = useState(neighourRadius);
-  const [theme] = useTheme();
-  const style = { colorScheme: theme === "dark" ? "dark" : "light" };
-
-  function onOpenChange(open: boolean) {
-    if (!open) {
-      if (cutoff !== surfaceCutoff) {
-        setSurfaceCutoff(cutoff);
-      }
-      if (radius !== neighourRadius) {
-        setNeighourRadius(radius);
-      }
-    }
-  }
-
-  return (
-    <Popover onOpenChange={onOpenChange}>
-      <PopoverTrigger>
-        <SlidersHorizontal />
-      </PopoverTrigger>
-      <PopoverContent>
-        <FormItem name="surface-cutoff" label="Surface cutoff">
-          <Input
-            type="number"
-            step="0.01"
-            min="0.0"
-            max="10"
-            value={cutoff}
-            style={style}
-            onChange={(e) => setcutoff(Number(e.target.value))}
-          />
-        </FormItem>
-        <FormItem name="neighbour-radius" label="Neighbour radius">
-          <Input
-            type="number"
-            step="0.1"
-            min="0.0"
-            max="1000"
-            value={radius}
-            style={style}
-            onChange={(e) => setradius(Number(e.target.value))}
-          />
-        </FormItem>
-        <LabeledRadioGroup
-          label="Render selection as"
-          value={renderSelectionAs}
-          choices={[
-            ["spacefill", "Spacefill"],
-            ["ball+stick", "Ball+stick"],
-            ["licorice", "Licorice"],
-            ["surface", "Surface"],
-          ]}
-          onChange={onRenderSelectionAsChange}
-        />
-        <span>(Close popover to commit changes)</span>
-      </PopoverContent>
-    </Popover>
   );
 }
 
