@@ -35,6 +35,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "~/components/ui/popover";
+import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 
 export type ActPassSelection = {
   active: number[];
@@ -313,6 +314,7 @@ export function ResiduesSubForm({
   const [surfaceCutoff, setSurfaceCutoff] = useState(0.15);
   const [neighourRadius, setNeighourRadius] = useState(6.5);
   const [showSurface, setShowSurface] = useState(false);
+  const [showBuried, setShowBuried] = useState(false);
   // gzipping and base64 encoding file can be slow, so we cache it
   // for example 8qg1 of 1.7Mb took 208ms
   const [safeFile, setSafeFile] = useState<string | undefined>(undefined);
@@ -406,6 +408,15 @@ export function ResiduesSubForm({
     setSurfaceCutoff(cutoff);
   }
 
+  let surfaceOrBuriedResidues: number[] = [];
+  if (showSurface) {
+    surfaceOrBuriedResidues = molecule.surfaceResidues;
+  } else if (showBuried) {
+    surfaceOrBuriedResidues = molecule.residues
+      .filter((residue) => !molecule.surfaceResidues.includes(residue.resno))
+      .map((residue) => residue.resno);
+  }
+
   return (
     <>
       <div className="h-[500px] w-full">
@@ -414,7 +425,7 @@ export function ResiduesSubForm({
           chain={molecule.targetChain}
           active={actpass.active}
           passive={actpass.passive}
-          surface={showSurface ? molecule.surfaceResidues : []}
+          surface={surfaceOrBuriedResidues}
           neighbours={showNeighbours ? actpass.neighbours : []}
           pickable={restraintsFlavour.kind !== "surf"}
           onPick={handle3DResiduePick}
@@ -465,11 +476,16 @@ export function ResiduesSubForm({
         {restraintsFlavour.kind === "actpass" && (
           <PickIn3D value={picker3D} onChange={setPicker3D} />
         )}
-        {restraintsFlavour.kind !== "surf" && (
-          <LabeledCheckbox value={showSurface} onChange={setShowSurface}>
-            Show surface residues
-          </LabeledCheckbox>
-        )}
+        <div className="flex flex-row gap-4 py-2">
+          {restraintsFlavour.kind !== "surf" && (
+            <ShowSurfaceBuriedToggles
+              surface={showSurface}
+              setSurface={setShowSurface}
+              buried={showBuried}
+              setBuried={setShowBuried}
+            />
+          )}
+        </div>
         <MoleculeSettings
           surfaceCutoff={surfaceCutoff}
           setSurfaceCutoff={onSurfaceCutoffChange}
@@ -479,6 +495,46 @@ export function ResiduesSubForm({
         {/* TODO show none/surface/buried radio group? */}
       </div>
     </>
+  );
+}
+
+function ShowSurfaceBuriedToggles({
+  surface,
+  setSurface,
+  buried,
+  setBuried,
+}: {
+  surface: boolean;
+  setSurface: (show: boolean) => void;
+  buried: boolean;
+  setBuried: (show: boolean) => void;
+}) {
+  let value: "" | "surface" | "buried" = "";
+  if (surface) {
+    value = "surface";
+  } else if (buried) {
+    value = "buried";
+  }
+
+  function onValueChange(value: string) {
+    setSurface(value === "surface");
+    setBuried(value === "buried");
+  }
+
+  return (
+    <div className="flex items-center space-x-2">
+      <Label htmlFor="showsurfaceburied">Show</Label>
+      <ToggleGroup
+        type="single"
+        defaultValue={value}
+        onValueChange={onValueChange}
+        id="showsurfaceburied"
+        className="border"
+      >
+        <ToggleGroupItem value="surface">Surface</ToggleGroupItem>
+        <ToggleGroupItem value="buried">Buried</ToggleGroupItem>
+      </ToggleGroup>
+    </div>
   );
 }
 

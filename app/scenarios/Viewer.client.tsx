@@ -367,7 +367,7 @@ export function Viewer({
   const isDark = theme === "dark";
   const activeColor = isDark ? "green" : "lime";
   const passiveColor = isDark ? "orange" : "yellow";
-  const opacity = isDark ? 0.7 : 0.3;
+  const opacity = isDark ? 0.7 : 0.5;
   return (
     <ErrorBoundary>
       <NGLStage onMouseLeave={onMouseLeave}>
@@ -409,9 +409,9 @@ export function Viewer({
           />
           <NGLResidues
             residues={surface}
-            color={isDark ? "sky" : "orange"}
-            opacity={isDark ? 0.5 : 0.1}
-            representation="spacefill"
+            color={"sky"}
+            opacity={0.5}
+            representation="surface"
           />
         </NGLComponent>
       </NGLStage>
