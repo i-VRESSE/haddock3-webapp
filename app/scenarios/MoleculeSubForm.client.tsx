@@ -5,6 +5,7 @@ import { useTheme } from "remix-themes";
 import { FormDescription } from "./FormDescription";
 import { FormItem } from "./FormItem";
 import { ChainSelect } from "./ChainSelect";
+import { ChainRadioGroup } from "./ChainRadioGroup";
 import {
   ResiduesSelect,
   ResidueSelection,
@@ -34,6 +35,8 @@ import { HiddenFileInput } from "./HiddenFileInput";
 import { LinkToFile } from "./LinkToFile";
 import { MoleculeSettings } from "./MoleculeSettings";
 import { Spinner } from "~/components/ui/spinner";
+import { Button } from "~/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 export type ActPassSelection = {
   active: number[];
@@ -119,7 +122,11 @@ export function UserStructure({
       </FormItem>
       <FormItem name={`${name}-chain`} label="Chain">
         {file ? (
-          <ChainSelect chains={chains} onSelect={onChainSelect} selected="" />
+          <ChainRadioGroup
+            chains={chains}
+            onSelect={onChainSelect}
+            selected=""
+          />
         ) : (
           <p>Load a structure first</p>
         )}
@@ -143,24 +150,44 @@ export interface Molecule {
 export function ProcessedStructure({
   molecule,
   bodyRestraints,
+  onChainChange,
+  onRefreshStructure,
 }: {
   molecule: Molecule;
   bodyRestraints: string;
+  onChainChange: (chain: string) => void;
+  onRefreshStructure: () => void;
 }) {
   const [theme] = useTheme();
   const style = { colorScheme: theme === "dark" ? "dark" : "light" };
-  // TODO allow another pdb file to be chosen or a different chain to be selected
   return (
     <>
       <div>
-        <div>
+        <div className="flex items-center">
           User uploaded structure:{" "}
           <LinkToFile file={molecule.userFile}>
             {molecule.userFile.name}
           </LinkToFile>
+          <Button
+            onClick={(e) => {
+              e.preventDefault();
+              onRefreshStructure();
+            }}
+            title="Upload another structure"
+            variant="ghost"
+            size="icon"
+          >
+            <RefreshCw />
+          </Button>
         </div>
         <div>
-          Selected chain <b>{molecule.userSelectedChain}</b> has been filtered{" "}
+          Selected chain{" "}
+          <ChainSelect
+            chains={molecule.userChains}
+            onSelect={onChainChange}
+            selected={molecule.userSelectedChain}
+          ></ChainSelect>{" "}
+          has been filtered{" "}
           {molecule.userSelectedChain !== molecule.targetChain && (
             <span>
               and renamed to <b>{molecule.targetChain}</b>
@@ -653,6 +680,14 @@ export function MoleculeSubForm({
           <ProcessedStructure
             molecule={molecule}
             bodyRestraints={actpass.bodyRestraints}
+            onChainChange={(chain) =>
+              onUserStructureAndChainSelect(
+                molecule.userFile,
+                chain,
+                molecule.userChains,
+              )
+            }
+            onRefreshStructure={() => setMolecule(undefined)}
           />
           {molecule.errors ? (
             <RestraintsErrorsReport errors={molecule.errors} />

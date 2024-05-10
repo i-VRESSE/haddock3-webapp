@@ -24,12 +24,12 @@ export function LabeledRadioGroup<T extends string>({
   value,
   choices,
   onChange,
-  label = "How would you like to select residues for restraints?",
+  label,
 }: {
   value: T;
   choices: [T, string][];
   onChange: (value: T) => void;
-  label?: string;
+  label: string;
 }) {
   const name = useId();
   return (

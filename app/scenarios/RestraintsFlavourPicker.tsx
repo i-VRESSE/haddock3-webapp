@@ -30,6 +30,7 @@ function KindRadioGroup({
 }) {
   return (
     <LabeledRadioGroup
+      label="How would you like to select residues for restraints?"
       value={value}
       choices={[
         ["surf", "Surface residues as passive"],
