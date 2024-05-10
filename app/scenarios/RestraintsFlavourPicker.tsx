@@ -100,7 +100,6 @@ export function RestraintsFlavourPicker({
           </LabeledCheckbox>
         </>
       )}
-      {/* TODO add checkbox somewhere for showing neighbours */}
     </>
   );
 }

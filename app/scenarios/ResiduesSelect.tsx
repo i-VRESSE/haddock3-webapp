@@ -332,7 +332,6 @@ export function ResiduesSelect({
         (Hold Shift to select a range of residues. Click residue in 3D viewer to
         select.)
       </FormDescription>
-      {/* TODO add buttons to select all, none, invert */}
       <div className="flex flex-row gap-2">
         {showActive && (
           <div>
@@ -408,13 +407,19 @@ function ResiduesHeader({
           {/* use non breaking whitespace to prevent layout shifts */}
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         </div>
-        {showActive && (
-          <div className={cn("pr-1", residueVariants["act"])}>Active</div>
-        )}
-        {showPassive && (
-          <div className={cn("pr-1", residueVariants["pass"])}>Passive</div>
-        )}
+        {showActive && <ResidueHeaderItem variant="act" label="Active" />}
+        {showPassive && <ResidueHeaderItem variant="pass" label="Passive" />}
       </div>
     </div>
   );
+}
+
+function ResidueHeaderItem({
+  variant,
+  label,
+}: {
+  variant: Variant;
+  label: string;
+}) {
+  return <div className={cn("pr-1", residueVariants[variant])}>{label}</div>;
 }

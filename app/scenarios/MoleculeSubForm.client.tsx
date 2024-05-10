@@ -33,6 +33,7 @@ import { ShowSurfaceBuriedToggles } from "./ShowSurfaceBuriedToggles";
 import { HiddenFileInput } from "./HiddenFileInput";
 import { LinkToFile } from "./LinkToFile";
 import { MoleculeSettings } from "./MoleculeSettings";
+import { Spinner } from "~/components/ui/spinner";
 
 export type ActPassSelection = {
   active: number[];
@@ -286,6 +287,7 @@ export function ResiduesSubForm({
     number | undefined
   >();
   const [picker3D, setPicker3D] = useState<ActPass>("act");
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     const fetchSafeFile = async () => {
@@ -309,22 +311,27 @@ export function ResiduesSubForm({
     if (!onActPassChange || !safeFile) {
       return;
     }
-    const neighbours = await computeNeighbours({
-      structure: safeFile,
-      chain: molecule.targetChain,
-      surface: molecule.surfaceResidues,
-      active: newSelection.act,
-      passive: newSelection.pass,
-      restraintsFlavour,
-      radius: neighourRadius,
-    });
-    onActPassChange({
-      active: newSelection.act,
-      passive: newSelection.pass,
-      neighbours,
-      chain: molecule.targetChain,
-      bodyRestraints: actpass.bodyRestraints,
-    });
+    setBusy(true);
+    try {
+      const neighbours = await computeNeighbours({
+        structure: safeFile,
+        chain: molecule.targetChain,
+        surface: molecule.surfaceResidues,
+        active: newSelection.act,
+        passive: newSelection.pass,
+        restraintsFlavour,
+        radius: neighourRadius,
+      });
+      onActPassChange({
+        active: newSelection.act,
+        passive: newSelection.pass,
+        neighbours,
+        chain: molecule.targetChain,
+        bodyRestraints: actpass.bodyRestraints,
+      });
+    } finally {
+      setBusy(false);
+    }
   }
 
   function handle3DResiduePick(chain: string, resno: number) {
@@ -342,30 +349,38 @@ export function ResiduesSubForm({
     if (!onActPassChange || !safeFile) {
       return;
     }
-    // TODO show user ws call is running
-    const neighbours = await computeNeighbours({
-      structure: safeFile,
-      chain: molecule.targetChain,
-      surface: molecule.surfaceResidues,
-      active: actpass.active,
-      passive: actpass.passive,
-      restraintsFlavour,
-      radius: neighourRadius,
-    });
-    onActPassChange({
-      ...actpass,
-      neighbours,
-    });
-    setNeighourRadius(radius);
+    setBusy(true);
+    try {
+      const neighbours = await computeNeighbours({
+        structure: safeFile,
+        chain: molecule.targetChain,
+        surface: molecule.surfaceResidues,
+        active: actpass.active,
+        passive: actpass.passive,
+        restraintsFlavour,
+        radius: neighourRadius,
+      });
+      onActPassChange({
+        ...actpass,
+        neighbours,
+      });
+      setNeighourRadius(radius);
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function onSurfaceCutoffChange(cutoff: number) {
     if (!safeFile) {
       return;
     }
-    // TODO show user ws call is running
-    const surfaceResidues = await calculateAccessibility(safeFile, cutoff);
-    setSurfaceResidues(surfaceResidues[0][molecule.targetChain] || []);
+    setBusy(true);
+    try {
+      const surfaceResidues = await calculateAccessibility(safeFile, cutoff);
+      setSurfaceResidues(surfaceResidues[0][molecule.targetChain] || []);
+    } finally {
+      setBusy(false);
+    }
     setSurfaceCutoff(cutoff);
   }
 
@@ -375,17 +390,6 @@ export function ResiduesSubForm({
       setShowBuried(false);
       setShowSurface(true);
     } else {
-      if (onActPassChange) {
-        // Force selection redraw
-        // TODO maybe needed in other places,
-        // TODO dont use force, but some hook
-        onActPassChange({
-          ...actpass,
-          active: [...actpass.active],
-          passive: [...actpass.passive],
-          neighbours: [...actpass.neighbours],
-        });
-      }
       setShowSurface(false);
       setShowBuried(false);
     }
@@ -421,7 +425,6 @@ export function ResiduesSubForm({
       </div>
       {children}
       <Label>{label}</Label>
-      {/* TODO show neigbours as passive, be carefull not to conflict with user selected passive residues */}
       <ResiduesSelect
         options={molecule.residues}
         onChange={handle2DResidueChange}
@@ -472,15 +475,17 @@ export function ResiduesSubForm({
               />
             )}
         </div>
-        <MoleculeSettings
-          surfaceCutoff={surfaceCutoff}
-          setSurfaceCutoff={onSurfaceCutoffChange}
-          neighourRadius={neighourRadius}
-          setNeighourRadius={onNeighourRadiusChange}
-          renderSelectionAs={renderSelectionAs}
-          onRenderSelectionAsChange={onRenderSelectionAsChange}
-        />
-        {/* TODO show none/surface/buried radio group? */}
+        <div className="flex gap-2">
+          <MoleculeSettings
+            surfaceCutoff={surfaceCutoff}
+            setSurfaceCutoff={onSurfaceCutoffChange}
+            neighourRadius={neighourRadius}
+            setNeighourRadius={onNeighourRadiusChange}
+            renderSelectionAs={renderSelectionAs}
+            onRenderSelectionAsChange={onRenderSelectionAsChange}
+          />
+          <Spinner title="Performing computation on server" show={busy} />
+        </div>
       </div>
     </>
   );

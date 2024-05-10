@@ -33,12 +33,6 @@ export const Surface: Story = {
     });
 
     await loadFileIntoInput("/assets/2oob.pdb", fileInput);
-
-    // TODO wait for file to be loaded and select chain A
-    // const chainAButton = canvas.getByText("A")
-    // await userEvent.click(chainAButton);
-
-    // TODO component calls haddock3 restraints web service, make sure storybook server can reverse proxy it.
   },
 };
 
