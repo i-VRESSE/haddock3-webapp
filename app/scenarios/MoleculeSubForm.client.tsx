@@ -143,7 +143,6 @@ export interface Molecule {
   targetChain: string;
   residues: Residue[];
   surfaceResidues: number[];
-  // TODO dont store surface twice in surfaceResidues and residues[n].surface
   errors?: RestraintsErrors;
 }
 
