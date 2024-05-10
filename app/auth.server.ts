@@ -242,7 +242,7 @@ export async function getOptionalClientUser(
 export async function mustBeAdmin(request: Request) {
   const user = await getUser(request);
   if (!user.isAdmin) {
-    throw json("Forbidden, not admin", { status: 403 });
+    throw json({ error: "Forbidden, not admin" }, { status: 403 });
   }
 }
 
