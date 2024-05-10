@@ -2,9 +2,10 @@ import { useId } from "react";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 
-
 export function ChainRadioGroup({
-  chains, onSelect, selected,
+  chains,
+  onSelect,
+  selected,
 }: {
   chains: string[];
   onSelect: (chain: string) => void;
@@ -41,7 +42,8 @@ export function ChainRadioGroup({
           <RadioGroupItem
             value={chain}
             id={id + chain}
-            className="bg-inherit" />
+            className="bg-inherit"
+          />
           <Label htmlFor={id + chain}>{chain}</Label>
         </div>
       ))}
