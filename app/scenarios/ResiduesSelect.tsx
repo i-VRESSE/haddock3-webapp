@@ -1,25 +1,48 @@
-import { ChangeEvent, useId, useState } from "react";
+import { ChangeEvent, useId, useMemo, useState } from "react";
 import { FormDescription } from "./FormDescription";
-import { Residue, SecondaryStructure } from "./molecule.client";
-import clsx from "clsx";
+import { Residue } from "./molecule.client";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useTheme } from "remix-themes";
 import { cn } from "~/lib/utils";
+import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
 
-const residueVariants: Record<SecondaryStructure, string> = {
-  sheet: "bg-amber-200 dark:bg-amber-700",
-  helix: "bg-red-200 dark:bg-red-900",
-  turn: "",
-  "": "",
+type Variant = "act" | "pass" | "highlight" | "";
+
+const residueVariants: Record<Variant, string> = {
+  act: "bg-green-100 dark:bg-green-700",
+  pass: "bg-yellow-100 dark:bg-yellow-700",
+  highlight: "bg-secondary dark:bg-secondary-foreground",
+  "": "bg-inherit dark:bg-inherit",
 };
+
+function CopyToClipBoardIcon() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 14 15"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M11.746.07A.5.5 0 0011.5.003h-6a.5.5 0 00-.5.5v2.5H.5a.5.5 0 00-.5.5v10a.5.5 0 00.5.5h8a.5.5 0 00.5-.5v-2.5h4.5a.5.5 0 00.5-.5v-8a.498.498 0 00-.15-.357L11.857.154a.506.506 0 00-.11-.085zM9 10.003h4v-7h-1.5a.5.5 0 01-.5-.5v-1.5H6v2h.5a.5.5 0 01.357.15L8.85 5.147c.093.09.15.217.15.357v4.5zm-8-6v9h7v-7H6.5a.5.5 0 01-.5-.5v-1.5H1z"
+        fill="currentColor"
+      ></path>
+    </svg>
+  );
+}
 
 function ImportResidues({
   selected,
   onChange,
+  disabled = false,
 }: {
   selected: number[];
   onChange: (selected: number[]) => void;
+  disabled?: boolean;
 }) {
   const sortedResidues = [...selected].sort((a, b) => a - b).join(",");
 
@@ -35,112 +58,214 @@ function ImportResidues({
     }
   }
   return (
-    <div className="flex items-center gap-2">
-      <Input readOnly value={sortedResidues} className="w-1/2 p-1" />
-      <Button variant="outline" size="sm" onClick={doImport}>
-        Import
-      </Button>
+    <div className="flex items-center gap-1">
+      <Input readOnly value={sortedResidues} className="w-32 p-1" />
+      <CopyButton content={sortedResidues} />
+      {!disabled && (
+        <Button variant="outline" size="sm" onClick={doImport}>
+          Import
+        </Button>
+      )}
     </div>
+  );
+}
+
+export function CopyButton({ content }: { content: string }) {
+  return (
+    <Button
+      size="icon"
+      variant="ghost"
+      onClick={() => navigator.clipboard.writeText(content)}
+      title="Copy list of residues to clipboard"
+    >
+      <CopyToClipBoardIcon />
+    </Button>
   );
 }
 
 function ResidueCheckbox({
   resno,
-  sec,
   seq,
+  showActive,
+  showPassive,
   highlight,
-  checked,
-  disabled,
+  activeChecked,
+  passiveChecked,
+  neighbourChecked,
+  activeDisabled,
+  passiveDisabled,
   onHover,
-  onChange,
+  onActiveChange,
+  onPassiveChange,
 }: {
   resno: number;
-  sec: SecondaryStructure;
   seq: string;
-  highlight: boolean;
-  checked: boolean;
-  disabled: boolean;
-  onHover: () => void;
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  showActive: boolean;
+  showPassive: boolean;
+  highlight: boolean; // External component wants us to highlight this residue
+  activeChecked: boolean;
+  passiveChecked: boolean;
+  neighbourChecked: boolean;
+  activeDisabled: boolean;
+  passiveDisabled: boolean;
+  onHover: () => void; // We want external component to know we are hovering
+  onActiveChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onPassiveChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }) {
   const id = useId();
   const [theme] = useTheme();
   const style = { colorScheme: theme === "dark" ? "dark" : "light" };
+  let htmlFor = id + "act";
+  if (showPassive && !showActive) {
+    htmlFor = id + "pass";
+  }
+
+  let variant: Variant = "";
+  if (passiveChecked || neighbourChecked) {
+    variant = "pass";
+  }
+  if (activeChecked) {
+    variant = "act";
+  }
+  if (highlight) {
+    variant = "highlight";
+  }
 
   return (
     <div
-      key={resno}
       className={cn(
         "inline-block w-4 text-center font-mono hover:bg-secondary hover:text-secondary-foreground",
-        {
-          "bg-secondary text-secondary-foreground": highlight,
-        },
+        residueVariants[variant],
       )}
-      title={disabled ? `${resno}, disabled due to not on surface` : `${resno}`}
+      title={resno.toString()}
       onMouseEnter={onHover}
     >
-      <label htmlFor={id} className={residueVariants[sec]}>
-        {seq}
-      </label>
-      <input
-        type="checkbox"
-        style={style}
-        value={resno}
-        disabled={disabled}
-        id={id}
-        checked={checked}
-        onChange={onChange}
-      />
+      <label htmlFor={htmlFor}>{seq}</label>
+      {showActive && (
+        <input
+          type="checkbox"
+          style={style}
+          value={resno}
+          disabled={activeDisabled}
+          id={id + "act"}
+          checked={activeChecked}
+          onChange={onActiveChange}
+        />
+      )}
+      {showPassive && (
+        <input
+          type="checkbox"
+          style={style}
+          value={resno}
+          disabled={passiveDisabled || activeChecked || neighbourChecked}
+          id={id + "pass"}
+          checked={passiveChecked || neighbourChecked}
+          onChange={onPassiveChange}
+        />
+      )}
     </div>
   );
+}
+
+export interface ResidueSelection {
+  act: number[];
+  pass: number[];
+}
+
+export interface ResidueNeighbourSelection extends ResidueSelection {
+  neighbours: number[];
 }
 
 export function ResiduesSelect({
   options,
   selected,
   onChange,
-  surface,
+  disabledPassive = false,
+  disabledActive = false,
+  showPassive = false,
+  showActive = false,
+  showNeighbours = false,
   onHover,
   highlight,
 }: {
   options: Residue[];
-  selected: number[];
-  onChange: (selected: number[]) => void;
-  surface: number[];
+  selected: ResidueNeighbourSelection;
+  onChange: (selected: ResidueSelection) => void;
+  disabledPassive?: boolean;
+  disabledActive?: boolean;
+  showPassive?: boolean;
+  showActive?: boolean;
+  showNeighbours?: boolean;
   onHover: (resno: number | undefined) => void;
   highlight: number | undefined;
 }) {
+  const surface = useMemo(
+    () => options.filter((r) => r.surface).map((r) => r.resno),
+    [options],
+  );
   const [lastChecked, setLastChecked] = useState<number | null>(null);
 
-  function handleChange(e: ChangeEvent<HTMLInputElement>, index: number) {
+  function handleChange(
+    e: ChangeEvent<HTMLInputElement>,
+    index: number,
+    actpass: ActPass,
+  ) {
     const residue = parseInt(e.target.value);
     const ne = e.nativeEvent as KeyboardEvent;
+    let newSelected: number[] = [];
     if (ne.shiftKey && lastChecked !== null) {
       const start = Math.min(lastChecked, index);
       const end = Math.max(lastChecked, index);
-      const newSelected = [...selected];
+      newSelected = [...selected[actpass]];
       for (let i = start; i <= end; i++) {
         const resno = options[i].resno;
         if (!newSelected.includes(resno) && surface.includes(resno)) {
           newSelected.push(resno);
         }
       }
-      onChange(newSelected);
     } else {
       if (e.target.checked) {
-        onChange([...selected, residue]);
+        newSelected = [...selected[actpass], residue];
       } else {
-        onChange(selected.filter((r) => r !== residue));
+        newSelected = selected[actpass].filter((r) => r !== residue);
       }
     }
+    if (actpass === "act") {
+      // Active should take precedence over passive.
+      // For example given passive is selected,
+      // then selecting same residue as active should remove it from passive.
+      const passiveWithoutAlsoActive = selected.pass.filter(
+        (r) => !newSelected.includes(r),
+      );
+      onChange({
+        act: newSelected,
+        pass: passiveWithoutAlsoActive,
+      });
+    } else {
+      onChange({
+        pass: newSelected,
+        act: selected.act,
+      });
+    }
+
     if (e.target.checked) {
       setLastChecked(index);
     }
   }
 
-  function onImport(selected: number[]) {
-    const filtered = selected.filter((r) => surface.includes(r));
-    onChange(filtered);
+  function onActiveImport(imported: number[]) {
+    const filtered = imported.filter((r) => surface.includes(r));
+    onChange({
+      act: filtered,
+      pass: selected.pass,
+    });
+  }
+  function onPassiveImport(imported: number[]) {
+    const filtered = imported.filter((r) => surface.includes(r));
+    onChange({
+      pass: filtered,
+      act: selected.act,
+    });
   }
 
   const chunkSize = 10;
@@ -156,9 +281,14 @@ export function ResiduesSelect({
 
     return resultArray;
   }, initialArray);
+
   return (
     <>
       <div className="flex flex-row flex-wrap">
+        <ResiduesHeader
+          showActive={showActive}
+          showPassive={showPassive || showNeighbours}
+        />
         {chunks.map((chunk, cindex) => (
           <div key={cindex}>
             <p
@@ -172,13 +302,26 @@ export function ResiduesSelect({
                 <ResidueCheckbox
                   key={r.resno}
                   resno={r.resno}
-                  sec={r.sec}
                   seq={r.seq}
                   highlight={highlight === r.resno}
-                  checked={selected.includes(r.resno)}
-                  disabled={!surface.includes(r.resno)}
+                  activeChecked={selected.act.includes(r.resno)}
+                  passiveChecked={selected.pass.includes(r.resno)}
+                  activeDisabled={
+                    disabledActive ? true : !surface.includes(r.resno)
+                  }
+                  passiveDisabled={
+                    disabledPassive ? true : !surface.includes(r.resno)
+                  }
                   onHover={() => onHover(r.resno)}
-                  onChange={(e) => handleChange(e, cindex * chunkSize + index)}
+                  onActiveChange={(e) =>
+                    handleChange(e, cindex * chunkSize + index, "act")
+                  }
+                  onPassiveChange={(e) =>
+                    handleChange(e, cindex * chunkSize + index, "pass")
+                  }
+                  showActive={showActive}
+                  showPassive={showPassive || showNeighbours}
+                  neighbourChecked={selected.neighbours.includes(r.resno)}
                 />
               ))}
             </div>
@@ -186,17 +329,97 @@ export function ResiduesSelect({
         ))}
       </div>
       <FormDescription>
-        <span className={clsx("p-1 font-mono", residueVariants["helix"])}>
-          Helix
-        </span>{" "}
-        <span className={clsx("p-1 font-mono", residueVariants["sheet"])}>
-          Sheet
-        </span>{" "}
         (Hold Shift to select a range of residues. Click residue in 3D viewer to
         select.)
       </FormDescription>
-      {/* TODO add buttons to select all, none, invert */}
-      <ImportResidues selected={selected} onChange={onImport} />
+      <div className="flex flex-row gap-2">
+        {showActive && (
+          <div>
+            Active
+            <ImportResidues
+              selected={selected.act}
+              onChange={onActiveImport}
+              disabled={disabledActive}
+            />
+          </div>
+        )}
+        {showPassive && (
+          <div>
+            Passive
+            <ImportResidues
+              selected={selected.pass}
+              onChange={onPassiveImport}
+              disabled={disabledPassive}
+            />
+          </div>
+        )}
+      </div>
     </>
   );
+}
+
+export type ActPass = "act" | "pass";
+
+export function PickIn3D({
+  value,
+  onChange,
+}: {
+  value: ActPass;
+  onChange: (value: ActPass) => void;
+}) {
+  return (
+    <div className="flex flex-row items-center gap-1">
+      <div>3D viewer picks</div>
+      <ToggleGroup type="single" defaultValue={value} onValueChange={onChange}>
+        <ToggleGroupItem
+          value="act"
+          className="data-[state=on]:bg-green-100"
+          aria-label="Picking in 3D viewer will select active"
+          title="Picking in 3D viewer will select active"
+        >
+          A
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="pass"
+          className="data-[state=on]:bg-yellow-100"
+          aria-label="Picking in 3D will viwer select passive"
+          title="Picking in 3D will viwer select passive"
+        >
+          P
+        </ToggleGroupItem>
+      </ToggleGroup>
+    </div>
+  );
+}
+
+function ResiduesHeader({
+  showActive,
+  showPassive,
+}: {
+  showActive: boolean;
+  showPassive: boolean;
+}) {
+  return (
+    <div>
+      <p className="text-[0.5rem]">&nbsp;</p>
+      <div className="inline-block text-start font-mono">
+        <div title="Amino aced sequence">
+          {/* use non breaking whitespace to prevent layout shifts */}
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </div>
+        {showActive && <ResidueHeaderItem variant="act" label="Active" />}
+        {showPassive && <ResidueHeaderItem variant="pass" label="Passive" />}
+      </div>
+    </div>
+  );
+}
+
+function ResidueHeaderItem({
+  variant,
+  label,
+}: {
+  variant: Variant;
+  label: string;
+}) {
+  return <div className={cn("pr-1", residueVariants[variant])}>{label}</div>;
 }

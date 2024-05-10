@@ -16,7 +16,6 @@ import {
   ActPassSelection,
   MoleculeSubForm,
 } from "~/scenarios/MoleculeSubForm.client";
-import { AntigenSubForm, Flavour } from "~/scenarios/Antigen.client";
 import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import {
   generateAmbiguousRestraintsFile,
@@ -158,43 +157,32 @@ export default function AntibodyAntigenScenario() {
   const [antibodyActPass, seAntibodyActPass] = useState<ActPassSelection>({
     active: [],
     passive: [],
+    neighbours: [],
     chain: "",
     bodyRestraints: "",
   });
   const [antigenActPass, setAntigen2ActPass] = useState<ActPassSelection>({
     active: [],
     passive: [],
+    neighbours: [],
     chain: "",
     bodyRestraints: "",
   });
-  const [antigenFlavour, setAntigenFlavour] = useState<Flavour>("actpass");
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    let antigenSelection = antigenActPass;
-    if (antigenFlavour === "pass") {
-      // in the ResidueSubForm the user selected residues are stored as active
-      // and the computed surface neighbouring residues are stored as passive
-      // here we store all those residues as passive
-      antigenSelection = {
-        active: [],
-        passive: [...antigenActPass.active, ...antigenActPass.passive],
-        chain: antigenActPass.chain,
-        bodyRestraints: antigenActPass.bodyRestraints,
-      };
-    }
     const ambig_fname = await generateAmbiguousRestraintsFile(
       antibodyActPass,
-      antigenSelection,
+      antigenActPass,
     );
     formData.set("ambig_fname", ambig_fname);
 
     const unambig_fname = generateUnAmbiguousRestraintsFile(
       antibodyActPass.bodyRestraints,
-      antigenSelection.bodyRestraints,
+      antigenActPass.bodyRestraints,
     );
     if (unambig_fname) {
       formData.set("unambig_fname", unambig_fname);
@@ -237,7 +225,7 @@ export default function AntibodyAntigenScenario() {
                 accessibilityCutoff={0.15}
               />
               <div>
-                <AntigenSubForm
+                <MoleculeSubForm
                   name="antigen"
                   legend="Antigen"
                   description="In tutorial named pdbs/4I1B_clean.pdb"
@@ -246,8 +234,6 @@ export default function AntibodyAntigenScenario() {
                   targetChain="B"
                   preprocessPipeline="delhetatmkeepcoord"
                   accessibilityCutoff={0.15}
-                  antigenFlavour={antigenFlavour}
-                  onFlavourChange={setAntigenFlavour}
                 />
               </div>
             </div>

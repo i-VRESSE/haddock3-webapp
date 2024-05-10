@@ -1,10 +1,10 @@
 import { Structure, autoLoad } from "ngl";
-import ResidueProxy from "ngl/dist/declarations/proxy/residue-proxy";
 
 export interface Residue {
   resno: number;
   seq: string;
-  sec: SecondaryStructure;
+  // residues which are not a amino acids, rna or dna do not have a single letter code representation
+  // TODO handle non amino acids mrna or dna
   surface?: boolean;
 }
 export type Chains = Record<string, Residue[]>;
@@ -13,23 +13,6 @@ export interface Molecule {
   chains: Chains;
   file: File;
   originalFile: File; // File not passed through the pdbtools preprocess pipeline
-}
-
-export type SecondaryStructure = "sheet" | "helix" | "turn" | "";
-
-function secondaryStructureOfResidue(
-  residue: ResidueProxy,
-): SecondaryStructure {
-  if (residue.isSheet()) {
-    return "sheet";
-  }
-  if (residue.isHelix()) {
-    return "helix";
-  }
-  if (residue.isTurn()) {
-    return "turn";
-  }
-  return "";
 }
 
 export function chainsFromStructure(structure: Structure) {
@@ -41,7 +24,6 @@ export function chainsFromStructure(structure: Structure) {
       residues.push({
         resno: r.resno,
         seq: r.getResname1(),
-        sec: secondaryStructureOfResidue(r),
       });
     });
     // Same chain can be before+after TER line
