@@ -70,7 +70,9 @@ export default function JobPage() {
         <h2 className="text-2xl">Input</h2>
         <ListFiles files={inputFiles!} jobid={job.id} />
         <p>
-          <a href={`${prefix}jobs/${job.id}/input.zip`}>&#128230; Download archive</a>
+          <a href={`${prefix}jobs/${job.id}/input.zip`}>
+            &#128230; Download archive
+          </a>
         </p>
         {hasWorkflow && (
           <p>
@@ -81,7 +83,9 @@ export default function JobPage() {
       <div>
         <h2 className="text-xl">Module output</h2>
         <OutputReport files={outputFiles!} jobid={job.id} />
-        <a href={`${prefix}jobs/${job.id}/output.zip`}>&#128230; Download archive</a>
+        <a href={`${prefix}jobs/${job.id}/output.zip`}>
+          &#128230; Download archive
+        </a>
       </div>
       <div>
         <h2 className="text-xl">Other output files</h2>

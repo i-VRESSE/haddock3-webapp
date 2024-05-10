@@ -9,10 +9,10 @@ installGlobals();
 const isStorybook = process.argv[1]?.includes("storybook");
 const isTestEnv = process.env.VITEST;
 
-const prefix = process.env.HADDOCK3_PREFIX || '/'
+const prefix = process.env.HADDOCK3_PREFIX || "/";
 const remixConfig = {
-  basename: prefix
-}
+  basename: prefix,
+};
 
 export default defineConfig({
   server: {

@@ -1,1 +1,1 @@
-export const prefix = import.meta.env.BASE_URL ?? '/';
+export const prefix = import.meta.env.BASE_URL ?? "/";
