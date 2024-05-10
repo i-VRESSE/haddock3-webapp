@@ -24,22 +24,22 @@ import { FormActions } from "./FormActions";
 const App = () => {
   const { catalog, submitAllowed, archive } = useLoaderData<typeof loader>();
   const setCatalog = useSetCatalog();
-  const activetCatalog = useCatalog();
+  const activeCatalog = useCatalog();
   const { loadWorkflowArchive } = useWorkflow();
   useEffect(() => {
     setCatalog(prepareCatalog(catalog)); // On mount configure catalog
   }, [catalog]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (archive !== undefined && activetCatalog.title !== "") {
+    if (archive !== undefined && activeCatalog.title !== "") {
       // Only load archive once active catalog is set
       loadWorkflowArchive(archive);
     }
-  }, [archive, activetCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [archive, activeCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     // on builder page check for zip in browser storage and loads it
-    if (activetCatalog.title === "") {
+    if (activeCatalog.title === "") {
       return;
     }
     if (typeof indexedDB === "undefined") {
@@ -51,28 +51,33 @@ const App = () => {
     const open = indexedDB.open("haddock3", 1);
     open.onsuccess = function () {
       const db = open.result;
-      const tx = db.transaction("zips", "readwrite");
-      const zips = tx.objectStore("zips");
-      const request = zips.get("workflow.zip");
-      request.onsuccess = function () {
-        const zip: Blob = request.result;
-        console.log("zip", zip);
-        if (zip === undefined) {
-          return;
-        }
-        const url = URL.createObjectURL(zip);
-        loadWorkflowArchive(url)
-          .finally(() => {
-            URL.revokeObjectURL(url);
-          })
-          .catch((error) => {
-            console.error("Error loading workflow from indexeddb", error);
-          });
-        // remove zip from indexeddb so next visit to builder page loads nothing
-        zips.delete("workflow.zip");
-      };
+      try {
+        const tx = db.transaction("zips", "readwrite");
+        const zips = tx.objectStore("zips");
+        const request = zips.get("workflow.zip");
+        request.onsuccess = function () {
+          const zip: Blob = request.result;
+          console.log("zip", zip);
+          if (zip === undefined) {
+            return;
+          }
+          const url = URL.createObjectURL(zip);
+          loadWorkflowArchive(url)
+            .finally(() => {
+              URL.revokeObjectURL(url);
+            })
+            .catch((error) => {
+              console.error("Error loading workflow from indexeddb", error);
+            });
+          // remove zip from indexeddb so next visit to builder page loads nothing
+          zips.delete("workflow.zip");
+        };
+      } catch (error) {
+        console.log("Error loading workflow from indexeddb");
+        console.error(error);
+      }
     };
-  }, [activetCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
