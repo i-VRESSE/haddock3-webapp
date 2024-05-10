@@ -8,6 +8,7 @@ import {
   listOutputFiles,
 } from "~/models/job.server";
 import { moduleInfo } from "~/models/module_utils";
+import { prefix } from "~/prefix";
 
 export interface ContactMapCluster {
   id: number;
@@ -158,7 +159,7 @@ async function getChartData(
 
 function downloadPath(jobid: number, module: ModuleInfo, filename: string) {
   return (
-    `/jobs/${jobid}/files/` +
+    `${prefix}jobs/${jobid}/files/` +
     buildPath({
       moduleIndex: module.index,
       moduleName: module.name,

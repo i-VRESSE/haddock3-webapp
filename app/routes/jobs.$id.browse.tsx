@@ -18,6 +18,7 @@ import {
 } from "~/caprieval/caprieval.server";
 import { Button } from "~/components/ui/button";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
+import { prefix } from "~/prefix";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
@@ -54,7 +55,7 @@ export default function JobPage() {
             <p>
               <a
                 title="Download archive of best ranked clusters/structures"
-                href={`/jobs/${job.id}/files/${bestRanked}`}
+                href={`${prefix}jobs/${job.id}/files/${bestRanked}`}
               >
                 🏆 Download best ranked
               </a>
@@ -69,18 +70,18 @@ export default function JobPage() {
         <h2 className="text-2xl">Input</h2>
         <ListFiles files={inputFiles!} jobid={job.id} />
         <p>
-          <a href={`/jobs/${job.id}/input.zip`}>&#128230; Download archive</a>
+          <a href={`${prefix}jobs/${job.id}/input.zip`}>&#128230; Download archive</a>
         </p>
         {hasWorkflow && (
           <p>
-            <Link to={`/jobs/${job.id}/edit`}>&#128393; Edit</Link>
+            <Link to={`${prefix}jobs/${job.id}/edit`}>&#128393; Edit</Link>
           </p>
         )}
       </div>
       <div>
         <h2 className="text-xl">Module output</h2>
         <OutputReport files={outputFiles!} jobid={job.id} />
-        <a href={`/jobs/${job.id}/output.zip`}>&#128230; Download archive</a>
+        <a href={`${prefix}jobs/${job.id}/output.zip`}>&#128230; Download archive</a>
       </div>
       <div>
         <h2 className="text-xl">Other output files</h2>

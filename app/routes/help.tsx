@@ -1,3 +1,4 @@
+import { Link } from "@remix-run/react";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 
 export default function Help() {
@@ -50,9 +51,9 @@ export default function Help() {
 
       <p className="py-2">
         When you have not logged in before you can login on the{" "}
-        <a href="/login" className="underline">
+        <Link to="/login" className="underline">
           login page
-        </a>{" "}
+        </Link>{" "}
         with your socials like{" "}
         <a href="https://aai.egi.eu/" className="underline">
           EGI Check-in account
@@ -62,9 +63,9 @@ export default function Help() {
           Orcid account
         </a>{" "}
         or register a new account on the{" "}
-        <a href="/register" className="underline">
+        <Link to="/register" className="underline">
           register page
-        </a>
+        </Link>
         . After registration you will be logged in immediatly.
       </p>
 
@@ -85,9 +86,9 @@ export default function Help() {
 
       <p className="py-2">
         On your{" "}
-        <a href="/profile" className="underline">
+        <Link to="/profile" className="underline">
           profile page
-        </a>{" "}
+        </Link>{" "}
         you can see your expertise levels. If you have multiple expertise levels
         you can pick the one you want to use when building a workflow.
       </p>
@@ -107,9 +108,9 @@ export default function Help() {
 
       <p className="py-2">
         When you have a specific task in mind, you can use the{" "}
-        <a href="/scenarios" className="underline">
+        <Link to="/scenarios" className="underline">
           scenario page
-        </a>{" "}
+        </Link>{" "}
         to select a predefined workflow.
       </p>
 
@@ -133,9 +134,9 @@ export default function Help() {
       <p className="py-2">
         When you do not have a workflow, but know exactly what you want to do,
         then you can build a Haddock3 workflow from scratch on the{" "}
-        <a href="/builder" className="underline">
+        <Link to="/builder" className="underline">
           build page
-        </a>
+        </Link>
         .
       </p>
 
@@ -173,9 +174,9 @@ export default function Help() {
       <p>
         When you have a workflow and its data files ready for use, then you can
         upload a zip file with the workflow and its data files on the{" "}
-        <a href="/upload" className="underline">
+        <Link to="/upload" className="underline">
           upload page
-        </a>
+        </Link>
         . The workflow file must be called {WORKFLOW_CONFIG_FILENAME}.
       </p>
 
@@ -212,9 +213,9 @@ export default function Help() {
 
       <p className="py-2">
         If you want to see all the jobs you submitted, you can go to the{" "}
-        <a href="/jobs" className="underline">
+        <Link to="/jobs" className="underline">
           jobs page
-        </a>
+        </Link>
         . On the jobs page you can go to the job results page by clicking on the
         job. You can also rename the job by clicking on the pencil icon. And you
         can delete the job by clicking on the X icon. Deleting a job will cancel

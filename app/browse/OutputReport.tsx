@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { ListFiles } from "./ListFiles";
 import type { DirectoryItem } from "~/bartender-client/types";
 import { Link } from "@remix-run/react";
+import { prefix } from "~/prefix";
 
 export function files2modules(files: DirectoryItem) {
   if (!files.children) {
@@ -89,14 +90,14 @@ export const OutputReport = ({
                       title="Caprieval analysis report"
                       target="_blank"
                       rel="noreferrer"
-                      href={`/jobs/${jobid}/files/${module.report.path}`}
+                      href={`${prefix}jobs/${jobid}/files/${module.report.path}`}
                       className="dark:invert"
                     >
                       &#128202;
                     </a>
                     <a
                       title="Download archive of best ranked clusters/structures"
-                      href={`/jobs/${jobid}/files/${module.report.path}/../summary.tgz`}
+                      href={`${prefix}jobs/${jobid}/files/${module.report.path}/../summary.tgz`}
                     >
                       🏆
                     </a>
@@ -106,7 +107,7 @@ export const OutputReport = ({
                   target="_blank"
                   rel="noreferrer"
                   title="Archive of module output"
-                  href={`/jobs/${jobid}/archive/${module.output.path}`}
+                  href={`${prefix}jobs/${jobid}/archive/${module.output.path}`}
                 >
                   &#128230;
                 </a>

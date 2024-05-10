@@ -3,6 +3,7 @@ import { CompletedJobs } from "~/bartender-client/types";
 import { ListLogFiles } from "../browse/ListLogFiles";
 import type { JobModelDTO } from "~/bartender-client/types";
 import { JobName } from "./JobName";
+import { prefix } from "~/prefix";
 
 interface Props {
   job: SerializeFrom<JobModelDTO>;
@@ -26,7 +27,7 @@ export function JobStatus({ job }: Props) {
             <summary className="cursor-pointer">Logs</summary>
             <ListLogFiles jobid={job.id} ok={job.state === "ok"} />
           </details>
-          <a href={`/jobs/${job.id}/zip`}>&#128230; Download archive</a>
+          <a href={`${prefix}jobs/${job.id}/zip`}>&#128230; Download archive</a>
         </>
       )}
     </>

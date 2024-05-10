@@ -19,6 +19,7 @@ import {
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 import { JobName } from "~/components/JobName";
 import { buttonVariants } from "~/components/ui/button";
+import { prefix } from "~/prefix";
 // TODO rescore is not used here, so imports should not be from this module
 // move to a separate module called ~/model/modules and ~/models/caprieval
 
@@ -89,14 +90,14 @@ export default function ReportPage() {
           )}
           <a
             title="Download archive of best ranked clusters/structures"
-            href={`/jobs/${job.id}/files/${bestRanked}`}
+            href={`${prefix}jobs/${job.id}/files/${bestRanked}`}
             className={buttonVariants({ variant: "outline", size: "sm" })}
           >
             🏆 Download best ranked
           </a>
           <a
             title="Download archive of all files"
-            href={`/jobs/${job.id}/zip`}
+            href={`${prefix}jobs/${job.id}/zip`}
             className={buttonVariants({ variant: "outline", size: "sm" })}
           >
             &#128230; Download all
