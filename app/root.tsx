@@ -1,4 +1,3 @@
-import { cssBundleHref } from "@remix-run/css-bundle";
 import {
   json,
   type LinksFunction,
@@ -8,7 +7,6 @@ import {
 import {
   isRouteErrorResponse,
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
@@ -18,7 +16,7 @@ import {
 } from "@remix-run/react";
 
 import { getOptionalClientUser } from "./auth.server";
-import styles from "./tailwind.css";
+import styles from "./tailwind.css?url";
 import { Navbar } from "./components/Navbar";
 import { Banner } from "./components/Banner";
 import { themeSessionResolver } from "./session.server";
@@ -29,10 +27,7 @@ import {
 } from "remix-themes";
 import clsx from "clsx";
 
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: styles },
-  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
-];
+export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 export const meta: MetaFunction = () => {
   return [{ title: "Haddock3" }];
@@ -80,7 +75,6 @@ export function App() {
         </div>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   );
