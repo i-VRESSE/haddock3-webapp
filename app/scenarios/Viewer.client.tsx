@@ -48,27 +48,27 @@ function useStage() {
 export function NGLResidues({
   residues,
   color,
-  opacity,
+  opacity = 1.0,
   representation,
 }: {
   residues: number[];
   color: string;
-  opacity: number;
+  opacity?: number;
   representation: StructureRepresentationType;
-  hovered?: number[];
 }) {
   const name = useId();
   const stage = useStage();
   const component = useComponent();
 
+  const selection = useMemo(() => {
+    const sortedResidues = [...residues].sort((a, b) => a - b);
+    return sortedResidues.length ? sortedResidues.join(", ") : "not all";
+  }, [residues]);
+
   useEffect(() => {
-    const repr = stage.getRepresentationsByName(name).first;
-    if (repr) {
-      repr.dispose();
-    }
     component.addRepresentation(representation, {
       name,
-      sele: "not all",
+      sele: selection,
       color,
       opacity,
     });
@@ -78,16 +78,16 @@ export function NGLResidues({
         repr.dispose();
       }
     };
+    // to not (re)create new representation when selection changes, keep it out of dep list
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage, component, color, opacity, name, representation]);
 
   useEffect(() => {
     const repr = stage.getRepresentationsByName(name).first;
     if (repr) {
-      const sortedResidues = [...residues].sort((a, b) => a - b);
-      const sel = sortedResidues.length ? sortedResidues.join(", ") : "not all";
-      repr.setSelection(sel);
+      repr.setSelection(selection);
     }
-  }, [residues, name, stage]);
+  }, [selection, name, stage]);
 
   return null;
 }
@@ -256,7 +256,6 @@ export function NGLStage({
   const onHoverCallback = useCallback(
     (pickinProxy: PickingProxy) => {
       if (onHover && pickinProxy?.atom?.resno && pickinProxy?.atom?.chainname) {
-        // TODO use pickProxy.shiftKey to select range of residues?
         onHover(
           pickinProxy.atom.chainname,
           pickinProxy.atom.resno,
@@ -279,7 +278,6 @@ export function NGLStage({
     };
   }, [stage, onHoverCallback]);
 
-  //  TODO make height and width configurable
   return (
     <div
       className="relative h-full w-full overflow-hidden"
@@ -366,8 +364,8 @@ export function NGLSurface({
   const name = useId();
 
   const schemeId = useMemo(() => {
-    const oldSchemeId = Object.keys(ColormakerRegistry.schemes).find((key) =>
-      key.endsWith(`|${name}`),
+    const oldSchemeId = Object.keys(ColormakerRegistry.userSchemes).find(
+      (key) => key.endsWith(`|${name}`),
     );
     if (oldSchemeId) {
       ColormakerRegistry.removeScheme(oldSchemeId);
@@ -399,10 +397,6 @@ export function NGLSurface({
   const component = useComponent();
 
   useEffect(() => {
-    const repr = stage.getRepresentationsByName(name).first;
-    if (repr) {
-      repr.dispose();
-    }
     component.addRepresentation("surface", {
       name,
       color: defaultColor,
