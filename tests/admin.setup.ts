@@ -10,7 +10,7 @@ setup("register as admin", async ({ page }) => {
   await page.getByRole("button", { name: "Register" }).click();
 
   // Wait for /register POST request to complete
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(500);
 
   // if this email is already registered then login
   const elem = page.getByText("This email is already registered.");
