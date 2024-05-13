@@ -19,6 +19,10 @@ import {
 } from "~/components/ui/table";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  if (process.env.HADDOCK3WEBAPP_CSB_AUTH) {
+    // TODO redirect to admin pages or docs of csb portal
+    return json({ error: "Not found" }, { status: 404 });
+  }
   await mustBeAdmin(request);
   const users = await listUsers();
   const expertiseLevels = listExpertiseLevels();

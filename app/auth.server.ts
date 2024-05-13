@@ -6,6 +6,7 @@ import {
   type OAuth2StrategyVerifyParams,
 } from "remix-auth-oauth2";
 import { json } from "@remix-run/node";
+import { parse as parseCookie } from "cookie";
 
 import { sessionStorage } from "./session.server";
 import {
@@ -15,7 +16,7 @@ import {
   localLogin,
   oauthregister,
 } from "./models/user.server";
-import { email, object, parse, string } from "valibot";
+import { boolean, email, number, object, parse, string } from "valibot";
 
 // Create an instance of the authenticator, pass a generic with what
 // strategies will return and will store in the session
@@ -206,7 +207,53 @@ export async function mustBeAuthenticated(request: Request) {
   return userId;
 }
 
+const CsbUserSchema = object({
+  id: number(),
+  email: string([email()]),
+  permissions: number(),
+  suspended: boolean(),
+});
+
 export async function getOptionalUser(request: Request) {
+  if (process.env.HADDOCK3WEBAPP_CSB_AUTH) {
+    // TODO get bonvinlab_auth_token cookie
+    const cookieString = request.headers.get("Cookie") || "";
+    const cookies = parseCookie(cookieString);
+    const csbToken = cookies.bonvinlab_auth_token;
+    if (!csbToken) {
+      return null;
+    }
+    // TODO if there is cookie then call csb backend GET /api/auth/validate
+    const resp = await fetch("http://backend:8180/api/auth/validate", {
+      headers: {
+        Authorization: `Bearer ${csbToken}`,
+      },
+    });
+    // TODO backend response contains user info like
+    // user_name, email, id, permissions bitmask 1=easy,2=expert,4=guru
+    if (!resp.ok) {
+      return null;
+    }
+    const rawCsbUser = await resp.json();
+    const csbUser = parse(CsbUserSchema, rawCsbUser);
+    // TODO create place to store bartender token of this user
+    // TODO cache csbUser in haddock3 webapp db??
+    if (csbUser.suspended) {
+      return null;
+    }
+    return {
+      id: csbUser.id,
+      email: csbUser.email,
+      // TODO check if we are parsing number correctly
+      isAdmin: (csbUser.permissions & 32) !== 0,
+      expertiseLevels: [
+        (csbUser.permissions & 1) !== 0 ? "easy" : "",
+        (csbUser.permissions & 2) !== 0 ? "expert" : "",
+        (csbUser.permissions & 4) !== 0 ? "guru" : "",
+      ].filter(Boolean),
+      photo: null,
+    };
+  }
   const userId = await authenticator.isAuthenticated(request);
   if (userId === null) {
     return null;

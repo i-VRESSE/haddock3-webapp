@@ -24,6 +24,15 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  if (process.env.HADDOCK3WEBAPP_CSB_AUTH) {
+    // TODO redirect ends up in infinite loop, should make return 404 and change links to this page
+    return new Response("Redirecting to the CSB registration page...", {
+      status: 302,
+      headers: {
+        Location: "/registration?redirect_uri=/haddock3",
+      },
+    });
+  }
   await authenticator.isAuthenticated(request, {
     successRedirect: "/",
   });

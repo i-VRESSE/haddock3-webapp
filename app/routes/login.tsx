@@ -16,6 +16,14 @@ import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  if (process.env.HADDOCK3WEBAPP_CSB_AUTH) {
+    return new Response("Redirecting to the CSB login page...", {
+      status: 302,
+      headers: {
+        Location: "/login?redirect_uri=/haddock3",
+      },
+    });
+  }
   const user = await getOptionalUser(request);
   if (user) {
     return redirect("/");
