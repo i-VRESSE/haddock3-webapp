@@ -42,6 +42,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Label } from "~/components/ui/label";
+import { prefix } from "~/prefix";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
@@ -80,7 +81,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       scatterSelection,
       boxSelection,
       moduleName: "clustrmsd",
-      structurePrefix: `/jobs/${jobId}/files/output/foo/bar/`,
+      structurePrefix: `${prefix}jobs/${jobId}/files/output/foo/bar/`,
     });
   }
   return json({
