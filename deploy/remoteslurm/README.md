@@ -1,6 +1,7 @@
 # Haddock3 webapp with remote Slurm cluster
 
 First you **must** change the destination in the `bartender-config.yaml` to your remote Slurm cluster.
+After login the Slurm cluster user must have haddock3 executables in their path.
 
 ```shell
 # Must be in root of repo
