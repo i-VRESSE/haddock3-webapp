@@ -55,6 +55,7 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: "docker compose -f deploy/arq/docker-compose.yml -p playwright up",
+    reuseExistingServer: !process.env.CI,
     url: "http://localhost:8080",
   },
 });
