@@ -1,5 +1,7 @@
 import type { ICatalog } from "@i-vresse/wb-core/dist/types";
-import guru from "./haddock3.guru.json";
+import rawcatalog from "./haddock3.guru.json?raw";
+
+const catalog = JSON.parse(rawcatalog);
 
 function descriptionsFromSchema(
   schema: ICatalog["global"]["schema"],
@@ -43,7 +45,6 @@ function descriptionsFromSchema(
  * @throws Error if no schema is found for the specified module.
  */
 export function getModuleDescriptions(moduleName: string, whitelist: string[]) {
-  const catalog = guru as unknown as ICatalog;
   let schema: ICatalog["global"]["schema"] | undefined = undefined;
   if (moduleName !== "global") {
     for (const node of catalog.nodes) {

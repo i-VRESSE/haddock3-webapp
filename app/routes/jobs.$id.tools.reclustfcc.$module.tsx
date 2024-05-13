@@ -39,6 +39,7 @@ import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { prefix } from "~/prefix";
 
 const fieldDescriptions = getModuleDescriptions(`clustfcc`, [
   "clust_cutoff",
@@ -83,7 +84,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       scatterSelection,
       boxSelection,
       moduleName: "clustfcc",
-      structurePrefix: `/jobs/${jobid}/files/output/foo/bar/`,
+      structurePrefix: `${prefix}jobs/${jobid}/files/output/foo/bar/`,
     });
   }
 

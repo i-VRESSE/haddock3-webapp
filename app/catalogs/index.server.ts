@@ -1,8 +1,8 @@
 import type { ICatalog } from "@i-vresse/wb-core/dist/types";
 
-import easy from "./haddock3.easy.json";
-import expert from "./haddock3.expert.json";
-import guru from "./haddock3.guru.json";
+import easy from "./haddock3.easy.json?raw";
+import expert from "./haddock3.expert.json?raw";
+import guru from "./haddock3.guru.json?raw";
 import type { ExpertiseLevel } from "~/drizzle/schema.server";
 import { JOB_OUTPUT_DIR } from "~/bartender-client/constants";
 import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog.js";
@@ -31,9 +31,9 @@ function loadCatalog(catalog: ICatalog) {
 
 function loadCatalogs() {
   return {
-    easy: loadCatalog(easy as unknown as ICatalog),
-    expert: loadCatalog(expert as unknown as ICatalog),
-    guru: loadCatalog(guru as unknown as ICatalog),
+    easy: loadCatalog(JSON.parse(easy) as unknown as ICatalog),
+    expert: loadCatalog(JSON.parse(expert) as unknown as ICatalog),
+    guru: loadCatalog(JSON.parse(guru) as unknown as ICatalog),
   } as const;
 }
 

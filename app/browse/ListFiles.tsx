@@ -1,4 +1,5 @@
 import type { DirectoryItem } from "~/bartender-client/types";
+import { prefix } from "~/prefix";
 
 const ListItem = ({ jobid, item }: { jobid: number; item: DirectoryItem }) => {
   if (item.is_dir) {
@@ -14,7 +15,7 @@ const ListFile = ({ jobid, file }: { jobid: number; file: DirectoryItem }) => (
     <a
       target="_blank"
       rel="noreferrer"
-      href={`/jobs/${jobid}/files/${file.path}`}
+      href={`${prefix}jobs/${jobid}/files/${file.path}`}
     >
       {file.name}
     </a>

@@ -6,6 +6,8 @@ LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webap
 LABEL org.opencontainers.image.licenses=Apache-2.0
 LABEL org.opencontainers.image.description="Haddock3 webapplication image."
 
+ARG HADDOCK3_WEBAPP_PREFIX=/
+
 # set for base and all layer that inherit from it
 ENV NODE_ENV production
 
@@ -29,6 +31,7 @@ ADD package.json package-lock.json ./
 RUN npm prune --production 
 
 # Build the app
+ENV HADDOCK3_WEBAPP_PREFIX=${HADDOCK3_WEBAPP_PREFIX}
 FROM base as build
 
 WORKDIR /myapp
@@ -50,9 +53,9 @@ WORKDIR /myapp
 
 COPY --from=production-deps /myapp/node_modules /myapp/node_modules
 
-COPY --from=build /myapp/build /myapp/build
+COPY --from=build /myapp/build/server /myapp/build/server
+COPY --from=build /myapp/build/client /myapp/build/client
 COPY --from=build /myapp/app/drizzle /myapp/app/drizzle
-COPY --from=build /myapp/public /myapp/public
 
 COPY --from=build /myapp/package.json /myapp/package.json
 

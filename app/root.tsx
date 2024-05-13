@@ -1,4 +1,3 @@
-import { cssBundleHref } from "@remix-run/css-bundle";
 import {
   json,
   type LinksFunction,
@@ -8,7 +7,6 @@ import {
 import {
   isRouteErrorResponse,
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
@@ -18,7 +16,7 @@ import {
 } from "@remix-run/react";
 
 import { getOptionalClientUser } from "./auth.server";
-import styles from "./tailwind.css";
+import styles from "./tailwind.css?url";
 import { Navbar } from "./components/Navbar";
 import { Banner } from "./components/Banner";
 import { themeSessionResolver } from "./session.server";
@@ -29,10 +27,7 @@ import {
 } from "remix-themes";
 import clsx from "clsx";
 
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: styles },
-  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
-];
+export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 export const meta: MetaFunction = () => {
   return [{ title: "Haddock3" }];
@@ -80,7 +75,6 @@ export function App() {
         </div>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   );
@@ -118,10 +112,7 @@ function BoundaryShell({
               <Navbar />
             </div>
           </header>
-          <div className="bg-error-content grow p-6">
-            <h1 className="py-8 text-2xl">Something bad happened.</h1>
-            {children}
-          </div>
+          <div className="bg-error-content grow p-6">{children}</div>
         </div>
         <Scripts />
       </body>
@@ -135,11 +126,39 @@ export function ErrorBoundary() {
 
   // Logic copied from https://github.com/remix-run/remix/blob/main/packages/remix-react/errorBoundaries.tsx
   if (isRouteErrorResponse(error)) {
+    switch (error.status) {
+      case 401:
+        return (
+          <BoundaryShell title="Unauthorized">
+            <h2 className="py-8 text-xl">
+              {error.status} {error.data?.error && error.data.error}
+            </h2>
+            <p>Page requires authorization. Please login and try again.</p>
+          </BoundaryShell>
+        );
+      case 403:
+        return (
+          <BoundaryShell title="Forbidden">
+            <h2 className="py-8 text-xl">
+              {error.status} {error.data?.error && error.data.error}
+            </h2>
+            <p>Page requires permissions you do not have.</p>
+          </BoundaryShell>
+        );
+      case 404:
+        return (
+          <BoundaryShell title="Not Found">
+            <h2 className="py-8 text-xl">Page not found</h2>
+          </BoundaryShell>
+        );
+    }
     return (
-      <BoundaryShell title="Unhandled Thrown Response!">
+      <BoundaryShell title="Routing error">
+        <h1 className="py-8 text-2xl">Something bad happened</h1>
         <h2 style={{ fontFamily: "system-ui, sans-serif", padding: "2rem" }}>
-          {error.status} {error.statusText}
+          {error.status} {error.data?.error && error.data.error}
         </h2>
+        <p>{error.statusText}</p>
       </BoundaryShell>
     );
   }
@@ -159,6 +178,7 @@ export function ErrorBoundary() {
 
   return (
     <BoundaryShell title="Error!">
+      <h1 className="py-8 text-2xl">Something bad happened</h1>
       <div>The website administrators have been notified.</div>
       {process.env.NODE_ENV !== "production" && (
         <details>

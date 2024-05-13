@@ -8,6 +8,7 @@ import {
   listOutputFiles,
 } from "~/models/job.server";
 import { moduleInfo } from "~/models/module_utils";
+import { prefix } from "~/prefix";
 
 export interface ContactMapCluster {
   id: number;
@@ -124,12 +125,12 @@ export async function getClusterInfo(
     heavyatoms_interchain_contacts: downloadPath(
       module.jobid,
       module,
-      `cluster${clusterId}_heavyatoms_interchain_contacts.tsv`,
+      `cluster${clusterId}_contmap_heavyatoms_interchain_contacts.tsv`,
     ),
     interchain_contacts: downloadPath(
       module.jobid,
       module,
-      `cluster${clusterId}_interchain_contacts.tsv`,
+      `cluster${clusterId}_contmap_interchain_contacts.tsv`,
     ),
     chordchart,
     heatmap,
@@ -158,7 +159,7 @@ async function getChartData(
 
 function downloadPath(jobid: number, module: ModuleInfo, filename: string) {
   return (
-    `/jobs/${jobid}/files/` +
+    `${prefix}jobs/${jobid}/files/` +
     buildPath({
       moduleIndex: module.index,
       moduleName: module.name,
