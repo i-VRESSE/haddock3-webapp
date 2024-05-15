@@ -69,6 +69,21 @@ function MyNavLink({
   );
 }
 
+export function MenuList() {
+  return (
+    <NavigationMenu className="">
+      <NavigationMenuList className="flex space-x-5">
+        <MyNavLink to="/builder">Builder</MyNavLink>
+        <MyNavLink to="/scenarios">Scenario</MyNavLink>
+        <MyNavLink to="/upload">Upload</MyNavLink>
+        <MyNavLink to="/jobs">Manage</MyNavLink>
+        <MyNavLink to="/about">About</MyNavLink>
+        <MyNavLink to="/help">Help</MyNavLink>
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+
 export const Navbar = () => {
   const loggedIn = useIsLoggedIn();
 
@@ -79,16 +94,7 @@ export const Navbar = () => {
           Haddock3
         </NavLink>
       </div>
-      <NavigationMenu className="">
-        <NavigationMenuList className="flex space-x-5">
-          <MyNavLink to="/builder">Builder</MyNavLink>
-          <MyNavLink to="/scenarios">Scenario</MyNavLink>
-          <MyNavLink to="/upload">Upload</MyNavLink>
-          <MyNavLink to="/jobs">Manage</MyNavLink>
-          <MyNavLink to="/about">About</MyNavLink>
-          <MyNavLink to="/help">Help</MyNavLink>
-        </NavigationMenuList>
-      </NavigationMenu>
+      <MenuList />
       <div className="ml-auto">
         {loggedIn ? <LoggedInButton /> : <LoginButton />}
       </div>

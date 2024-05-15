@@ -7,6 +7,7 @@ import {
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import { type FlatErrors, ValiError, flatten } from "valibot";
 import { availableSocialLogins } from "~/auth";
+import { disabledInPortalMode } from "~/portal.server";
 import { AuthorizationError } from "remix-auth";
 import { authenticator, getOptionalUser } from "~/auth.server";
 import { ErrorMessages } from "~/components/ErrorMessages";
@@ -16,14 +17,7 @@ import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  if (process.env.HADDOCK3WEBAPP_CSB_AUTH) {
-    return new Response("Redirecting to the CSB login page...", {
-      status: 302,
-      headers: {
-        Location: "/login?redirect_uri=/haddock3",
-      },
-    });
-  }
+  disabledInPortalMode();
   const user = await getOptionalUser(request);
   if (user) {
     return redirect("/");
@@ -33,6 +27,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  disabledInPortalMode();
   try {
     return await authenticator.authenticate("user-pass", request, {
       successRedirect: "/",

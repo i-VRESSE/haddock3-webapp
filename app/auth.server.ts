@@ -6,7 +6,7 @@ import {
   type OAuth2StrategyVerifyParams,
 } from "remix-auth-oauth2";
 import { json } from "@remix-run/node";
-import { parse as parseCookie } from "cookie";
+import { email, object, parse, string } from "valibot";
 
 import { sessionStorage } from "./session.server";
 import {
@@ -15,14 +15,25 @@ import {
   isSubmitAllowed,
   localLogin,
   oauthregister,
+  User,
+  portalregister,
 } from "./models/user.server";
-import { boolean, email, number, object, parse, string } from "valibot";
+import {
+  CsbUser,
+  PortalStrategy,
+  getPortalUser,
+  inPortalMode,
+  mapPermissions,
+} from "./portal.server";
 
 // Create an instance of the authenticator, pass a generic with what
 // strategies will return and will store in the session
-export const authenticator = new Authenticator<string>(sessionStorage, {
-  throwOnError: true,
-});
+export const authenticator = new Authenticator<string | CsbUser>(
+  sessionStorage,
+  {
+    throwOnError: true,
+  },
+);
 
 const CredentialsSchema = object({
   email: string([email()]),
@@ -41,6 +52,11 @@ authenticator.use(
   }),
   "user-pass",
 );
+
+if (inPortalMode) {
+  const portalStrategy = new PortalStrategy();
+  authenticator.use(portalStrategy);
+}
 
 // remix-auth-github is not compatible with the remix v2
 // TODO uncomment when it is fixed
@@ -199,6 +215,15 @@ if (
   authenticator.use(orcidStrategy);
 }
 
+if (inPortalMode) {
+  const portalStrategy = new PortalStrategy();
+  authenticator.use(portalStrategy);
+  authenticator.unuse("user-pass");
+  authenticator.unuse("egi");
+  authenticator.unuse("github");
+  authenticator.unuse("orcid");
+}
+
 export async function mustBeAuthenticated(request: Request) {
   const userId = await authenticator.isAuthenticated(request);
   if (userId === null) {
@@ -207,56 +232,47 @@ export async function mustBeAuthenticated(request: Request) {
   return userId;
 }
 
-const CsbUserSchema = object({
-  id: number(),
-  email: string([email()]),
-  permissions: number(),
-  suspended: boolean(),
-});
+function mergeUser(csbUser: CsbUser, webappUser: User): User {
+  const perms = mapPermissions(csbUser.permissions);
+  return {
+    ...webappUser,
+    id: csbUser.id.toString(),
+    email: csbUser.email,
+    isAdmin: perms.admin,
+    expertiseLevels: perms.levels,
+  };
+}
 
 export async function getOptionalUser(request: Request) {
-  if (process.env.HADDOCK3WEBAPP_CSB_AUTH) {
-    // TODO get bonvinlab_auth_token cookie
-    const cookieString = request.headers.get("Cookie") || "";
-    const cookies = parseCookie(cookieString);
-    const csbToken = cookies.bonvinlab_auth_token;
-    if (!csbToken) {
-      return null;
-    }
-    // TODO if there is cookie then call csb backend GET /api/auth/validate
-    const resp = await fetch("http://backend:8180/api/auth/validate", {
-      headers: {
-        Authorization: `Bearer ${csbToken}`,
-      },
-    });
-    // TODO backend response contains user info like
-    // user_name, email, id, permissions bitmask 1=easy,2=expert,4=guru
-    if (!resp.ok) {
-      return null;
-    }
-    const rawCsbUser = await resp.json();
-    const csbUser = parse(CsbUserSchema, rawCsbUser);
-    // TODO create place to store bartender token of this user
-    // TODO cache csbUser in haddock3 webapp db??
-    if (csbUser.suspended) {
-      return null;
-    }
-    return {
-      id: csbUser.id,
-      email: csbUser.email,
-      // TODO check if we are parsing number correctly
-      isAdmin: (csbUser.permissions & 32) !== 0,
-      expertiseLevels: [
-        (csbUser.permissions & 1) !== 0 ? "easy" : "",
-        (csbUser.permissions & 2) !== 0 ? "expert" : "",
-        (csbUser.permissions & 4) !== 0 ? "guru" : "",
-      ].filter(Boolean),
-      photo: null,
-    };
-  }
   const userId = await authenticator.isAuthenticated(request);
   if (userId === null) {
+    if (inPortalMode) {
+      try {
+        await authenticator.authenticate("portal", request, {
+          throwOnError: true,
+        });
+      } catch (error) {
+        if (error instanceof Error) {
+          return null;
+        }
+      }
+    }
     return null;
+  }
+  if (typeof userId === "object") {
+    if (!inPortalMode) {
+      throw new Error("Unexpected user object in non-portal mode");
+    }
+    // now the portal backend is fetched from
+    // 1. once when anonymous user visits first time via authenticator.authenticate()
+    // 2. each time a user makes a request to a restricted route
+    // TODO check backend is quick enough to handle this, if not cache it somehow for a certain duration
+    const csbUser = await getPortalUser(request);
+    let webappUser = await getUserById(userId.id.toString());
+    if (!webappUser) {
+      webappUser = await portalregister(csbUser.id.toString(), csbUser.email);
+    }
+    return mergeUser(csbUser, webappUser);
   }
   return await getUserById(userId);
 }

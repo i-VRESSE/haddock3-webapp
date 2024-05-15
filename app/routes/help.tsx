@@ -1,7 +1,9 @@
 import { Link } from "@remix-run/react";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
+import { useInPortalMode } from "~/portal";
 
 export default function Help() {
+  const inPortalModel = useInPortalMode();
   return (
     <main>
       <h1 className="py-4 text-2xl">Help</h1>
@@ -49,25 +51,39 @@ export default function Help() {
         User
       </h2>
 
-      <p className="py-2">
-        When you have not logged in before you can login on the{" "}
-        <Link to="/login" className="underline">
-          login page
-        </Link>{" "}
-        with your socials like{" "}
-        <a href="https://aai.egi.eu/" className="underline">
-          EGI Check-in account
-        </a>{" "}
-        or{" "}
-        <a href="https://orcid.org" className="underline">
-          Orcid account
-        </a>{" "}
-        or register a new account on the{" "}
-        <Link to="/register" className="underline">
-          register page
-        </Link>
-        . After registration you will be logged in immediatly.
-      </p>
+      {inPortalModel ? (
+        <p className="py-2">
+          When you have not logged in before you can login on the{" "}
+          <a href="/login" className="underline">
+            login page
+          </a>{" "}
+          or register a new account on the{" "}
+          <a href="/registration" className="underline">
+            register page
+          </a>
+          .
+        </p>
+      ) : (
+        <p className="py-2">
+          When you have not logged in before you can login on the{" "}
+          <Link to="/login" className="underline">
+            login page
+          </Link>{" "}
+          with your socials like{" "}
+          <a href="https://aai.egi.eu/" className="underline">
+            EGI Check-in account
+          </a>{" "}
+          or{" "}
+          <a href="https://orcid.org" className="underline">
+            Orcid account
+          </a>{" "}
+          or register a new account on the{" "}
+          <Link to="/register" className="underline">
+            register page
+          </Link>
+          . After registration you will be logged in immediatly.
+        </p>
+      )}
 
       <p className="py-2">
         To submit a job you need to be logged in and have an expertise level

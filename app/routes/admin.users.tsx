@@ -17,12 +17,10 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { disabledInPortalMode } from "~/portal.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  if (process.env.HADDOCK3WEBAPP_CSB_AUTH) {
-    // TODO redirect to admin pages or docs of csb portal
-    return json({ error: "Not found" }, { status: 404 });
-  }
+  disabledInPortalMode();
   await mustBeAdmin(request);
   const users = await listUsers();
   const expertiseLevels = listExpertiseLevels();
@@ -33,6 +31,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  disabledInPortalMode();
   await mustBeAdmin(request);
   const formData = await request.formData();
   const userId = formData.get("userId");

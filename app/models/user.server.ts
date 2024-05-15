@@ -136,6 +136,19 @@ export async function oauthregister(email: string, photo?: string) {
   return user[0].id;
 }
 
+export async function portalregister(id: string, email: string) {
+  const user = await db
+    .insert(users)
+    .values({
+      id,
+      email,
+      photo: generatePhoto(email),
+    })
+    .onConflictDoNothing()
+    .returning(userSelect);
+  return user[0];
+}
+
 export async function getUserById(userId: string): Promise<User> {
   const foundUsers = await db
     .select(userSelect)

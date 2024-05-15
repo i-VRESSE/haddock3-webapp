@@ -22,17 +22,10 @@ import { ErrorMessages } from "../components/ErrorMessages";
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
+import { disabledInPortalMode } from "~/portal.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  if (process.env.HADDOCK3WEBAPP_CSB_AUTH) {
-    // TODO redirect ends up in infinite loop, should make return 404 and change links to this page
-    return new Response("Redirecting to the CSB registration page...", {
-      status: 302,
-      headers: {
-        Location: "/registration?redirect_uri=/haddock3",
-      },
-    });
-  }
+  disabledInPortalMode();
   await authenticator.isAuthenticated(request, {
     successRedirect: "/",
   });
@@ -54,6 +47,7 @@ const RegisterSchema = object(
 );
 
 export async function action({ request }: ActionFunctionArgs) {
+  disabledInPortalMode();
   const formData = await request.formData();
   const result = safeParse(RegisterSchema, Object.fromEntries(formData));
   if (!result.success) {
