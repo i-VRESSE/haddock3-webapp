@@ -26,18 +26,33 @@ sequenceDiagram
     Web app->>+Bartender: Result of job
 ```
 
+Or in [portal mode](docs/portal.md):
+
+sequenceDiagram
+Web app->>+Portal: Login
+Web app->>+Builder: Construct workflow config
+Web app->>+Haddock3 restraints web service: Calculate restraints
+Builder->>+Bartender: Submit job
+Bartender->>+haddock3 CLI: Run
+Web app->>+Bartender: State of job
+Web app->>+Bartender: Result of job
+
+````
+
 ## Setup
 
 The web app is written in [Node.js](https://nodejs.org/) to install dependencies run:
 
 ```shell
 npm install
-```
+````
 
 Configuration of the web application is done via `.env` file or environment variables.
 For configuration of authentication & authorization see [docs/auth.md](docs/auth.md).
 For configuration of job submission see [docs/bartender.md#configuration](docs/bartender.md#configuration).
 For configuration of how to rewrite the submitted workflow file see [docs/reewite.md](docs/reewite.md).
+For instructions to run within the BonvinLab computational stuctural biology portal se [docs/portal](docs/portal.md).
+
 Use [.env.example](./.env.example) as a template:
 
 ```shell

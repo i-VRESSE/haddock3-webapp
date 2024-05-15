@@ -8,6 +8,7 @@
 - [Haddock3 webapp with single worker and docker compose](arq/README.md)
 - [Haddock3 webapp with remote slurm cluster and docker compose](remoteslurm/README.md)
 - [Haddock3 webapp with containerized slurm cluster and docker compose](containerslurm/README.md)
+- [Haddock3 webapp within BonvinLab computational stuctural biology portal](portal/README.md)
 
 ## Versions
 
