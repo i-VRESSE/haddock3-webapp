@@ -4,9 +4,7 @@ import "./core2.css";
 import {
   CatalogPanel,
   NodePanel,
-  WorkflowClear,
   WorkflowPanel,
-  WorkflowUploadButton,
   Wrapper,
 } from "@i-vresse/wb-core";
 import {
@@ -16,10 +14,12 @@ import {
 } from "@i-vresse/wb-core/dist/store";
 import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog";
 import { useEffect } from "react";
-import { WorkflowSubmitButton } from "./SubmitButton";
+import { SubmitButton } from "./SubmitButton";
 import { useLoaderData } from "@remix-run/react";
 import type { loader } from "~/routes/builder";
-import { WorkflowDownloadButton } from "./DownloadButton";
+import { DownloadButton } from "./DownloadButton";
+import { UploadButton } from "./UploadButton";
+import { ClearButton } from "./ClearButton";
 
 const App = () => {
   const { catalog, submitAllowed, archive } = useLoaderData<typeof loader>();
@@ -85,14 +85,11 @@ const App = () => {
         <CatalogPanel></CatalogPanel>
 
         <WorkflowPanel>
-          {/* TODO disable when form invalid */}
-          <WorkflowSubmitButton submitAllowed={submitAllowed} />
-          {/* TODO replace txt with icon */}
-          <WorkflowUploadButton />
-          <WorkflowDownloadButton />
-          <WorkflowClear/>
+          <SubmitButton submitAllowed={submitAllowed} />
+          <UploadButton />
+          <DownloadButton />
+          <ClearButton />
         </WorkflowPanel>
-
         <NodePanel />
       </div>
     </>

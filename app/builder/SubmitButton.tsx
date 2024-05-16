@@ -2,6 +2,7 @@ import {
   useCatalog,
   useFiles,
   useWorkflow,
+  useWorkflowHasErrors,
 } from "@i-vresse/wb-core/dist/store";
 import { catalog2tomlSchemas } from "@i-vresse/wb-core/dist/toml.js";
 import { createZip } from "@i-vresse/wb-core/dist/archive";
@@ -13,8 +14,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { Play } from "lucide-react";
 
-export const WorkflowSubmitButton = ({
+export const SubmitButton = ({
   submitAllowed,
 }: {
   submitAllowed: boolean;
@@ -23,6 +25,7 @@ export const WorkflowSubmitButton = ({
   const { nodes, global } = useWorkflow();
   const files = useFiles();
   const catalog = useCatalog();
+  const hasErrors = useWorkflowHasErrors();
 
   const submitworkflow = async (): Promise<void> => {
     const tomlSchemas = catalog2tomlSchemas(catalog);
@@ -33,7 +36,20 @@ export const WorkflowSubmitButton = ({
     submit(formData, { method: "post", encType: "multipart/form-data" });
   };
   if (submitAllowed) {
-    return <Button onClick={submitworkflow}>Submit</Button>;
+    return (
+      <Button
+        disabled={hasErrors}
+        onClick={submitworkflow}
+        title={
+          hasErrors
+            ? "The workflow contains errors. Fix them to allow submit"
+            : "Submit workflow"
+        }
+      >
+        <Play />
+        Submit
+      </Button>
+    );
   }
   return (
     <TooltipProvider>
