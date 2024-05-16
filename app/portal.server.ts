@@ -1,11 +1,12 @@
-import { SessionStorage } from "@remix-run/server-runtime";
 import { boolean, email, number, object, string, parse, Output } from "valibot";
 import { parse as parseCookie } from "cookie";
-import { AuthenticateOptions, Strategy } from "remix-auth";
 import { ExpertiseLevel } from "./drizzle/schema.server";
 
-export const PORTALCOOKIENAME = "bonvinlab_auth_token";
 export const inPortalMode = !!process.env.HADDOCK3WEBAPP_CSB_PORTAL;
+export const PORTALCOOKIENAME = "bonvinlab_auth_token";
+export const PORTAL_VALIDATE_URL =
+  process.env.HADDOCK3WEBAPP_CSB_PORTAL_BACKEND ??
+  "http://backend:8180/api/auth/validate";
 
 export function disabledInPortalMode() {
   if (inPortalMode) {
@@ -24,21 +25,19 @@ export const CsbUserSchema = object({
 export type CsbUser = Output<typeof CsbUserSchema>;
 
 export async function getPortalUser(request: Request) {
-  // TODO get bonvinlab_auth_token cookie
+  // get bonvinlab_auth_token cookie
   const cookieString = request.headers.get("Cookie") || "";
   const cookies = parseCookie(cookieString);
   const csbToken = cookies[PORTALCOOKIENAME];
   if (!csbToken) {
     throw new Error("Failed to validate token");
   }
-  // TODO if there is cookie then call csb backend GET /api/auth/validate
-  const resp = await fetch("http://backend:8180/api/auth/validate", {
+  // if there is cookie then call csb backend GET /api/auth/validate
+  const resp = await fetch(PORTAL_VALIDATE_URL, {
     headers: {
       Authorization: `Bearer ${csbToken}`,
     },
   });
-  // TODO backend response contains user info like
-  // user_name, email, id, permissions bitmask 1=easy,2=expert,4=guru
   if (!resp.ok) {
     throw new Error("Failed to validate token");
   }
@@ -49,66 +48,32 @@ export async function getPortalUser(request: Request) {
   }
   return csbUser;
 }
+export async function getOptionalPortalUser(request: Request) {
+  try {
+    return await getPortalUser(request);
+  } catch (error) {
+    return null;
+  }
+}
 
 export function mapPermissions(perms: number) {
-  const levels: ExpertiseLevel[] = [];
+  const expertiseLevels: ExpertiseLevel[] = [];
+  let preferredExpertiseLevel: ExpertiseLevel | null = null;
   if ((perms & 1) !== 0) {
-    levels.push("easy");
+    expertiseLevels.push("easy");
+    preferredExpertiseLevel = "easy";
   }
   if ((perms & 2) !== 0) {
-    levels.push("expert");
+    expertiseLevels.push("expert");
+    preferredExpertiseLevel = "expert";
   }
   if ((perms & 4) !== 0) {
-    levels.push("guru");
+    expertiseLevels.push("guru");
+    preferredExpertiseLevel = "guru";
   }
   return {
-    levels,
-    admin: (perms & 32) !== 0,
+    expertiseLevels,
+    preferredExpertiseLevel,
+    isAdmin: (perms & 32) !== 0,
   };
-}
-
-export interface PortalStrategyVerifyParams {
-  /**
-   * The request that triggered the authentication.
-   */
-  request: Request;
-}
-
-export class PortalStrategy extends Strategy<
-  CsbUser,
-  PortalStrategyVerifyParams
-> {
-  name = "portal";
-
-  constructor() {
-    super(({ request }) => getPortalUser(request));
-  }
-
-  async authenticate(
-    request: Request,
-    sessionStorage: SessionStorage,
-    options: AuthenticateOptions,
-  ): Promise<CsbUser> {
-    try {
-      const user = await this.verify({ request });
-      return this.success(user, request, sessionStorage, options);
-    } catch (error) {
-      if (error instanceof Error) {
-        return await this.failure(
-          error.message,
-          request,
-          sessionStorage,
-          options,
-          error,
-        );
-      }
-      return await this.failure(
-        "Unknown error",
-        request,
-        sessionStorage,
-        options,
-        new Error(JSON.stringify(error, null, 2)),
-      );
-    }
-  }
 }

@@ -17,23 +17,20 @@ import {
   oauthregister,
   User,
   portalregister,
+  UserNotFoundError,
 } from "./models/user.server";
 import {
   CsbUser,
-  PortalStrategy,
-  getPortalUser,
+  getOptionalPortalUser,
   inPortalMode,
   mapPermissions,
 } from "./portal.server";
 
 // Create an instance of the authenticator, pass a generic with what
 // strategies will return and will store in the session
-export const authenticator = new Authenticator<string | CsbUser>(
-  sessionStorage,
-  {
-    throwOnError: true,
-  },
-);
+export const authenticator = new Authenticator<number>(sessionStorage, {
+  throwOnError: true,
+});
 
 const CredentialsSchema = object({
   email: string([email()]),
@@ -52,11 +49,6 @@ authenticator.use(
   }),
   "user-pass",
 );
-
-if (inPortalMode) {
-  const portalStrategy = new PortalStrategy();
-  authenticator.use(portalStrategy);
-}
 
 // remix-auth-github is not compatible with the remix v2
 // TODO uncomment when it is fixed
@@ -216,63 +208,56 @@ if (
 }
 
 if (inPortalMode) {
-  const portalStrategy = new PortalStrategy();
-  authenticator.use(portalStrategy);
+  // Disable all strategies in portal mode
+  // portal mode bypasses the authenticator
   authenticator.unuse("user-pass");
   authenticator.unuse("egi");
   authenticator.unuse("github");
   authenticator.unuse("orcid");
 }
 
-export async function mustBeAuthenticated(request: Request) {
-  const userId = await authenticator.isAuthenticated(request);
-  if (userId === null) {
-    throw json({ error: "Unauthorized" }, { status: 401 });
-  }
-  return userId;
-}
-
 function mergeUser(csbUser: CsbUser, webappUser: User): User {
-  const perms = mapPermissions(csbUser.permissions);
-  return {
+  const { isAdmin, expertiseLevels, preferredExpertiseLevel } = mapPermissions(
+    csbUser.permissions,
+  );
+  const user = {
     ...webappUser,
-    id: csbUser.id.toString(),
+    id: csbUser.id,
     email: csbUser.email,
-    isAdmin: perms.admin,
-    expertiseLevels: perms.levels,
+    isAdmin,
+    expertiseLevels,
   };
+  // TODO when csb user gets permission lowered
+  // we should also lower the preferred expertise level in the webapp
+  if (!user.preferredExpertiseLevel && preferredExpertiseLevel) {
+    user.preferredExpertiseLevel = preferredExpertiseLevel;
+  }
+  return user;
 }
 
 export async function getOptionalUser(request: Request) {
-  const userId = await authenticator.isAuthenticated(request);
-  if (userId === null) {
-    if (inPortalMode) {
-      try {
-        await authenticator.authenticate("portal", request, {
-          throwOnError: true,
-        });
-      } catch (error) {
-        if (error instanceof Error) {
-          return null;
-        }
+  if (inPortalMode) {
+    const csbUser = await getOptionalPortalUser(request);
+    if (!csbUser) {
+      return null;
+    }
+    if (csbUser.suspended) {
+      throw json({ error: "Suspended" }, { status: 403 });
+    }
+    try {
+      const webappUser = await getUserById(csbUser.id);
+      return mergeUser(csbUser, webappUser);
+    } catch (error) {
+      if (error instanceof UserNotFoundError) {
+        // New user from the portal sync them with the webapp
+        const webappUser = await portalregister(csbUser.id, csbUser.email);
+        return mergeUser(csbUser, webappUser);
       }
     }
-    return null;
   }
-  if (typeof userId === "object") {
-    if (!inPortalMode) {
-      throw new Error("Unexpected user object in non-portal mode");
-    }
-    // now the portal backend is fetched from
-    // 1. once when anonymous user visits first time via authenticator.authenticate()
-    // 2. each time a user makes a request to a restricted route
-    // TODO check backend is quick enough to handle this, if not cache it somehow for a certain duration
-    const csbUser = await getPortalUser(request);
-    let webappUser = await getUserById(userId.id.toString());
-    if (!webappUser) {
-      webappUser = await portalregister(csbUser.id.toString(), csbUser.email);
-    }
-    return mergeUser(csbUser, webappUser);
+  const userId = await authenticator.isAuthenticated(request);
+  if (userId === null) {
+    return null;
   }
   return await getUserById(userId);
 }

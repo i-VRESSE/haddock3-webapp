@@ -2,11 +2,9 @@ import { MenuList } from "./Navbar";
 import { Banner } from "./Banner";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "./ui/navigation-menu";
 import { Link, NavLink } from "@remix-run/react";

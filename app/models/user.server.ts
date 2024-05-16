@@ -136,7 +136,7 @@ export async function oauthregister(email: string, photo?: string) {
   return user[0].id;
 }
 
-export async function portalregister(id: string, email: string) {
+export async function portalregister(id: number, email: string) {
   const user = await db
     .insert(users)
     .values({
@@ -149,7 +149,7 @@ export async function portalregister(id: string, email: string) {
   return user[0];
 }
 
-export async function getUserById(userId: string): Promise<User> {
+export async function getUserById(userId: number): Promise<User> {
   const foundUsers = await db
     .select(userSelect)
     .from(users)
@@ -186,7 +186,7 @@ export function listExpertiseLevels() {
 const now = sql<string>`now()`;
 
 export async function assignExpertiseLevel(
-  userId: string,
+  userId: number,
   level: ExpertiseLevel,
 ) {
   // set preferred level to the assigned level if no preferred level is set
@@ -211,7 +211,7 @@ export async function assignExpertiseLevel(
 }
 
 export async function unassignExpertiseLevel(
-  userId: string,
+  userId: number,
   level: ExpertiseLevel,
 ) {
   const user = await getUserById(userId);
@@ -233,7 +233,7 @@ export async function unassignExpertiseLevel(
 }
 
 export async function setPreferredExpertiseLevel(
-  userId: string,
+  userId: number,
   preferredExpertiseLevel: ExpertiseLevel,
 ) {
   await db
@@ -245,7 +245,7 @@ export async function setPreferredExpertiseLevel(
     .where(eq(users.id, userId));
 }
 
-export async function setIsAdmin(userId: string, isAdmin: boolean) {
+export async function setIsAdmin(userId: number, isAdmin: boolean) {
   await db
     .update(users)
     .set({
@@ -256,7 +256,7 @@ export async function setIsAdmin(userId: string, isAdmin: boolean) {
 }
 
 export async function setBartenderToken(
-  userId: string,
+  userId: number,
   token: string,
   expireAt: number,
 ) {

@@ -4,7 +4,7 @@ import {
   type LoaderFunctionArgs,
 } from "@remix-run/node";
 import { Form, Link, useSubmit } from "@remix-run/react";
-import { mustBeAuthenticated } from "~/auth.server";
+import { getUser } from "~/auth.server";
 import { useUser } from "~/auth";
 import {
   listExpertiseLevels,
@@ -18,12 +18,12 @@ import { useTheme, Theme } from "remix-themes";
 import { useInPortalMode } from "~/portal";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await mustBeAuthenticated(request);
+  await getUser(request);
   return json({});
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const userIdOrCsbUser = await mustBeAuthenticated(request);
+  const user = await getUser(request);
   const formData = await request.formData();
   const ActionSchema = object({
     preferredExpertiseLevel: enumType(listExpertiseLevels()),
@@ -31,12 +31,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const result = safeParse(ActionSchema, Object.fromEntries(formData));
 
   if (result.success) {
-    const userId =
-      typeof userIdOrCsbUser === "string"
-        ? userIdOrCsbUser
-        : userIdOrCsbUser.id.toString();
     await setPreferredExpertiseLevel(
-      userId,
+      user.id,
       result.output.preferredExpertiseLevel,
     );
   } else {
