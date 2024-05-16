@@ -5,7 +5,6 @@ import {
   CatalogPanel,
   NodePanel,
   WorkflowPanel,
-  WorkflowUploadButton,
   Wrapper,
 } from "@i-vresse/wb-core";
 import {
@@ -15,11 +14,12 @@ import {
 } from "@i-vresse/wb-core/dist/store";
 import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog";
 import { useEffect } from "react";
-import { WorkflowSubmitButton } from "./SubmitButton";
+import { SubmitButton } from "./SubmitButton";
 import { useLoaderData } from "@remix-run/react";
 import type { loader } from "~/routes/builder";
-import { WorkflowDownloadButton } from "./DownloadButton";
-import { FormActions } from "./FormActions";
+import { DownloadButton } from "./DownloadButton";
+import { UploadButton } from "./UploadButton";
+import { ClearButton } from "./ClearButton";
 
 const App = () => {
   const { catalog, submitAllowed, archive } = useLoaderData<typeof loader>();
@@ -85,18 +85,12 @@ const App = () => {
         <CatalogPanel></CatalogPanel>
 
         <WorkflowPanel>
-          <WorkflowUploadButton />
+          <SubmitButton submitAllowed={submitAllowed} />
+          <UploadButton />
+          <DownloadButton />
+          <ClearButton />
         </WorkflowPanel>
-
         <NodePanel />
-      </div>
-      <div className="page sticky inset-x-0 bottom-0 p-4">
-        <div></div>
-        <div role="group" className="flex flex-row gap-4">
-          <WorkflowSubmitButton submitAllowed={submitAllowed} />
-          <WorkflowDownloadButton />
-        </div>
-        <FormActions />
       </div>
     </>
   );
