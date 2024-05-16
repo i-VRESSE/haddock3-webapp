@@ -29,7 +29,7 @@ Btn classes are copied from app/components/ui/button.tsx
 */
 
 .btn {
-  @apply inline-block h-10 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out;
+  @apply h-10 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out flex gap-4;
 }
 
 /* variant=secondary */
@@ -52,7 +52,15 @@ Btn classes are copied from app/components/ui/button.tsx
 }
 
 .btn-toolbar {
-  @apply flex flex-wrap justify-start;
+  @apply flex flex-wrap justify-start align-baseline;
+}
+
+.btn-group {
+  @apply flex gap-2;
+}
+
+.dropdown.btn-group {
+  gap: 0rem;
 }
 
 /* variant=default */
@@ -60,6 +68,18 @@ Btn classes are copied from app/components/ui/button.tsx
   @apply bg-primary text-primary-foreground hover:bg-primary/90;
 }
 
+.btn-outline-secondary {
+  @apply hover:bg-accent hover:text-accent-foreground;
+}
+
+.btn-visual-panel,
+.btn-catalog-node {
+  @apply w-full;
+}
+
+.btn-visual-node div {
+  @apply flex;
+}
 .workflow-builder-app ul {
   @apply list-inside;
 }
@@ -184,7 +204,7 @@ Btn classes are copied from app/components/ui/button.tsx
 }
 
 .workflow-builder-app .nav-tabs {
-  @apply border-b-4  border-b-primary;
+  @apply border-b-4  border-b-secondary;
 }
 
 .workflow-builder-app .nav-link {
@@ -192,7 +212,7 @@ Btn classes are copied from app/components/ui/button.tsx
 }
 
 .workflow-builder-app .nav .active {
-  @apply border-muted bg-primary text-primary-foreground;
+  @apply border-muted bg-secondary text-secondary-foreground;
 }
 
 .workflow-builder-app .justify-content-end {
@@ -241,6 +261,10 @@ Btn classes are copied from app/components/ui/button.tsx
 .workflow-builder-app .page > .action-row {
   padding: 0.25rem;
   overflow: unset;
+}
+
+.workflow-builder-app .text-danger {
+  @apply text-destructive;
 }
 
 code .table {

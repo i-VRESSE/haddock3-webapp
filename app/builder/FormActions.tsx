@@ -41,7 +41,7 @@ export const FormActions = (): JSX.Element => {
   const index = useSelectNodeIndex();
   const { deleteNode, clearNodeSelection } = useWorkflow();
   const submitFormRef = useActiveSubmitButton();
-  const { editingGlobal, toggleGlobalEdit } = useWorkflow();
+  const { editingGlobal, setEditingGlobal } = useWorkflow();
   if (submitFormRef === undefined || !(index > -1 || editingGlobal)) {
     return <></>;
   }
@@ -68,7 +68,7 @@ export const FormActions = (): JSX.Element => {
       <Button
         variant="secondary"
         onClick={() =>
-          editingGlobal ? toggleGlobalEdit() : clearNodeSelection()
+          editingGlobal ? setEditingGlobal(false) : clearNodeSelection()
         }
         title="Forget changes made in form and close form"
       >
