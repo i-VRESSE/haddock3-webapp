@@ -95,6 +95,8 @@ See [docs/scenarios.md](docs/scenarios.md) for more information on how the web a
 You can develop inside a [devcontainer](https://containers.dev/) inside Visual Studio Code. The devcontainer includes all services required by the webapp.
 You just have to supply the cns executable as `./deploy/cns` file, see [deployment](deploy/README.md), before building/starting the containers.
 
+When you exit VS code the containers will keep running, kill by running `docker compose -f .devcontainer/docker-compose.yml -p haddock3-webapp_devcontainer down` in the terminal or in VS Code reopen folder outside container.
+
 ### Development outside devcontainer
 
 To develop the webapp ouside a devcontainer you have the following services running:
