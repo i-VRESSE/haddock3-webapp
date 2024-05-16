@@ -74,7 +74,7 @@ Btn classes are copied from app/components/ui/button.tsx
   @apply w-full;
 }
 
-.btn-visual-panel div {
+.btn-visual-node div {
   @apply flex;
 } 
 .workflow-builder-app ul {
