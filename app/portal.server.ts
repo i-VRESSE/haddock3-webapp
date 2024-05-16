@@ -44,8 +44,6 @@ export async function getPortalUser(request: Request) {
   }
   const rawCsbUser = await resp.json();
   const csbUser = parse(CsbUserSchema, rawCsbUser);
-  // TODO create place to store bartender token of this user
-  // TODO cache csbUser in haddock3 webapp db??
   if (csbUser.suspended) {
     throw new Error("Failed to validate token");
   }

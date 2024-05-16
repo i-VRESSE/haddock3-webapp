@@ -13,6 +13,13 @@ import { Link, NavLink } from "@remix-run/react";
 import { useIsAdmin, useIsLoggedIn, useUser } from "~/auth";
 import { generatePhoto } from "~/models/generatePhoto";
 import { useMemo } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
 
 function Haddock3Navbar() {
   return (
@@ -74,25 +81,23 @@ export const SERVICES = [
 function ServicesMenu() {
   return (
     <NavigationMenuItem>
-      <NavigationMenuTrigger className="bg-secondary">
-        Services
-      </NavigationMenuTrigger>
-      <NavigationMenuContent>
-        <ul className="flex flex-col gap-2 p-4 whitespace-nowrap">
+      <DropdownMenu>
+        <DropdownMenuTrigger className="bg-secondary" asChild>
+          <Button variant="ghost">Services</Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
           {SERVICES.map((service) => (
-            <li key={service.name}>
-              <NavigationMenuLink asChild>
-                <a
-                  href={service.url}
-                  className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                >
-                  {service.name}
-                </a>
-              </NavigationMenuLink>
-            </li>
+            <DropdownMenuItem asChild key={service.url}>
+              <a
+                href={service.url}
+                className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+              >
+                {service.name}
+              </a>
+            </DropdownMenuItem>
           ))}
-        </ul>
-      </NavigationMenuContent>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </NavigationMenuItem>
   );
 }
@@ -102,34 +107,39 @@ function AnonymousUserButton() {
 
   return (
     <NavigationMenuItem>
-      <NavigationMenuTrigger className="bg-secondary">
-        Anonymous&nbsp;
-        <img alt="gravatar" src={photo} className="h-10 w-10 dark:invert" />
-      </NavigationMenuTrigger>
-      <NavigationMenuContent>
-        <ul className="flex flex-col gap-3 p-4">
-          <li>
-            <NavigationMenuLink asChild>
-              <a
-                href="/login"
-                className="block hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-              >
-                Login
-              </a>
-            </NavigationMenuLink>
-          </li>
-          <li>
-            <NavigationMenuLink asChild>
-              <a
-                href="/registration"
-                className="block hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-              >
-                Register
-              </a>
-            </NavigationMenuLink>
-          </li>
-        </ul>
-      </NavigationMenuContent>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          className="bg-secondary flex flex-row items-center"
+          asChild
+        >
+          <Button variant="ghost">
+            Anonymous&nbsp;
+            <img
+              alt="gravatar"
+              src={photo}
+              className="h-10 w-10 dark:invert rounded-full"
+            />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem asChild>
+            <a
+              href="/login"
+              className="block hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+            >
+              Login
+            </a>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <a
+              href="/registration"
+              className="block hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+            >
+              Register
+            </a>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </NavigationMenuItem>
   );
 }
@@ -141,51 +151,45 @@ function LoggedInButton() {
 
   return (
     <NavigationMenuItem>
-      <NavigationMenuTrigger className="bg-secondary">
-        {userName}
-        &nbsp;
-        <img
-          alt="gravatar"
-          src={user.photo}
-          className="h-10 w-10 dark:invert"
-        />
-      </NavigationMenuTrigger>
-      <NavigationMenuContent>
-        <ul className="flex flex-col gap-2 p-4">
-          <li>
-            <NavigationMenuLink asChild>
+      <DropdownMenu>
+        <DropdownMenuTrigger className="bg-secondary" asChild>
+          <Button variant="ghost">
+            {userName}
+            &nbsp;
+            <img
+              alt="gravatar"
+              src={user.photo}
+              className="h-10 w-10 dark:invert rounded-full"
+            />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem asChild>
+            <a
+              href="/dashboard"
+              className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+            >
+              Dashboard
+            </a>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/profile">Haddock3 settings</Link>
+          </DropdownMenuItem>
+          {isAdmin && (
+            <DropdownMenuItem asChild>
               <a
-                href="/dashboard"
+                href="/admin"
                 className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
               >
-                Dashboard
+                Admin
               </a>
-            </NavigationMenuLink>
-          </li>
-          <li>
-            <NavigationMenuLink asChild>
-              <Link to="/profile">Haddock3 settings</Link>
-            </NavigationMenuLink>
-          </li>
-          {isAdmin && (
-            <li>
-              <NavigationMenuLink asChild>
-                <a
-                  href="/admin"
-                  className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                >
-                  Admin
-                </a>
-              </NavigationMenuLink>
-            </li>
+            </DropdownMenuItem>
           )}
-          <li>
-            <NavigationMenuLink asChild>
-              <Link to="/logout">Logout</Link>
-            </NavigationMenuLink>
-          </li>
-        </ul>
-      </NavigationMenuContent>
+          <DropdownMenuItem asChild>
+            <Link to="/logout">Logout</Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </NavigationMenuItem>
   );
 }
