@@ -63,10 +63,13 @@ Btn classes are copied from app/components/ui/button.tsx
   gap: 0rem;
 }
 
-
 /* variant=default */
 .workflow-builder-app .btn-primary {
   @apply bg-primary text-primary-foreground hover:bg-primary/90;
+}
+
+.btn-outline-secondary {
+  @apply hover:bg-accent hover:text-accent-foreground;
 }
 
 .btn-visual-panel,
@@ -76,7 +79,7 @@ Btn classes are copied from app/components/ui/button.tsx
 
 .btn-visual-node div {
   @apply flex;
-} 
+}
 .workflow-builder-app ul {
   @apply list-inside;
 }
@@ -201,7 +204,7 @@ Btn classes are copied from app/components/ui/button.tsx
 }
 
 .workflow-builder-app .nav-tabs {
-  @apply border-b-4  border-b-primary;
+  @apply border-b-4  border-b-secondary;
 }
 
 .workflow-builder-app .nav-link {
@@ -209,7 +212,7 @@ Btn classes are copied from app/components/ui/button.tsx
 }
 
 .workflow-builder-app .nav .active {
-  @apply border-muted bg-primary text-primary-foreground;
+  @apply border-muted bg-secondary text-secondary-foreground;
 }
 
 .workflow-builder-app .justify-content-end {
@@ -261,7 +264,7 @@ Btn classes are copied from app/components/ui/button.tsx
 }
 
 .workflow-builder-app .text-danger {
-   @apply text-destructive
+  @apply text-destructive;
 }
 
 code .table {

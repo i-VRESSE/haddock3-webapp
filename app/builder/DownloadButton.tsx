@@ -5,8 +5,8 @@ export const WorkflowDownloadButton = (): JSX.Element => {
   const { save } = useWorkflow();
 
   return (
-    <Button variant="secondary" onClick={save}>
-      Download archive
+    <Button variant="ghost" onClick={save}>
+      Download
     </Button>
   );
 };

@@ -19,7 +19,6 @@ import { WorkflowSubmitButton } from "./SubmitButton";
 import { useLoaderData } from "@remix-run/react";
 import type { loader } from "~/routes/builder";
 import { WorkflowDownloadButton } from "./DownloadButton";
-import { FormActions } from "./FormActions";
 
 const App = () => {
   const { catalog, submitAllowed, archive } = useLoaderData<typeof loader>();
@@ -85,18 +84,12 @@ const App = () => {
         <CatalogPanel></CatalogPanel>
 
         <WorkflowPanel>
+          <WorkflowSubmitButton submitAllowed={submitAllowed} />
           <WorkflowUploadButton />
+          <WorkflowDownloadButton />
         </WorkflowPanel>
 
         <NodePanel />
-      </div>
-      <div className="page sticky inset-x-0 bottom-0 p-4">
-        <div></div>
-        <div role="group" className="flex flex-row gap-4">
-          <WorkflowSubmitButton submitAllowed={submitAllowed} />
-          <WorkflowDownloadButton />
-        </div>
-        <FormActions />
       </div>
     </>
   );
