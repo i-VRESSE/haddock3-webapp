@@ -4,6 +4,7 @@ import "./core2.css";
 import {
   CatalogPanel,
   NodePanel,
+  WorkflowClear,
   WorkflowPanel,
   WorkflowUploadButton,
   Wrapper,
@@ -84,9 +85,12 @@ const App = () => {
         <CatalogPanel></CatalogPanel>
 
         <WorkflowPanel>
+          {/* TODO disable when form invalid */}
           <WorkflowSubmitButton submitAllowed={submitAllowed} />
+          {/* TODO replace txt with icon */}
           <WorkflowUploadButton />
           <WorkflowDownloadButton />
+          <WorkflowClear/>
         </WorkflowPanel>
 
         <NodePanel />
