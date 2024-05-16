@@ -25,11 +25,6 @@
       "name": "analysis",
       "description": "HADDOCK3 modules related to model analysis.",
       "collapsed": false
-    },
-    {
-      "name": "extras",
-      "description": "\nHADDOCK3 extra modules.\n\nThe extra modules are modules that do not belong to any of the standard\nsimulation categories but that help further configuring the workflow.\n",
-      "collapsed": true
     }
   ],
   "global": {
@@ -481,6 +476,13 @@
             "type": "number",
             "maximum": 1000,
             "minimum": 1
+          },
+          "allatoms": {
+            "default": false,
+            "title": "Atoms to be considered during the analysis.",
+            "description": "Atoms to be considered during the analysis.",
+            "$comment": "Atoms to be considered during the analysis. If false (default), only backbone atoms will be considered, otherwise all the heavy-atoms.",
+            "type": "boolean"
           }
         },
         "required": [],
@@ -531,6 +533,9 @@
           "ui:group": "analysis"
         },
         "clt_threshold": {
+          "ui:group": "analysis"
+        },
+        "allatoms": {
           "ui:group": "analysis"
         }
       },
@@ -844,7 +849,7 @@
           "ui:group": "analysis"
         },
         "topX": {
-          "ui:group": "sample"
+          "ui:group": "analysis"
         },
         "cluster_heatmap_datatype": {
           "ui:group": "analysis"
@@ -3046,30 +3051,6 @@
       "tomlSchema": {}
     },
     {
-      "id": "exit",
-      "category": "extras",
-      "label": "Exit module",
-      "description": "Stop the workflow when this module is reached.",
-      "schema": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "default": "Stopping the workflow.",
-            "title": "Exiting message.",
-            "description": "The message to print when exiting.",
-            "$comment": "The message to print when exiting.",
-            "type": "string",
-            "minLength": 0,
-            "maxLength": 1000
-          }
-        },
-        "required": [],
-        "additionalProperties": false
-      },
-      "uiSchema": {},
-      "tomlSchema": {}
-    },
-    {
       "id": "flexref",
       "category": "refinement",
       "label": "Flexible refinement with CNS.",
@@ -5260,6 +5241,9 @@
         "sinter_rigid_init": {
           "ui:group": "sampling"
         },
+        "sinter_rigid_final": {
+          "ui:group": "sampling"
+        },
         "sinter_cool2_init": {
           "ui:group": "sampling"
         },
@@ -5504,7 +5488,8 @@
       },
       "uiSchema": {
         "ambig_fname": {
-          "ui:widget": "file"
+          "ui:widget": "file",
+          "ui:group": "distance restraints"
         }
       },
       "tomlSchema": {}
@@ -5564,6 +5549,15 @@
             "description": "Atoms to be considered during the analysis.",
             "$comment": "Atoms to be considered during the analysis. If false (default), only backbone atoms will be considered, otherwise all the heavy-atoms.",
             "type": "boolean"
+          },
+          "contact_distance_cutoff": {
+            "default": 5,
+            "title": "Distance cutoff defining a contact.",
+            "description": "Cutoff distance (in Angstrom) defining a contact.",
+            "$comment": "Distance (in Angstrom) cutoff defining a contact. Any atoms within this cutoff range will be used to define the interface. Standard values are usually 3.9 A or 5.0 A.",
+            "type": "number",
+            "maximum": 30,
+            "minimum": 0.1
           }
         },
         "required": [],
@@ -5583,6 +5577,9 @@
           "ui:group": "analysis"
         },
         "allatoms": {
+          "ui:group": "analysis"
+        },
+        "contact_distance_cutoff": {
           "ui:group": "analysis"
         }
       },
@@ -5676,7 +5673,50 @@
         "required": [],
         "additionalProperties": false
       },
-      "uiSchema": {},
+      "uiSchema": {
+        "glowworms": {
+          "ui:group": "sampling"
+        },
+        "steps": {
+          "ui:group": "sampling"
+        },
+        "swarms": {
+          "ui:group": "sampling"
+        },
+        "scoring": {
+          "ui:group": "scoring"
+        },
+        "top": {
+          "ui:group": "analysis"
+        },
+        "receptor_chains": {
+          "ui:group": "restraints"
+        },
+        "receptor_active": {
+          "ui:group": "restraints"
+        },
+        "receptor_passive": {
+          "ui:group": "restraints"
+        },
+        "ligand_chains": {
+          "ui:group": "restraints"
+        },
+        "ligand_active": {
+          "ui:group": "restraints"
+        },
+        "ligand_passive": {
+          "ui:group": "restraints"
+        },
+        "noxt": {
+          "ui:group": "topology"
+        },
+        "noh": {
+          "ui:group": "topology"
+        },
+        "restraints": {
+          "ui:group": "distance restraints"
+        }
+      },
       "tomlSchema": {}
     },
     {
@@ -9742,6 +9782,15 @@
             "type": "number",
             "maximum": 99999,
             "minimum": 1
+          },
+          "sortby": {
+            "default": "score",
+            "title": "Method used to define `best cluster`.",
+            "description": "Best cluster can be defined based either on cluster models scores, or on cluster size. By default, 'score' is selected.",
+            "$comment": "if the selection is done by 'score' the average score of the top (4) models of each cluster is used to define the cluster rank. When clustering by 'size', a bigger cluster size corresponds to a higher rank. By default, 'score' is selected.",
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 15
           }
         },
         "required": [],
@@ -9752,6 +9801,9 @@
           "ui:group": "analysis"
         },
         "top_models": {
+          "ui:group": "analysis"
+        },
+        "sortby": {
           "ui:group": "analysis"
         }
       },
@@ -9914,6 +9966,9 @@
         "ligand_top_fname": {
           "ui:widget": "file",
           "ui:group": "force field"
+        },
+        "limit": {
+          "ui:group": "sampling"
         },
         "tolerance": {
           "ui:group": "module"
