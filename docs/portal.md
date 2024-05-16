@@ -15,3 +15,25 @@ To use a non-anomyous page in the webapp the webapp will
 4. combines portal user info with the webapp user info
 
 The portal mode can be enabled by setting the `HADDOCK3WEBAPP_CSB_PORTAL` environment variable to a thruthy value like `1`.
+
+## Mock portal
+
+Run webapp with:
+
+```shell
+export HADDOCK3_WEBAPP_PREFIX=/haddock30/
+export HADDOCK3WEBAPP_CSB_PORTAL=true
+export HADDOCK3WEBAPP_CSB_PORTAL_BACKEND=http://localhost:8180/api/auth/validate
+npm run dev
+# or for production server use
+npm run build && npm start
+```
+
+Start the mock portal with:
+
+```shell
+npx tsx app/mock_portal.ts
+```
+
+Goto http://0.0.0.0:8000/haddock30/ for webapp.
+Goto http://0.0.0.0:8000/login to login to the mock portal.
