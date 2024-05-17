@@ -65,6 +65,14 @@ export async function getCompletedJobById(
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
+  const returncode = await getJobReturnCode(jobid, bartenderToken)
+  if (returncode) {
+    const state: typeof job.state = 'error'
+    return {
+      ...job,
+      state
+    }
+  }
   return job;
 }
 
@@ -253,7 +261,12 @@ export function getModuleIndexPadding(files: DirectoryItem) {
   const nrModules = files.children.filter(
     (c) => c.is_dir && c.name.includes("_"),
   ).length;
-  return Math.ceil(Math.log10(nrModules));
+  let padding = Math.ceil(Math.log10(nrModules));
+  // Wken you have <10 nodes it still uses padding of 2 for example 05_caprieval
+  if (padding === 1) {
+    padding = 2;
+  }
+  return padding
 }
 
 export function buildPath({
@@ -384,7 +397,7 @@ export async function fetchHtml({
     bartenderToken,
   );
   if (!response.ok) {
-    throw new Error(`could not get ${htmlFilename}`);
+    throw new Error(`could not get ${prefix}${htmlFilename}`);
   }
   return await response.text();
 }
@@ -422,4 +435,13 @@ export async function getParamsCfg<Schema extends BaseSchema>({
   }
   const params = parse(schema, config);
   return params;
+}
+
+export async function getJobReturnCode(jobid: number, bartenderToken: string) {
+  const file = await getJobfile(jobid, 'returncode', bartenderToken)
+  if (file.ok) {
+    const body = await file.text()
+    return parseInt(body)
+  }
+  return 1;
 }

@@ -27,6 +27,9 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobid = jobIdFromParams(params);
   const bartenderToken = await getBartenderToken(request);
   const job = await getCompletedJobById(jobid, bartenderToken);
+  if (job.state === 'error') {
+    return redirect(`/jobs/${jobid}/browse`);
+  }
   const hasWorkflow = await jobHasWorkflow(jobid, bartenderToken);
 
   try {
