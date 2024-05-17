@@ -102,7 +102,7 @@ function ServicesMenu() {
 }
 
 function AnonymousUserButton() {
-  const {pathname} = useLocation();
+  const { pathname } = useLocation();
   const photo = useMemo(() => generatePhoto("anonymous@bonvinlab.org"), []);
 
   return (

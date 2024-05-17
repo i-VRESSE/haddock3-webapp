@@ -63,15 +63,20 @@ const frontend = http.createServer((req, res) => {
     );
 
     req.pipe(proxyReq);
-  } else if (req.url?.startsWith("/login") || req.url?.startsWith("/registration")) {
+  } else if (
+    req.url?.startsWith("/login") ||
+    req.url?.startsWith("/registration")
+  ) {
     console.log("Setting cookie");
     const setCookie = "bonvinlab_auth_token=sometoken; Path=/; HttpOnly";
     let status = 200;
     const headers: OutgoingHttpHeaders = {
       "Content-Type": "text/plain",
       "set-cookie": setCookie,
-    }
-    const redirect = new URL(req.url, 'http://localhost').searchParams.get("redirect_uri");
+    };
+    const redirect = new URL(req.url, "http://localhost").searchParams.get(
+      "redirect_uri",
+    );
     if (redirect) {
       headers["Location"] = redirect;
       status = 302;

@@ -92,8 +92,8 @@ export async function logout(request: Request) {
   return new Response(null, {
     status: 302,
     headers: {
-      "Location": "/",
+      Location: "/",
       "Set-Cookie": cookie,
-    }
+    },
   });
 }
