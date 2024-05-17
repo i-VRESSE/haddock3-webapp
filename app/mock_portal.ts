@@ -18,11 +18,11 @@ const backend = http.createServer((req, res) => {
       JSON.stringify({
         id: 42,
         email: "someone@example.com",
-        // All levels + admin == 39
-        // All levels == 7
-        // Just easy == 1
-        // No levels == 0
-        permissions: 7,
+        // PermissionEasy        = 1
+        // PermissionExpert      = 2
+        // PermissionGuru        = 4
+        // PermissionAdmin       = 32
+        permissions: 32,
         suspended: false,
       }),
     );

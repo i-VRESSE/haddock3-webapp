@@ -66,22 +66,22 @@ export async function getOptionalPortalUser(request: Request) {
 export function mapPermissions(perms: number) {
   const expertiseLevels: ExpertiseLevel[] = [];
   let preferredExpertiseLevel: ExpertiseLevel | null = null;
-  if ((perms & 1) !== 0) {
+  if (perms >= 1) {
     expertiseLevels.push("easy");
     preferredExpertiseLevel = "easy";
   }
-  if ((perms & 2) !== 0) {
+  if (perms >= 2) {
     expertiseLevels.push("expert");
     preferredExpertiseLevel = "expert";
   }
-  if ((perms & 4) !== 0) {
+  if (perms >= 4) {
     expertiseLevels.push("guru");
     preferredExpertiseLevel = "guru";
   }
   return {
     expertiseLevels,
     preferredExpertiseLevel,
-    isAdmin: (perms & 32) !== 0,
+    isAdmin: perms === 32,
   };
 }
 
