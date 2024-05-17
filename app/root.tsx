@@ -6,12 +6,14 @@ import {
 } from "@remix-run/node";
 import {
   isRouteErrorResponse,
+  Link,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useLocation,
   useRouteError,
 } from "@remix-run/react";
 
@@ -28,6 +30,7 @@ import { inPortalMode } from "./portal.server";
 import { useInPortalMode } from "./portal";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
+import { prefix } from "./prefix";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -105,6 +108,7 @@ function BoundaryShell({
 export function ErrorBoundary() {
   const error = useRouteError();
   const inPortalMode = useInPortalMode();
+  const { pathname } = useLocation();
   console.error(error);
 
   // Logic copied from https://github.com/remix-run/remix/blob/main/packages/remix-react/errorBoundaries.tsx
@@ -119,17 +123,26 @@ export function ErrorBoundary() {
             {inPortalMode ? (
               <p>
                 Please{" "}
-                <a href="/login" className="underline">
+                <a
+                  href={`/login?redirect_uri=${prefix}${pathname.slice(1)}`}
+                  className="underline"
+                >
                   login
                 </a>{" "}
                 or{" "}
-                <a href="/registration" className="underline">
+                <a
+                  href={`/registration?redirect_uri=${prefix}${pathname.slice(1)}`}
+                  className="underline"
+                >
                   register
                 </a>{" "}
                 to use the services of the BonvinLab
               </p>
             ) : (
-              <p>Page requires authorization. Please login and try again.</p>
+              <p>
+                Page requires authorization. Please{" "}
+                <Link to="/login">login</Link> and try again.
+              </p>
             )}
           </BoundaryShell>
         );
