@@ -34,7 +34,7 @@ const Schema = object({
   antigen: instance(File, "Antibody structure as PDB file", []),
   ambig_fname: instance(File, "Ambiguous restraints as TBL file"),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
-  reference_fname: instance(File, "Reference structure as PDB file", []),
+  reference_fname: optional(instance(File, "Reference structure as PDB file", [])),
 });
 type Schema = Output<typeof Schema>;
 
@@ -51,6 +51,7 @@ function generateWorkflow(data: Schema) {
     ? `# Restraints to keep the antibody chains together
 unambig_fname = "${data.unambig_fname.name}"`
     : "";
+  const ref_line = data.reference_fname?.name ? `reference_fname = "${data.reference_fname.name}"` : ""
   return `
 # ====================================================================
 # Antibody-antigen docking example with restraints from the antibody
@@ -105,7 +106,7 @@ top_models = 10
 
 [caprieval]
 # this is only for this tutorial to check the performance at the rigidbody stage
-reference_fname = "${data.reference_fname.name}"
+${ref_line}
 
 [flexref]
 # Acceptable percentage of model failures
@@ -129,7 +130,7 @@ ${unambig_line}
 top_cluster = 500
 
 [caprieval]
-reference_fname = "${data.reference_fname.name}"
+${ref_line}
 
 # ====================================================================
 
@@ -142,10 +143,12 @@ async function createZip(workflow: string, data: Schema) {
   zip.file(data.antibody.name, data.antibody);
   zip.file(data.antigen.name, data.antigen);
   zip.file(data.ambig_fname.name, data.ambig_fname);
-  if (data.unambig_fname) {
+  if (data.unambig_fname?.name) {
     zip.file(data.unambig_fname.name, data.unambig_fname);
   }
-  zip.file(data.reference_fname.name, data.reference_fname);
+  if (data.reference_fname?.name) {
+    zip.file(data.reference_fname.name, data.reference_fname);
+  }
   return zip.generateAsync({ type: "blob" });
 }
 

@@ -34,7 +34,7 @@ const Schema = object({
   protein2: instance(File, "Second protein structure as PDB file"),
   ambig_fname: instance(File, "Ambiguous restraints as TBL file"),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
-  reference_fname: instance(File, "Reference structure as PDB file"),
+  reference_fname: optional(instance(File, "Reference structure as PDB file")),
 });
 type Schema = Output<typeof Schema>;
 
@@ -46,6 +46,7 @@ function generateWorkflow(data: Schema) {
   const unambig_line = data.unambig_fname
     ? `unambig_fname = "${data.unambig_fname.name}"`
     : "";
+  const ref_line = data.reference_fname?.name ? `reference_fname = "${data.reference_fname.name}"` : ""
   return `
 # ====================================================================
 # Protein-protein docking example with NMR-derived ambiguous interaction restraints
@@ -79,27 +80,27 @@ ${unambig_line}
 sampling = 1000
 
 [caprieval]
-reference_fname = "${data.reference_fname.name}"
+${ref_line}
 
 [seletop]
 select = 200
 
 [caprieval]
-reference_fname = "${data.reference_fname.name}"
+${ref_line}
 
 [flexref]
 ambig_fname = "${data.ambig_fname.name}"
 ${unambig_line}
 
 [caprieval]
-reference_fname = "${data.reference_fname.name}"
+${ref_line}
 
 [emref]
 ambig_fname = "${data.ambig_fname.name}"
 ${unambig_line}
 
 [caprieval]
-reference_fname = "${data.reference_fname.name}"
+${ref_line}
 
 [clustfcc]
 
@@ -107,7 +108,7 @@ reference_fname = "${data.reference_fname.name}"
 top_models = 4
 
 [caprieval]
-reference_fname = "${data.reference_fname.name}"
+${ref_line}
 
 # ====================================================================
 `;
@@ -119,8 +120,10 @@ async function createZip(workflow: string, data: Schema) {
   zip.file(data.protein1.name, data.protein1);
   zip.file(data.protein2.name, data.protein2);
   zip.file(data.ambig_fname.name, data.ambig_fname);
-  zip.file(data.reference_fname.name, data.reference_fname);
-  if (data.unambig_fname) {
+  if (data.reference_fname?.name) {
+    zip.file(data.reference_fname.name, data.reference_fname);
+  }
+  if (data.unambig_fname?.name) {
     zip.file(data.unambig_fname.name, data.unambig_fname);
   }
   return zip.generateAsync({ type: "blob" });
