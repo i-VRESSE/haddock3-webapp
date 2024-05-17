@@ -1,35 +1,47 @@
 version: "3.9"
 
 services:
-  webapp:
+  nginx:
+    volumes:
+      - type: bind
+        source: ./haddock30.nginx.conf
+        # TODO make in portal repo /nginx/*.conf:server include /etc/nginx/services/* files
+        target: /etc/nginx/services/haddock3.conf
+    depends_on:
+      h3webapp:
+        condition: service_started
+  h3webapp:
     image: ghcr.io/i-vresse/haddock3-webapp:${WEBAPP_TAG:-latest}
     build:
       context: ../..
       dockerfile: deploy/Dockerfile
       args:
-        HADDOCK3_WEBAPP_PREFIX: /haddock30/
+        HADDOCK3WEBAPP_PREFIX: /haddock30/
     restart: always
     entrypoint: /usr/bin/sh
     command: ["-c", "/wait && npm run setup && npm run start"]
     depends_on:
       bartender:
         condition: service_started
-      webappdb:
+      h3webappdb:
         condition: service_healthy
       h3restraints:
         condition: service_started
+      backend:
+        condition: service_started
     environment:
       BARTENDER_API_URL: "http://bartender:8000"
-      DATABASE_URL: postgresql://postgres:postgres@webappdb:5432/postgres
+      DATABASE_URL: postgresql://postgres:postgres@h3webappdb:5432/postgres
       BARTENDER_PRIVATE_KEY: /certs/private_key.pem
       SESSION_SECRET_FILE: /certs/session.secret
       WAIT_PATHS: /certs/private_key.pem
       HADDOCK3_RESTRAINTS_URL: "http://h3restraints:5000"
       HADDOCK3WEBAPP_CSB_PORTAL: active
+      HADDOCK3WEBAPP_CSB_PORTAL_BACKEND: http://backend:8180/api
     volumes:
       - bartender-certs:/certs:ro
 
-  webappdb:
+  h3webappdb:
     image: postgres:15.4-bullseye
     restart: always
     environment:
@@ -37,7 +49,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     volumes:
-      - webapp-db-data:/var/lib/postgresql/data
+      - h3webapp-db-data:/var/lib/postgresql/data
     healthcheck:
       test: pg_isready -U postgres
       interval: 2s
@@ -112,7 +124,7 @@ services:
     command: sh -c 'uvicorn --host 0.0.0.0 --port 5000 haddock.clis.restraints.webservice:app'
 
 volumes:
-  webapp-db-data:
+  h3webapp-db-data:
   bartender-db-data:
   bartender-job-data:
   bartender-certs:

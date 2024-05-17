@@ -21,7 +21,7 @@ The portal mode can be enabled by setting the `HADDOCK3WEBAPP_CSB_PORTAL` enviro
 Run webapp with:
 
 ```shell
-export HADDOCK3_WEBAPP_PREFIX=/haddock30/
+export HADDOCK3WEBAPP_PREFIX=/haddock30/
 export HADDOCK3WEBAPP_CSB_PORTAL=true
 export HADDOCK3WEBAPP_CSB_PORTAL_BACKEND=http://localhost:8180/api
 # or for production server use
