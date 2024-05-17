@@ -4,7 +4,7 @@
  * The backend can be used to validate the user's session or logout.
  * The portal revere proxies the haddock3 webapp from the /haddock30 path.
  */
-import http from "node:http";
+import http, { OutgoingHttpHeaders } from "node:http";
 
 import { parse } from "cookie";
 
@@ -63,13 +63,20 @@ const frontend = http.createServer((req, res) => {
     );
 
     req.pipe(proxyReq);
-  } else if (req.url === "/login" || req.url === "/registration") {
+  } else if (req.url?.startsWith("/login") || req.url?.startsWith("/registration")) {
     console.log("Setting cookie");
     const setCookie = "bonvinlab_auth_token=sometoken; Path=/; HttpOnly";
-    res.writeHead(200, {
+    let status = 200;
+    const headers: OutgoingHttpHeaders = {
       "Content-Type": "text/plain",
       "set-cookie": setCookie,
-    });
+    }
+    const redirect = new URL(req.url, 'http://localhost').searchParams.get("redirect_uri");
+    if (redirect) {
+      headers["Location"] = redirect;
+      status = 302;
+    }
+    res.writeHead(status, headers);
     res.end("Logged in or registed\n");
   } else if (req.url === "/dashboard") {
     res.writeHead(200, { "Content-Type": "text/plain" });

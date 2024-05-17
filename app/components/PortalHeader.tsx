@@ -7,7 +7,7 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "./ui/navigation-menu";
-import { Link, NavLink } from "@remix-run/react";
+import { Link, NavLink, useLocation } from "@remix-run/react";
 import { useIsAdmin, useIsLoggedIn, useUser } from "~/auth";
 import { generatePhoto } from "~/models/generatePhoto";
 import { useMemo } from "react";
@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
+import { prefix } from "~/prefix";
 
 function Haddock3Navbar() {
   return (
@@ -101,6 +102,7 @@ function ServicesMenu() {
 }
 
 function AnonymousUserButton() {
+  const {pathname} = useLocation();
   const photo = useMemo(() => generatePhoto("anonymous@bonvinlab.org"), []);
 
   return (
@@ -122,7 +124,7 @@ function AnonymousUserButton() {
         <DropdownMenuContent>
           <DropdownMenuItem asChild>
             <a
-              href="/login"
+              href={`/login?redirect_uri=${prefix}${pathname.slice(1)}`}
               className="block hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
             >
               Login
@@ -130,7 +132,7 @@ function AnonymousUserButton() {
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <a
-              href="/registration"
+              href={`/registration?redirect_uri=${prefix}${pathname.slice(1)}`}
               className="block hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
             >
               Register
