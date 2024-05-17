@@ -23,8 +23,7 @@ Run webapp with:
 ```shell
 export HADDOCK3_WEBAPP_PREFIX=/haddock30/
 export HADDOCK3WEBAPP_CSB_PORTAL=true
-export HADDOCK3WEBAPP_CSB_PORTAL_BACKEND=http://localhost:8180/api/auth/validate
-npm run dev
+export HADDOCK3WEBAPP_CSB_PORTAL_BACKEND=http://localhost:8180/api
 # or for production server use
 npm run build && npm start
 ```

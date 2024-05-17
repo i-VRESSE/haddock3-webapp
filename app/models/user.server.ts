@@ -234,7 +234,7 @@ export async function unassignExpertiseLevel(
 
 export async function setPreferredExpertiseLevel(
   userId: number,
-  preferredExpertiseLevel: ExpertiseLevel,
+  preferredExpertiseLevel: ExpertiseLevel | null,
 ) {
   await db
     .update(users)

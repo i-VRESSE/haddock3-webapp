@@ -109,11 +109,7 @@ export default function Page() {
         </RadioGroup>
       </fieldset>
 
-      {inPortalModel ? (
-        <a href="dashboard" className="underline">
-          User dasboard
-        </a>
-      ) : (
+      {!inPortalModel && (
         <>
           {/* TODO add change password form if user is not authenticated with a social login */}
           <Button asChild variant="outline">

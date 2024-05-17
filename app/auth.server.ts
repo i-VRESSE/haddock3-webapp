@@ -18,6 +18,7 @@ import {
   User,
   portalregister,
   UserNotFoundError,
+  setPreferredExpertiseLevel,
 } from "./models/user.server";
 import {
   CsbUser,
@@ -216,7 +217,7 @@ if (inPortalMode) {
   authenticator.unuse("orcid");
 }
 
-function mergeUser(csbUser: CsbUser, webappUser: User): User {
+async function mergeUser(csbUser: CsbUser, webappUser: User): Promise<User> {
   const { isAdmin, expertiseLevels, preferredExpertiseLevel } = mapPermissions(
     csbUser.permissions,
   );
@@ -227,9 +228,15 @@ function mergeUser(csbUser: CsbUser, webappUser: User): User {
     isAdmin,
     expertiseLevels,
   };
-  // TODO when csb user gets permission lowered
-  // we should also lower the preferred expertise level in the webapp
   if (!user.preferredExpertiseLevel && preferredExpertiseLevel) {
+    user.preferredExpertiseLevel = preferredExpertiseLevel;
+  }
+  if (
+    user.preferredExpertiseLevel !== null &&
+    !expertiseLevels.includes(user.preferredExpertiseLevel)
+  ) {
+    // If user no longer has the level they prefer then pick one from available levels
+    await setPreferredExpertiseLevel(user.id, preferredExpertiseLevel);
     user.preferredExpertiseLevel = preferredExpertiseLevel;
   }
   return user;
@@ -246,12 +253,12 @@ export async function getOptionalUser(request: Request) {
     }
     try {
       const webappUser = await getUserById(csbUser.id);
-      return mergeUser(csbUser, webappUser);
+      return await mergeUser(csbUser, webappUser);
     } catch (error) {
       if (error instanceof UserNotFoundError) {
         // New user from the portal sync them with the webapp
         const webappUser = await portalregister(csbUser.id, csbUser.email);
-        return mergeUser(csbUser, webappUser);
+        return await mergeUser(csbUser, webappUser);
       }
     }
   }

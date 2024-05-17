@@ -1,12 +1,11 @@
 import { boolean, email, number, object, string, parse, Output } from "valibot";
 import { parse as parseCookie } from "cookie";
-import { ExpertiseLevel } from "./drizzle/schema.server";
+import { type ExpertiseLevel } from "./drizzle/schema.server";
 
 export const inPortalMode = !!process.env.HADDOCK3WEBAPP_CSB_PORTAL;
-export const PORTALCOOKIENAME = "bonvinlab_auth_token";
-export const PORTAL_VALIDATE_URL =
-  process.env.HADDOCK3WEBAPP_CSB_PORTAL_BACKEND ??
-  "http://backend:8180/api/auth/validate";
+export const PORTAL_COOKIE_NAME = "bonvinlab_auth_token";
+export const PORTAL_BACKEND_URL =
+  process.env.HADDOCK3WEBAPP_CSB_PORTAL_BACKEND ?? "http://backend:8180/api";
 
 export function disabledInPortalMode() {
   if (inPortalMode) {
@@ -24,20 +23,28 @@ export const CsbUserSchema = object({
 });
 export type CsbUser = Output<typeof CsbUserSchema>;
 
-export async function getPortalUser(request: Request) {
-  // get bonvinlab_auth_token cookie
+function getToken(request: Request) {
   const cookieString = request.headers.get("Cookie") || "";
   const cookies = parseCookie(cookieString);
-  const csbToken = cookies[PORTALCOOKIENAME];
+  const csbToken = cookies[PORTAL_COOKIE_NAME];
   if (!csbToken) {
     throw new Error("Failed to validate token");
   }
-  // if there is cookie then call csb backend GET /api/auth/validate
-  const resp = await fetch(PORTAL_VALIDATE_URL, {
+  return csbToken;
+}
+
+function getPortalHeaders(request: Request) {
+  const csbToken = getToken(request);
+  return {
     headers: {
       Authorization: `Bearer ${csbToken}`,
     },
-  });
+  };
+}
+
+export async function getPortalUser(request: Request) {
+  const url = `${PORTAL_BACKEND_URL}/auth/validate`;
+  const resp = await fetch(url, getPortalHeaders(request));
   if (!resp.ok) {
     throw new Error("Failed to validate token");
   }
@@ -76,4 +83,17 @@ export function mapPermissions(perms: number) {
     preferredExpertiseLevel,
     isAdmin: (perms & 32) !== 0,
   };
+}
+
+export async function logout(request: Request) {
+  const url = `${PORTAL_BACKEND_URL}/auth/logout`;
+  const backendResp = await fetch(url, getPortalHeaders(request));
+  const cookie = backendResp.headers.get("Set-Cookie") ?? "";
+  return new Response(null, {
+    status: 302,
+    headers: {
+      "Location": "/",
+      "Set-Cookie": cookie,
+    }
+  });
 }

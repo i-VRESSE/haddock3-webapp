@@ -1,3 +1,9 @@
+/**
+ * This is a mock portal that simulates the portals frontend and backend.
+ * The frontend has the user management pages.
+ * The backend can be used to validate the user's session or logout.
+ * The portal revere proxies the haddock3 webapp from the /haddock30 path.
+ */
 import http from "node:http";
 
 import { parse } from "cookie";
@@ -12,15 +18,28 @@ const backend = http.createServer((req, res) => {
       JSON.stringify({
         id: 42,
         email: "someone@example.com",
-        permissions: 2,
+        // All levels + admin == 39
+        // All levels == 7
+        // Just easy == 1
+        // No levels == 0
+        permissions: 7,
         suspended: false,
       }),
     );
     res.end();
-    return;
+  } else if (req.url === "/api/auth/logout") {
+    console.log("Clearing cookie");
+    const setCookie =
+      'bonvinlab_auth_token=""; Path=/; HttpOnly; Expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    res.writeHead(200, {
+      "Content-Type": "text/plain",
+      "set-cookie": setCookie,
+    });
+    res.end("Logged out\n");
+  } else {
+    res.writeHead(404, { "Content-Type": "text/plain" });
+    res.end("Not found\n");
   }
-  res.writeHead(200, { "Content-Type": "text/plain" });
-  res.end("Hello World\n");
 });
 
 backend.listen(8180, "0.0.0.0", () => {
@@ -52,18 +71,12 @@ const frontend = http.createServer((req, res) => {
       "set-cookie": setCookie,
     });
     res.end("Logged in or registed\n");
-  } else if (req.url === "/logout") {
-    console.log("Clearing cookie");
-    const setCookie =
-      'bonvinlab_auth_token=""; Path=/; HttpOnly; Expires=Thu, 01 Jan 1970 00:00:00 GMT';
-    res.writeHead(200, {
-      "Content-Type": "text/plain",
-      "set-cookie": setCookie,
-    });
-    res.end("Logged out\n");
   } else if (req.url === "/dashboard") {
     res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("Dashboard\n");
+    res.end("Dashboard page\n");
+  } else if (req.url === "/admin") {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("Admin page\n");
   } else {
     res.writeHead(404, { "Content-Type": "text/plain" });
     res.end("Not found\n");
