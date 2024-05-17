@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
+import { prefix } from "~/prefix";
 
 const LoggedInButton = () => {
   const user = useUser();
@@ -43,11 +44,17 @@ const LoggedInButton = () => {
   );
 };
 
-const LoginButton = () => (
-  <Link className={navigationMenuTriggerStyle()} to="/login">
-    Login
-  </Link>
-);
+const LoginButton = () => {
+  const { pathname } = useLocation();
+  return (
+    <Link
+      className={navigationMenuTriggerStyle()}
+      to={`/login?redirect_uri=${prefix}${pathname.slice(1)}`}
+    >
+      Login
+    </Link>
+  );
+};
 
 function MyNavLink({
   to,

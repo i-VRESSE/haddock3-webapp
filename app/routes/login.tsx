@@ -29,8 +29,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export async function action({ request }: ActionFunctionArgs) {
   disabledInPortalMode();
   try {
+    const successRedirect =
+      new URL(request.url, "http://localhost").searchParams.get(
+        "redirect_uri",
+      ) ?? "/";
     return await authenticator.authenticate("user-pass", request, {
-      successRedirect: "/",
+      successRedirect,
     });
   } catch (error) {
     if (error instanceof AuthorizationError && error.cause) {

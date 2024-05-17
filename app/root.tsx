@@ -120,6 +120,7 @@ export function ErrorBoundary() {
             <h2 className="py-8 text-xl">
               {error.status} {error.data?.error && error.data.error}
             </h2>
+            <p>Page requires authorization.</p>
             {inPortalMode ? (
               <p>
                 Please{" "}
@@ -136,12 +137,18 @@ export function ErrorBoundary() {
                 >
                   register
                 </a>{" "}
-                to use the services of the BonvinLab
+                to use the services of the BonvinLab.
               </p>
             ) : (
               <p>
-                Page requires authorization. Please{" "}
-                <Link to="/login">login</Link> and try again.
+                Please{" "}
+                <Link
+                  to={`/login?redirect_uri=${prefix}${pathname.slice(1)}`}
+                  className="underline"
+                >
+                  login
+                </Link>{" "}
+                and try again.
               </p>
             )}
           </BoundaryShell>
