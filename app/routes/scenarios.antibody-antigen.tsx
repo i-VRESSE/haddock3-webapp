@@ -28,6 +28,7 @@ import {
   generateAmbiguousRestraintsFile,
   generateUnAmbiguousRestraintsFile,
 } from "~/scenarios/restraints";
+import { FormErrors } from "~/scenarios/FormErrors";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);

@@ -65,14 +65,6 @@ export async function getCompletedJobById(
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  const returncode = await getJobReturnCode(jobid, bartenderToken);
-  if (returncode) {
-    const state: typeof job.state = "error";
-    return {
-      ...job,
-      state,
-    };
-  }
   return job;
 }
 
@@ -435,13 +427,4 @@ export async function getParamsCfg<Schema extends BaseSchema>({
   }
   const params = parse(schema, config);
   return params;
-}
-
-export async function getJobReturnCode(jobid: number, bartenderToken: string) {
-  const file = await getJobfile(jobid, "returncode", bartenderToken);
-  if (file.ok) {
-    const body = await file.text();
-    return parseInt(body);
-  }
-  return 1;
 }
