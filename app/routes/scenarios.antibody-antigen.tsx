@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { json, useActionData, useNavigate, useSubmit } from "@remix-run/react";
 import JSZip from "jszip";
-import { Output, instance, object, optional } from "valibot";
+import {
+  Output,
+  ValiError,
+  instance,
+  minSize,
+  object,
+  optional,
+} from "valibot";
 import { LoaderFunctionArgs } from "@remix-run/node";
 
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
@@ -32,7 +39,12 @@ export const action = uploadaction;
 const Schema = object({
   antibody: instance(File, "Antibody structure as PDB file", []),
   antigen: instance(File, "Antibody structure as PDB file", []),
-  ambig_fname: instance(File, "Ambiguous restraints as TBL file"),
+  ambig_fname: instance(File, "Ambiguous restraints as TBL file", [
+    minSize(
+      1,
+      "Ambiguous restraints file should not be empty. Please select some residues.",
+    ),
+  ]),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
   reference_fname: optional(
     instance(File, "Reference structure as PDB file", []),
@@ -53,7 +65,7 @@ function generateWorkflow(data: Schema) {
     ? `# Restraints to keep the antibody chains together
 unambig_fname = "${data.unambig_fname.name}"`
     : "";
-  const ref_line = data.reference_fname?.name
+  const ref_line = data.reference_fname
     ? `reference_fname = "${data.reference_fname.name}"`
     : "";
   return `
@@ -147,10 +159,10 @@ async function createZip(workflow: string, data: Schema) {
   zip.file(data.antibody.name, data.antibody);
   zip.file(data.antigen.name, data.antigen);
   zip.file(data.ambig_fname.name, data.ambig_fname);
-  if (data.unambig_fname?.name) {
+  if (data.unambig_fname) {
     zip.file(data.unambig_fname.name, data.unambig_fname);
   }
-  if (data.reference_fname?.name) {
+  if (data.reference_fname) {
     zip.file(data.reference_fname.name, data.reference_fname);
   }
   return zip.generateAsync({ type: "blob" });
@@ -175,6 +187,9 @@ export default function AntibodyAntigenScenario() {
     chain: "",
     bodyRestraints: "",
   });
+  const [errors, setErrors] = useState<string[] | undefined>(
+    actionData?.errors,
+  );
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -195,10 +210,18 @@ export default function AntibodyAntigenScenario() {
       formData.set("unambig_fname", unambig_fname);
     }
 
-    const data = parseFormData(formData, Schema);
-    const workflow = generateWorkflow(data);
-    const zipPromise = createZip(workflow, data);
-    handleActionButton(event.nativeEvent, zipPromise, navigate, submit);
+    try {
+      const data = parseFormData(formData, Schema);
+      setErrors(undefined);
+      const workflow = generateWorkflow(data);
+      const zipPromise = createZip(workflow, data);
+      handleActionButton(event.nativeEvent, zipPromise, navigate, submit);
+    } catch (e) {
+      if (e instanceof ValiError) {
+        return setErrors(e.issues.map((i) => i.message));
+      }
+      setErrors([String(e)]);
+    }
   }
 
   return (
@@ -254,9 +277,7 @@ export default function AntibodyAntigenScenario() {
                 In tutorial named pdbs/4G6M_matched.pdb
               </FormDescription>
             </FormItem>
-            <div className="py-2 text-red-500">
-              {actionData?.errors.map((error) => <p key={error}>{error}</p>)}
-            </div>
+            <FormErrors errors={errors} />
             <ActionButtons />
           </form>
         )}
