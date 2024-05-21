@@ -50,7 +50,7 @@ export default function JobPage() {
     <main className="flex flex-row gap-16">
       <div>
         <JobStatus job={job} />
-        {hasCaprieval && job.state === 'ok' && (
+        {hasCaprieval && job.state === "ok" && (
           <>
             <p>
               <a
@@ -82,7 +82,11 @@ export default function JobPage() {
       </div>
       <div>
         <h2 className="text-xl">Module output</h2>
-        <OutputReport files={outputFiles!} jobid={job.id} withTools={job.state === 'ok'}/>
+        <OutputReport
+          files={outputFiles!}
+          jobid={job.id}
+          withTools={job.state === "ok"}
+        />
         <a href={`${prefix}jobs/${job.id}/output.zip`}>
           &#128230; Download archive
         </a>

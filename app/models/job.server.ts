@@ -65,13 +65,13 @@ export async function getCompletedJobById(
   if (!CompletedJobs.has(job.state)) {
     throw new Error("Job is not completed");
   }
-  const returncode = await getJobReturnCode(jobid, bartenderToken)
+  const returncode = await getJobReturnCode(jobid, bartenderToken);
   if (returncode) {
-    const state: typeof job.state = 'error'
+    const state: typeof job.state = "error";
     return {
       ...job,
-      state
-    }
+      state,
+    };
   }
   return job;
 }
@@ -266,7 +266,7 @@ export function getModuleIndexPadding(files: DirectoryItem) {
   if (padding === 1) {
     padding = 2;
   }
-  return padding
+  return padding;
 }
 
 export function buildPath({
@@ -438,10 +438,10 @@ export async function getParamsCfg<Schema extends BaseSchema>({
 }
 
 export async function getJobReturnCode(jobid: number, bartenderToken: string) {
-  const file = await getJobfile(jobid, 'returncode', bartenderToken)
+  const file = await getJobfile(jobid, "returncode", bartenderToken);
   if (file.ok) {
-    const body = await file.text()
-    return parseInt(body)
+    const body = await file.text();
+    return parseInt(body);
   }
   return 1;
 }

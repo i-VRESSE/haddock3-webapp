@@ -34,7 +34,9 @@ const Schema = object({
   antigen: instance(File, "Antibody structure as PDB file", []),
   ambig_fname: instance(File, "Ambiguous restraints as TBL file"),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
-  reference_fname: optional(instance(File, "Reference structure as PDB file", [])),
+  reference_fname: optional(
+    instance(File, "Reference structure as PDB file", []),
+  ),
 });
 type Schema = Output<typeof Schema>;
 
@@ -51,7 +53,9 @@ function generateWorkflow(data: Schema) {
     ? `# Restraints to keep the antibody chains together
 unambig_fname = "${data.unambig_fname.name}"`
     : "";
-  const ref_line = data.reference_fname?.name ? `reference_fname = "${data.reference_fname.name}"` : ""
+  const ref_line = data.reference_fname?.name
+    ? `reference_fname = "${data.reference_fname.name}"`
+    : "";
   return `
 # ====================================================================
 # Antibody-antigen docking example with restraints from the antibody

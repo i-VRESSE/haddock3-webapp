@@ -36,7 +36,9 @@ export function ShowSurfaceBuriedToggles({
         id={id}
         className="border"
       >
-        <ToggleGroupItem value="surface">Surface accessible residues</ToggleGroupItem>
+        <ToggleGroupItem value="surface">
+          Surface accessible residues
+        </ToggleGroupItem>
         <ToggleGroupItem value="buried">Buried residues</ToggleGroupItem>
       </ToggleGroup>
     </div>

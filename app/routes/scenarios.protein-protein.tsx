@@ -46,7 +46,9 @@ function generateWorkflow(data: Schema) {
   const unambig_line = data.unambig_fname
     ? `unambig_fname = "${data.unambig_fname.name}"`
     : "";
-  const ref_line = data.reference_fname?.name ? `reference_fname = "${data.reference_fname.name}"` : ""
+  const ref_line = data.reference_fname?.name
+    ? `reference_fname = "${data.reference_fname.name}"`
+    : "";
   return `
 # ====================================================================
 # Protein-protein docking example with NMR-derived ambiguous interaction restraints
