@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useActionData, useSubmit, useNavigate, json } from "@remix-run/react";
-import { object, instance, Output, optional } from "valibot";
+import {
+  object,
+  instance,
+  Output,
+  optional,
+  minSize,
+  ValiError,
+} from "valibot";
 import JSZip from "jszip";
 import { LoaderFunctionArgs } from "@remix-run/node";
 
@@ -21,6 +28,7 @@ import {
   generateAmbiguousRestraintsFile,
   generateUnAmbiguousRestraintsFile,
 } from "../scenarios/restraints";
+import { FormErrors } from "../scenarios/FormErrors";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -30,11 +38,17 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = uploadaction;
 
 const Schema = object({
+  // TODO check content of pdb files are valid
   protein1: instance(File, "First protein structure as PDB file"),
   protein2: instance(File, "Second protein structure as PDB file"),
-  ambig_fname: instance(File, "Ambiguous restraints as TBL file"),
+  ambig_fname: instance(File, "Ambiguous restraints as TBL file", [
+    minSize(
+      1,
+      "Ambiguous restraints file should not be empty. Please select residues.",
+    ),
+  ]),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
-  reference_fname: instance(File, "Reference structure as PDB file"),
+  reference_fname: optional(instance(File, "Reference structure as PDB file")),
 });
 type Schema = Output<typeof Schema>;
 
@@ -45,6 +59,9 @@ function generateWorkflow(data: Schema) {
 
   const unambig_line = data.unambig_fname
     ? `unambig_fname = "${data.unambig_fname.name}"`
+    : "";
+  const ref_line = data.reference_fname
+    ? `reference_fname = "${data.reference_fname.name}"`
     : "";
   return `
 # ====================================================================
@@ -79,27 +96,27 @@ ${unambig_line}
 sampling = 1000
 
 [caprieval]
-reference_fname = "${data.reference_fname.name}"
+${ref_line}
 
 [seletop]
 select = 200
 
 [caprieval]
-reference_fname = "${data.reference_fname.name}"
+${ref_line}
 
 [flexref]
 ambig_fname = "${data.ambig_fname.name}"
 ${unambig_line}
 
 [caprieval]
-reference_fname = "${data.reference_fname.name}"
+${ref_line}
 
 [emref]
 ambig_fname = "${data.ambig_fname.name}"
 ${unambig_line}
 
 [caprieval]
-reference_fname = "${data.reference_fname.name}"
+${ref_line}
 
 [clustfcc]
 
@@ -107,7 +124,9 @@ reference_fname = "${data.reference_fname.name}"
 top_models = 4
 
 [caprieval]
-reference_fname = "${data.reference_fname.name}"
+${ref_line}
+
+[contactmap]
 
 # ====================================================================
 `;
@@ -119,7 +138,9 @@ async function createZip(workflow: string, data: Schema) {
   zip.file(data.protein1.name, data.protein1);
   zip.file(data.protein2.name, data.protein2);
   zip.file(data.ambig_fname.name, data.ambig_fname);
-  zip.file(data.reference_fname.name, data.reference_fname);
+  if (data.reference_fname) {
+    zip.file(data.reference_fname.name, data.reference_fname);
+  }
   if (data.unambig_fname) {
     zip.file(data.unambig_fname.name, data.unambig_fname);
   }
@@ -145,6 +166,9 @@ export default function ProteinProteinScenario() {
     chain: "",
     bodyRestraints: "",
   });
+  const [errors, setErrors] = useState<string[] | undefined>(
+    actionData?.errors,
+  );
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -165,10 +189,18 @@ export default function ProteinProteinScenario() {
       formData.set("unambig_fname", unambig_fname);
     }
 
-    const data = parseFormData(formData, Schema);
-    const workflow = generateWorkflow(data);
-    const zipPromise = createZip(workflow, data);
-    handleActionButton(event.nativeEvent, zipPromise, navigate, submit);
+    try {
+      const data = parseFormData(formData, Schema);
+      setErrors(undefined);
+      const workflow = generateWorkflow(data);
+      const zipPromise = createZip(workflow, data);
+      handleActionButton(event.nativeEvent, zipPromise, navigate, submit);
+    } catch (e) {
+      if (e instanceof ValiError) {
+        return setErrors(e.issues.map((i) => i.message));
+      }
+      setErrors([String(e)]);
+    }
   }
 
   return (
@@ -222,9 +254,7 @@ export default function ProteinProteinScenario() {
                 In example named data/e2a-hpr_1GGR.pdb
               </FormDescription>
             </FormItem>
-            <div className="py-2 text-destructive-foreground">
-              {actionData?.errors.map((error) => <p key={error}>{error}</p>)}
-            </div>
+            <FormErrors errors={errors} />
             <ActionButtons />
           </form>
         )}
