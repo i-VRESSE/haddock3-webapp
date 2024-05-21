@@ -61,6 +61,18 @@ export const OutputReport = ({
                     🔧
                   </Link>
                 )}
+                {module.name === "clustfcc" && (
+                  <a
+                    title="Cluster matrix plot"
+                    target="_blank"
+                    rel="noreferrer"
+                    // http://0.0.0.0:3000/jobs/5/files/output/09_clustfcc/fcc_matrix.html
+                    href={`${prefix}jobs/${jobid}/files/output/${module.id}_${module.name}/fcc_matrix.html`}
+                    className="dark:invert"
+                  >
+                    &#128202;
+                  </a>
+                )}
                 {module.name === "clustrmsd" && withTools && (
                   <Link
                     title="Recluster"
@@ -68,6 +80,18 @@ export const OutputReport = ({
                   >
                     🔧
                   </Link>
+                )}
+                {module.name === "clustrmsd" && (
+                  <a
+                    title="Cluster matrix plot"
+                    target="_blank"
+                    rel="noreferrer"
+                    // http://0.0.0.0:3000/jobs/5/files/output/09_clustrmsd/rmsd_matrix.html
+                    href={`${prefix}jobs/${jobid}/files/output/${module.id}_${module.name}/rmsd_matrix.html`}
+                    className="dark:invert"
+                  >
+                    &#128202;
+                  </a>
                 )}
                 {module.name === "caprieval" && withTools && (
                   <Link
