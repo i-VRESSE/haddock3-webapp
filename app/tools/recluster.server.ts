@@ -1,4 +1,5 @@
-import { buildPath, getJobfile } from "~/models/job.server";
+import { getPlotFromHtml } from "~/lib/html";
+import { buildPath, fetchHtml, getJobfile } from "~/models/job.server";
 import { parseTsv } from "~/models/tsv";
 
 export const parseClusterTsv = (body: string) =>
@@ -122,4 +123,26 @@ export async function getClusterTsv({
     isInteractive: false,
   });
   return appendPath(rows, ioJson.input);
+}
+export async function getMatrixPlot(options: {
+  jobid: number;
+  moduleIndex: number;
+  bartenderToken: string;
+  moduleIndexPadding: number;
+  isInteractive: boolean;
+  moduleName: "clustfcc" | "clustrmsd";
+  htmlFilename: "fcc_matrix.html" | "rmsd_matrix.html";
+}) {
+  const html = await fetchHtml({
+    ...options,
+    module: options.moduleIndex,
+    isAnalysis: false,
+  });
+  const plot = getPlotFromHtml(html, 1);
+  // Size is computed at https://github.com/haddocking/haddock3/blob/003cdde55322768d9d61440396f26fd726d4113d/src/haddock/libs/libplots.py#L1284-L1291
+  // but when read from html file they are undefined
+  // Set size again here to workable values
+  plot.layout.width = 1070;
+  plot.layout.height = 1000;
+  return plot;
 }
