@@ -4,7 +4,6 @@ import easy from "./haddock3.easy.json?raw";
 import expert from "./haddock3.expert.json?raw";
 import guru from "./haddock3.guru.json?raw";
 import type { ExpertiseLevel } from "~/drizzle/schema.server";
-import { JOB_OUTPUT_DIR } from "~/bartender-client/constants";
 import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog.js";
 
 // Load catalogs during startup
@@ -24,7 +23,12 @@ function loadCatalog(catalog: ICatalog) {
     catalog.global.schema.properties &&
     typeof catalog.global.schema.properties.run_dir === "object"
   ) {
-    catalog.global.schema.properties.run_dir.default = JOB_OUTPUT_DIR;
+    // Delete run_dir as it is always set when workflow.cfg is rewritten
+    // downside that when you download from builder it is no longer valid on cli
+    delete catalog.global.schema.properties.run_dir
+    catalog.global.schema.required = catalog.global.schema.required?.filter(
+      (prop) => prop !== "run_dir",
+    );
   }
   return hideExecutionParameters(alwaysPlotMatrix(prepareCatalog(catalog)));
 }
