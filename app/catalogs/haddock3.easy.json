@@ -902,7 +902,7 @@
     {
       "id": "emscoring",
       "category": "scoring",
-      "label": "EM scoring module.\n\nThis module performs energy minimization and scoring of the models generated\nin the previous step of the workflow. No restraints are applied during this step.\n",
+      "label": "EM scoring module.\n\nThis module performs energy minimization and scoring of the models generated in\nthe previous step of the workflow. No restraints are applied during this step.\n",
       "description": "HADDOCK3 module to perform energy minimization scoring.",
       "schema": {
         "type": "object",
@@ -1455,7 +1455,7 @@
     {
       "id": "mdscoring",
       "category": "scoring",
-      "label": "MD scoring module.\n\nThis module will perform a short MD simulation on the input models and\nscore them. No restraints are applied during this step.",
+      "label": "MD scoring module.\n\nThis module will perform a short MD simulation on the input models and\nscore them. No restraints are applied during this step.\n",
       "description": "HADDOCK3 module to perform energy minimization scoring.",
       "schema": {
         "type": "object",
