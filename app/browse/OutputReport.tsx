@@ -34,9 +34,11 @@ export function files2modules(files: DirectoryItem) {
 export const OutputReport = ({
   jobid,
   files,
+  withTools,
 }: {
   jobid: number;
   files: DirectoryItem;
+  withTools?: boolean;
 }) => {
   const modules = useMemo(() => {
     return files2modules(files);
@@ -51,7 +53,7 @@ export const OutputReport = ({
                 {module.id}&nbsp;{module.name}
               </div>
               <div>
-                {module.name === "clustfcc" && (
+                {module.name === "clustfcc" && withTools && (
                   <Link
                     title="Recluster"
                     to={`/jobs/${jobid}/tools/reclustfcc/${module.id}`}
@@ -59,7 +61,19 @@ export const OutputReport = ({
                     🔧
                   </Link>
                 )}
-                {module.name === "clustrmsd" && (
+                {module.name === "clustfcc" && (
+                  <a
+                    title="Cluster matrix plot"
+                    target="_blank"
+                    rel="noreferrer"
+                    // http://0.0.0.0:3000/jobs/5/files/output/09_clustfcc/fcc_matrix.html
+                    href={`${prefix}jobs/${jobid}/files/output/${module.id}_${module.name}/fcc_matrix.html`}
+                    className="dark:invert"
+                  >
+                    &#128202;
+                  </a>
+                )}
+                {module.name === "clustrmsd" && withTools && (
                   <Link
                     title="Recluster"
                     to={`/jobs/${jobid}/tools/reclustrmsd/${module.id}`}
@@ -67,7 +81,19 @@ export const OutputReport = ({
                     🔧
                   </Link>
                 )}
-                {module.name === "caprieval" && (
+                {module.name === "clustrmsd" && (
+                  <a
+                    title="Cluster matrix plot"
+                    target="_blank"
+                    rel="noreferrer"
+                    // http://0.0.0.0:3000/jobs/5/files/output/09_clustrmsd/rmsd_matrix.html
+                    href={`${prefix}jobs/${jobid}/files/output/${module.id}_${module.name}/rmsd_matrix.html`}
+                    className="dark:invert"
+                  >
+                    &#128202;
+                  </a>
+                )}
+                {module.name === "caprieval" && withTools && (
                   <Link
                     title="Rescore"
                     to={`/jobs/${jobid}/tools/rescore/${module.id}`}
@@ -75,7 +101,7 @@ export const OutputReport = ({
                     🔧
                   </Link>
                 )}
-                {module.name === "contactmap" && (
+                {module.name === "contactmap" && withTools && (
                   <Link
                     title="Contact map report"
                     to={`/jobs/${jobid}/analysis/contactmap/${module.id}`}
@@ -84,7 +110,7 @@ export const OutputReport = ({
                     &#128208;
                   </Link>
                 )}
-                {module.report && (
+                {module.report && withTools && (
                   <>
                     <a
                       title="Caprieval analysis report"

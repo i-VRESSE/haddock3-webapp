@@ -71,7 +71,7 @@ interactive_applications:
       type: object
   reclustrmsd:
     command_template: >
-      haddock3-re clustrmsd
+      haddock3-re clustrmsd --plot_matrix
       {% if criterion == 'maxclust' -%}
       --n_clusters {{n_clusters|q}}
       {% else -%}
@@ -107,7 +107,7 @@ interactive_applications:
       type: object
   reclustfcc:
     command_template: >
-      haddock3-re clustfcc
+      haddock3-re clustfcc --plot_matrix
       --clust_cutoff {{clust_cutoff|q}} --strictness {{strictness|q}} --min_population {{min_population|q}}
       {{clustfcc_dir|q}}
       &&

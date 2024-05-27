@@ -12,7 +12,6 @@ export function PDBFileInput({
   const [file, setFile] = useState<File | undefined>();
 
   async function onChange(event: React.ChangeEvent<HTMLInputElement>) {
-    event.preventDefault();
     const file = event.target.files?.[0];
     setFile(file);
   }

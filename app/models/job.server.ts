@@ -253,7 +253,12 @@ export function getModuleIndexPadding(files: DirectoryItem) {
   const nrModules = files.children.filter(
     (c) => c.is_dir && c.name.includes("_"),
   ).length;
-  return Math.ceil(Math.log10(nrModules));
+  let padding = Math.ceil(Math.log10(nrModules));
+  // Wken you have <10 nodes it still uses padding of 2 for example 05_caprieval
+  if (padding === 1) {
+    padding = 2;
+  }
+  return padding;
 }
 
 export function buildPath({
@@ -384,7 +389,7 @@ export async function fetchHtml({
     bartenderToken,
   );
   if (!response.ok) {
-    throw new Error(`could not get ${htmlFilename}`);
+    throw new Error(`could not get ${prefix}${htmlFilename}`);
   }
   return await response.text();
 }

@@ -43,6 +43,9 @@ import { Input } from "~/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Label } from "~/components/ui/label";
 import { prefix } from "~/prefix";
+import { MatrixPlot } from "~/tools/MatrixPlot.client";
+import type { Data, Layout } from "plotly.js";
+import { getMatrixPlot } from "~/tools/recluster.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
@@ -72,6 +75,12 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     moduleIndex,
     ...info,
   });
+  const matrixPlot = await getMatrixPlot({
+    moduleIndex,
+    ...info,
+    moduleName: "clustrmsd",
+    htmlFilename: "rmsd_matrix.html",
+  });
   let caprievalData;
   if (showInteractiveVersion) {
     const { scatterSelection, boxSelection } = getPlotSelection(request.url);
@@ -91,6 +100,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     interactivness: showInteractiveVersion,
     maxInteractivness: hasInteractiveVersion,
     clusters,
+    matrixPlot,
     caprievalData,
   });
 };
@@ -138,6 +148,7 @@ export default function ReclusterPage() {
     interactivness,
     maxInteractivness,
     clusters,
+    matrixPlot,
     caprievalData,
   } = useLoaderData<typeof loader>();
   // Strip JsonifyObject wrapper
@@ -250,6 +261,17 @@ export default function ReclusterPage() {
       </Form>
       <div>
         <details open={true}>
+          <summary>Matrix</summary>
+          <ClientOnly fallback={<p>Loading...</p>}>
+            {() => (
+              <MatrixPlot
+                data={matrixPlot.data as Data[]}
+                layout={matrixPlot.layout as Layout}
+              />
+            )}
+          </ClientOnly>
+        </details>
+        <details open={false}>
           <summary>Clusters</summary>
           <ReClusterTable clusters={clusters} />
         </details>

@@ -26,7 +26,7 @@ RUN apt-get update && \
 
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
-RUN echo cachebust=1 && git clone --recursive https://github.com/${HADDOCK3_GHORG}/haddock3.git . && git checkout ${HADDOCK3_VERSION}
+RUN echo cachebust=2 && git clone --recursive https://github.com/${HADDOCK3_GHORG}/haddock3.git . && git checkout ${HADDOCK3_VERSION}
 WORKDIR /opt/haddock3/src/fcc/src
 RUN make
 WORKDIR /opt/haddock3/src/fast-rmsdmatrix/src
@@ -54,7 +54,7 @@ ENV GDOCK_PATH=/opt/gdock
 # bartender ==========================================================================================================
 
 WORKDIR /opt/bartender
-RUN git clone https://github.com/i-VRESSE/bartender.git . && git checkout ${BARTENDER_VERSION}
+RUN echo cachebust=1 && git clone https://github.com/i-VRESSE/bartender.git . && git checkout ${BARTENDER_VERSION}
 RUN pip install .
 
 CMD ["/usr/local/bin/bartender", "serve"]
