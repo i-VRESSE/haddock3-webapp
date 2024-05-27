@@ -19,17 +19,6 @@ export function getCatalog(level: ExpertiseLevel) {
 function loadCatalog(catalog: ICatalog) {
   catalog.examples = {};
   // Set default run_dir to JOB_OUTPUT_DIR
-  if (
-    catalog.global.schema.properties &&
-    typeof catalog.global.schema.properties.run_dir === "object"
-  ) {
-    // Delete run_dir as it is always set when workflow.cfg is rewritten
-    // downside that when you download from builder it is no longer valid on cli
-    delete catalog.global.schema.properties.run_dir
-    catalog.global.schema.required = catalog.global.schema.required?.filter(
-      (prop) => prop !== "run_dir",
-    );
-  }
   return hideExecutionParameters(alwaysPlotMatrix(prepareCatalog(catalog)));
 }
 
@@ -91,5 +80,21 @@ function hideExecutionParameters(catalog: ICatalog) {
     ...catalog.global.uiSchema,
     ...uiSchema,
   };
+  return catalog;
+}
+
+export function getCatalogForBuilder(catalogLevel: ExpertiseLevel) {
+  const catalog = structuredClone(getCatalog(catalogLevel));
+  if (
+    catalog.global.schema.properties &&
+    typeof catalog.global.schema.properties.run_dir === "object"
+  ) {
+    // Delete run_dir as it is always set when workflow.cfg is rewritten
+    // downside that when you download from builder it is no longer valid on cli
+    delete catalog.global.schema.properties.run_dir;
+    catalog.global.schema.required = catalog.global.schema.required?.filter(
+      (prop) => prop !== "run_dir",
+    );
+  }
   return catalog;
 }
