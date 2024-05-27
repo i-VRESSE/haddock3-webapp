@@ -18,20 +18,22 @@ The portal mode can be enabled by setting the `HADDOCK3WEBAPP_CSB_PORTAL` enviro
 
 ## Mock portal
 
-Run webapp with:
-
-```shell
-export HADDOCK3WEBAPP_PREFIX=/haddock30/
-export HADDOCK3WEBAPP_CSB_PORTAL=true
-export HADDOCK3WEBAPP_CSB_PORTAL_BACKEND=http://localhost:8180/api
-# or for production server use
-npm run build && npm start
-```
+The mock portal has the same endpoints as the real portal that are needed for haddock3 webapp, but those endpoints have very simply layout and mocked logic. A visitor is always logged in as someone@example.com user with all the rights.
 
 Start the mock portal with:
 
 ```shell
 npx tsx app/mock_portal.ts
+```
+
+Run webapp in another terminal  with:
+
+```shell
+export HADDOCK3WEBAPP_PREFIX=/haddock30/
+export HADDOCK3WEBAPP_CSB_PORTAL=true
+export HADDOCK3WEBAPP_CSB_PORTAL_BACKEND=http://localhost:8180/api
+npm run build
+npm start
 ```
 
 Goto http://0.0.0.0:8000/haddock30/ for webapp.

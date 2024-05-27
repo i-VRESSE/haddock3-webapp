@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"is_admin" boolean DEFAULT false NOT NULL,
 	"bartender_token" text DEFAULT '' NOT NULL,
 	"bartender_token_expires_at" integer DEFAULT 0 NOT NULL,
+	-- manually added default value as .default([]) does not do anything
 	"expertise_levels" expertise_level[] DEFAULT '{}' NOT NULL,
 	"preferred_expertise_level" "expertise_level",
 	"photo" text NOT NULL,

@@ -81,7 +81,7 @@ export default function Help() {
           <Link to="/register" className="underline">
             register page
           </Link>
-          . After registration you will be logged in immediatly.
+          . After registration you will be logged in immediately.
         </p>
       )}
 
