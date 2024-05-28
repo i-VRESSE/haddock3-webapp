@@ -1,11 +1,11 @@
 name: Deployment images
 
 on:
-#   push:
-#     branches:
-#       - main
-#     tags:
-#       - v*
+  push:
+    branches:
+      - main
+    tags:
+      - v*
   pull_request:
   workflow_dispatch:
     inputs:
@@ -63,7 +63,7 @@ jobs:
       - name: Push image
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           # This strips the git ref prefix from the version.
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           # This strips the "v" prefix from the tag name.
@@ -110,7 +110,7 @@ jobs:
         - name: Push image
           run: |
             IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-    
+            IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
             # This strips the git ref prefix from the version.
             VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
             # This strips the "v" prefix from the tag name.
@@ -135,7 +135,7 @@ jobs:
         run: > 
             docker build --file deploy/Dockerfile --tag $IMAGE_NAME
             --label "runnumber=${GITHUB_RUN_ID}"
-            deploy
+            .
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
@@ -143,7 +143,7 @@ jobs:
       - name: Push image
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           # This strips the git ref prefix from the version.
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           # This strips the "v" prefix from the tag name.
