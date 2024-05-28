@@ -23,7 +23,7 @@ export function JobStatus({ job }: Props) {
       <p>Updated on: {new Date(job.updated_on).toUTCString()}</p>
       {CompletedJobs.has(job.state) && (
         <>
-          <details>
+          <details open={job.state === "error"}>
             <summary className="cursor-pointer">Logs</summary>
             <ListLogFiles jobid={job.id} ok={job.state === "ok"} />
           </details>
