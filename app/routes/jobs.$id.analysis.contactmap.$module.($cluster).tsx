@@ -35,7 +35,6 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const clusterIds = await getClusters(moduleInfo, bartenderToken);
   if (params.cluster === undefined) {
     return redirect(
-      // TODO check if prefix needed
       `/jobs/${jobid}/analysis/contactmap/${moduleIndex}/${clusterIds[0]}`,
     );
   }

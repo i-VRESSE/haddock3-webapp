@@ -93,7 +93,7 @@ export function ActionButtons() {
       <Button type="submit" name="kind" value="refine" variant="secondary">
         Refine in builder
       </Button>
-      <Button type="submit" variant="secondary" name="kind" value="download">
+      <Button type="submit" name="kind" value="download" variant="secondary">
         Download workfow.zip
       </Button>
     </div>

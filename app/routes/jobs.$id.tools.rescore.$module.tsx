@@ -23,6 +23,7 @@ import {
   WeightsSchema,
 } from "~/caprieval/caprieval.server";
 import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
+import { prefix } from "~/prefix";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
@@ -61,7 +62,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     // the pdb file can be downloaed at /jobs/52/files/output/11_seletopclusts/cluster_1_model_1.pdb.gz
     // so we need to do some path manipulation,
     // with foo/bar/ negating the ../../ in the path
-    structurePrefix: `/jobs/${jobId}/files/output/foo/bar/`,
+    structurePrefix: `${prefix}jobs/${jobId}/files/output/foo/bar/`,
   });
   return json({
     moduleIndex,

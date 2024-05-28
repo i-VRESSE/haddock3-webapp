@@ -125,12 +125,12 @@ export async function getClusterInfo(
     heavyatoms_interchain_contacts: downloadPath(
       module.jobid,
       module,
-      `cluster${clusterId}_heavyatoms_interchain_contacts.tsv`,
+      `cluster${clusterId}_contmap_heavyatoms_interchain_contacts.tsv`,
     ),
     interchain_contacts: downloadPath(
       module.jobid,
       module,
-      `cluster${clusterId}_interchain_contacts.tsv`,
+      `cluster${clusterId}_contmap_interchain_contacts.tsv`,
     ),
     chordchart,
     heatmap,
