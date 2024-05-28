@@ -38,7 +38,7 @@ ENV PYTHONPATH=/opt/haddock3/src
 
 # lightdock ==========================================================================================================
 
-RUN pip install lightdock==${LIGHTDOCK_VERSION}
+RUN echo cachebust=1 && pip install lightdock==${LIGHTDOCK_VERSION}
 
 # gdock =============================================================================================================
 
