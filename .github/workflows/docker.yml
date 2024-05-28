@@ -149,11 +149,15 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/i-vresse/haddock3-webapp
+      - name: Pull images
+        run: docker compose -f deploy/arq/docker-compose.yml -p playwright pull
+        env:
+          WEBAPP_TAG: ${{ steps.meta.outputs.version }}
+          BARTENDER_TAG: ${{ steps.meta.outputs.version }}
+          CERTMAKER_TAG: ${{ steps.meta.outputs.version }}
       - name: Run Playwright tests
-        run: |
-          TAG=$(${{ steps.meta.outputs.tags }} | sed 's/ghcr.io\/i-vresse\/haddock3-webapp://')
-          echo TAG=$TAG
-          WEBAPP_TAG=$TAG
-          BARTENDER_TAG=$TAG
-          CERTMAKER_TAG=$TAG
-          npx playwright test
+        run: npx playwright test
+        env:
+          WEBAPP_TAG: ${{ steps.meta.outputs.version }}
+          BARTENDER_TAG: ${{ steps.meta.outputs.version }}
+          CERTMAKER_TAG: ${{ steps.meta.outputs.version }}
