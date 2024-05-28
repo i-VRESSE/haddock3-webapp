@@ -7,29 +7,7 @@ on:
     tags:
       - v*
   pull_request:
-  workflow_dispatch:
-    inputs:
-        HADDOCK3_GHORG:
-            description: 'Haddock3 GH organization'
-            required: true
-            default: 'i-VRESSE'
-        HADDOCK3_VERSION:
-            description: 'Haddock3 version'
-            required: true
-            default: 'web-service'
-        BARTENDER_VERSION:
-            description: 'Bartender version'
-            required: true
-            default: 'main'
-        GDOCK_VERSION:
-            description: 'Gdock version'
-            required: true
-            default: 'main'
-        LIGHTDOCK_VERSION:
-            description: 'Lightdock version'
-            required: true
-            default: '0.9.4'
-    
+
 jobs:
   bartender:
     runs-on: ubuntu-latest
@@ -37,120 +15,99 @@ jobs:
       packages: write
       contents: read
     env:
-        HADDOCK3_GHORG: ${{ inputs.HADDOCK3_GHORG || 'i-VRESSE' }}
-        HADDOCK3_VERSION: ${{ inputs.HADDOCK3_VERSION || 'web-service' }}
-        BARTENDER_VERSION: ${{ inputs.BARTENDER_VERSION || 'main' }}
-        GDOCK_VERSION: ${{ inputs.GDOCK_VERSION || 'main' }}
-        LIGHTDOCK_VERSION: ${{ inputs.LIGHTDOCK_VERSION || '0.9.4' }}
-        IMAGE_NAME: bartender
+      HADDOCK3_GHORG: "i-VRESSE"
+      HADDOCK3_VERSION: "web-service"
+      BARTENDER_VERSION: "main"
+      GDOCK_VERSION: "main"
+      LIGHTDOCK_VERSION: "0.9.4"
     steps:
       - uses: actions/checkout@v4
-
-      - name: Build image
-        run: > 
-            docker build --file deploy/Dockerfile.bartenderhaddock3 --tag $IMAGE_NAME
-            --label "runnumber=${GITHUB_RUN_ID}"
-            --build-arg HADDOCK3_VERSION=$HADDOCK3_VERSION
-            --build-arg HADDOCK3_GHORG=$HADDOCK3_GHORG
-            --build-arg BARTENDER_VERSION=$BARTENDER_VERSION
-            --build-arg GDOCK_VERSION=$GDOCK_VERSION
-            --build-arg LIGHTDOCK_VERSION=$LIGHTDOCK_VERSION
-            deploy
-
-      - name: Log in to registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Push image
-        run: |
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          # This strips the git ref prefix from the version.
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # This strips the "v" prefix from the tag name.
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          # This uses the Docker `latest` tag convention.
-          [ "$VERSION" == "main" ] && VERSION=latest
-          # combine build args into version
-          VERSION="${VERSION}"
-          if [ "$HADDOCK3_VERSION" != "web-service" ]; then
-            VERSION="${VERSION}-${HADDOCK3_VERSION}"
-          fi
-          if [ "$HADDOCK3_GHORG" != "i-VRESSE" ]; then
-            VERSION="${VERSION}-${HADDOCK3_GHORG}"
-          fi
-          if [ "$BARTENDER_VERSION" != "main" ]; then
-            VERSION="${VERSION}-${BARTENDER_VERSION}"
-          fi
-          if [ "$GDOCK_VERSION" != "main" ]; then
-            VERSION="${VERSION}-${GDOCK_VERSION}"
-          fi
-          if [ "$LIGHTDOCK_VERSION" != "0.9.4" ]; then
-            VERSION="${VERSION}-${LIGHTDOCK_VERSION}"
-          fi
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/i-vresse/bartender
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: deploy
+          file: deploy/Dockerfile.bartenderhaddock3
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            HADDOCK3_VERSION=$HADDOCK3_VERSION
+            HADDOCK3_GHORG=$HADDOCK3_GHORG
+            BARTENDER_VERSION=$BARTENDER_VERSION
+            GDOCK_VERSION=$GDOCK_VERSION
+            LIGHTDOCK_VERSION=$LIGHTDOCK_VERSION
   certmaker:
     runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
-    env:
-        IMAGE_NAME: certmaker
     steps:
-        - uses: actions/checkout@v4
-    
-        - name: Build image
-          run: docker build --file deploy/Dockerfile.openssl --tag $IMAGE_NAME deploy
-    
-        - name: Log in to registry
-          run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-    
-        - name: Push image
-          run: |
-            IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-            IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-            # This strips the git ref prefix from the version.
-            VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-            # This strips the "v" prefix from the tag name.
-            [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-            # This uses the Docker `latest` tag convention.
-            [ "$VERSION" == "main" ] && VERSION=latest
-            echo IMAGE_ID=$IMAGE_ID
-            echo VERSION=$VERSION
-            docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-            docker push $IMAGE_ID:$VERSION
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/i-vresse/certmaker
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: deploy
+          file: deploy/Dockerfile.openssl
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
   webapp:
     runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
-    env:
-        IMAGE_NAME: webapp
     steps:
       - uses: actions/checkout@v4
-
-      - name: Build image
-        run: > 
-            docker build --file deploy/Dockerfile --tag $IMAGE_NAME
-            --label "runnumber=${GITHUB_RUN_ID}"
-            .
-
-      - name: Log in to registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Push image
-        run: |
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          # This strips the git ref prefix from the version.
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          # This strips the "v" prefix from the tag name.
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          # This uses the Docker `latest` tag convention.
-          [ "$VERSION" == "main" ] && VERSION=latest
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/i-vresse/haddock3-webapp
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: deploy
+          file: deploy/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
