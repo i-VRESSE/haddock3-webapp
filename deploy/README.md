@@ -30,3 +30,33 @@ To remove all users and jobs run the following command:
 ```shell
 docker compose -f <docker compose file> down -v
 ```
+
+# Images
+
+The Docker images are published on https://github.com/orgs/i-VRESSE/packages .
+
+Each image has same set of tags:
+
+- latest, build from HEAD of the main branch
+- `<version>`, build from the version tag
+- `pr-<number>`, build from the pull request
+
+## bartender
+
+Bartender web service with haddock3, lightdock, gdock executables.
+
+Image does not contain real cns executable, downstream should bind or copy it to /opt/haddock3/bin/cns.
+
+This image can be used to run the
+
+1. bartender web service, with `bartender serve` command
+2. bartender worker, with `bartender perform` command
+3. haddock3 restraints web service, with `uvicorn --host 0.0.0.0 --port 5000 haddock.clis.restraints.webservice:app` command
+
+## certmaker
+
+Generates a rsa private key (/certs/private_key.pem file) and public key (/certs/public_key.pem file) pair on startup.
+
+## haddock3-webapp
+
+Haddock3 web application image.

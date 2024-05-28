@@ -15,6 +15,9 @@ jobs:
       packages: write
       contents: read
     env:
+      # TODO use main when https://github.com/haddocking/haddock3/pull/841 is nerged
+      # HADDOCK3_GHORG: haddocking"
+      # HADDOCK3_VERSION: "main"
       HADDOCK3_GHORG: "i-VRESSE"
       HADDOCK3_VERSION: "web-service"
       BARTENDER_VERSION: "main"
@@ -29,6 +32,10 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/i-vresse/bartender
+          labels: |
+            org.opencontainers.image.description=bartender web service with haddock3, lightdock, gdock executables. Image does not contain real cns executable, downstream should bind or copy it to /opt/haddock3/bin/cns.
+            org.opencontainers.image.url=https://github.com/i-VRESSE/haddock3-webapp/blob/bind-mount-cns/deploy/README.md#images
+            org.opencontainers.image.documentation.url=https://github.com/i-VRESSE/haddock3-webapp/blob/bind-mount-cns/deploy/README.md#images
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
@@ -46,11 +53,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            HADDOCK3_VERSION=$HADDOCK3_VERSION
-            HADDOCK3_GHORG=$HADDOCK3_GHORG
-            BARTENDER_VERSION=$BARTENDER_VERSION
-            GDOCK_VERSION=$GDOCK_VERSION
-            LIGHTDOCK_VERSION=$LIGHTDOCK_VERSION
+            HADDOCK3_VERSION=${{ env.HADDOCK3_VERSION }}
+            HADDOCK3_GHORG=${{ env.HADDOCK3_GHORG }}
+            BARTENDER_VERSION=${{ env.BARTENDER_VERSION }}
+            GDOCK_VERSION=${{ env.GDOCK_VERSION }}
+            LIGHTDOCK_VERSION=${{ env.LIGHTDOCK_VERSION }}
   certmaker:
     runs-on: ubuntu-latest
     permissions:
@@ -65,6 +72,10 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/i-vresse/certmaker
+          labels: |
+            org.opencontainers.image.description=Generates a rsa private key (/certs/private_key.pem file) and public key (/certs/public_key.pem file) pair on startup.
+            org.opencontainers.image.url=https://github.com/i-VRESSE/haddock3-webapp/blob/bind-mount-cns/deploy/README.md#images
+            org.opencontainers.image.documentation.url=https://github.com/i-VRESSE/haddock3-webapp/blob/bind-mount-cns/deploy/README.md#images
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
@@ -95,6 +106,10 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/i-vresse/haddock3-webapp
+          labels: |
+            org.opencontainers.image.description=Haddock3 web application image.
+            org.opencontainers.image.url=https://github.com/i-VRESSE/haddock3-webapp/blob/bind-mount-cns/deploy/README.md#images
+            org.opencontainers.image.documentation.url=https://github.com/i-VRESSE/haddock3-webapp/blob/bind-mount-cns/deploy/README.md#images
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
@@ -104,7 +119,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: deploy
           file: deploy/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
