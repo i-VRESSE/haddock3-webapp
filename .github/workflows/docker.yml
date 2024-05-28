@@ -8,6 +8,7 @@ on:
       - v*
   pull_request:
   # TODO have way to rebuild bartender image when it and its deps have updated
+  # TODO when PR is closed the image should be removed
 
 jobs:
   bartender:
@@ -34,7 +35,7 @@ jobs:
         with:
           images: ghcr.io/i-vresse/bartender
           labels: |
-            org.opencontainers.image.description="bartender web service with haddock3, lightdock, gdock executables. Image does not contain real cns executable, downstream should bind or copy it to /opt/haddock3/bin/cns."
+            org.opencontainers.image.description=bartender web service with haddock3, lightdock, gdock executables. Image does not contain real cns executable, downstream should bind or copy it to /opt/haddock3/bin/cns.
             org.opencontainers.image.url=https://github.com/i-VRESSE/haddock3-webapp/blob/bind-mount-cns/deploy/README.md#images
             org.opencontainers.image.documentation.url=https://github.com/i-VRESSE/haddock3-webapp/blob/bind-mount-cns/deploy/README.md#images
       - name: Login to DockerHub
@@ -74,7 +75,7 @@ jobs:
         with:
           images: ghcr.io/i-vresse/certmaker
           labels: |
-            org.opencontainers.image.description="Generates a rsa private key (/certs/private_key.pem file) and public key (/certs/public_key.pem file) pair on startup."
+            org.opencontainers.image.description=Generates a rsa private key (/certs/private_key.pem file) and public key (/certs/public_key.pem file) pair on startup.
             org.opencontainers.image.url=https://github.com/i-VRESSE/haddock3-webapp/blob/bind-mount-cns/deploy/README.md#images
             org.opencontainers.image.documentation.url=https://github.com/i-VRESSE/haddock3-webapp/blob/bind-mount-cns/deploy/README.md#images
       - name: Login to DockerHub
@@ -108,7 +109,7 @@ jobs:
         with:
           images: ghcr.io/i-vresse/haddock3-webapp
           labels: |
-            org.opencontainers.image.description="Haddock3 web application image."
+            org.opencontainers.image.description=Haddock3 web application image.
             org.opencontainers.image.url=https://github.com/i-VRESSE/haddock3-webapp/blob/bind-mount-cns/deploy/README.md#images
             org.opencontainers.image.documentation.url=https://github.com/i-VRESSE/haddock3-webapp/blob/bind-mount-cns/deploy/README.md#images
       - name: Login to DockerHub

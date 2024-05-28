@@ -37,11 +37,11 @@ The Docker images are published on https://github.com/orgs/i-VRESSE/packages .
 
 Each image has same set of tags:
 
-- latest, build from HEAD of the main branch
-- `<version>`, build from the version tag
-- `pr-<number>`, build from the pull request
+- `latest`, build from HEAD of the main branch
+- `<version>`, build from that version tag
+- `pr-<number>`, build from that pull request
 
-## bartender
+## bartender image
 
 Bartender web service with haddock3, lightdock, gdock executables.
 
@@ -53,10 +53,10 @@ This image can be used to run the
 2. bartender worker, with `bartender perform` command
 3. haddock3 restraints web service, with `uvicorn --host 0.0.0.0 --port 5000 haddock.clis.restraints.webservice:app` command
 
-## certmaker
+## certmaker image
 
 Generates a rsa private key (/certs/private_key.pem file) and public key (/certs/public_key.pem file) pair on startup.
 
-## haddock3-webapp
+## haddock3-webapp image
 
 Haddock3 web application image.
