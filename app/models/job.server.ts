@@ -18,6 +18,11 @@ const BOOK_KEEPING_FILES = [
   "workflow.cfg.orig",
 ];
 
+export const HADDOCK3WEBAPP_REFRESH_RATE_MS = process.env
+  .HADDOCK3WEBAPP_REFRESH_RATE_MS
+  ? parseInt(process.env.HADDOCK3WEBAPP_REFRESH_RATE_MS)
+  : 5000;
+
 export function jobIdFromParams(params: Params) {
   const jobId = params.id;
   if (jobId == null) {

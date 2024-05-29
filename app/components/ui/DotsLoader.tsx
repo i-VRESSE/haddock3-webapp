@@ -1,16 +1,15 @@
 import { ComponentPropsWithoutRef, useEffect, useState } from "react";
 
-// max. number of dots to draw
-const maxLength = 30;
-
 type DotsProps = {
   state: string;
   label?: string;
+  maxLength?: number;
 } & ComponentPropsWithoutRef<"div">;
 
 export default function DotsLoader({
   state,
   label = "Loading",
+  maxLength = 30,
   ...props
 }: DotsProps) {
   const [count, setCount] = useState(1);
@@ -31,7 +30,7 @@ export default function DotsLoader({
       // clean up
       clearInterval(timer);
     };
-  }, []);
+  }, [maxLength]);
 
   useEffect(() => {
     // reset to 1 on each state change

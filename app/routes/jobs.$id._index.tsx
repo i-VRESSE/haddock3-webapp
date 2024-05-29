@@ -7,11 +7,15 @@ import {
 } from "@remix-run/node";
 import { useLoaderData, useRevalidator } from "@remix-run/react";
 
-import { deleteJob, getJobById, jobIdFromParams } from "~/models/job.server";
+import {
+  deleteJob,
+  getJobById,
+  jobIdFromParams,
+  HADDOCK3WEBAPP_REFRESH_RATE_MS,
+} from "~/models/job.server";
 import { getUser } from "~/auth.server";
 import { JobStatus } from "~/components/JobStatus";
 import { getBartenderTokenByUser } from "~/bartender-client/token.server";
-import { PAGE_REFRESH_RATE_MS } from "~/bartender-client/constants";
 import DotsLoader from "~/components/ui/DotsLoader";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
@@ -27,7 +31,11 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     }
   }
 
-  return json({ job });
+  return json({
+    job,
+    // provide refresh rate from env or default of 5 sec.
+    HADDOCK3WEBAPP_REFRESH_RATE_MS,
+  });
 };
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
@@ -42,29 +50,37 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 };
 
 export default function JobPage() {
-  const { job } = useLoaderData<typeof loader>();
+  const { job, HADDOCK3WEBAPP_REFRESH_RATE_MS } =
+    useLoaderData<typeof loader>();
   const { revalidate } = useRevalidator();
+
+  // update value of updated_on
+  job.updated_on = new Date().toISOString();
 
   useEffect(() => {
     // set interval to refresh job status
-    const id = setInterval(() => {
-      // reload only if user is on the page/tab
-      if (
-        document.visibilityState === "visible" &&
-        // and job state is not "definitive"
-        job.state !== "error" &&
-        job.state !== "ok"
-      ) {
-        console.log("JobPage...REVALIDATE");
-        revalidate();
-      }
-    }, PAGE_REFRESH_RATE_MS);
+    let id: NodeJS.Timeout;
+    if (job.state !== "error" && job.state !== "ok") {
+      id = setInterval(() => {
+        // reload only if user is on the page/tab
+        if (
+          document.visibilityState === "visible" &&
+          // and job state is not "definitive"
+          job.state !== "error" &&
+          job.state !== "ok"
+        ) {
+          // console.log("JobPage...REVALIDATE");
+          revalidate();
+        }
+      }, HADDOCK3WEBAPP_REFRESH_RATE_MS);
+      // console.log("useEffect...id...", id);
+    }
     return () => {
       // clear interval
-      console.log("JobPage...clearInterval...", id);
+      // console.log("JobPage...clearInterval...", id);
       if (id) clearInterval(id);
     };
-  }, [revalidate, job.state]);
+  }, [HADDOCK3WEBAPP_REFRESH_RATE_MS, revalidate, job.state]);
 
   return (
     <main className="flex gap-16">

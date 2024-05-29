@@ -19,12 +19,13 @@ services:
     ports:
       - "8080:8080"
     environment:
-      BARTENDER_API_URL: "http://bartender:8000"
-      DATABASE_URL: postgresql://postgres:postgres@webappdb:5432/postgres
-      BARTENDER_PRIVATE_KEY: /certs/private_key.pem
-      SESSION_SECRET_FILE: /certs/session.secret
-      WAIT_PATHS: /certs/private_key.pem
-      HADDOCK3_RESTRAINTS_URL: "http://h3restraints:5000"
+      - BARTENDER_API_URL=http://bartender:8000
+      - DATABASE_URL=postgresql://postgres:postgres@webappdb:5432/postgres
+      - BARTENDER_PRIVATE_KEY=/certs/private_key.pem
+      - SESSION_SECRET_FILE=/certs/session.secret
+      - WAIT_PATHS=/certs/private_key.pem
+      - HADDOCK3_RESTRAINTS_URL=http://h3restraints:5000
+      - HADDOCK3WEBAPP_REFRESH_RATE_MS
     volumes:
       - bartender-certs:/certs:ro
 
