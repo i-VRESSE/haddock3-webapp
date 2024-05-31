@@ -66,6 +66,6 @@ Haddock3 web application image.
 Each pull requests creates several Docker images on ghcr.io with tag `pr-<pr_number>`.
 When the PR is closed, those images are no longer useful and are removed with a [GitHub workflow](.github/workflows/docker-cleanup.yml).
 
-The GitHub workflow needs a secret called `DELPACK_TOKEN`, 
+The GitHub workflow needs a secret called `DELPACK_TOKEN`,
 see https://docs.github.com/en/rest/packages/packages?apiVersion=2022-11-28#delete-package-version-for-an-organization
 which permissions the token needs.
