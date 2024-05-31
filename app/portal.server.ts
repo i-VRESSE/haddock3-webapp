@@ -34,10 +34,9 @@ function getToken(request: Request) {
 }
 
 function getPortalHeaders(request: Request) {
-  const csbToken = getToken(request);
   return {
     headers: {
-      Authorization: `Bearer ${csbToken}`,
+      Cookie: request.headers.get("Cookie") ?? "",
     },
   };
 }
