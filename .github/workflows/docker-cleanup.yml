@@ -1,0 +1,39 @@
+name: Docker Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+    cleanup:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Docker meta
+              id: meta
+              uses: docker/metadata-action@v5
+              with:
+                images: ghcr.io/i-vresse/haddock3-webapp            
+            - uses: actions/github-script@v7
+              with:
+                github-token: ${{ secrets.DELPACK_TOKEN }}
+                script: |
+                  const package_version_id = "${{ steps.meta.outputs.version }}";
+                  const images = [
+                    `ghcr.io/i-vresse/haddock3-webapp`,
+                    `ghcr.io/i-vresse/bartender`,
+                    `ghcr.io/i-vresse/certmaker`
+                  ];
+                  for (const image of images) {
+                    console.log(`Deleting ${image}`);
+                    try {
+                        await github.rest.packages.deletePackageVersionForOrg({
+                            package_type: 'container',
+                            package_name: image,
+                            org: 'i-VRESSE',
+                            package_version_id
+                        });
+                    } catch (error) {
+                        console.error(`Error deleting ${image}:${tag}: ${error}`);
+                    }
+                  }
+            
