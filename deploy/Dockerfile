@@ -19,7 +19,13 @@ FROM base as deps
 WORKDIR /myapp
 
 ADD package.json package-lock.json tsconfig.json ./
-RUN npm install --production=false
+
+ENV NODE_ENV development
+RUN npm install
+
+# Workaround for Error: Cannot find module @rollup/rollup-linux-arm64-gnu.
+ARG TARGETPLATFORM
+RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; then npm install --no-save @rollup/rollup-linux-arm64-gnu; fi
 
 # Setup production node_modules
 FROM base as production-deps
