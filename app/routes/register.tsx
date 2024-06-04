@@ -22,8 +22,10 @@ import { ErrorMessages } from "../components/ErrorMessages";
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
+import { disabledInPortalMode } from "~/portal.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  disabledInPortalMode();
   await authenticator.isAuthenticated(request, {
     successRedirect: "/",
   });
@@ -45,6 +47,7 @@ const RegisterSchema = object(
 );
 
 export async function action({ request }: ActionFunctionArgs) {
+  disabledInPortalMode();
   const formData = await request.formData();
   const result = safeParse(RegisterSchema, Object.fromEntries(formData));
   if (!result.success) {

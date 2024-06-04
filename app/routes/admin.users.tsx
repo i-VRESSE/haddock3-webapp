@@ -17,8 +17,10 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { disabledInPortalMode } from "~/portal.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  disabledInPortalMode();
   await mustBeAdmin(request);
   const users = await listUsers();
   const expertiseLevels = listExpertiseLevels();
@@ -29,12 +31,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  disabledInPortalMode();
   await mustBeAdmin(request);
   const formData = await request.formData();
-  const userId = formData.get("userId");
-  if (userId === null || typeof userId !== "string") {
+  const rawUserId = formData.get("userId");
+  if (rawUserId === null || typeof rawUserId !== "string") {
     throw json({ error: "Unknown user" }, { status: 400 });
   }
+  const userId = parseInt(rawUserId, 10);
   const isAdmin = formData.get("isAdmin");
   if (isAdmin !== null) {
     await setIsAdmin(userId, isAdmin === "true");
@@ -70,7 +74,7 @@ export default function AdminUsersPage() {
         <TableBody>
           {users.map((user) => {
             const update = (data: FormData) => {
-              data.set("userId", user.id);
+              data.set("userId", user.id.toString());
               submit(data, {
                 method: "post",
               });

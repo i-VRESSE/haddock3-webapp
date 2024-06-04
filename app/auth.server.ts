@@ -6,6 +6,7 @@ import {
   type OAuth2StrategyVerifyParams,
 } from "remix-auth-oauth2";
 import { json } from "@remix-run/node";
+import { email, object, parse, string } from "valibot";
 
 import { sessionStorage } from "./session.server";
 import {
@@ -14,12 +15,21 @@ import {
   isSubmitAllowed,
   localLogin,
   oauthregister,
+  User,
+  portalregister,
+  UserNotFoundError,
+  setPreferredExpertiseLevel,
 } from "./models/user.server";
-import { email, object, parse, string } from "valibot";
+import {
+  CsbUser,
+  getOptionalPortalUser,
+  inPortalMode,
+  mapPermissions,
+} from "./portal.server";
 
 // Create an instance of the authenticator, pass a generic with what
 // strategies will return and will store in the session
-export const authenticator = new Authenticator<string>(sessionStorage, {
+export const authenticator = new Authenticator<number>(sessionStorage, {
   throwOnError: true,
 });
 
@@ -198,15 +208,60 @@ if (
   authenticator.use(orcidStrategy);
 }
 
-export async function mustBeAuthenticated(request: Request) {
-  const userId = await authenticator.isAuthenticated(request);
-  if (userId === null) {
-    throw json({ error: "Unauthorized" }, { status: 401 });
+if (inPortalMode) {
+  // Disable all strategies in portal mode
+  // portal mode bypasses the authenticator
+  authenticator.unuse("user-pass");
+  authenticator.unuse("egi");
+  authenticator.unuse("github");
+  authenticator.unuse("orcid");
+}
+
+async function mergeUser(csbUser: CsbUser, webappUser: User): Promise<User> {
+  const { isAdmin, expertiseLevels, preferredExpertiseLevel } = mapPermissions(
+    csbUser.permissions,
+  );
+  const user = {
+    ...webappUser,
+    id: csbUser.id,
+    email: csbUser.email,
+    isAdmin,
+    expertiseLevels,
+  };
+  if (!user.preferredExpertiseLevel && preferredExpertiseLevel) {
+    user.preferredExpertiseLevel = preferredExpertiseLevel;
   }
-  return userId;
+  if (
+    user.preferredExpertiseLevel !== null &&
+    !expertiseLevels.includes(user.preferredExpertiseLevel)
+  ) {
+    // If user no longer has the level they prefer then pick one from available levels
+    await setPreferredExpertiseLevel(user.id, preferredExpertiseLevel);
+    user.preferredExpertiseLevel = preferredExpertiseLevel;
+  }
+  return user;
 }
 
 export async function getOptionalUser(request: Request) {
+  if (inPortalMode) {
+    const csbUser = await getOptionalPortalUser(request);
+    if (!csbUser) {
+      return null;
+    }
+    if (csbUser.suspended) {
+      throw json({ error: "Suspended" }, { status: 403 });
+    }
+    try {
+      const webappUser = await getUserById(csbUser.id);
+      return await mergeUser(csbUser, webappUser);
+    } catch (error) {
+      if (error instanceof UserNotFoundError) {
+        // New user from the portal sync them with the webapp
+        const webappUser = await portalregister(csbUser.id, csbUser.email);
+        return await mergeUser(csbUser, webappUser);
+      }
+    }
+  }
   const userId = await authenticator.isAuthenticated(request);
   if (userId === null) {
     return null;
