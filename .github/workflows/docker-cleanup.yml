@@ -18,12 +18,12 @@ jobs:
               `bartender`,
               `certmaker`
             ];
-            let message = 'Please delete the images belonging to this Pull Request.\n\n';
+            let message = 'Please delete the images belonging to this Pull Request as they a no longer useful.\n\n';
             for (const image of images) {
               message += `- [ghcr.io/i-vresse/${image}](https://github.com/i-VRESSE/haddock3-webapp/pkgs/container/${image}/versions)\n`;
             }
             message += `\nGoto versions page of each image, find version called ${package_version_id}, click on **...** button and select **Delete version**.\n`;
-            github.issues.createComment({
+            await github.rest.issues.createComment({
               issue_number,
               owner: context.repo.owner,
               repo: context.repo.repo,
