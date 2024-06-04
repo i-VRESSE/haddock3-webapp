@@ -7,7 +7,7 @@ By default the webapp runs in standalone mode, meaning registration, login and u
 In portal mode the webapp hands that of the the portal and its backend.
 Also the header and footer of the portal will be shown.
 
-To use a non-anomyous page in the webapp the webapp will
+To steps to render a use a non-anomyous page in the webapp are
 
 1. check if there is a cookie set for the portal
 2. if not redirect to the portal login page
@@ -15,6 +15,7 @@ To use a non-anomyous page in the webapp the webapp will
 4. combines portal user info with the webapp user info
 
 The portal mode can be enabled by setting the `HADDOCK3WEBAPP_CSB_PORTAL` environment variable to a thruthy value like `1`.
+The portal expects the haddock3 webapp to be running on a subpath of the portal, so the `HADDOCK3WEBAPP_PREFIX` environment variable should be set to something like `/haddock30`.
 
 ## Mock portal
 
@@ -37,4 +38,4 @@ npm start
 ```
 
 Goto http://0.0.0.0:8000/haddock30/ for webapp.
-Goto http://0.0.0.0:8000/login to login to the mock portal.
+Goto http://0.0.0.0:8000/new/login to login to the mock portal.
