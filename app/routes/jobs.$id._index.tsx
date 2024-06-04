@@ -35,6 +35,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     job,
     // provide refresh rate from env or default of 5 sec.
     HADDOCK3WEBAPP_REFRESH_RATE_MS,
+    lastCheckedOn: new Date().toISOString(),
   });
 };
 
@@ -50,12 +51,9 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 };
 
 export default function JobPage() {
-  const { job, HADDOCK3WEBAPP_REFRESH_RATE_MS } =
+  const { job, HADDOCK3WEBAPP_REFRESH_RATE_MS, lastCheckedOn } =
     useLoaderData<typeof loader>();
   const { revalidate } = useRevalidator();
-
-  // update value of updated_on
-  job.updated_on = new Date().toISOString();
 
   useEffect(() => {
     // set interval to refresh job status
@@ -85,7 +83,7 @@ export default function JobPage() {
   return (
     <main className="flex gap-16">
       <div>
-        <JobStatus job={job} />
+        <JobStatus job={job} lastStateCheckOn={lastCheckedOn} />
         {/* show dots loader indicating we monitor state change */}
         {job.state !== "error" && job.state !== "ok" ? (
           <DotsLoader
