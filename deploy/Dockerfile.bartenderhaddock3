@@ -1,5 +1,5 @@
 # Dockerfile for bartender web service with haddock3, lightdock, gdock executables.
-FROM python:3.9-slim-bookworm
+FROM python:3.9-slim-bookworm AS builder
 LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/Dockerfile.bartenderhaddock3
 LABEL org.opencontainers.image.licenses=Apache-2.0
 LABEL org.opencontainers.image.description="bartender web service with haddock3, lightdock, gdock executables. Image does not contain real cns executable, downstream should bind or copy it to /opt/haddock3/bin/cns."
@@ -23,6 +23,9 @@ RUN apt-get update && \
   apt-get clean && rm -rf /var/lib/apt/lists/* \
   && \
   pip install --upgrade pip
+
+RUN python3 -m venv /venv
+ENV PATH=/venv/bin:$PATH
 
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
@@ -55,7 +58,18 @@ WORKDIR /opt/bartender
 RUN echo cachebust=1 && git clone https://github.com/i-VRESSE/bartender.git . && git checkout ${BARTENDER_VERSION}
 RUN pip install .
 
-CMD ["/usr/local/bin/bartender", "serve"]
+FROM python:3.9-slim-bookworm
+
+COPY --from=builder /opt/haddock3 /opt/haddock3
+COPY --from=builder /opt/gdock /opt/gdock
+COPY --from=builder /opt/bartender /opt/bartender
+COPY --from=builder /wait /wait
+COPY --from=builder /venv /venv
+
+ENV PATH=/venv/bin:$PATH
+ENV PYTHONPATH=/opt/haddock3/src
+
+CMD ["/venv/bin/bartender", "serve"]
 
 HEALTHCHECK --interval=30s --timeout=5s CMD curl --fail http://localhost:8000/api/health || exit 1
 
@@ -67,13 +81,7 @@ ARG USER_GID=$USER_UID
 
 # Create the user
 RUN groupadd --gid $USER_GID $USERNAME \
-    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    #
-    # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
-    && apt-get update \
-    && apt-get install -y sudo \
-    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
-    && chmod 0440 /etc/sudoers.d/$USERNAME
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
 
 RUN mkdir /jobs && chown -R $USERNAME:$USERNAME /jobs
 
