@@ -54,11 +54,11 @@ export default function Help() {
       {inPortalModel ? (
         <p className="py-2">
           When you have not logged in before you can login on the{" "}
-          <a href="/login" className="underline">
+          <a href="/new/login" className="underline">
             login page
           </a>{" "}
           or register a new account on the{" "}
-          <a href="/registration" className="underline">
+          <a href="/new/registration" className="underline">
             register page
           </a>
           .
