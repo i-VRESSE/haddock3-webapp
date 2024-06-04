@@ -2,6 +2,10 @@
 
 > [!NOTE]
 > All deployment methods require the `cns` executable to available in this directory.
+>
+> On Apple M1 and later versions, the `cns` executable should be compiled for the linux arm64 platform. On Intel or AMD processors the `cns` executable should be compiled for the linux amd64 platform.
+>
+> The `cns` executable should have its execute bit set with `chmod +x cns`.
 
 ## Methods
 
@@ -31,3 +35,46 @@ To remove all users and jobs run the following command:
 ```shell
 docker compose -f <docker compose file> down -v
 ```
+
+# Images
+
+The Docker images are published on https://github.com/orgs/i-VRESSE/packages .
+
+Each image has same set of tags:
+
+- `latest`, build from HEAD of the main branch
+- `<version>`, build from that version tag
+- `pr-<number>`, build from that pull request
+
+The images are avaliable for linux amd64 and linux arm64 platforms, but arm64 images are not build on pull requests.
+
+When a pull request is closed, you are reminded to remove the images belonging to that pull request from the registry.
+
+## bartender image
+
+Bartender web service with haddock3, lightdock, gdock executables.
+
+Image does not contain real cns executable, downstream should bind or copy it to /opt/haddock3/bin/cns.
+
+This image can be used to run the
+
+1. bartender web service, with `bartender serve` command
+2. bartender worker, with `bartender perform` command
+3. haddock3 restraints web service, with `uvicorn --host 0.0.0.0 --port 5000 haddock.clis.restraints.webservice:app` command
+
+## certmaker image
+
+Generates a rsa private key (/certs/private_key.pem file) and public key (/certs/public_key.pem file) pair on startup.
+
+## haddock3-webapp image
+
+Haddock3 web application image.
+
+## Clean up after Pull Request close
+
+Each pull requests creates several Docker images on ghcr.io with tag `pr-<pr_number>`.
+When the PR is closed, those images are no longer useful and are removed with a [GitHub workflow](.github/workflows/docker-cleanup.yml).
+
+The GitHub workflow needs a secret called `DELPACK_TOKEN`,
+see https://docs.github.com/en/rest/packages/packages?apiVersion=2022-11-28#delete-package-version-for-an-organization
+which permissions the token needs.

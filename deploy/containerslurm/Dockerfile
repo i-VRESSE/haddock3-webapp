@@ -1,8 +1,9 @@
 # Dockerfile with slurm scheduler, sshd, haddock3, lightdock, gdock executables.
 FROM ghcr.io/xenon-middleware/slurm:23
 
+ARG HADDOCK3_GHORG=haddocking
 ARG HADDOCK3_VERSION=main
-ARG GDOCK_VERSION=master
+ARG GDOCK_VERSION=main
 ARG LIGHTDOCK_VERSION=0.9.4
 
 USER root
@@ -34,19 +35,19 @@ RUN /usr/local/bin/pip install lightdock==${LIGHTDOCK_VERSION}
 
 WORKDIR /opt/gdock
 RUN git clone https://github.com/gdocking/gdock.git . && git checkout ${GDOCK_VERSION}
+RUN pip install matplotlib==3.8.4  # dont install 3.9.0rc2
 RUN python3.9 setup.py develop
 RUN bash install.sh /opt/gdock
 ENV GDOCK_PATH=/opt/gdock
 
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
-RUN git clone --recursive https://github.com/haddocking/haddock3.git . && git checkout ${HADDOCK3_VERSION}
-RUN cd src/fcc/src && make && cd .. && \
-    # pretend fcc is installed
-    ln -s $PWD /usr/local/lib/python3.9/dist-packages/fcc && \
-    touch __init__.py scripts/__init__.py
+RUN echo cachebust=1 && git clone --recursive https://github.com/${HADDOCK3_GHORG}/haddock3.git . && git checkout ${HADDOCK3_VERSION}
+WORKDIR /opt/haddock3/src/fcc/src
+RUN make
+WORKDIR /opt/haddock3/src/fast-rmsdmatrix/src
+RUN chmod u+x Makefile && make fast-rmsdmatrix
+WORKDIR /opt/haddock3
 RUN /usr/local/bin/pip install -r requirements.txt && /usr/local/bin/pip install . && \
     mkdir -p /usr/local/lib/python3.9/bin
-COPY cns /usr/local/lib/python3.9/bin/cns
-RUN chmod +rx /usr/local/lib/python3.9/bin/cns
 WORKDIR /

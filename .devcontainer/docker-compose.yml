@@ -52,6 +52,7 @@ services:
     build:
       context: ../deploy
       dockerfile: ./Dockerfile.bartenderhaddock3
+      # TODO remove args when https://github.com/haddocking/haddock3/pull/841 is merged
       args:
         HADDOCK3_VERSION: web-service
         HADDOCK3_GHORG: i-VRESSE
@@ -104,6 +105,7 @@ services:
     build:
       context: ../deploy
       dockerfile: ./Dockerfile.bartenderhaddock3
+      # TODO remove args when https://github.com/haddocking/haddock3/pull/841 is merged
       args:
         HADDOCK3_VERSION: web-service
         HADDOCK3_GHORG: i-VRESSE
@@ -113,6 +115,10 @@ services:
       - type: bind
         source: ../deploy/arq/bartender-config.yaml
         target: /opt/bartender/config.yaml
+      - type: bind
+        source: ../deploy/cns
+        target: /opt/haddock3/bin/cns
+        read_only: true
       - bartender-job-data:/jobs
     depends_on:
       redis:
@@ -133,6 +139,7 @@ services:
     build:
       context: ../deploy
       dockerfile: ./Dockerfile.bartenderhaddock3
+      # TODO remove args when https://github.com/haddocking/haddock3/pull/841 is merged
       args:
         HADDOCK3_VERSION: web-service
         HADDOCK3_GHORG: i-VRESSE

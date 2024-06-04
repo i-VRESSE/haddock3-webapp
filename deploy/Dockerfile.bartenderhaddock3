@@ -2,7 +2,7 @@
 FROM python:3.9-slim-bookworm
 LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/Dockerfile.bartenderhaddock3
 LABEL org.opencontainers.image.licenses=Apache-2.0
-LABEL org.opencontainers.image.description="bartender web service with haddock3, lightdock, gdock executables. Image does not contain real cns executable, downstream should copy it to /opt/haddock3/bin/cns."
+LABEL org.opencontainers.image.description="bartender web service with haddock3, lightdock, gdock executables. Image does not contain real cns executable, downstream should bind or copy it to /opt/haddock3/bin/cns."
 
 ARG HADDOCK3_GHORG=haddocking
 ARG HADDOCK3_VERSION=main
@@ -32,15 +32,13 @@ RUN make
 WORKDIR /opt/haddock3/src/fast-rmsdmatrix/src
 RUN chmod u+x Makefile && make fast-rmsdmatrix
 WORKDIR /opt/haddock3
-RUN pip install -r requirements.txt && python setup.py develop
-COPY ./cns /opt/haddock3/bin/cns
-RUN chmod +rx /opt/haddock3/bin/cns
+RUN pip install -r requirements.txt && python setup.py develop && mkdir -p bin
 WORKDIR /
 ENV PYTHONPATH=/opt/haddock3/src
 
 # lightdock ==========================================================================================================
 
-RUN pip install lightdock==${LIGHTDOCK_VERSION}
+RUN echo cachebust=1 && pip install lightdock==${LIGHTDOCK_VERSION}
 
 # gdock =============================================================================================================
 

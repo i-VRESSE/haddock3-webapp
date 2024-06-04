@@ -61,6 +61,10 @@ services:
     build:
       context: ..
       dockerfile: ./Dockerfile.bartenderhaddock3
+      # TODO remove args when https://github.com/haddocking/haddock3/pull/841 is merged
+      args:
+        HADDOCK3_VERSION: web-service
+        HADDOCK3_GHORG: i-VRESSE
     restart: always
     command: sh -c '/wait && alembic upgrade head && bartender serve'
     volumes:
@@ -120,6 +124,10 @@ services:
     build:
       context: ..
       dockerfile: ./Dockerfile.bartenderhaddock3
+      # TODO remove args when https://github.com/haddocking/haddock3/pull/841 is merged
+      args:
+        HADDOCK3_VERSION: web-service
+        HADDOCK3_GHORG: i-VRESSE
     restart: always
     command: sh -c 'uvicorn --host 0.0.0.0 --port 5000 haddock.clis.restraints.webservice:app'
 

@@ -1,3 +1,7 @@
 /node_modules
 /public/build
 .git
+/.github
+/tests
+/stories
+/docs

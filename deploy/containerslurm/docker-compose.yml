@@ -9,7 +9,13 @@ services:
     depends_on:
       - slurm
   slurm:
+    image: ghcr.io/i-vresse/slurm:23
     build:
       context: ..
       dockerfile: containerslurm/Dockerfile
     privileged: true
+    volumes:
+      - type: bind
+        source: ../cns
+        target: /usr/local/lib/python3.9/bin/cns
+        read_only: true
