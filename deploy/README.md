@@ -2,6 +2,8 @@
 
 > [!NOTE]
 > All deployment methods require the `cns` executable to available in this directory.
+>
+> On Apple M1 and later versions, the `cns` executable should be compiled for the linux arm64 platform. On Intel or AMD processors the `cns` executable should be compiled for the linux amd64 platform.
 
 ## Methods
 
@@ -40,6 +42,10 @@ Each image has same set of tags:
 - `latest`, build from HEAD of the main branch
 - `<version>`, build from that version tag
 - `pr-<number>`, build from that pull request
+
+The images are avaliable for linux amd64 and linux arm64 platforms, but arm64 images are not build on pull requests.
+
+When a pull request is closed, you are reminded to remove the images belonging to that pull request from the registry.
 
 ## bartender image
 
