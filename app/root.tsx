@@ -6,19 +6,19 @@ import {
 } from "@remix-run/node";
 import {
   isRouteErrorResponse,
+  Link,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useLocation,
   useRouteError,
 } from "@remix-run/react";
 
 import { getOptionalClientUser } from "./auth.server";
 import styles from "./tailwind.css?url";
-import { Navbar } from "./components/Navbar";
-import { Banner } from "./components/Banner";
 import { themeSessionResolver } from "./session.server";
 import {
   PreventFlashOnWrongTheme,
@@ -26,6 +26,11 @@ import {
   useTheme,
 } from "remix-themes";
 import clsx from "clsx";
+import { inPortalMode } from "./portal.server";
+import { useInPortalMode } from "./portal";
+import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
+import { prefix } from "./prefix";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -36,7 +41,7 @@ export const meta: MetaFunction = () => {
 export async function loader({ request }: LoaderFunctionArgs) {
   const { getTheme } = await themeSessionResolver(request);
   const user = await getOptionalClientUser(request);
-  return json({ user, theme: getTheme() });
+  return json({ user, theme: getTheme(), inPortalMode });
 }
 
 export function App() {
@@ -53,25 +58,11 @@ export function App() {
       </head>
       <body>
         <div className="flex min-h-screen flex-col">
-          <header>
-            <Banner />
-            <Navbar />
-          </header>
+          <Header />
           <div className="m-6 grow">
             <Outlet />
           </div>
-          <footer className="bg-primary p-1 text-center text-primary-foreground">
-            <p className="text-sm">
-              This work is co-funded by the Horizon 2020 projects EOSC-hub and
-              EGI-ACE (grant numbers 777536 and 101017567), BioExcel (grant
-              numbers 823830 and 675728) and by a computing grant from NWO-ENW
-              (project number 2019.053).
-            </p>
-            <p className="text-sm">
-              2008-2023 © Computational Structural Biology group. All rights
-              reserved.
-            </p>
-          </footer>
+          <Footer />
         </div>
         <ScrollRestoration />
         <Scripts />
@@ -105,13 +96,7 @@ function BoundaryShell({
       </head>
       <body>
         <div className="flex min-h-screen flex-col">
-          <header>
-            <div className="flex h-64 flex-col bg-[url('https://www.bonvinlab.org/images/pages/banner_home-mini.jpg')] bg-cover">
-              <div className="flex-grow" />{" "}
-              {/* Push the navbar to the bottom of the banner */}
-              <Navbar />
-            </div>
-          </header>
+          <Header />
           <div className="bg-error-content grow p-6">{children}</div>
         </div>
         <Scripts />
@@ -122,6 +107,8 @@ function BoundaryShell({
 
 export function ErrorBoundary() {
   const error = useRouteError();
+  const inPortalMode = useInPortalMode();
+  const { pathname } = useLocation();
   console.error(error);
 
   // Logic copied from https://github.com/remix-run/remix/blob/main/packages/remix-react/errorBoundaries.tsx
@@ -133,7 +120,37 @@ export function ErrorBoundary() {
             <h2 className="py-8 text-xl">
               {error.status} {error.data?.error && error.data.error}
             </h2>
-            <p>Page requires authorization. Please login and try again.</p>
+            <p>Page requires authorization.</p>
+            {inPortalMode ? (
+              <p>
+                Please{" "}
+                <a
+                  href={`/new/login?redirect_uri=${prefix}${pathname.slice(1)}`}
+                  className="underline"
+                >
+                  login
+                </a>{" "}
+                or{" "}
+                <a
+                  href={`/new/registration?redirect_uri=${prefix}${pathname.slice(1)}`}
+                  className="underline"
+                >
+                  register
+                </a>{" "}
+                to use the services of the BonvinLab.
+              </p>
+            ) : (
+              <p>
+                Please{" "}
+                <Link
+                  to={`/login?redirect_uri=${prefix}${pathname.slice(1)}`}
+                  className="underline"
+                >
+                  login
+                </Link>{" "}
+                and try again.
+              </p>
+            )}
           </BoundaryShell>
         );
       case 403:

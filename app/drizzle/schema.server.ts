@@ -5,7 +5,7 @@ import {
   text,
   integer,
   boolean,
-  uuid,
+  serial,
 } from "drizzle-orm/pg-core";
 
 export const expertiseLevel = pgEnum("expertise_level", [
@@ -15,7 +15,7 @@ export const expertiseLevel = pgEnum("expertise_level", [
 ]);
 
 export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: serial("id").primaryKey(),
   createdAt: timestamp("created_at", { precision: 3, mode: "string" })
     .defaultNow()
     .notNull(),

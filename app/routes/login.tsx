@@ -7,6 +7,7 @@ import {
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import { type FlatErrors, ValiError, flatten } from "valibot";
 import { availableSocialLogins } from "~/auth";
+import { disabledInPortalMode } from "~/portal.server";
 import { AuthorizationError } from "remix-auth";
 import { authenticator, getOptionalUser } from "~/auth.server";
 import { ErrorMessages } from "~/components/ErrorMessages";
@@ -16,6 +17,7 @@ import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  disabledInPortalMode();
   const user = await getOptionalUser(request);
   if (user) {
     return redirect("/");
@@ -25,9 +27,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  disabledInPortalMode();
   try {
+    const successRedirect =
+      new URL(request.url, "http://localhost").searchParams.get(
+        "redirect_uri",
+      ) ?? "/";
     return await authenticator.authenticate("user-pass", request, {
-      successRedirect: "/",
+      successRedirect,
     });
   } catch (error) {
     if (error instanceof AuthorizationError && error.cause) {
