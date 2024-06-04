@@ -8,31 +8,24 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/i-vresse/haddock3-webapp
       - uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.DELPACK_TOKEN }}
           script: |
-            const package_version_id = "${{ steps.meta.outputs.version }}";
+            const issue_number = context.payload.pull_request?.number;
+            const package_version_id = `pr-${issue_number}`;
             const images = [
-              `ghcr.io/i-vresse/haddock3-webapp`,
-              `ghcr.io/i-vresse/bartender`,
-              `ghcr.io/i-vresse/certmaker`
+              `haddock3-webapp`,
+              `bartender`,
+              `certmaker`
             ];
+            let message = 'Please delete the images belonging to this Pull Request.\n\n';
             for (const image of images) {
-              console.log(`Deleting ${image}:${tag}...`);
-              try {
-                  await github.rest.packages.deletePackageVersionForOrg({
-                      package_type: 'container',
-                      package_name: image,
-                      org: 'i-VRESSE',
-                      package_version_id
-                  });
-              } catch (error) {
-                  console.error(`Error deleting ${image}:${tag}: ${error}`);
-              }
+              message += `- [ghcr.io/i-vresse/${image}](https://github.com/i-VRESSE/haddock3-webapp/pkgs/container/${image)[-1]}/versions)\n`;
             }
+            message += `\nGoto each image version page, find version called ${package_version_id}, click on **...** button and select **Delete version**.\n`;
+            github.issues.createComment({
+              issue_number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });
