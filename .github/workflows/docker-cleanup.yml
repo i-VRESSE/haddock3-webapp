@@ -20,9 +20,9 @@ jobs:
             ];
             let message = 'Please delete the images belonging to this Pull Request.\n\n';
             for (const image of images) {
-              message += `- [ghcr.io/i-vresse/${image}](https://github.com/i-VRESSE/haddock3-webapp/pkgs/container/${image)[-1]}/versions)\n`;
+              message += `- [ghcr.io/i-vresse/${image}](https://github.com/i-VRESSE/haddock3-webapp/pkgs/container/${image}/versions)\n`;
             }
-            message += `\nGoto each image version page, find version called ${package_version_id}, click on **...** button and select **Delete version**.\n`;
+            message += `\nGoto versions page of each image, find version called ${package_version_id}, click on **...** button and select **Delete version**.\n`;
             github.issues.createComment({
               issue_number,
               owner: context.repo.owner,
