@@ -6,9 +6,7 @@ After login the Slurm cluster user must have haddock3 executables in their path.
 ```shell
 # Must be in root of repo
 cd ../..
-# Need cns executable in deploy directory, so it can be copied into the Docker image
-cp <cns executable> deploy/cns
-docker compose -f deploy/slurm/docker-compose.yml up --build
+docker compose -f deploy/remoteslurm/docker-compose.yml up --build
 ```
 
 The haddock3 webapp should be running on http://localhost:8080

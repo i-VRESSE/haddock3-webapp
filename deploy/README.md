@@ -4,6 +4,8 @@
 > All deployment methods require the `cns` executable to available in this directory.
 >
 > On Apple M1 and later versions, the `cns` executable should be compiled for the linux arm64 platform. On Intel or AMD processors the `cns` executable should be compiled for the linux amd64 platform.
+>
+> The `cns` executable should have its execute bit set with `chmod +x cns`.
 
 ## Methods
 
