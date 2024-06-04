@@ -124,7 +124,7 @@ function AnonymousUserButton() {
         <DropdownMenuContent>
           <DropdownMenuItem asChild>
             <a
-              href={`/login?redirect_uri=${prefix}${pathname.slice(1)}`}
+              href={`/new/login?redirect_uri=${prefix}${pathname.slice(1)}`}
               className="block hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
             >
               Login
@@ -132,7 +132,7 @@ function AnonymousUserButton() {
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <a
-              href={`/registration?redirect_uri=${prefix}${pathname.slice(1)}`}
+              href={`/new/registration?redirect_uri=${prefix}${pathname.slice(1)}`}
               className="block hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
             >
               Register
@@ -166,7 +166,7 @@ function LoggedInButton() {
         <DropdownMenuContent>
           <DropdownMenuItem asChild>
             <a
-              href="/dashboard"
+              href="/new/dashboard"
               className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
             >
               Dashboard
@@ -178,7 +178,7 @@ function LoggedInButton() {
           {isAdmin && (
             <DropdownMenuItem asChild>
               <a
-                href="/admin"
+                href="/new/admin"
                 className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
               >
                 Admin
@@ -186,7 +186,7 @@ function LoggedInButton() {
             </DropdownMenuItem>
           )}
           <DropdownMenuItem asChild>
-            <Link to="/logout">Logout</Link>
+            <Link to="/new/logout">Logout</Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

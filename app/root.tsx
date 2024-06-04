@@ -125,14 +125,14 @@ export function ErrorBoundary() {
               <p>
                 Please{" "}
                 <a
-                  href={`/login?redirect_uri=${prefix}${pathname.slice(1)}`}
+                  href={`/new/login?redirect_uri=${prefix}${pathname.slice(1)}`}
                   className="underline"
                 >
                   login
                 </a>{" "}
                 or{" "}
                 <a
-                  href={`/registration?redirect_uri=${prefix}${pathname.slice(1)}`}
+                  href={`/new/registration?redirect_uri=${prefix}${pathname.slice(1)}`}
                   className="underline"
                 >
                   register

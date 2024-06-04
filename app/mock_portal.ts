@@ -64,8 +64,8 @@ const frontend = http.createServer((req, res) => {
 
     req.pipe(proxyReq);
   } else if (
-    req.url?.startsWith("/login") ||
-    req.url?.startsWith("/registration")
+    req.url?.startsWith("/new/login") ||
+    req.url?.startsWith("/new/registration")
   ) {
     console.log("Setting cookie");
     const setCookie = "bonvinlab_auth_token=sometoken; Path=/; HttpOnly";
@@ -83,10 +83,10 @@ const frontend = http.createServer((req, res) => {
     }
     res.writeHead(status, headers);
     res.end("Logged in or registed\n");
-  } else if (req.url === "/dashboard") {
+  } else if (req.url === "/new/dashboard") {
     res.writeHead(200, { "Content-Type": "text/plain" });
     res.end("Dashboard page\n");
-  } else if (req.url === "/admin") {
+  } else if (req.url === "/new/admin") {
     res.writeHead(200, { "Content-Type": "text/plain" });
     res.end("Admin page\n");
   } else {

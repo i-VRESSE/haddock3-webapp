@@ -2,8 +2,10 @@ import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 import { mustBeAdmin } from "~/auth.server";
+import { disabledInPortalMode } from "~/portal.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  disabledInPortalMode();
   await mustBeAdmin(request);
   return json({});
 }

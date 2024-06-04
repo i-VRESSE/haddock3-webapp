@@ -26,7 +26,7 @@ Start the mock portal with:
 npx tsx app/mock_portal.ts
 ```
 
-Run webapp in another terminal  with:
+Run webapp in another terminal with:
 
 ```shell
 export HADDOCK3WEBAPP_PREFIX=/haddock30/
