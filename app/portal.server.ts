@@ -1,5 +1,4 @@
 import { boolean, email, number, object, string, parse, Output } from "valibot";
-import { parse as parseCookie } from "cookie";
 import { type ExpertiseLevel } from "./drizzle/schema.server";
 
 export const inPortalMode = !!process.env.HADDOCK3WEBAPP_CSB_PORTAL;
@@ -22,16 +21,6 @@ export const CsbUserSchema = object({
   suspended: boolean(),
 });
 export type CsbUser = Output<typeof CsbUserSchema>;
-
-function getToken(request: Request) {
-  const cookieString = request.headers.get("Cookie") || "";
-  const cookies = parseCookie(cookieString);
-  const csbToken = cookies[PORTAL_COOKIE_NAME];
-  if (!csbToken) {
-    throw new Error("Failed to validate token");
-  }
-  return csbToken;
-}
 
 function getPortalHeaders(request: Request) {
   return {
