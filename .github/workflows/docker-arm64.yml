@@ -1,4 +1,4 @@
-name: Deployment images
+name: Deployment images arm64
 
 on:
   push:
@@ -6,9 +6,6 @@ on:
       - main
     tags:
       - v*
-  pull_request:
-  # TODO have way to rebuild bartender image when it and its deps have updated
-  # TODO when PR is closed the image should be removed
 
 jobs:
   bartender:
@@ -27,6 +24,8 @@ jobs:
       LIGHTDOCK_VERSION: "0.9.4"
     steps:
       - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -54,6 +53,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: linux/arm64
           build-args: |
             HADDOCK3_VERSION=${{ env.HADDOCK3_VERSION }}
             HADDOCK3_GHORG=${{ env.HADDOCK3_GHORG }}
@@ -67,6 +67,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -94,6 +96,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: linux/arm64
   webapp:
     runs-on: ubuntu-latest
     permissions:
@@ -101,6 +104,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -127,6 +132,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: linux/arm64
   playwright:
     needs:
       - bartender
