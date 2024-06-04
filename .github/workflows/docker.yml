@@ -54,6 +54,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: ${{startsWith(steps.meta.outputs.version, 'pr-') && 'linux/amd64' || 'linux/arm64,linux/amd64' }}
           build-args: |
             HADDOCK3_VERSION=${{ env.HADDOCK3_VERSION }}
             HADDOCK3_GHORG=${{ env.HADDOCK3_GHORG }}
@@ -94,6 +95,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: ${{startsWith(steps.meta.outputs.version, 'pr-') && 'linux/amd64' || 'linux/arm64,linux/amd64' }}
   webapp:
     runs-on: ubuntu-latest
     permissions:
@@ -127,6 +129,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: ${{startsWith(steps.meta.outputs.version, 'pr-') && 'linux/amd64' || 'linux/arm64,linux/amd64' }}
   playwright:
     needs:
       - bartender
