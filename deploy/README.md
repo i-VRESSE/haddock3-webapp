@@ -42,8 +42,9 @@ The Docker images are published on https://github.com/orgs/i-VRESSE/packages .
 
 Each image has same set of tags:
 
-- `latest`, build from HEAD of the main branch
+- `main`, build from HEAD of the main branch
 - `<version>`, build from that version tag
+- `latest`, build latest version tag
 - `pr-<number>`, build from that pull request
 
 The images are avaliable for linux amd64 and linux arm64 platforms, but arm64 images are not build on pull requests.
