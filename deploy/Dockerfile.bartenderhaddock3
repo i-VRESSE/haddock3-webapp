@@ -34,7 +34,7 @@ RUN echo cachebust=1 && pip install lightdock==${LIGHTDOCK_VERSION}
 # gdock =============================================================================================================
 
 WORKDIR /opt/gdock
-RUN git clone https://github.com/gdocking/gdock.git . && git checkout ${GDOCK_VERSION}
+RUN git clone --depth 1 -b ${GDOCK_VERSION} https://github.com/gdocking/gdock.git .
 RUN pip install matplotlib==3.8.4  # dont install 3.9.0rc2
 RUN python setup.py develop
 RUN bash install.sh /opt/gdock
@@ -43,18 +43,20 @@ ENV GDOCK_PATH=/opt/gdock
 # bartender ==========================================================================================================
 
 WORKDIR /opt/bartender
-RUN echo cachebust=1 && git clone https://github.com/i-VRESSE/bartender.git . && git checkout ${BARTENDER_VERSION}
+RUN echo cachebust=1 && git clone --depth 1 -b ${BARTENDER_VERSION} https://github.com/i-VRESSE/bartender.git .
 RUN pip install .
 
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
-RUN echo cachebust=2 && git clone --recursive https://github.com/${HADDOCK3_GHORG}/haddock3.git . && git checkout ${HADDOCK3_VERSION}
+RUN echo cachebust=2 && git clone --depth 1 -b ${HADDOCK3_VERSION} --recursive https://github.com/${HADDOCK3_GHORG}/haddock3.git .
 WORKDIR /opt/haddock3/src/fcc/src
 RUN make
 WORKDIR /opt/haddock3/src/fast-rmsdmatrix/src
 RUN chmod u+x Makefile && make fast-rmsdmatrix
 WORKDIR /opt/haddock3
-RUN pip install -r requirements.txt && python setup.py develop && mkdir -p bin && rm -rf /venv/lib/python3.9/site-packages/kaleido* /venv/lib/python3.9/site-packages/lightdock/test
+# Do not need kaleido (226Mb) for the webapp
+RUN grep -v kaleido requirements.txt > requirements.pruned.txt && pip install -r requirements.pruned.txt
+RUN python setup.py develop && mkdir -p bin
 WORKDIR /
 ENV PYTHONPATH=/opt/haddock3/src
 
@@ -62,12 +64,15 @@ ENV PYTHONPATH=/opt/haddock3/src
 
 FROM python:3.9-slim-bookworm
 
-COPY --from=builder /opt/haddock3 /opt/haddock3
-COPY --from=builder /opt/gdock /opt/gdock
-COPY --from=builder /opt/bartender /opt/bartender
 COPY --from=builder /wait /wait
 COPY --from=builder /venv /venv
+COPY --from=builder /opt/haddock3 /opt/haddock3
+# Just copy the required files
+COPY --from=builder /opt/bartender/alembic.ini /opt/bartender/alembic.ini
+COPY --from=builder /opt/bartender/src/bartender/db/migrations /opt/bartender/src/bartender/db/migrations
+COPY --from=builder /opt/bartender/config-example.yaml /opt/bartender/config-example.yaml
 
+WORKDIR /opt/bartender
 ENV PATH=/venv/bin:$PATH
 ENV PYTHONPATH=/opt/haddock3/src
 
