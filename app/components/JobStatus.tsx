@@ -7,9 +7,10 @@ import { prefix } from "~/prefix";
 
 interface Props {
   job: SerializeFrom<JobModelDTO>;
+  lastStateCheckOn?: string;
 }
 
-export function JobStatus({ job }: Props) {
+export function JobStatus({ job, lastStateCheckOn }: Props) {
   return (
     <>
       <p>ID: {job.id}</p>
@@ -21,6 +22,9 @@ export function JobStatus({ job }: Props) {
       </p>
       <p>Created on: {new Date(job.created_on).toUTCString()}</p>
       <p>Updated on: {new Date(job.updated_on).toUTCString()}</p>
+      {lastStateCheckOn ? (
+        <p>Last checked on: {new Date(lastStateCheckOn).toUTCString()}</p>
+      ) : null}
       {CompletedJobs.has(job.state) && (
         <>
           <details open={job.state === "error"}>
