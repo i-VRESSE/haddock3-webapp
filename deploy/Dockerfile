@@ -11,8 +11,6 @@ ARG HADDOCK3WEBAPP_PREFIX=/
 # set for base and all layer that inherit from it
 ENV NODE_ENV production
 
-RUN apt update && apt install -y libssl3
-
 # Install all node_modules, including dev dependencies
 FROM base as deps
 
@@ -32,9 +30,12 @@ FROM base as production-deps
 
 WORKDIR /myapp
 
+RUN apt update && apt install -y curl && \
+    curl -sf https://gobinaries.com/tj/node-prune | sh
+
 COPY --from=deps /myapp/node_modules /myapp/node_modules
 ADD package.json package-lock.json ./
-RUN npm prune --production 
+RUN npm prune --production && node-prune
 
 # Build the app
 ENV HADDOCK3WEBAPP_PREFIX=${HADDOCK3WEBAPP_PREFIX}
