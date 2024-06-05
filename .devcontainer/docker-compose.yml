@@ -62,6 +62,10 @@ services:
       - type: bind
         source: ../deploy/arq/bartender-config.yaml
         target: /opt/bartender/config.yaml
+      - type: bind
+        source: ../deploy/cns
+        target: /opt/haddock3/bin/cns
+        read_only: true
       - bartender-certs:/certs:ro
       - bartender-job-data:/jobs
     depends_on:
