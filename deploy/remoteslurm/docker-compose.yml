@@ -57,6 +57,10 @@ services:
       - type: bind
         source: ./mypicker.py
         target: /opt/bartender/mypicker.py
+      - type: bind
+        source: ../deploy/cns
+        target: /opt/haddock3/bin/cns
+        read_only: true
       - bartender-certs:/certs:ro
       - bartender-job-data:/jobs
       # To use a local private ssh key to login to the remote slurm machine

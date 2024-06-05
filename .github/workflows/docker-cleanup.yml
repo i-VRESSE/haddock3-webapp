@@ -18,7 +18,7 @@ jobs:
               `bartender`,
               `certmaker`
             ];
-            let message = 'Please delete the images belonging to this Pull Request as they a no longer useful.\n\n';
+            let message = 'Please delete the images belonging to this Pull Request as they are no longer useful.\n\n';
             for (const image of images) {
               message += `- [ghcr.io/i-vresse/${image}](https://github.com/i-VRESSE/haddock3-webapp/pkgs/container/${image}/versions)\n`;
             }
