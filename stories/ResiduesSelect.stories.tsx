@@ -19,11 +19,13 @@ export const Surface: Story = {
     options: [
       {
         resno: 1,
+        resname: "A",
         seq: "A",
         surface: true,
       },
       {
         resno: 2,
+        resname: "T",
         seq: "T",
         surface: false,
       },
@@ -46,16 +48,19 @@ export const ActiveOnly: Story = {
     options: [
       {
         resno: 1,
+        resname: "A",
         seq: "A",
         surface: true,
       },
       {
         resno: 2,
+        resname: "T",
         seq: "T",
         surface: false,
       },
       {
         resno: 3,
+        resname: "G",
         seq: "G",
         surface: true,
       },
@@ -78,16 +83,19 @@ export const PassiveOnly: Story = {
     options: [
       {
         resno: 1,
+        resname: "A",
         seq: "A",
         surface: true,
       },
       {
         resno: 2,
+        resname: "T",
         seq: "T",
         surface: false,
       },
       {
         resno: 3,
+        resname: "G",
         seq: "G",
         surface: true,
       },
@@ -112,21 +120,25 @@ export const ActiveAndDisabledPassive: Story = {
     options: [
       {
         resno: 1,
+        resname: "A",
         seq: "A",
         surface: true,
       },
       {
         resno: 2,
+        resname: "T",
         seq: "T",
         surface: true,
       },
       {
         resno: 3,
+        resname: "G",
         seq: "G",
         surface: true,
       },
       {
         resno: 4,
+        resname: "C",
         seq: "C",
         surface: true,
       },
@@ -151,21 +163,25 @@ export const ActiveAndPassive: Story = {
     options: [
       {
         resno: 1,
+        resname: "A",
         seq: "A",
         surface: true,
       },
       {
         resno: 2,
+        resname: "T",
         seq: "T",
         surface: true,
       },
       {
         resno: 3,
+        resname: "G",
         seq: "G",
         surface: true,
       },
       {
         resno: 4,
+        resname: "C",
         seq: "C",
         surface: true,
       },
@@ -187,6 +203,7 @@ export const LongList: Story = {
     showPassive: true,
     options: Array.from({ length: 100 }, (_, i) => ({
       resno: i + 42,
+      resname: "XXX",
       seq: "X",
       surface: true,
     })),

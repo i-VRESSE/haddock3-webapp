@@ -215,7 +215,10 @@ async function restrainBodies(structure: string) {
     parseAs: "text",
   });
   if (error) {
-    console.warn("Calculating restraints of bodies failed, treating like no restraints where found", error);
+    console.warn(
+      "Calculating restraints of bodies failed, treating like no restraints where found",
+      error,
+    );
     return "";
   }
   if (typeof data !== "string") {
