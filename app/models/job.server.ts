@@ -41,7 +41,7 @@ export async function getJobs(bartenderToken: string, limit = 100, offset = 0) {
       },
     },
   });
-  if (!response.ok || !data) {
+  if (!response.ok) {
     throw response;
   }
   return data;
