@@ -29,6 +29,7 @@ import {
   generateUnAmbiguousRestraintsFile,
 } from "../scenarios/restraints";
 import { FormErrors } from "../scenarios/FormErrors";
+import { HeteroMoleculeSubForm } from "~/scenarios/HeteroMoleculeSubForm.client";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -268,7 +269,7 @@ export default function Page() {
               After pdb upload give list of all ligands as radio+resname+chain+resno. 
               On hover should highlight in 3D and vice versa.
               Nice to have hetnam and hetsyn also in list */}
-              <MoleculeSubForm
+              <HeteroMoleculeSubForm
                 name="ligand"
                 legend="Ligand"
                 description="In example named rifampicin.pdb"
