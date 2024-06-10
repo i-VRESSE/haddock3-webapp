@@ -339,6 +339,31 @@ export function ResiduesSubForm({
     }
   }, [restraintsFlavour, setPicker3D, setShowNeigbours]);
 
+  useEffect(() => {
+    // If only one residue is present, select it
+    if (molecule.residues.length === 1) {
+      const active = ["act", "actpass"].includes(restraintsFlavour.kind)
+        ? [molecule.residues[0].resno]
+        : [];
+      const passive = ["surf", "pass"].includes(restraintsFlavour.kind)
+        ? [molecule.residues[0].resno]
+        : [];
+      onActPassChange?.({
+        active,
+        passive,
+        neighbours: [],
+        chain: molecule.targetChain,
+        bodyRestraints: actpass.bodyRestraints,
+      });
+    }
+  }, [
+    actpass.bodyRestraints,
+    molecule.residues,
+    molecule.targetChain,
+    onActPassChange,
+    restraintsFlavour.kind,
+  ]);
+
   async function handle2DResidueChange(newSelection: ResidueSelection) {
     if (!onActPassChange || !safeFile) {
       return;
