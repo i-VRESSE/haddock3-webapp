@@ -69,6 +69,7 @@ function generateWorkflow(data: Schema) {
   // - resdic_A
   // - resdic_B
   // TODO Use different ambig_fname* in the rigidbody and flexref sections
+  // TODO ligand_param_fname is requires expert level, should hide/disable on /scenarios page if level not adequate
   return `
 # ====================================================================
 # Protein-ligand docking example
