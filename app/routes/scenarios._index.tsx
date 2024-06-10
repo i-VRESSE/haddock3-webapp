@@ -23,8 +23,12 @@ const scenarios: Scenario[] = [
     title: "Protein DNA",
     description: "Based on HADDOCK2.4 Protein DNA docking tutorial",
   },
+  {
+    url: "/scenarios/protein-ligand",
+    title: "Protein Ligand",
+    description: "Based on HADDOCK2.4 Protein Small Molecule docking tutorial",
+  },
   // should be preprocesed like in tutorial
-  // TODO add protein-ligand see https://www.bonvinlab.org/education/HADDOCK24/HADDOCK24-binding-sites
   // TODO add protein-shape see https://www.bonvinlab.org/education/HADDOCK24/shape-small-molecule
 ];
 
