@@ -1,10 +1,11 @@
-import { ActPassSelection } from "./MoleculeSubForm.client";
-import { strFromU8, gzip } from "fflate";
+import { strFromU8, gzip, gunzip, strToU8 } from "fflate";
 
+import type { ActPassSelection } from "./MoleculeSubForm.client";
 import {
   HTTPValidationError,
   client,
 } from "~/haddock3-restraints-client/client";
+import { loadStructure, residueNumbers } from "./molecule.client";
 
 export async function generateAmbiguousRestraintsFile(
   selection1: ActPassSelection,
@@ -76,8 +77,8 @@ export async function passiveFromActive(
     body,
   });
   if (error) {
-    console.error(error);
-    throw new Error("Could not calculate passive restraints");
+    console.error("Error in passiveFromActive, returning empty array", error);
+    return [];
   }
   return data;
 }
@@ -109,6 +110,15 @@ export async function calculateAccessibility(
     body,
   });
   if (error) {
+    if (typeof error === "string" && error === "Internal Server Error") {
+      console.warn(
+        "Could not calculate accessibility, treating all residues as accessible",
+      );
+      const blob = await jsonUnSafeFile(structure);
+      const nglStructure = await loadStructure(blob);
+      const data = residueNumbers(nglStructure);
+      return [data, undefined];
+    }
     console.error(error);
     return [{}, flattenErrorResponses(error)];
   }
@@ -133,6 +143,12 @@ const pipelines = {
 } as const;
 export type PreprocessPipeline = keyof typeof pipelines;
 
+/**
+ * Compress with gzip and base64 encode
+ *
+ * @param file
+ * @returns
+ */
 export async function jsonSafeFile(file: File): Promise<string> {
   const data = new Uint8Array(await file.arrayBuffer());
   return new Promise((resolve, reject) => {
@@ -141,6 +157,28 @@ export async function jsonSafeFile(file: File): Promise<string> {
         reject(err);
       }
       resolve(btoa(strFromU8(data, true)));
+    });
+  });
+}
+
+/**
+ * Base64 decode and decompress with gzip
+ *
+ * @param structure
+ * @param filename
+ * @returns
+ */
+async function jsonUnSafeFile(
+  structure: string,
+  filename = "structure.pdb",
+): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const bin = strToU8(atob(structure), true);
+    gunzip(bin, (err, data) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(new File([data], filename, { type: "text/plain" }));
     });
   });
 }
@@ -177,8 +215,8 @@ async function restrainBodies(structure: string) {
     parseAs: "text",
   });
   if (error) {
-    console.error(error);
-    throw new Error("Could not restrain bodies");
+    console.warn("Calculating restraints of bodies failed, treating like no restraints where found", error);
+    return "";
   }
   if (typeof data !== "string") {
     return "";

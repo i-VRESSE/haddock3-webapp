@@ -1,5 +1,6 @@
 import { Structure, autoLoad } from "ngl";
 import { getResName1 } from "./constants";
+import ResidueProxy from "ngl/dist/declarations/proxy/residue-proxy";
 
 export interface Residue {
   resno: number;
@@ -15,17 +16,16 @@ export interface Molecule {
   originalFile: File; // File not passed through the pdbtools preprocess pipeline
 }
 
-export function chainsFromStructure(structure: Structure) {
-  const chains: Chains = {};
+function residuesPerChain<T>(
+  structure: Structure,
+  accessor: (r: ResidueProxy) => T,
+): Record<string, T[]> {
+  const chains: Record<string, T[]> = {};
   structure.eachChain((c) => {
     const chainName = c.chainname;
-    let residues: Residue[] = [];
+    let residues: T[] = [];
     c.eachResidue((r) => {
-      residues.push({
-        resno: r.resno,
-        resname: r.resname,
-        seq: getResName1(r.resname),
-      });
+      residues.push(accessor(r));
     });
     // Same chain can be before+after TER line
     // See https://github.com/haddocking/haddock3/blob/main/examples/data/1a2k_r_u.pdb
@@ -36,6 +36,18 @@ export function chainsFromStructure(structure: Structure) {
     chains[chainName] = residues;
   });
   return chains;
+}
+
+export function chainsFromStructure(structure: Structure): Chains {
+  return residuesPerChain(structure, (r) => ({
+    resno: r.resno,
+    resname: r.resname,
+    seq: getResName1(r.resname),
+  }));
+}
+
+export function residueNumbers(structure: Structure) {
+  return residuesPerChain(structure, (r) => r.resno);
 }
 
 export async function loadStructure(blob: Blob) {
