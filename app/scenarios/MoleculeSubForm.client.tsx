@@ -277,6 +277,10 @@ function toggleResidue(
   return newSelection;
 }
 
+// TODO only render big proteins as surfaces other molecules as spacefill
+// current workaround is to molecule has more than 50 residues, render as surface
+const BIG_MOLECULE = 50;
+
 export function ResiduesSubForm({
   molecule,
   actpass,
@@ -302,7 +306,9 @@ export function ResiduesSubForm({
   const [showSurface, setShowSurface] = useState(false);
   const [showBuried, setShowBuried] = useState(false);
   const [renderSelectionAs, setRenderSelectionAs] =
-    useState<StructureRepresentationType>("surface");
+    useState<StructureRepresentationType>(
+      molecule.residues.length > BIG_MOLECULE ? "surface" : "spacefill",
+    );
   // gzipping and base64 encoding file can be slow, so we cache it
   // for example 8qg1 of 1.7Mb took 208ms
   const [safeFile, setSafeFile] = useState<string | undefined>(undefined);

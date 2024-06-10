@@ -1,10 +1,10 @@
 import { Structure, autoLoad } from "ngl";
+import { getResName1 } from "./constants";
 
 export interface Residue {
   resno: number;
+  resname: string;
   seq: string;
-  // residues which are not a amino acids, rna or dna do not have a single letter code representation
-  // TODO handle non amino acids mrna or dna
   surface?: boolean;
 }
 export type Chains = Record<string, Residue[]>;
@@ -23,7 +23,8 @@ export function chainsFromStructure(structure: Structure) {
     c.eachResidue((r) => {
       residues.push({
         resno: r.resno,
-        seq: r.getResname1(),
+        resname: r.resname,
+        seq: getResName1(r.resname),
       });
     });
     // Same chain can be before+after TER line

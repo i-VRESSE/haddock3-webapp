@@ -85,6 +85,7 @@ export function CopyButton({ content }: { content: string }) {
 
 function ResidueCheckbox({
   resno,
+  resname,
   seq,
   showActive,
   showPassive,
@@ -99,6 +100,7 @@ function ResidueCheckbox({
   onPassiveChange,
 }: {
   resno: number;
+  resname: string;
   seq: string;
   showActive: boolean;
   showPassive: boolean;
@@ -137,7 +139,7 @@ function ResidueCheckbox({
         "inline-block w-4 text-center font-mono hover:bg-secondary hover:text-secondary-foreground",
         residueVariants[variant],
       )}
-      title={resno.toString()}
+      title={`${resno.toString()}:${resname}`}
       onMouseEnter={onHover}
     >
       <label htmlFor={htmlFor}>{seq}</label>
@@ -302,6 +304,7 @@ export function ResiduesSelect({
                 <ResidueCheckbox
                   key={r.resno}
                   resno={r.resno}
+                  resname={r.resname}
                   seq={r.seq}
                   highlight={highlight === r.resno}
                   activeChecked={selected.act.includes(r.resno)}
