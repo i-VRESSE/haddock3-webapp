@@ -48,6 +48,8 @@ const Schema = object({
       "Ambiguous restraints file should not be empty. Please select residues.",
     ),
   ]),
+  ligand_param_fname: optional(instance(File, "Custom ligand parameter file")),
+  ligand_top_fname: optional(instance(File, "Custom ligand topology file")),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
   reference_fname: optional(instance(File, "Reference structure as PDB file")),
 });
@@ -58,17 +60,19 @@ function generateWorkflow(data: Schema) {
   // https://github.com/haddocking/haddock3/blob/main/examples/docking-protein-ligand/docking-protein-ligand-full.cfg
   // made valid for easy expertise level
 
-  const unambig_line = data.unambig_fname
-    ? `unambig_fname = "${data.unambig_fname.name}"`
-    : "";
   const ref_line = data.reference_fname
     ? `reference_fname = "${data.reference_fname.name}"`
     : "";
+
+  const param_line = data.ligand_param_fname
+    ? `ligand_param_fname = "${data.ligand_param_fname.name}"`
+    : "";
+  const top_line = data.ligand_top_fname
+    ? `ligand_top_fname = "${data.ligand_top_fname.name}"`
+    : "";
   // TODO make dynamic values of
-  // - ligand_param_fname
-  // - ligand_top_fname
-  // - resdic_A
-  // - resdic_B
+  // - resdic_A === proteinActPass.active?
+  // - resdic_B === ligandActPass.active?
   // TODO Use different ambig_fname* in the rigidbody and flexref sections
   // TODO ligand_param_fname is requires expert level, should hide/disable on /scenarios page if level not adequate
   return `
@@ -97,15 +101,15 @@ molecules =  [
 # ====================================================================
 [topoaa]
 autohis = true
-ligand_param_fname = "data/ligand-prodrg.param"
-ligand_top_fname = "data/ligand-prodrg.top"
+${param_line}
+${top_line}
 delenph = false
 
 [rigidbody]
 tolerance = 5
 ambig_fname = "data/ambig-active-rigidbody.tbl"
-ligand_param_fname = "data/ligand-prodrg.param"
-ligand_top_fname = "data/ligand-prodrg.top"
+${param_line}
+${top_line}
 sampling = 1000
 w_vdw = 1.0
 
@@ -121,8 +125,8 @@ ${ref_line}
 [flexref]
 tolerance = 5
 ambig_fname = "data/ambig-passive.tbl"
-ligand_param_fname = "data/ligand-prodrg.param"
-ligand_top_fname = "data/ligand-prodrg.top"
+${param_line}
+${top_line}
 mdsteps_rigid = 0
 mdsteps_cool1 = 0
 
@@ -170,6 +174,12 @@ async function createZip(workflow: string, data: Schema) {
   if (data.unambig_fname) {
     zip.file(data.unambig_fname.name, data.unambig_fname);
   }
+  if (data.ligand_param_fname) {
+    zip.file(data.ligand_param_fname.name, data.ligand_param_fname);
+  }
+  if (data.ligand_top_fname) {
+    zip.file(data.ligand_top_fname.name, data.ligand_top_fname);
+  }
   return zip.generateAsync({ type: "blob" });
 }
 
@@ -185,7 +195,7 @@ export default function Page() {
     chain: "",
     bodyRestraints: "",
   });
-  const [dnaActPass, setDnaActPass] = useState<ActPassSelection>({
+  const [ligandActPass, setLigandActPass] = useState<ActPassSelection>({
     active: [],
     passive: [],
     neighbours: [],
@@ -203,13 +213,13 @@ export default function Page() {
 
     const ambig_fname = await generateAmbiguousRestraintsFile(
       proteinActPass,
-      dnaActPass,
+      ligandActPass,
     );
     formData.set("ambig_fname", ambig_fname);
 
     const unambig_fname = generateUnAmbiguousRestraintsFile(
       proteinActPass.bodyRestraints,
-      dnaActPass.bodyRestraints,
+      ligandActPass.bodyRestraints,
     );
     if (unambig_fname) {
       formData.set("unambig_fname", unambig_fname);
@@ -265,16 +275,12 @@ export default function Page() {
                 onActPassChange={setProteinActPass}
                 targetChain="A"
               />
-              {/* TODO replace MoleculeSubForm with ligand specific form
-              After pdb upload give list of all ligands as radio+resname+chain+resno. 
-              On hover should highlight in 3D and vice versa.
-              Nice to have hetnam and hetsyn also in list */}
               <HeteroMoleculeSubForm
                 name="ligand"
                 legend="Ligand"
                 description="In example named rifampicin.pdb"
-                actpass={dnaActPass}
-                onActPassChange={setDnaActPass}
+                actpass={ligandActPass}
+                onActPassChange={setLigandActPass}
                 targetChain="B"
               />
             </div>

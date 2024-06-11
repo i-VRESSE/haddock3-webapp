@@ -183,11 +183,12 @@ async function jsonUnSafeFile(
   });
 }
 
-async function preprocessPdb(
+export async function preprocessPdb(
   file: File,
   fromChain: string,
   toChain: string,
   preprocessPipeline: PreprocessPipeline = "",
+  prefix = "",
 ) {
   const structure = await jsonSafeFile(file);
 
@@ -204,12 +205,16 @@ async function preprocessPdb(
     console.error(error);
     throw new Error("Could not preprocess pdb");
   }
-  return new File([data], `processed-${fromChain}2${toChain}-${file.name}`, {
-    type: file.type,
-  });
+  return new File(
+    [data],
+    `processed-${fromChain}2${toChain}-${prefix}-${file.name}`,
+    {
+      type: file.type,
+    },
+  );
 }
 
-async function restrainBodies(structure: string) {
+export async function restrainBodies(structure: string) {
   const { error, data } = await client.POST("/restrain_bodies", {
     body: { structure, exclude: [] },
     parseAs: "text",
