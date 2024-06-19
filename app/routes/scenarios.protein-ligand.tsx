@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { useActionData, useSubmit, useNavigate, json } from "@remix-run/react";
+import {
+  useActionData,
+  useSubmit,
+  useNavigate,
+  json,
+  useLoaderData,
+} from "@remix-run/react";
 import {
   object,
   instance,
@@ -35,8 +41,14 @@ import { FormErrors } from "../scenarios/FormErrors";
 import { HeteroMoleculeSubForm } from "~/scenarios/HeteroMoleculeSubForm.client";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await mustBeAllowedToSubmit(request);
-  return json({});
+  const user = await mustBeAllowedToSubmit(request);
+  // Only expert and higher can use custom ligand files
+  // See https://www.bonvinlab.org/haddock3/modules/topology/haddock.modules.topology.topoaa.html#ligand-param-fname
+  return json({
+    mayUseCustomLigandFiles:
+      user.preferredExpertiseLevel !== null &&
+      ["expert", "guru"].includes(user.preferredExpertiseLevel),
+  });
 };
 
 export const action = uploadaction;
@@ -96,8 +108,6 @@ function generateWorkflow(
   const top_line = data.ligand_top_fname
     ? `ligand_top_fname = "${data.ligand_top_fname.name}"`
     : "";
-
-  // TODO ligand_param_fname is requires expert level, should hide/disable on /scenarios page if level not adequate
 
   const resdic_A = JSON.stringify([
     ...proteinActPass.active,
@@ -215,6 +225,7 @@ async function createZip(workflow: string, data: Schema) {
 }
 
 export default function Page() {
+  const { mayUseCustomLigandFiles } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof uploadaction>();
   const submit = useSubmit();
   const navigate = useNavigate();
@@ -333,6 +344,7 @@ export default function Page() {
                 actpass={ligandActPass}
                 onActPassChange={setLigandActPass}
                 targetChain="B"
+                mayUseCustomLigandFiles={mayUseCustomLigandFiles}
               />
             </div>
             <FormItem

@@ -202,6 +202,7 @@ export function HeteroMoleculeSubForm({
   actpass,
   onActPassChange,
   targetChain,
+  mayUseCustomLigandFiles,
 }: {
   name: string;
   legend: string;
@@ -209,6 +210,7 @@ export function HeteroMoleculeSubForm({
   actpass: ActPassSelection;
   onActPassChange: (actpass: ActPassSelection) => void;
   targetChain: string;
+  mayUseCustomLigandFiles: boolean;
 }) {
   const [processedFile, setProcessedFile] = useState<File | undefined>();
   const [selected, setSelected] = useState<Hetero | undefined>();
@@ -281,28 +283,32 @@ export function HeteroMoleculeSubForm({
             />
           </div>
         )}
-        <FormItem
-          name="ligand_param_fname"
-          label="Custom parameter file (optional)"
-        >
-          <Input
-            type="file"
-            id="ligand_param_fname"
-            name="ligand_param_fname"
-            accept=".param"
-          />
-        </FormItem>
-        <FormItem
-          name="ligand_top_fname"
-          label="Custom topology file (optional)"
-        >
-          <Input
-            type="file"
-            id="ligand_top_fname"
-            name="ligand_top_fname"
-            accept=".top"
-          />
-        </FormItem>
+        {mayUseCustomLigandFiles && (
+          <>
+            <FormItem
+              name="ligand_param_fname"
+              label="Custom parameter file (optional)"
+            >
+              <Input
+                type="file"
+                id="ligand_param_fname"
+                name="ligand_param_fname"
+                accept=".param"
+              />
+            </FormItem>
+            <FormItem
+              name="ligand_top_fname"
+              label="Custom topology file (optional)"
+            >
+              <Input
+                type="file"
+                id="ligand_top_fname"
+                name="ligand_top_fname"
+                accept=".top"
+              />
+            </FormItem>
+          </>
+        )}
       </>
     </MoleculeSubFormWrapper>
   );
