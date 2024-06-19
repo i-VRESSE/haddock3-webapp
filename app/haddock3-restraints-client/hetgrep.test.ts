@@ -1120,6 +1120,7 @@ END
 `;
 
 const pdb8TRE_atp = `\
+REMARK 200 Generated with haddock3-webapp hetGrep method                        
 HET    ATP  A1001      31                                                       
 HETNAM     ATP ADENOSINE-5'-TRIPHOSPHATE                                        
 HETATM  679  PG  ATP A1001      -9.415  19.269   9.768  1.00 29.64           P  
