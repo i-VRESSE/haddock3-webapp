@@ -1,4 +1,13 @@
-import { boolean, email, number, object, string, parse, Output } from "valibot";
+import {
+  boolean,
+  email,
+  number,
+  object,
+  string,
+  parse,
+  InferOutput,
+  pipe,
+} from "valibot";
 import { type ExpertiseLevel } from "./drizzle/schema.server";
 
 export const inPortalMode = !!process.env.HADDOCK3WEBAPP_CSB_PORTAL;
@@ -16,11 +25,11 @@ export function disabledInPortalMode() {
 }
 export const CsbUserSchema = object({
   id: number(),
-  email: string([email()]),
+  email: pipe(string(), email()),
   permissions: number(),
   suspended: boolean(),
 });
-export type CsbUser = Output<typeof CsbUserSchema>;
+export type CsbUser = InferOutput<typeof CsbUserSchema>;
 
 function getPortalHeaders(request: Request) {
   return {

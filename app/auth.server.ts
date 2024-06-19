@@ -6,7 +6,7 @@ import {
   type OAuth2StrategyVerifyParams,
 } from "remix-auth-oauth2";
 import { json } from "@remix-run/node";
-import { email, object, parse, string } from "valibot";
+import { email, object, parse, string, pipe } from "valibot";
 
 import { sessionStorage } from "./session.server";
 import {
@@ -34,7 +34,7 @@ export const authenticator = new Authenticator<number>(sessionStorage, {
 });
 
 const CredentialsSchema = object({
-  email: string([email()]),
+  email: pipe(string(), email()),
   password: string(),
 });
 
@@ -177,7 +177,9 @@ if (
       const headers = {
         Authorization: `Bearer ${accessToken}`,
       };
-      const profileResponse = await fetch(this.profileEndpoint, { headers });
+      const profileResponse = await fetch(this.profileEndpoint, {
+        headers,
+      });
       const profile = await profileResponse.json();
       const emails = await this.userEmails(profile.sub);
       // TODO store Orcid id into database

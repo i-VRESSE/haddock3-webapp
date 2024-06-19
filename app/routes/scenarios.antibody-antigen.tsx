@@ -2,12 +2,13 @@ import { useState } from "react";
 import { json, useActionData, useNavigate, useSubmit } from "@remix-run/react";
 import JSZip from "jszip";
 import {
-  Output,
+  InferOutput,
   ValiError,
   instance,
   minSize,
   object,
   optional,
+  pipe,
 } from "valibot";
 import { LoaderFunctionArgs } from "@remix-run/node";
 
@@ -36,20 +37,19 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = uploadaction;
 
 const Schema = object({
-  antibody: instance(File, "Antibody structure as PDB file", []),
-  antigen: instance(File, "Antibody structure as PDB file", []),
-  ambig_fname: instance(File, "Ambiguous restraints as TBL file", [
+  antibody: instance(File, "Antibody structure as PDB file"),
+  antigen: instance(File, "Antibody structure as PDB file"),
+  ambig_fname: pipe(
+    instance(File, "Ambiguous restraints as TBL file"),
     minSize(
       1,
       "Ambiguous restraints file should not be empty. Please select some residues.",
     ),
-  ]),
-  unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
-  reference_fname: optional(
-    instance(File, "Reference structure as PDB file", []),
   ),
+  unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
+  reference_fname: optional(instance(File, "Reference structure as PDB file")),
 });
-type Schema = Output<typeof Schema>;
+type Schema = InferOutput<typeof Schema>;
 
 function generateWorkflow(data: Schema) {
   // create workflow.cfg with form data as values for filename fields

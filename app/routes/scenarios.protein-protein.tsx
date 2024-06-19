@@ -3,10 +3,11 @@ import { useActionData, useSubmit, useNavigate, json } from "@remix-run/react";
 import {
   object,
   instance,
-  Output,
+  InferOutput,
   optional,
   minSize,
   ValiError,
+  pipe,
 } from "valibot";
 import JSZip from "jszip";
 import { LoaderFunctionArgs } from "@remix-run/node";
@@ -39,16 +40,17 @@ const Schema = object({
   // TODO check content of pdb files are valid
   protein1: instance(File, "First protein structure as PDB file"),
   protein2: instance(File, "Second protein structure as PDB file"),
-  ambig_fname: instance(File, "Ambiguous restraints as TBL file", [
+  ambig_fname: pipe(
+    instance(File, "Ambiguous restraints as TBL file"),
     minSize(
       1,
       "Ambiguous restraints file should not be empty. Please select residues.",
     ),
-  ]),
+  ),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
   reference_fname: optional(instance(File, "Reference structure as PDB file")),
 });
-type Schema = Output<typeof Schema>;
+type Schema = InferOutput<typeof Schema>;
 
 function generateWorkflow(data: Schema) {
   // Workflow based on

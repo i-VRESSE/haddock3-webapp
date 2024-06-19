@@ -1,5 +1,15 @@
-import type { Output } from "valibot";
-import { object, coerce, number, optional, picklist, integer } from "valibot";
+import {
+  object,
+  number,
+  optional,
+  picklist,
+  integer,
+  pipe,
+  transform,
+  InferOutput,
+  union,
+  string,
+} from "valibot";
 
 import { getParamsCfg } from "~/models/job.server";
 import { getClusterTsv } from "./recluster.server";
@@ -8,11 +18,15 @@ import { createClient } from "~/models/config.server";
 export const Schema = object({
   // TODO newer valibot has picklist to constrain values, but gives tsc error, wait for next version
   criterion: optional(picklist(["maxclust", "distance"]), "maxclust"),
-  n_clusters: optional(coerce(number([integer()]), Number)),
-  clust_cutoff: optional(coerce(number(), Number)),
-  min_population: optional(coerce(number([integer()]), Number)),
+  n_clusters: optional(
+    pipe(union([string(), number()]), transform(Number), integer()),
+  ),
+  clust_cutoff: optional(pipe(union([string(), number()]), transform(Number))),
+  min_population: optional(
+    pipe(union([string(), number()]), transform(Number), integer()),
+  ),
 });
-export type Schema = Output<typeof Schema>;
+export type Schema = InferOutput<typeof Schema>;
 
 export async function getParams({
   jobid,

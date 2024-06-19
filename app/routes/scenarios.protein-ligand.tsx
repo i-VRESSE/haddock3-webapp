@@ -3,10 +3,11 @@ import { useActionData, useSubmit, useNavigate, json } from "@remix-run/react";
 import {
   object,
   instance,
-  Output,
+  InferOutput,
   optional,
   minSize,
   ValiError,
+  pipe,
 } from "valibot";
 import JSZip from "jszip";
 import { LoaderFunctionArgs } from "@remix-run/node";
@@ -42,28 +43,26 @@ export const action = uploadaction;
 const Schema = object({
   protein: instance(File, "Protein structure as PDB file"),
   ligand: instance(File, "Ligand structure as PDB file"),
-  ambig_actpass_fname: instance(
-    File,
-    "Ambiguous active+passive restraints as TBL file",
-    [
-      minSize(
-        1,
-        "Ambiguous restraints file should not be empty. Please select residues.",
-      ),
-    ],
-  ),
-  ambig_pass_fname: instance(File, "Ambiguous passive restraints as TBL file", [
+  ambig_actpass_fname: pipe(
+    instance(File, "Ambiguous active+passive restraints as TBL file"),
     minSize(
       1,
       "Ambiguous restraints file should not be empty. Please select residues.",
     ),
-  ]),
+  ),
+  ambig_pass_fname: pipe(
+    instance(File, "Ambiguous passive restraints as TBL file"),
+    minSize(
+      1,
+      "Ambiguous restraints file should not be empty. Please select residues.",
+    ),
+  ),
   ligand_param_fname: optional(instance(File, "Custom ligand parameter file")),
   ligand_top_fname: optional(instance(File, "Custom ligand topology file")),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
   reference_fname: optional(instance(File, "Reference structure as PDB file")),
 });
-type Schema = Output<typeof Schema>;
+type Schema = InferOutput<typeof Schema>;
 
 function generateWorkflow(
   data: Schema,

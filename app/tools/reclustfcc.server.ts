@@ -1,14 +1,28 @@
 import { getParamsCfg } from "~/models/job.server";
 import { getClusterTsv } from "./recluster.server";
-import { object, number, coerce, finite, type Output, integer } from "valibot";
+import {
+  object,
+  number,
+  finite,
+  type InferOutput,
+  pipe,
+  transform,
+  integer,
+  union,
+  string,
+} from "valibot";
 import { createClient } from "~/models/config.server";
 
 export const Schema = object({
-  clust_cutoff: coerce(number([finite()]), Number),
-  strictness: coerce(number([finite()]), Number),
-  min_population: coerce(number([integer()]), Number),
+  clust_cutoff: pipe(union([string(), number()]), transform(Number), finite()),
+  strictness: pipe(union([string(), number()]), transform(Number), finite()),
+  min_population: pipe(
+    union([string(), number()]),
+    transform(Number),
+    integer(),
+  ),
 });
-export type Schema = Output<typeof Schema>;
+export type Schema = InferOutput<typeof Schema>;
 
 export async function getParams({
   jobid,
