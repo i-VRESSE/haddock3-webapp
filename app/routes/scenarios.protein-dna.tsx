@@ -8,6 +8,10 @@ import {
   minSize,
   ValiError,
   pipe,
+  integer,
+  minValue,
+  string,
+  transform,
 } from "valibot";
 import JSZip from "jszip";
 import { LoaderFunctionArgs } from "@remix-run/node";
@@ -20,7 +24,7 @@ import { FormItem } from "~/scenarios/FormItem";
 import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import { action as uploadaction } from "./upload";
 import { MoleculeSubForm } from "~/scenarios/MoleculeSubForm.client";
-import { ActPassSelection } from "~/scenarios/ActPassSelection";
+import { ActPassSelection, countSelected } from "~/scenarios/ActPassSelection";
 import { ClientOnly } from "~/components/ClientOnly";
 import { mustBeAllowedToSubmit } from "~/auth.server";
 import {
@@ -40,6 +44,18 @@ const Schema = object({
   // TODO check content of pdb files are valid
   protein: instance(File, "Protein structure as PDB file"),
   dna: instance(File, "DNA structure as PDB file"),
+  nrSelectedProteinResidues: pipe(
+    string(),
+    transform(Number),
+    integer(),
+    minValue(1, "At least one residue must be selected for the protein."),
+  ),
+  nrSelectedDNAesidues: pipe(
+    string(),
+    transform(Number),
+    integer(),
+    minValue(1, "At least one residue must be selected for the DNA."),
+  ),
   ambig_fname: pipe(
     instance(File, "Ambiguous restraints as TBL file"),
     minSize(
@@ -184,6 +200,9 @@ export default function Page() {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
+
+    formData.set("nrSelectedProteinResidues", countSelected(proteinActPass));
+    formData.set("nrSelectedDNAResidues", countSelected(dnaActPass));
 
     const ambig_fname = await generateAmbiguousRestraintsFile(
       proteinActPass,

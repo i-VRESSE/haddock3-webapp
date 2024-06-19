@@ -5,10 +5,14 @@ import {
   InferOutput,
   ValiError,
   instance,
+  integer,
   minSize,
+  minValue,
   object,
   optional,
   pipe,
+  string,
+  transform,
 } from "valibot";
 import { LoaderFunctionArgs } from "@remix-run/node";
 
@@ -21,7 +25,7 @@ import { parseFormData } from "~/scenarios/schema";
 import { mustBeAllowedToSubmit } from "~/auth.server";
 import { ClientOnly } from "~/components/ClientOnly";
 import { MoleculeSubForm } from "~/scenarios/MoleculeSubForm.client";
-import { ActPassSelection } from "~/scenarios/ActPassSelection";
+import { ActPassSelection, countSelected } from "~/scenarios/ActPassSelection";
 import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import {
   generateAmbiguousRestraintsFile,
@@ -48,6 +52,18 @@ const Schema = object({
   ),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
   reference_fname: optional(instance(File, "Reference structure as PDB file")),
+  nrSelectedAntibodyResidues: pipe(
+    string(),
+    transform(Number),
+    integer(),
+    minValue(1, "At least one residue must be selected for the antibody."),
+  ),
+  nrSelectedAntigenResidues: pipe(
+    string(),
+    transform(Number),
+    integer(),
+    minValue(1, "At least one residue must be selected for the antigen."),
+  ),
 });
 type Schema = InferOutput<typeof Schema>;
 
@@ -196,6 +212,9 @@ export default function AntibodyAntigenScenario() {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
+
+    formData.set("nrSelectedAntibodyResidues", countSelected(antibodyActPass));
+    formData.set("nrSelectedAntigenResidues", countSelected(antigenActPass));
 
     const ambig_fname = await generateAmbiguousRestraintsFile(
       antibodyActPass,
