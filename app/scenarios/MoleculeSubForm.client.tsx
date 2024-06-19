@@ -37,14 +37,7 @@ import { MoleculeSettings } from "./MoleculeSettings";
 import { Spinner } from "~/components/ui/spinner";
 import { Button } from "~/components/ui/button";
 import { RefreshCw } from "lucide-react";
-
-export type ActPassSelection = {
-  active: number[];
-  passive: number[];
-  neighbours: number[];
-  chain: string;
-  bodyRestraints: string;
-};
+import { ActPassSelection } from "./ActPassSelection";
 
 export function MoleculeSubFormWrapper({
   legend,

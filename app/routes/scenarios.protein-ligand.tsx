@@ -18,10 +18,11 @@ import { FormDescription } from "~/scenarios/FormDescription";
 import { FormItem } from "~/scenarios/FormItem";
 import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import { action as uploadaction } from "./upload";
+import { MoleculeSubForm } from "~/scenarios/MoleculeSubForm.client";
 import {
   ActPassSelection,
-  MoleculeSubForm,
-} from "~/scenarios/MoleculeSubForm.client";
+  validateActPassPair,
+} from "~/scenarios/ActPassSelection";
 import { ClientOnly } from "~/components/ClientOnly";
 import { mustBeAllowedToSubmit } from "~/auth.server";
 import {
@@ -39,10 +40,19 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = uploadaction;
 
 const Schema = object({
-  // TODO check content of pdb files are valid
   protein: instance(File, "Protein structure as PDB file"),
   ligand: instance(File, "Ligand structure as PDB file"),
-  ambig_fname: instance(File, "Ambiguous restraints as TBL file", [
+  ambig_actpass_fname: instance(
+    File,
+    "Ambiguous active+passive restraints as TBL file",
+    [
+      minSize(
+        1,
+        "Ambiguous restraints file should not be empty. Please select residues.",
+      ),
+    ],
+  ),
+  ambig_pass_fname: instance(File, "Ambiguous passive restraints as TBL file", [
     minSize(
       1,
       "Ambiguous restraints file should not be empty. Please select residues.",
@@ -55,7 +65,11 @@ const Schema = object({
 });
 type Schema = Output<typeof Schema>;
 
-function generateWorkflow(data: Schema) {
+function generateWorkflow(
+  data: Schema,
+  proteinActPass: ActPassSelection,
+  ligandActPass: ActPassSelection,
+) {
   // Workflow based on
   // https://github.com/haddocking/haddock3/blob/main/examples/docking-protein-ligand/docking-protein-ligand-full.cfg
   // made valid for easy expertise level
@@ -70,11 +84,15 @@ function generateWorkflow(data: Schema) {
   const top_line = data.ligand_top_fname
     ? `ligand_top_fname = "${data.ligand_top_fname.name}"`
     : "";
-  // TODO make dynamic values of
-  // - resdic_A === proteinActPass.active?
-  // - resdic_B === ligandActPass.active?
-  // TODO Use different ambig_fname* in the rigidbody and flexref sections
+
   // TODO ligand_param_fname is requires expert level, should hide/disable on /scenarios page if level not adequate
+
+  const resdic_A = JSON.stringify([
+    ...proteinActPass.active,
+    ...proteinActPass.passive,
+    ...proteinActPass.neighbours,
+  ]);
+  const resdic_B = JSON.stringify(ligandActPass.active);
   return `
 # ====================================================================
 # Protein-ligand docking example
@@ -107,7 +125,7 @@ delenph = false
 
 [rigidbody]
 tolerance = 5
-ambig_fname = "data/ambig-active-rigidbody.tbl"
+ambig_fname = "${data.ambig_actpass_fname.name}"
 ${param_line}
 ${top_line}
 sampling = 1000
@@ -124,7 +142,7 @@ ${ref_line}
 
 [flexref]
 tolerance = 5
-ambig_fname = "data/ambig-passive.tbl"
+ambig_fname = "${data.ambig_pass_fname.name}"
 ${param_line}
 ${top_line}
 mdsteps_rigid = 0
@@ -134,8 +152,8 @@ mdsteps_cool1 = 0
 ${ref_line}
 
 [rmsdmatrix]
-resdic_A = [ 151, 152, 348, 276, 156, 292, 277, 222, 371, 246, 406, 179, 178, 227, 294, 224, 119, 118 ]
-resdic_B = [ 500 ]
+resdic_A = ${resdic_A}
+resdic_B = ${resdic_B}
 
 [clustrmsd]
 criterion = 'maxclust'
@@ -167,7 +185,8 @@ async function createZip(workflow: string, data: Schema) {
   zip.file(WORKFLOW_CONFIG_FILENAME, workflow);
   zip.file(data.protein.name, data.protein);
   zip.file(data.ligand.name, data.ligand);
-  zip.file(data.ambig_fname.name, data.ambig_fname);
+  zip.file(data.ambig_actpass_fname.name, data.ambig_actpass_fname);
+  zip.file(data.ambig_pass_fname.name, data.ambig_pass_fname);
   if (data.reference_fname) {
     zip.file(data.reference_fname.name, data.reference_fname);
   }
@@ -209,13 +228,41 @@ export default function Page() {
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
+
+    const selErrors = validateActPassPair(
+      proteinActPass,
+      ligandActPass,
+      "protein",
+      "ligand",
+    );
+    if (selErrors.length > 0) {
+      setErrors(selErrors);
+      return;
+    }
     const formData = new FormData(form);
 
-    const ambig_fname = await generateAmbiguousRestraintsFile(
+    const ambig_actpass_fname = await generateAmbiguousRestraintsFile(
       proteinActPass,
       ligandActPass,
     );
-    formData.set("ambig_fname", ambig_fname);
+    formData.set("ambig_actpass_fname", ambig_actpass_fname);
+
+    // when user only selected active residues, treat them as passive
+    const onlyPassive =
+      proteinActPass.passive.length === 0 &&
+      proteinActPass.active.length > 0 &&
+      proteinActPass.neighbours.length === 0;
+    const ambig_pass_fname = await generateAmbiguousRestraintsFile(
+      {
+        active: [],
+        passive: onlyPassive ? proteinActPass.active : proteinActPass.passive,
+        neighbours: proteinActPass.neighbours,
+        chain: proteinActPass.chain,
+        bodyRestraints: proteinActPass.bodyRestraints,
+      },
+      ligandActPass,
+    );
+    formData.set("ambig_pass_fname", ambig_pass_fname);
 
     const unambig_fname = generateUnAmbiguousRestraintsFile(
       proteinActPass.bodyRestraints,
@@ -228,7 +275,7 @@ export default function Page() {
     try {
       const data = parseFormData(formData, Schema);
       setErrors(undefined);
-      const workflow = generateWorkflow(data);
+      const workflow = generateWorkflow(data, proteinActPass, ligandActPass);
       const zipPromise = createZip(workflow, data);
       handleActionButton(event.nativeEvent, zipPromise, navigate, submit);
     } catch (e) {
@@ -284,7 +331,10 @@ export default function Page() {
                 targetChain="B"
               />
             </div>
-            <FormItem name="reference_fname" label="Reference structure">
+            <FormItem
+              name="reference_fname"
+              label="Reference structure (optional)"
+            >
               <PDBFileInput name="reference_fname" />
               <FormDescription>
                 In example named data/target.pdb

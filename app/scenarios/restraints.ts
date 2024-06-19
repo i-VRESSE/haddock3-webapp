@@ -1,6 +1,6 @@
 import { strFromU8, gzip, gunzip, strToU8 } from "fflate";
 
-import type { ActPassSelection } from "./MoleculeSubForm.client";
+import type { ActPassSelection } from "./ActPassSelection";
 import {
   HTTPValidationError,
   client,

@@ -18,10 +18,8 @@ import { FormDescription } from "~/scenarios/FormDescription";
 import { FormItem } from "~/scenarios/FormItem";
 import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import { action as uploadaction } from "./upload";
-import {
-  ActPassSelection,
-  MoleculeSubForm,
-} from "~/scenarios/MoleculeSubForm.client";
+import { MoleculeSubForm } from "~/scenarios/MoleculeSubForm.client";
+import { ActPassSelection } from "~/scenarios/ActPassSelection";
 import { ClientOnly } from "~/components/ClientOnly";
 import { mustBeAllowedToSubmit } from "~/auth.server";
 import {

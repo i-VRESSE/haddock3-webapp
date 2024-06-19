@@ -19,10 +19,8 @@ import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
 import { mustBeAllowedToSubmit } from "~/auth.server";
 import { ClientOnly } from "~/components/ClientOnly";
-import {
-  ActPassSelection,
-  MoleculeSubForm,
-} from "~/scenarios/MoleculeSubForm.client";
+import { MoleculeSubForm } from "~/scenarios/MoleculeSubForm.client";
+import { ActPassSelection } from "~/scenarios/ActPassSelection";
 import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import {
   generateAmbiguousRestraintsFile,

@@ -1,15 +1,13 @@
 import { useId, useState } from "react";
 import { FormItem } from "./FormItem";
-import {
-  ActPassSelection,
-  MoleculeSubFormWrapper,
-} from "./MoleculeSubForm.client";
+import { MoleculeSubFormWrapper } from "./MoleculeSubForm.client";
+import { ActPassSelection } from "./ActPassSelection";
 import { LigandViewer } from "./Viewer.client";
 import { Input } from "~/components/ui/input";
 import { type Structure, autoLoad } from "ngl";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Label } from "~/components/ui/label";
-import { hetGrepFile } from "./hetGrep";
+import { hetGrepFile } from "../haddock3-restraints-client/hetGrep";
 import { jsonSafeFile, preprocessPdb, restrainBodies } from "./restraints";
 import { HiddenFileInput } from "./HiddenFileInput";
 import { LinkToFile } from "./LinkToFile";
@@ -20,7 +18,6 @@ async function heterosFromFile(file: File): Promise<Hetero[]> {
   const structure: Structure = await autoLoad(file);
   const heteros: Hetero[] = [];
   structure.eachResidue((r) => {
-    // TODO filter out solvents like glycerol
     if (r.isHetero() && !r.isWater() && !r.isIon()) {
       const hetero: Hetero = {
         resno: r.resno,
@@ -183,8 +180,8 @@ function UserStructure({
           )}
         </div>
       </FormItem>
-      <FormItem name={`${id}-hetero`} label="Hetero">
-        {file ? (
+      {file && (
+        <FormItem name={`${id}-hetero`} label="Hetero">
           <HeteroRadioGroup
             options={heteros}
             selected={mySelected}
@@ -192,10 +189,8 @@ function UserStructure({
             onHover={setHoveredFrom2DResidue}
             highlight={hoveredFrom3DResidue}
           />
-        ) : (
-          <p>Load a structure first</p>
-        )}
-      </FormItem>
+        </FormItem>
+      )}
     </>
   );
 }
@@ -286,7 +281,10 @@ export function HeteroMoleculeSubForm({
             />
           </div>
         )}
-        <FormItem name="ligand_param_fname" label="Custom parameter file">
+        <FormItem
+          name="ligand_param_fname"
+          label="Custom parameter file (optional)"
+        >
           <Input
             type="file"
             id="ligand_param_fname"
@@ -294,7 +292,10 @@ export function HeteroMoleculeSubForm({
             accept=".param"
           />
         </FormItem>
-        <FormItem name="ligand_top_fname" label="Custom topology file">
+        <FormItem
+          name="ligand_top_fname"
+          label="Custom topology file (optional)"
+        >
           <Input
             type="file"
             id="ligand_top_fname"
