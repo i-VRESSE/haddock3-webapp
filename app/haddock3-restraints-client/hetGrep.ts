@@ -26,7 +26,7 @@ export function hetGrep(
       line.slice(22, 26) === sequence,
   };
   const result = [
-    'REMARK 200 Generated with haddock3-webapp hetGrep method                        ',
+    "REMARK 200 Generated with haddock3-webapp hetGrep method                        ",
     ...lines.filter(filters.het),
     ...lines.filter(filters.hetnam),
   ];
