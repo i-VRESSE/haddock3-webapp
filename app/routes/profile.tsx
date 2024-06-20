@@ -10,7 +10,7 @@ import {
   listExpertiseLevels,
   setPreferredExpertiseLevel,
 } from "~/models/user.server";
-import { enumType, object, safeParse } from "valibot";
+import { object, picklist, safeParse } from "valibot";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
@@ -22,12 +22,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({});
 };
 
+const ActionSchema = object({
+  preferredExpertiseLevel: picklist(listExpertiseLevels()),
+});
+
 export const action = async ({ request }: ActionFunctionArgs) => {
   const user = await getUser(request);
   const formData = await request.formData();
-  const ActionSchema = object({
-    preferredExpertiseLevel: enumType(listExpertiseLevels()),
-  });
   const result = safeParse(ActionSchema, Object.fromEntries(formData));
 
   if (result.success) {

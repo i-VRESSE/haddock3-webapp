@@ -1,5 +1,15 @@
-import type { Output } from "valibot";
-import { object, number, coerce, finite, parse, picklist } from "valibot";
+import {
+  InferOutput,
+  pipe,
+  transform,
+  object,
+  number,
+  finite,
+  parse,
+  picklist,
+  string,
+  union,
+} from "valibot";
 import {
   buildPath,
   getJobfile,
@@ -30,13 +40,13 @@ export type Table =
 export const WeightsSchema = object({
   // could use minimum/maximum from catalog,
   // if they had sane values instead of -9999/9999
-  w_elec: coerce(number([finite()]), Number),
-  w_vdw: coerce(number([finite()]), Number),
-  w_desolv: coerce(number([finite()]), Number),
-  w_bsa: coerce(number([finite()]), Number),
-  w_air: coerce(number([finite()]), Number),
+  w_elec: pipe(union([string(), number()]), transform(Number), finite()),
+  w_vdw: pipe(union([string(), number()]), transform(Number), finite()),
+  w_desolv: pipe(union([string(), number()]), transform(Number), finite()),
+  w_bsa: pipe(union([string(), number()]), transform(Number), finite()),
+  w_air: pipe(union([string(), number()]), transform(Number), finite()),
 });
-export type Weights = Output<typeof WeightsSchema>;
+export type Weights = InferOutput<typeof WeightsSchema>;
 
 export async function getWeights({
   jobid,

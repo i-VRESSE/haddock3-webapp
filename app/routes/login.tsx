@@ -38,7 +38,7 @@ export async function action({ request }: ActionFunctionArgs) {
     });
   } catch (error) {
     if (error instanceof AuthorizationError && error.cause) {
-      let errors: FlatErrors;
+      let errors: FlatErrors<undefined>;
       if (error.cause instanceof WrongPasswordError) {
         errors = {
           nested: { password: [error.message] },
@@ -48,7 +48,7 @@ export async function action({ request }: ActionFunctionArgs) {
           nested: { email: [error.message] },
         };
       } else if (error.cause instanceof ValiError) {
-        errors = flatten(error.cause);
+        errors = flatten(error.cause.issues);
       } else {
         throw error;
       }
@@ -60,7 +60,9 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function LoginPage() {
-  const actionData = useActionData<{ errors: FlatErrors } | undefined>();
+  const actionData = useActionData<
+    { errors: FlatErrors<undefined> } | undefined
+  >();
   const { socials } = useLoaderData<typeof loader>();
   // Shared style between login and register. Extract if we use it more often?
   const centeredColumn = "flex flex-col items-center gap-4";

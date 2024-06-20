@@ -22,6 +22,7 @@ import {
 } from "ngl";
 import { Button } from "~/components/ui/button";
 import { useTheme } from "remix-themes";
+import { Hetero } from "./Hetero";
 
 function currentBackground() {
   let backgroundColor = "white";
@@ -49,11 +50,13 @@ export function NGLResidues({
   residues,
   color,
   opacity = 1.0,
+  chain = "",
   representation,
 }: {
   residues: number[];
   color: string;
   opacity?: number;
+  chain?: string;
   representation: StructureRepresentationType;
 }) {
   const name = useId();
@@ -62,8 +65,16 @@ export function NGLResidues({
 
   const selection = useMemo(() => {
     const sortedResidues = [...residues].sort((a, b) => a - b);
-    return sortedResidues.length ? sortedResidues.join(", ") : "not all";
-  }, [residues]);
+    if (sortedResidues.length) {
+      const newSelection = sortedResidues.join(", ");
+      if (chain) {
+        return `:${chain} and ${newSelection}`;
+      } else {
+        return newSelection;
+      }
+    }
+    return "not all";
+  }, [residues, chain]);
 
   useEffect(() => {
     component.addRepresentation(representation, {
@@ -130,13 +141,47 @@ export function useComponent() {
   return component;
 }
 
+// List from https://github.com/nglviewer/ngl/blob/5d64dbe6769448e0f33080e9ac957a70a0973a13/src/component/structure-component.ts#L52-L79
+const defaultRepresentationNames = new Set([
+  "angle",
+  "axes",
+  "backbone",
+  "ball+stick",
+  "base",
+  "cartoon",
+  "contact",
+  "dihedral",
+  "dihedral-histogram",
+  "distance",
+  "dot",
+  "helixorient",
+  "hyperball",
+  "label",
+  "licorice",
+  "line",
+  "molecularsurface",
+  "point",
+  "ribbon",
+  "rocket",
+  "rope",
+  "slice",
+  "spacefill",
+  "surface",
+  "trace",
+  "tube",
+  "unitcell",
+  "validation",
+]);
+
 export function NGLComponent({
   structure,
   chain,
+  opacity = 1.0,
   children,
 }: {
   structure: File;
   chain: string;
+  opacity?: number;
   children?: ReactNode;
 }) {
   const stage = useStage();
@@ -160,6 +205,23 @@ export function NGLComponent({
       stage.getComponentsByName(structure.name).dispose();
     };
   }, [stage, structure]);
+
+  useEffect(() => {
+    if (!component) {
+      return;
+    }
+    stage.eachRepresentation((repr) => {
+      // representations created with defaultFileRepresentation have default name
+      // while nested representations have unique names generated with useId hook
+      if (
+        repr.parent.name === component.name &&
+        defaultRepresentationNames.has(repr.name)
+      ) {
+        repr.setParameters({ opacity });
+      }
+    });
+    stage.viewer.requestRender();
+  }, [opacity, component, stage]);
 
   useEffect(() => {
     if (!component) {
@@ -206,8 +268,18 @@ export function NGLStage({
   children,
 }: {
   children: ReactNode;
-  onPick?: (chain: string, residue: number, componentName: string) => void;
-  onHover?: (chain: string, residue: number, componentName: string) => void;
+  onPick?: (
+    chain: string,
+    residue: number,
+    componentName: string,
+    resname: string,
+  ) => void;
+  onHover?: (
+    chain: string,
+    residue: number,
+    componentName: string,
+    resname: string,
+  ) => void;
   onMouseLeave?: () => void;
 }) {
   const [stage, setStage] = useState<Stage>();
@@ -235,6 +307,7 @@ export function NGLStage({
           pickinProxy.atom.chainname,
           pickinProxy.atom.resno,
           pickinProxy.component.name,
+          pickinProxy.atom.resname,
         );
       }
     },
@@ -260,6 +333,7 @@ export function NGLStage({
           pickinProxy.atom.chainname,
           pickinProxy.atom.resno,
           pickinProxy.component.name,
+          pickinProxy.atom.resname,
         );
       }
     },
@@ -309,7 +383,7 @@ export function NGLStage({
   );
 }
 
-class ErrorBoundary extends ReactComponent<
+export class ErrorBoundary extends ReactComponent<
   { children: ReactNode },
   { hasError: boolean }
 > {
@@ -517,6 +591,81 @@ export function Viewer({
     <ErrorBoundary>
       <NGLStage onMouseLeave={onMouseLeave} onHover={onHover} onPick={onPick}>
         <NGLComponent structure={structure} chain={chain}>
+          {representations}
+        </NGLComponent>
+      </NGLStage>
+    </ErrorBoundary>
+  );
+}
+
+export function LigandViewer({
+  structure,
+  selected,
+  onPick,
+  onHover,
+  highlight,
+  onMouseLeave,
+}: {
+  structure: File;
+  selected: Hetero | undefined;
+  onPick: (picked: string) => void;
+  onHover: (hovering: string) => void;
+  highlight: string | undefined;
+  onMouseLeave?: () => void;
+}) {
+  const [theme] = useTheme();
+  const isDark = theme === "dark";
+  const activeColor = isDark ? "green" : "lime";
+  const opacity = selected ? 0.05 : 1.0;
+  const representations = (
+    <>
+      {highlight && (
+        <NGLResidues
+          residues={[parseInt(highlight.split("-")[2])]}
+          color={activeColor}
+          chain={highlight.split("-")[1]}
+          opacity={1.0}
+          representation={"spacefill"}
+        />
+      )}
+      {selected && (
+        <NGLResidues
+          residues={[selected.resno]}
+          chain={selected.chain}
+          color={activeColor}
+          opacity={1.0}
+          representation={"spacefill"}
+        />
+      )}
+    </>
+  );
+
+  function onLigandPick(
+    chain: string,
+    residue: number,
+    componentName: string,
+    resname: string,
+  ) {
+    onPick(`${resname}-${chain}-${residue}`);
+  }
+
+  function onLigandHover(
+    chain: string,
+    residue: number,
+    componentName: string,
+    resname: string,
+  ) {
+    onHover(`${resname}-${chain}-${residue}`);
+  }
+
+  return (
+    <ErrorBoundary>
+      <NGLStage
+        onMouseLeave={onMouseLeave}
+        onHover={onLigandHover}
+        onPick={onLigandPick}
+      >
+        <NGLComponent structure={structure} chain={""} opacity={opacity}>
           {representations}
         </NGLComponent>
       </NGLStage>

@@ -2,12 +2,17 @@ import { useState } from "react";
 import { json, useActionData, useNavigate, useSubmit } from "@remix-run/react";
 import JSZip from "jszip";
 import {
-  Output,
+  InferOutput,
   ValiError,
   instance,
+  integer,
   minSize,
+  minValue,
   object,
   optional,
+  pipe,
+  string,
+  transform,
 } from "valibot";
 import { LoaderFunctionArgs } from "@remix-run/node";
 
@@ -19,10 +24,8 @@ import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
 import { mustBeAllowedToSubmit } from "~/auth.server";
 import { ClientOnly } from "~/components/ClientOnly";
-import {
-  ActPassSelection,
-  MoleculeSubForm,
-} from "~/scenarios/MoleculeSubForm.client";
+import { MoleculeSubForm } from "~/scenarios/MoleculeSubForm.client";
+import { ActPassSelection, countSelected } from "~/scenarios/ActPassSelection";
 import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import {
   generateAmbiguousRestraintsFile,
@@ -38,20 +41,31 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = uploadaction;
 
 const Schema = object({
-  antibody: instance(File, "Antibody structure as PDB file", []),
-  antigen: instance(File, "Antibody structure as PDB file", []),
-  ambig_fname: instance(File, "Ambiguous restraints as TBL file", [
+  antibody: instance(File, "Antibody structure as PDB file"),
+  antigen: instance(File, "Antibody structure as PDB file"),
+  ambig_fname: pipe(
+    instance(File, "Ambiguous restraints as TBL file"),
     minSize(
       1,
       "Ambiguous restraints file should not be empty. Please select some residues.",
     ),
-  ]),
+  ),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
-  reference_fname: optional(
-    instance(File, "Reference structure as PDB file", []),
+  reference_fname: optional(instance(File, "Reference structure as PDB file")),
+  nrSelectedAntibodyResidues: pipe(
+    string(),
+    transform(Number),
+    integer(),
+    minValue(1, "At least one residue must be selected for the antibody."),
+  ),
+  nrSelectedAntigenResidues: pipe(
+    string(),
+    transform(Number),
+    integer(),
+    minValue(1, "At least one residue must be selected for the antigen."),
   ),
 });
-type Schema = Output<typeof Schema>;
+type Schema = InferOutput<typeof Schema>;
 
 function generateWorkflow(data: Schema) {
   // create workflow.cfg with form data as values for filename fields
@@ -198,6 +212,9 @@ export default function AntibodyAntigenScenario() {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
+
+    formData.set("nrSelectedAntibodyResidues", countSelected(antibodyActPass));
+    formData.set("nrSelectedAntigenResidues", countSelected(antigenActPass));
 
     const ambig_fname = await generateAmbiguousRestraintsFile(
       antibodyActPass,

@@ -6,14 +6,15 @@ import {
 } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import {
-  type FlatErrors,
-  custom,
+  check,
   email,
   flatten,
   minLength,
   object,
   safeParse,
   string,
+  pipe,
+  FlatErrors,
 } from "valibot";
 import { authenticator } from "~/auth.server";
 import { EmailAlreadyRegisteredError, register } from "~/models/user.server";
@@ -32,18 +33,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return json({});
 }
 
-const RegisterSchema = object(
-  {
-    username: string([email()]),
-    password: string([minLength(8)]),
-    password2: string([minLength(8)]),
-  },
-  [
-    custom(
-      ({ password, password2 }) => password === password2,
-      "The passwords do not match.",
-    ),
-  ],
+const RegisterSchema = pipe(
+  object({
+    username: pipe(string(), email()),
+    password: pipe(string(), minLength(8)),
+    password2: pipe(string(), minLength(8)),
+  }),
+  check(
+    ({ password, password2 }) => password === password2,
+    "The passwords do not match.",
+  ),
 );
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -61,11 +60,13 @@ export async function action({ request }: ActionFunctionArgs) {
     // Login the just registered user
     const session = await getSession(request.headers.get("cookie"));
     session.set(authenticator.sessionKey, user.id);
-    const headers = new Headers({ "Set-Cookie": await commitSession(session) });
+    const headers = new Headers({
+      "Set-Cookie": await commitSession(session),
+    });
     return redirect("/", { headers });
   } catch (error) {
     if (error instanceof EmailAlreadyRegisteredError) {
-      const errors: FlatErrors = {
+      const errors: FlatErrors<undefined> = {
         nested: { username: ["This email is already registered."] },
       };
       return json({ errors }, { status: 400 });

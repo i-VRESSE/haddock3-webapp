@@ -37,14 +37,7 @@ import { MoleculeSettings } from "./MoleculeSettings";
 import { Spinner } from "~/components/ui/spinner";
 import { Button } from "~/components/ui/button";
 import { RefreshCw } from "lucide-react";
-
-export type ActPassSelection = {
-  active: number[];
-  passive: number[];
-  neighbours: number[];
-  chain: string;
-  bodyRestraints: string;
-};
+import { ActPassSelection } from "./ActPassSelection";
 
 export function MoleculeSubFormWrapper({
   legend,
@@ -277,6 +270,10 @@ function toggleResidue(
   return newSelection;
 }
 
+// TODO only render big proteins as surfaces other molecules as spacefill
+// current workaround is to molecule has more than 50 residues, render as surface
+const BIG_MOLECULE = 50;
+
 export function ResiduesSubForm({
   molecule,
   actpass,
@@ -302,7 +299,9 @@ export function ResiduesSubForm({
   const [showSurface, setShowSurface] = useState(false);
   const [showBuried, setShowBuried] = useState(false);
   const [renderSelectionAs, setRenderSelectionAs] =
-    useState<StructureRepresentationType>("surface");
+    useState<StructureRepresentationType>(
+      molecule.residues.length > BIG_MOLECULE ? "surface" : "spacefill",
+    );
   // gzipping and base64 encoding file can be slow, so we cache it
   // for example 8qg1 of 1.7Mb took 208ms
   const [safeFile, setSafeFile] = useState<string | undefined>(undefined);
@@ -332,6 +331,31 @@ export function ResiduesSubForm({
       setPicker3D("act");
     }
   }, [restraintsFlavour, setPicker3D, setShowNeigbours]);
+
+  useEffect(() => {
+    // If only one residue is present, select it
+    if (molecule.residues.length === 1) {
+      const active = ["act", "actpass"].includes(restraintsFlavour.kind)
+        ? [molecule.residues[0].resno]
+        : [];
+      const passive = ["surf", "pass"].includes(restraintsFlavour.kind)
+        ? [molecule.residues[0].resno]
+        : [];
+      onActPassChange?.({
+        active,
+        passive,
+        neighbours: [],
+        chain: molecule.targetChain,
+        bodyRestraints: actpass.bodyRestraints,
+      });
+    }
+  }, [
+    actpass.bodyRestraints,
+    molecule.residues,
+    molecule.targetChain,
+    onActPassChange,
+    restraintsFlavour.kind,
+  ]);
 
   async function handle2DResidueChange(newSelection: ResidueSelection) {
     if (!onActPassChange || !safeFile) {

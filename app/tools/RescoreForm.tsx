@@ -27,7 +27,7 @@ export function RescoreForm({
   moduleIndex,
 }: {
   weights: Weights;
-  errors: FlatErrors | undefined;
+  errors: FlatErrors<undefined> | undefined;
   showInteractiveVersion: boolean;
   hasInteractiveVersion: boolean;
   moduleIndex: number;

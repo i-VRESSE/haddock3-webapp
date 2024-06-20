@@ -9,7 +9,7 @@ import {
 } from "../bartender-client/constants";
 import { CompletedJobs, type DirectoryItem } from "~/bartender-client/types";
 import { BartenderError } from "./errors";
-import { type Output, parse, BaseSchema } from "valibot";
+import { type InferOutput, parse, GenericSchema } from "valibot";
 
 const BOOK_KEEPING_FILES = [
   "stderr.txt",
@@ -399,7 +399,7 @@ export async function fetchHtml({
   return await response.text();
 }
 
-export async function getParamsCfg<Schema extends BaseSchema>({
+export async function getParamsCfg<Schema extends GenericSchema>({
   jobid,
   moduleIndex,
   bartenderToken,
@@ -415,7 +415,7 @@ export async function getParamsCfg<Schema extends BaseSchema>({
   isInteractive: boolean;
   moduleName: string;
   schema: Schema;
-}): Promise<Output<Schema>> {
+}): Promise<InferOutput<Schema>> {
   const path = buildPath({
     moduleIndex,
     isInteractive,

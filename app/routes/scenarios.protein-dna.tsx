@@ -42,22 +42,19 @@ export const action = uploadaction;
 
 const Schema = object({
   // TODO check content of pdb files are valid
-  protein1: instance(File, "First protein structure as PDB file"),
-  protein2: instance(File, "Second protein structure as PDB file"),
-  nrSelectedProtein1Residues: pipe(
+  protein: instance(File, "Protein structure as PDB file"),
+  dna: instance(File, "DNA structure as PDB file"),
+  nrSelectedProteinResidues: pipe(
     string(),
     transform(Number),
     integer(),
-    minValue(1, "At least one residue must be selected for the first protein."),
+    minValue(1, "At least one residue must be selected for the protein."),
   ),
-  nrSelectedProtein2Residues: pipe(
+  nrSelectedDNAResidues: pipe(
     string(),
     transform(Number),
     integer(),
-    minValue(
-      1,
-      "At least one residue must be selected for the second protein.",
-    ),
+    minValue(1, "At least one residue must be selected for the DNA."),
   ),
   ambig_fname: pipe(
     instance(File, "Ambiguous restraints as TBL file"),
@@ -73,7 +70,7 @@ type Schema = InferOutput<typeof Schema>;
 
 function generateWorkflow(data: Schema) {
   // Workflow based on
-  // https://github.com/haddocking/haddock3/blob/main/examples/docking-protein-protein/docking-protein-protein-full.cfg
+  // https://github.com/haddocking/haddock3/blob/main/examples/docking-protein-DNA/docking-protein-DNA-full.cfg
   // made valid for easy expertise level
 
   const unambig_line = data.unambig_fname
@@ -83,14 +80,15 @@ function generateWorkflow(data: Schema) {
     ? `reference_fname = "${data.reference_fname.name}"`
     : "";
   return `
-# ====================================================================
-# Protein-protein docking example with NMR-derived ambiguous interaction restraints
+    # ====================================================================
+# protein-DNA docking example
 
 # directory in which the scoring will be done
 run_dir = "run1-full"
 
 # execution mode
 mode = "batch"
+# in which queue the jobs should run, if nothing is defined
 #  it will take the system's default
 # queue = "short"
 # concatenate models inside each job, concat = 5 each .job will produce 5 models
@@ -100,8 +98,8 @@ queue_limit = 100
 
 # molecules to be docked
 molecules =  [
-    "${data.protein1.name}",
-    "${data.protein2.name}"
+    "${data.protein.name}",
+    "${data.dna.name}"
     ]
 
 # ====================================================================
@@ -126,6 +124,7 @@ ${ref_line}
 [flexref]
 ambig_fname = "${data.ambig_fname.name}"
 ${unambig_line}
+dnarest_on = true
 
 [caprieval]
 ${ref_line}
@@ -133,6 +132,7 @@ ${ref_line}
 [emref]
 ambig_fname = "${data.ambig_fname.name}"
 ${unambig_line}
+dnarest_on = true
 
 [caprieval]
 ${ref_line}
@@ -145,17 +145,24 @@ top_models = 4
 [caprieval]
 ${ref_line}
 
+# Running final caprieval with allatoms parameter set to true to also
+#  include the evaluation of protein side chains and DNA nucleotides
+#  in both the alignment process and lrmsd, irmsd, ilrmsd computations
+[caprieval]
+allatoms = true
+${ref_line}
+
 [contactmap]
 
 # ====================================================================
-`;
+    `;
 }
 
 async function createZip(workflow: string, data: Schema) {
   const zip = new JSZip();
   zip.file(WORKFLOW_CONFIG_FILENAME, workflow);
-  zip.file(data.protein1.name, data.protein1);
-  zip.file(data.protein2.name, data.protein2);
+  zip.file(data.protein.name, data.protein);
+  zip.file(data.dna.name, data.dna);
   zip.file(data.ambig_fname.name, data.ambig_fname);
   if (data.reference_fname) {
     zip.file(data.reference_fname.name, data.reference_fname);
@@ -166,19 +173,19 @@ async function createZip(workflow: string, data: Schema) {
   return zip.generateAsync({ type: "blob" });
 }
 
-export default function ProteinProteinScenario() {
+export default function Page() {
   const actionData = useActionData<typeof uploadaction>();
   const submit = useSubmit();
   const navigate = useNavigate();
 
-  const [protein1ActPass, setProtein1ActPass] = useState<ActPassSelection>({
+  const [proteinActPass, setProteinActPass] = useState<ActPassSelection>({
     active: [],
     passive: [],
     neighbours: [],
     chain: "",
     bodyRestraints: "",
   });
-  const [protein2ActPass, setProtein2ActPass] = useState<ActPassSelection>({
+  const [dnaActPass, setDnaActPass] = useState<ActPassSelection>({
     active: [],
     passive: [],
     neighbours: [],
@@ -194,18 +201,18 @@ export default function ProteinProteinScenario() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    formData.set("nrSelectedProtei1nResidues", countSelected(protein1ActPass));
-    formData.set("nrSelectedProtein2Residues", countSelected(protein2ActPass));
+    formData.set("nrSelectedProteinResidues", countSelected(proteinActPass));
+    formData.set("nrSelectedDNAResidues", countSelected(dnaActPass));
 
     const ambig_fname = await generateAmbiguousRestraintsFile(
-      protein1ActPass,
-      protein2ActPass,
+      proteinActPass,
+      dnaActPass,
     );
     formData.set("ambig_fname", ambig_fname);
 
     const unambig_fname = generateUnAmbiguousRestraintsFile(
-      protein1ActPass.bodyRestraints,
-      protein2ActPass.bodyRestraints,
+      proteinActPass.bodyRestraints,
+      dnaActPass.bodyRestraints,
     );
     if (unambig_fname) {
       formData.set("unambig_fname", unambig_fname);
@@ -227,23 +234,23 @@ export default function ProteinProteinScenario() {
 
   return (
     <>
-      <h1 className="text-3xl">Protein-protein docking scenario</h1>
+      <h1 className="text-3xl">Protein-DNA docking scenario</h1>
       <p>
         Based on{" "}
         <a
           target="_blank"
           rel="noreferrer"
           className="hover:underline"
-          href="https://www.bonvinlab.org/education/HADDOCK24/HADDOCK24-protein-protein-basic/"
+          href="https://www.bonvinlab.org/education/HADDOCK24/HADDOCK24-protein-DNA-basic/"
         >
-          HADDOCK2.4 Protein-protein docking tutorial
+          HADDOCK2.4 Protein-dna docking basic tutorial
         </a>{" "}
         and the{" "}
         <a
           target="_blank"
           rel="noreferrer"
           className="hover:underline"
-          href="https://github.com/haddocking/haddock3/blob/main/examples/docking-protein-protein/docking-protein-protein-full.cfg"
+          href="https://github.com/haddocking/haddock3/blob/main/examples/docking-protein-DNA/docking-protein-DNA-full.cfg"
         >
           HADDOCK3 example
         </a>
@@ -254,26 +261,27 @@ export default function ProteinProteinScenario() {
           <form onSubmit={onSubmit}>
             <div className="grid grid-cols-2 gap-6">
               <MoleculeSubForm
-                name="protein1"
-                legend="First protein"
-                description="In example named data/e2a-hpr_1GGR.pdb"
-                actpass={protein1ActPass}
-                onActPassChange={setProtein1ActPass}
+                name="protein"
+                legend="Protein"
+                description="In example named data/cro.pdb or 3CRO_complex.pdb"
+                actpass={proteinActPass}
+                onActPassChange={setProteinActPass}
                 targetChain="A"
               />
               <MoleculeSubForm
-                name="protein2"
-                legend="Second protein"
-                description="In example named data/hpr_ensemble.pdb"
-                actpass={protein2ActPass}
-                onActPassChange={setProtein2ActPass}
+                name="dna"
+                legend="Nucleic acid (DNA and/or RNA)"
+                description="In example named data/dna.pdb or OR1_unbound.pdb"
+                actpass={dnaActPass}
+                onActPassChange={setDnaActPass}
+                preprocessPipeline="delhetatmkeepcoord"
                 targetChain="B"
               />
             </div>
             <FormItem name="reference_fname" label="Reference structure">
               <PDBFileInput name="reference_fname" />
               <FormDescription>
-                In example named data/e2a-hpr_1GGR.pdb
+                In example named data/target.pdb
               </FormDescription>
             </FormItem>
             <FormErrors errors={errors} />
