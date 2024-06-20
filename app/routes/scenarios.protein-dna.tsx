@@ -274,6 +274,7 @@ export default function Page() {
                 description="In example named data/dna.pdb or OR1_unbound.pdb"
                 actpass={dnaActPass}
                 onActPassChange={setDnaActPass}
+                preprocessPipeline="delhetatmkeepcoord"
                 targetChain="B"
               />
             </div>
