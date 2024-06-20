@@ -50,7 +50,7 @@ const Schema = object({
     integer(),
     minValue(1, "At least one residue must be selected for the protein."),
   ),
-  nrSelectedDNAesidues: pipe(
+  nrSelectedDNAResidues: pipe(
     string(),
     transform(Number),
     integer(),
