@@ -16,7 +16,6 @@ import { getClusterTsv } from "./recluster.server";
 import { createClient } from "~/models/config.server";
 
 export const Schema = object({
-  // TODO newer valibot has picklist to constrain values, but gives tsc error, wait for next version
   criterion: optional(picklist(["maxclust", "distance"]), "maxclust"),
   n_clusters: optional(
     pipe(union([string(), number()]), transform(Number), integer()),
