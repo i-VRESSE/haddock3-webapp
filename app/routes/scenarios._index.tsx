@@ -20,7 +20,7 @@ const scenarios: Scenario[] = [
   },
   {
     url: "/scenarios/protein-dna",
-    title: "Protein DNA",
+    title: "Protein DNA/RNA",
     description: "Based on HADDOCK2.4 Protein DNA docking tutorial",
   },
   {

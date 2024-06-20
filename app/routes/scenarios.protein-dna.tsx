@@ -270,7 +270,7 @@ export default function Page() {
               />
               <MoleculeSubForm
                 name="dna"
-                legend="DNA"
+                legend="Nucleic acid (DNA and/or RNA)"
                 description="In example named data/dna.pdb or OR1_unbound.pdb"
                 actpass={dnaActPass}
                 onActPassChange={setDnaActPass}
