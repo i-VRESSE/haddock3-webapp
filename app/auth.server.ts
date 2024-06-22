@@ -52,8 +52,6 @@ authenticator.use(
   "user-pass",
 );
 
-// remix-auth-github is not compatible with the remix v2
-// TODO uncomment when it is fixed
 /**
  * The super class GitHubStrategy returns emails that are not verified.
  * This subclass filters out unverified emails.
@@ -99,14 +97,12 @@ if (
       userAgent: "Haddock3WebApp",
     },
     async ({ profile }) => {
-      // console.log("github...profile...", profile)
       // TODO store users display name in database for more personal greeting
       const primaryEmail = profile.emails[0].value;
       const photo = profile.photos[0].value ?? undefined;
       const userId = await oauthregister(primaryEmail, photo);
-      // console.log("github...userId...", userId)
       return userId;
-    }
+    },
   );
 
   authenticator.use(gitHubStrategy);
