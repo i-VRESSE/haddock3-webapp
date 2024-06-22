@@ -53,7 +53,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     } else {
       return json({
         jobs: [] as JobModelDTO[],
-        error: `${resp.status} - ${resp.statusText}`,
+        error: `${resp.status ?? 500} - ${resp.statusText ?? "Server error"}`,
       });
     }
   }

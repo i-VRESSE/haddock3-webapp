@@ -26,12 +26,21 @@ services:
       - WAIT_PATHS=/certs/private_key.pem
       - HADDOCK3_RESTRAINTS_URL=http://h3restraints:5000
       - HADDOCK3WEBAPP_REFRESH_RATE_MS
+      - HADDOCK3WEBAPP_GITHUB_CLIENT_ID
+      - HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET
+      - HADDOCK3WEBAPP_GITHUB_CALLBACK_URL
+      - HADDOCK3WEBAPP_ORCID_CLIENT_ID
+      - HADDOCK3WEBAPP_ORCID_CLIENT_SECRET
+      - HADDOCK3WEBAPP_ORCID_CALLBACK_URL
+      - HADDOCK3WEBAPP_ORCID_SANDBOX
     volumes:
       - bartender-certs:/certs:ro
 
   webappdb:
     image: postgres:15.4-bullseye
     restart: always
+    ports:
+      - "5433:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres

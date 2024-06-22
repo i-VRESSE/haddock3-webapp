@@ -129,10 +129,18 @@ export async function oauthregister(email: string, photo?: string) {
       isAdmin,
       photo: photo ?? generatePhoto(email),
     })
-    .onConflictDoNothing()
+    .onConflictDoUpdate({
+      set: {
+        photo: photo ?? generatePhoto(email),
+      },
+      target: users.email,
+      targetWhere:sql`email = ${email}`
+        // eq(users.email, email)
+    })
     .returning({
       id: users.id,
     });
+  console.log("oauthregister.user...",user)
   return user[0].id;
 }
 
