@@ -129,7 +129,13 @@ export async function oauthregister(email: string, photo?: string) {
       isAdmin,
       photo: photo ?? generatePhoto(email),
     })
-    .onConflictDoNothing()
+    .onConflictDoUpdate({
+      set: {
+        photo: photo ?? generatePhoto(email),
+      },
+      target: users.email,
+      targetWhere: sql`email = ${email}`,
+    })
     .returning({
       id: users.id,
     });

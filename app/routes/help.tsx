@@ -206,7 +206,7 @@ export default function Help() {
         You can refresh the page to see the current status of the job.
       </p>
 
-      <p>
+      <div>
         A job goes through the following states:
         <ul className="list-inside list-disc">
           <li>
@@ -225,7 +225,7 @@ export default function Help() {
             hints why it errored.
           </li>
         </ul>
-      </p>
+      </div>
 
       <p className="py-2">
         If you want to see all the jobs you submitted, you can go to the{" "}
@@ -279,7 +279,7 @@ export default function Help() {
         report page is unavailable.
       </p>
 
-      <p className="py-2">
+      <div className="py-2">
         The browse page has 4 columns:
         <ul className="list-inside list-disc">
           <li>Job info - like its id, when it ran and logs.</li>
@@ -311,7 +311,7 @@ export default function Help() {
             module.
           </li>
         </ul>
-      </p>
+      </div>
     </main>
   );
 }

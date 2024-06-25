@@ -1,5 +1,6 @@
 import { Authenticator, type StrategyVerifyCallback } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
+import { GitHubEmails, GitHubStrategy } from "remix-auth-github";
 import {
   type OAuth2Profile,
   OAuth2Strategy,
@@ -51,63 +52,61 @@ authenticator.use(
   "user-pass",
 );
 
-// remix-auth-github is not compatible with the remix v2
-// TODO uncomment when it is fixed
-// /**
-//  * The super class GitHubStrategy returns emails that are not verified.
-//  * This subclass filters out unverified emails.
-//  */
-// class GitHubStrategyWithVerifiedEmail extends GitHubStrategy<string> {
-//   // From https://github.com/sergiodxa/remix-auth-github/blob/75cedd281b58523c5d3db5f7bbe92218cb733c46/src/index.ts#L197
-//   protected async userEmails(accessToken: string): Promise<GitHubEmails> {
-//     // url & agent are private to super class so we have to copy them here
-//     const userEmailsURL = "https://api.github.com/user/emails";
-//     const userAgent = "Haddock3WebApp";
-//     const response = await fetch(userEmailsURL, {
-//       headers: {
-//         Accept: "application/vnd.github.v3+json",
-//         Authorization: `token ${accessToken}`,
-//         "User-Agent": userAgent,
-//       },
-//     });
+/**
+ * The super class GitHubStrategy returns emails that are not verified.
+ * This subclass filters out unverified emails.
+ */
+class GitHubStrategyWithVerifiedEmail extends GitHubStrategy<number> {
+  // From https://github.com/sergiodxa/remix-auth-github/blob/75cedd281b58523c5d3db5f7bbe92218cb733c46/src/index.ts#L197
+  protected async userEmails(accessToken: string): Promise<GitHubEmails> {
+    // url & agent are private to super class so we have to copy them here
+    const userEmailsURL = "https://api.github.com/user/emails";
+    const userAgent = "Haddock3WebApp";
+    const response = await fetch(userEmailsURL, {
+      headers: {
+        Accept: "application/vnd.github.v3+json",
+        Authorization: `token ${accessToken}`,
+        "User-Agent": userAgent,
+      },
+    });
 
-//     const data: {
-//       email: string;
-//       verified: boolean;
-//       primary: boolean;
-//       visibility: string;
-//     }[] = await response.json();
-//     const emails: GitHubEmails = data
-//       .filter((e) => e.verified)
-//       .map(({ email }) => ({ value: email }));
-//     return emails;
-//   }
-// }
+    const data: {
+      email: string;
+      verified: boolean;
+      primary: boolean;
+      visibility: string;
+    }[] = await response.json();
+    const emails: GitHubEmails = data
+      .filter((e) => e.verified)
+      .map(({ email }) => ({ value: email }));
+    return emails;
+  }
+}
 
-// if (
-//   process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID &&
-//   process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET
-// ) {
-//   const gitHubStrategy = new GitHubStrategyWithVerifiedEmail(
-//     {
-//       clientID: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID,
-//       clientSecret: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET,
-//       callbackURL:
-//         process.env.HADDOCK3WEBAPP_GITHUB_CALLBACK_URL ||
-//         "http://localhost:3000/auth/github/callback",
-//       userAgent: "Haddock3WebApp",
-//     },
-//     async ({ profile }) => {
-//       // TODO store users display name in database for more personal greeting
-//       const primaryEmail = profile.emails[0].value;
-//       const photo = profile.photos[0].value ?? undefined;
-//       const userId = await oauthregister(primaryEmail, photo);
-//       return userId;
-//     }
-//   );
+if (
+  process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID &&
+  process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET
+) {
+  const gitHubStrategy = new GitHubStrategyWithVerifiedEmail(
+    {
+      clientID: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID,
+      clientSecret: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET,
+      callbackURL:
+        process.env.HADDOCK3WEBAPP_GITHUB_CALLBACK_URL ||
+        "http://localhost:3000/auth/github/callback",
+      userAgent: "Haddock3WebApp",
+    },
+    async ({ profile }) => {
+      // TODO store users display name in database for more personal greeting
+      const primaryEmail = profile.emails[0].value;
+      const photo = profile.photos[0].value ?? undefined;
+      const userId = await oauthregister(primaryEmail, photo);
+      return userId;
+    },
+  );
 
-//   authenticator.use(gitHubStrategy);
-// }
+  authenticator.use(gitHubStrategy);
+}
 
 if (
   process.env.HADDOCK3WEBAPP_ORCID_CLIENT_ID &&
