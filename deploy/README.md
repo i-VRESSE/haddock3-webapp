@@ -49,7 +49,7 @@ Each image has same set of tags:
 
 The images are avaliable for linux amd64 and linux arm64 platforms, but arm64 images are not build on pull requests.
 
-When a pull request is closed, you are reminded to remove the images belonging to that pull request from the registry.
+When a pull request is closed, you are reminded in a comment to remove the images belonging to that pull request from the registry.
 
 ## bartender image
 
@@ -70,12 +70,3 @@ Generates a rsa private key (/certs/private_key.pem file) and public key (/certs
 ## haddock3-webapp image
 
 Haddock3 web application image.
-
-## Clean up after Pull Request close
-
-Each pull requests creates several Docker images on ghcr.io with tag `pr-<pr_number>`.
-When the PR is closed, those images are no longer useful and are removed with a [GitHub workflow](.github/workflows/docker-cleanup.yml).
-
-The GitHub workflow needs a secret called `DELPACK_TOKEN`,
-see https://docs.github.com/en/rest/packages/packages?apiVersion=2022-11-28#delete-package-version-for-an-organization
-which permissions the token needs.

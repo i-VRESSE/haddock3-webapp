@@ -8,7 +8,6 @@ on:
       - v*
   pull_request:
   # TODO have way to rebuild bartender image when it and its deps have updated
-  # TODO when PR is closed the image should be removed
 
 jobs:
   bartender:
@@ -17,7 +16,7 @@ jobs:
       packages: write
       contents: read
     env:
-      # TODO use main when https://github.com/haddocking/haddock3/pull/841 is nerged
+      # TODO use main when https://github.com/haddocking/haddock3/pull/841 is merged
       # HADDOCK3_GHORG: haddocking"
       # HADDOCK3_VERSION: "main"
       HADDOCK3_GHORG: "i-VRESSE"
