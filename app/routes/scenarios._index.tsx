@@ -28,8 +28,6 @@ const scenarios: Scenario[] = [
     title: "Protein Ligand",
     description: "Based on HADDOCK2.4 Protein Small Molecule docking tutorial",
   },
-  // should be preprocesed like in tutorial
-  // TODO add protein-shape see https://www.bonvinlab.org/education/HADDOCK24/shape-small-molecule
 ];
 
 function ScenarioCard({ url, title, description }: Scenario) {
