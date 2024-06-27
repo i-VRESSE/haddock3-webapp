@@ -2,7 +2,7 @@
 # Visit https://bit.ly/cffinit to generate yours today!
 
 cff-version: 1.2.0
-title: i-VRESSE bartended haddock3
+title: Haddock3 web application
 message: >-
   If you use this software, please cite it using the
   metadata from this file.
@@ -20,6 +20,11 @@ authors:
     family-names: Kalverla
     given-names: Peter
     orcid: "https://orcid.org/0000-0002-5025-7862"
+  - given-names: Dusan
+    family-names: Mijatovic
+    email: d.mijatovic@esciencecenter.nl
+    affiliation: Netherlands eScience Center
+    orcid: 'https://orcid.org/0000-0002-1898-4461'
 license: Apache-2.0
 identifiers:
   - type: doi
