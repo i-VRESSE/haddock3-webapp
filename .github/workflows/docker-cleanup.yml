@@ -22,7 +22,7 @@ jobs:
             for (const image of images) {
               message += `- [ghcr.io/i-vresse/${image}](https://github.com/i-VRESSE/haddock3-webapp/pkgs/container/${image}/versions)\n`;
             }
-            message += `\nGoto versions page of each image, find version called ${package_version_id}, click on **...** button and select **Delete version**.\n`;
+            message += `\nGoto versions page of each image, find version called ${package_version_id}, filter on tagged versions by clicking "N tagged" button in table header, click on **...** button and select **Delete version**.\n`;
             await github.rest.issues.createComment({
               issue_number,
               owner: context.repo.owner,
