@@ -89,9 +89,7 @@ const Schema = object({
 });
 type Schema = InferOutput<typeof Schema>;
 
-function generateWorkflow(
-  data: Schema,
-) {
+function generateWorkflow(data: Schema) {
   // Workflow based on
   // https://github.com/haddocking/haddock3/blob/main/examples/docking-protein-ligand/docking-protein-ligand-full.cfg
   // made valid for easy expertise level
