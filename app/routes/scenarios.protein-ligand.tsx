@@ -247,21 +247,22 @@ export default function Page() {
     formData.set("nrSelectedLigandResidues", countSelected(ligandActPass));
 
     const ambig_actpass_fname = await generateAmbiguousRestraintsFile(
-      proteinActPass,
+      {
+        active: proteinActPass.active,
+        passive: [],
+        neighbours: [],
+        chain: proteinActPass.chain,
+        bodyRestraints: proteinActPass.bodyRestraints,
+      },
       ligandActPass,
     );
     formData.set("ambig_actpass_fname", ambig_actpass_fname);
 
-    // when user only selected active residues, treat them as passive
-    const onlyPassive =
-      proteinActPass.passive.length === 0 &&
-      proteinActPass.active.length > 0 &&
-      proteinActPass.neighbours.length === 0;
     const ambig_pass_fname = await generateAmbiguousRestraintsFile(
       {
         active: [],
-        passive: onlyPassive ? proteinActPass.active : proteinActPass.passive,
-        neighbours: proteinActPass.neighbours,
+        passive: proteinActPass.active,
+        neighbours: [],
         chain: proteinActPass.chain,
         bodyRestraints: proteinActPass.bodyRestraints,
       },
