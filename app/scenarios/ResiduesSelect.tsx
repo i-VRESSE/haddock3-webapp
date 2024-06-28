@@ -406,7 +406,7 @@ function ResiduesHeader({
     <div>
       <p className="text-[0.5rem]">&nbsp;</p>
       <div className="inline-block text-start font-mono">
-        <div title="Amino aced sequence">
+        <div title="Sequence">
           {/* use non breaking whitespace to prevent layout shifts */}
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         </div>

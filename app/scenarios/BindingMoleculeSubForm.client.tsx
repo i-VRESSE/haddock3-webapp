@@ -132,7 +132,7 @@ function BindingResiduesSelect({
               {/* use non breaking whitespace to prevent layout shifts */}
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             </div>
-            {<ResidueHeaderItem variant="act" label="Binding" />}
+            {<ResidueHeaderItem variant="act" label="Binding site" />}
           </div>
         </div>
         {chunks.map((chunk, cindex) => (
@@ -316,7 +316,7 @@ function BindingResiduesSubForm({
           onMouseLeave={() => setHoveredFrom3DResidue(undefined)}
         />
       </div>
-      <Label>Select residues involved in binding of the ligand.</Label>
+      <Label>Select ligand binding site residues</Label>
       <BindingResiduesSelect
         options={molecule.residues}
         onChange={handle2DResidueChange}
@@ -359,7 +359,7 @@ export function BindingMoleculeSubForm({
   onActPassChange,
   targetChain,
   preprocessPipeline = "",
-  accessibilityCutoff = 0.4,
+  accessibilityCutoff = 0.15,
 }: {
   name: string;
   legend: string;
