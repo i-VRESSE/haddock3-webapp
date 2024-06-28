@@ -82,8 +82,8 @@ const Schema = object({
       "Ambiguous restraints file should not be empty. Please select residues.",
     ),
   ),
-  ligand_param_fname: optional(instance(File, "Custom ligand parameter file")),
-  ligand_top_fname: optional(instance(File, "Custom ligand topology file")),
+  ligand_param_fname: instance(File, "Custom ligand parameter file"),
+  ligand_top_fname: instance(File, "Custom ligand topology file"),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
   reference_fname: optional(instance(File, "Reference structure as PDB file")),
 });
