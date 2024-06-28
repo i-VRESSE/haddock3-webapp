@@ -616,7 +616,7 @@ export function LigandViewer({
   const [theme] = useTheme();
   const isDark = theme === "dark";
   const activeColor = isDark ? "green" : "lime";
-  const opacity = selected ? 0.05 : 1.0;
+  const opacity = selected ? 0.0 : 1.0;
   const representations = (
     <>
       {highlight && (
@@ -634,7 +634,7 @@ export function LigandViewer({
           chain={selected.chain}
           color={activeColor}
           opacity={1.0}
-          representation={"spacefill"}
+          representation={"ball+stick"}
         />
       )}
     </>

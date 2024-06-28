@@ -35,7 +35,7 @@ function CopyToClipBoardIcon() {
   );
 }
 
-function ImportResidues({
+export function ImportResidues({
   selected,
   onChange,
   disabled = false,
@@ -83,7 +83,7 @@ export function CopyButton({ content }: { content: string }) {
   );
 }
 
-function ResidueCheckbox({
+export function ResidueCheckbox({
   resno,
   resname,
   seq,
@@ -406,7 +406,7 @@ function ResiduesHeader({
     <div>
       <p className="text-[0.5rem]">&nbsp;</p>
       <div className="inline-block text-start font-mono">
-        <div title="Amino aced sequence">
+        <div title="Sequence">
           {/* use non breaking whitespace to prevent layout shifts */}
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         </div>
@@ -417,7 +417,7 @@ function ResiduesHeader({
   );
 }
 
-function ResidueHeaderItem({
+export function ResidueHeaderItem({
   variant,
   label,
 }: {

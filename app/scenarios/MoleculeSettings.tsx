@@ -14,20 +14,20 @@ import { LabeledRadioGroup } from "./LabeledRadioGroup";
 export function MoleculeSettings({
   surfaceCutoff,
   setSurfaceCutoff,
-  neighourRadius,
-  setNeighourRadius,
   renderSelectionAs,
   onRenderSelectionAsChange,
+  neighourRadius = undefined,
+  setNeighourRadius = undefined,
 }: {
   surfaceCutoff: number;
   setSurfaceCutoff: (cutoff: number) => void;
-  neighourRadius: number;
-  setNeighourRadius: (radius: number) => void;
+  neighourRadius?: number;
+  setNeighourRadius?: (radius: number) => void;
   renderSelectionAs: StructureRepresentationType;
   onRenderSelectionAsChange: (value: StructureRepresentationType) => void;
 }) {
   const [cutoff, setcutoff] = useState(surfaceCutoff);
-  const [radius, setradius] = useState(neighourRadius);
+  const [radius, setradius] = useState(neighourRadius || 0);
   const [theme] = useTheme();
   const style = { colorScheme: theme === "dark" ? "dark" : "light" };
 
@@ -36,7 +36,7 @@ export function MoleculeSettings({
       if (cutoff !== surfaceCutoff) {
         setSurfaceCutoff(cutoff);
       }
-      if (radius !== neighourRadius) {
+      if (setNeighourRadius !== undefined && radius !== neighourRadius) {
         setNeighourRadius(radius);
       }
     }
@@ -59,17 +59,19 @@ export function MoleculeSettings({
             onChange={(e) => setcutoff(Number(e.target.value))}
           />
         </FormItem>
-        <FormItem name="neighbour-radius" label="Neighbour radius">
-          <Input
-            type="number"
-            step="0.1"
-            min="0.0"
-            max="1000"
-            value={radius}
-            style={style}
-            onChange={(e) => setradius(Number(e.target.value))}
-          />
-        </FormItem>
+        {setNeighourRadius !== undefined && (
+          <FormItem name="neighbour-radius" label="Neighbour radius">
+            <Input
+              type="number"
+              step="0.1"
+              min="0.0"
+              max="1000"
+              value={radius}
+              style={style}
+              onChange={(e) => setradius(Number(e.target.value))}
+            />
+          </FormItem>
+        )}
         <LabeledRadioGroup
           label="Render selection as"
           value={renderSelectionAs}
