@@ -91,8 +91,6 @@ type Schema = InferOutput<typeof Schema>;
 
 function generateWorkflow(
   data: Schema,
-  proteinActPass: ActPassSelection,
-  ligandActPass: ActPassSelection,
 ) {
   // Workflow based on
   // https://github.com/haddocking/haddock3/blob/main/examples/docking-protein-ligand/docking-protein-ligand-full.cfg
@@ -109,12 +107,6 @@ function generateWorkflow(
     ? `ligand_top_fname = "${data.ligand_top_fname.name}"`
     : "";
 
-  const resdic_A = JSON.stringify([
-    ...proteinActPass.active,
-    ...proteinActPass.passive,
-    ...proteinActPass.neighbours,
-  ]);
-  const resdic_B = JSON.stringify(ligandActPass.active);
   return `
 # ====================================================================
 # Protein-ligand docking example
@@ -173,9 +165,7 @@ mdsteps_cool1 = 0
 [caprieval]
 ${ref_line}
 
-[rmsdmatrix]
-resdic_A = ${resdic_A}
-resdic_B = ${resdic_B}
+[ilrmsdmatrix]
 
 [clustrmsd]
 criterion = 'maxclust'
@@ -290,7 +280,7 @@ export default function Page() {
     try {
       const data = parseFormData(formData, Schema);
       setErrors(undefined);
-      const workflow = generateWorkflow(data, proteinActPass, ligandActPass);
+      const workflow = generateWorkflow(data);
       const zipPromise = createZip(workflow, data);
       handleActionButton(event.nativeEvent, zipPromise, navigate, submit);
     } catch (e) {
