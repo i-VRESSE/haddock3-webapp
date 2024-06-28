@@ -28,6 +28,11 @@ const scenarios: Scenario[] = [
     title: "Protein Ligand",
     description: "Based on HADDOCK2.4 Protein Small Molecule docking tutorial",
   },
+  {
+    url: "/scenarios/protein-glycan",
+    title: "Protein Glycan",
+    description: "Based on HADDOCK3 Protein Glycan docking example",
+  },
 ];
 
 function ScenarioCard({ url, title, description }: Scenario) {
