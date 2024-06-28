@@ -173,7 +173,7 @@ function BindingResiduesSelect({
         (Hold Shift to select a range of residues. Click residue in 3D viewer to
         select.)
       </FormDescription>
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row items-center gap-2">
         Binding site
         <ImportResidues selected={selected.act} onChange={onActiveImport} />
       </div>
