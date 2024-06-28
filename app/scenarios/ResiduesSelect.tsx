@@ -35,7 +35,7 @@ function CopyToClipBoardIcon() {
   );
 }
 
-function ImportResidues({
+export function ImportResidues({
   selected,
   onChange,
   disabled = false,
@@ -83,7 +83,7 @@ export function CopyButton({ content }: { content: string }) {
   );
 }
 
-function ResidueCheckbox({
+export function ResidueCheckbox({
   resno,
   resname,
   seq,
@@ -417,7 +417,7 @@ function ResiduesHeader({
   );
 }
 
-function ResidueHeaderItem({
+export function ResidueHeaderItem({
   variant,
   label,
 }: {

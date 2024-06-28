@@ -239,7 +239,7 @@ async function computeNeighbours({
   return passiveFromActive(structure, chain, derivedActive, surface, radius);
 }
 
-function toggleResidue(
+export function toggleResidue(
   resno: number,
   pick: ActPass,
   current: ActPassSelection,
@@ -272,7 +272,7 @@ function toggleResidue(
 
 // TODO only render big proteins as surfaces other molecules as spacefill
 // current workaround is to molecule has more than 50 residues, render as surface
-const BIG_MOLECULE = 50;
+export const BIG_MOLECULE = 50;
 
 export function ResiduesSubForm({
   molecule,

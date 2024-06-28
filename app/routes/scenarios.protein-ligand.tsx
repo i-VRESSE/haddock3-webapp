@@ -29,7 +29,6 @@ import { FormDescription } from "~/scenarios/FormDescription";
 import { FormItem } from "~/scenarios/FormItem";
 import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import { action as uploadaction } from "./upload";
-import { MoleculeSubForm } from "~/scenarios/MoleculeSubForm.client";
 import { ActPassSelection, countSelected } from "~/scenarios/ActPassSelection";
 import { ClientOnly } from "~/components/ClientOnly";
 import { mustBeAllowedToSubmit } from "~/auth.server";
@@ -39,6 +38,7 @@ import {
 } from "../scenarios/restraints";
 import { FormErrors } from "../scenarios/FormErrors";
 import { HeteroMoleculeSubForm } from "~/scenarios/HeteroMoleculeSubForm.client";
+import { BindingMoleculeSubForm } from "~/scenarios/BindingMoleculeSubForm.client";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await mustBeAllowedToSubmit(request);
@@ -318,13 +318,14 @@ export default function Page() {
         {() => (
           <form onSubmit={onSubmit}>
             <div className="grid grid-cols-2 gap-6">
-              <MoleculeSubForm
+              <BindingMoleculeSubForm
                 name="protein"
                 legend="Protein"
                 description="In example named 2J8S-renumbered.pdb"
                 actpass={proteinActPass}
                 onActPassChange={setProteinActPass}
                 targetChain="A"
+                preprocessPipeline="delhetatmkeepcoord"
               />
               <HeteroMoleculeSubForm
                 name="ligand"
