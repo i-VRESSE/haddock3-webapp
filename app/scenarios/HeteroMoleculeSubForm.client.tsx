@@ -283,27 +283,29 @@ export function HeteroMoleculeSubForm({
             />
           </div>
         )}
-
-        <>
-          <FormItem name="ligand_param_fname" label="Custom parameter file">
-            <Input
-              type="file"
-              id="ligand_param_fname"
-              name="ligand_param_fname"
-              accept=".param"
-              required
-            />
-          </FormItem>
-          <FormItem name="ligand_top_fname" label="Custom topology file">
-            <Input
-              type="file"
-              id="ligand_top_fname"
-              name="ligand_top_fname"
-              accept=".top"
-              required
-            />
-          </FormItem>
-        </>
+        {mayUseCustomLigandFiles ||
+          (!mayUseCustomLigandFiles && (
+            <>
+              <FormItem name="ligand_param_fname" label="Custom parameter file">
+                <Input
+                  type="file"
+                  id="ligand_param_fname"
+                  name="ligand_param_fname"
+                  accept=".param"
+                  required
+                />
+              </FormItem>
+              <FormItem name="ligand_top_fname" label="Custom topology file">
+                <Input
+                  type="file"
+                  id="ligand_top_fname"
+                  name="ligand_top_fname"
+                  accept=".top"
+                  required
+                />
+              </FormItem>
+            </>
+          ))}
       </>
     </MoleculeSubFormWrapper>
   );

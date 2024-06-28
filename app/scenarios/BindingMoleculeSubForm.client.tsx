@@ -174,6 +174,7 @@ function BindingResiduesSelect({
         select.)
       </FormDescription>
       <div className="flex flex-row gap-2">
+        Binding site
         <ImportResidues selected={selected.act} onChange={onActiveImport} />
       </div>
     </>
@@ -315,7 +316,7 @@ function BindingResiduesSubForm({
           onMouseLeave={() => setHoveredFrom3DResidue(undefined)}
         />
       </div>
-      <Label>Select residues involved in binding the ligand.</Label>
+      <Label>Select residues involved in binding of the ligand.</Label>
       <BindingResiduesSelect
         options={molecule.residues}
         onChange={handle2DResidueChange}
