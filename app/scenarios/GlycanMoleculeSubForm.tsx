@@ -24,6 +24,7 @@ import { Residue } from "./molecule.client";
 import { FormDescription } from "./FormDescription";
 import { useChunked } from "./useChunked";
 import { useResidueChangeHandler } from "./useResidueChangeHandler";
+import { useTheme } from "remix-themes";
 
 type Kind = "pass" | "actpass";
 
@@ -129,6 +130,8 @@ function ResiduesSubForm({
   actpass,
   onActPassChange,
 }: ResidueSubFormProps) {
+  const [theme] = useTheme();
+  const selectionOpacity = theme === "dark" ? 0.3 : 0.1;
   const [restraintsKind, setRestraintsKind] = useState<Kind>("pass");
   const [busy, setBusy] = useState(false);
   const safeFile = useSafeFile(molecule.file);
@@ -199,7 +202,7 @@ function ResiduesSubForm({
           higlightResidue={hoveredFrom2DResidue}
           onHover={(_, residue) => setHoveredFrom3DResidue(residue)}
           onMouseLeave={() => setHoveredFrom3DResidue(undefined)}
-          selectionOpacity={0.1}
+          selectionOpacity={selectionOpacity}
         />
       </div>
       <GlycanResiduesSelect
