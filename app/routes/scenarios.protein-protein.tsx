@@ -32,6 +32,7 @@ import {
   generateUnAmbiguousRestraintsFile,
 } from "../scenarios/restraints";
 import { FormErrors } from "../scenarios/FormErrors";
+import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -270,12 +271,9 @@ export default function ProteinProteinScenario() {
                 targetChain="B"
               />
             </div>
-            <FormItem name="reference_fname" label="Reference structure">
-              <PDBFileInput name="reference_fname" />
-              <FormDescription>
-                In example named data/e2a-hpr_1GGR.pdb
-              </FormDescription>
-            </FormItem>
+            <ReferenceStructureInput>
+              In example named data/e2a-hpr_1GGR.pdb
+            </ReferenceStructureInput>
             <FormErrors errors={errors} />
             <ActionButtons />
           </form>

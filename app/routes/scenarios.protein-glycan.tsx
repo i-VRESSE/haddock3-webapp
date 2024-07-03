@@ -32,6 +32,7 @@ import {
   generateUnAmbiguousRestraintsFile,
 } from "../scenarios/restraints";
 import { FormErrors } from "../scenarios/FormErrors";
+import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -283,12 +284,9 @@ export default function ProteinProteinScenario() {
                 targetChain="B"
               />
             </div>
-            <FormItem name="reference_fname" label="Reference structure">
-              <PDBFileInput name="reference_fname" />
-              <FormDescription>
-                In example named data/target.pdb
-              </FormDescription>
-            </FormItem>
+            <ReferenceStructureInput>
+              In tutorial named pdbs/1LMQ_r_u.pdb
+            </ReferenceStructureInput>
             <FormErrors errors={errors} />
             <ActionButtons />
           </form>

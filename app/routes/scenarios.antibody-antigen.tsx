@@ -32,6 +32,7 @@ import {
   generateUnAmbiguousRestraintsFile,
 } from "~/scenarios/restraints";
 import { FormErrors } from "~/scenarios/FormErrors";
+import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -291,12 +292,9 @@ export default function AntibodyAntigenScenario() {
               {/* either using the NMR identified residues as active in HADDOCK, 
             or combining those with the surface neighbors and use this combination as passive only. */}
             </div>
-            <FormItem name="reference_fname" label="Reference structure">
-              <PDBFileInput name="reference_fname" />
-              <FormDescription>
-                In tutorial named pdbs/4G6M_matched.pdb
-              </FormDescription>
-            </FormItem>
+            <ReferenceStructureInput>
+              In tutorial named pdbs/4G6M_matched.pdb
+            </ReferenceStructureInput>
             <FormErrors errors={errors} />
             <ActionButtons />
           </form>

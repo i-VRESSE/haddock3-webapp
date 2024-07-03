@@ -39,6 +39,7 @@ import {
 import { FormErrors } from "../scenarios/FormErrors";
 import { HeteroMoleculeSubForm } from "~/scenarios/HeteroMoleculeSubForm.client";
 import { BindingMoleculeSubForm } from "~/scenarios/BindingMoleculeSubForm.client";
+import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await mustBeAllowedToSubmit(request);
@@ -337,15 +338,9 @@ export default function Page() {
                 mayUseCustomLigandFiles={mayUseCustomLigandFiles}
               />
             </div>
-            <FormItem
-              name="reference_fname"
-              label="Reference structure (optional)"
-            >
-              <PDBFileInput name="reference_fname" />
-              <FormDescription>
-                In example named data/target.pdb
-              </FormDescription>
-            </FormItem>
+            <ReferenceStructureInput label="Reference structure (optional)">
+              In example named data/target.pdb
+            </ReferenceStructureInput>
             <FormErrors errors={errors} />
             <ActionButtons />
           </form>
