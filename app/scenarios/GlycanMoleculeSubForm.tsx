@@ -1,82 +1,72 @@
-import { StructureRepresentationType } from "ngl";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { ActPassSelection } from "./ActPassSelection";
-import { BIG_MOLECULE } from "./constants";
-import { toggleResidue } from "./toggleResidue";
-import { Residue } from "./molecule.client";
-import { PreprocessPipeline } from "./restraints";
-import { Label } from "~/components/ui/label";
-import { Viewer } from "./Viewer.client";
-import { Spinner } from "~/components/ui/spinner";
-import { MoleculeSettings } from "./MoleculeSettings";
-import { FormDescription } from "./FormDescription";
-import {
-  ImportResidues,
-  ResidueCheckbox,
-  ResidueHeaderItem,
-  ResidueNeighbourSelection,
-  ResidueSelection,
-} from "./ResiduesSelect";
-import {
-  ShowSurfaceBuriedToggles,
-  useShowSurfaceBuriedToggles,
-} from "./ShowSurfaceBuriedToggles";
 import {
   AtomStructureSubForm,
   ResidueSubFormProps,
 } from "./AtomStructureSubForm.client";
-import { useSurfaceCutoff } from "./useSurfaceCutoff";
+import { PreprocessPipeline } from "./restraints";
+import { LabeledRadioGroup } from "./LabeledRadioGroup";
+import { Viewer } from "./Viewer.client";
+import { StructureRepresentationType } from "ngl";
+import { toggleResidue } from "./toggleResidue";
+import {
+  ActPass,
+  ImportResidues,
+  PickIn3D,
+  ResidueCheckbox,
+  ResidueSelection,
+  ResiduesHeader,
+} from "./ResiduesSelect";
 import { useSafeFile } from "./useSafeFile";
+import { Spinner } from "~/components/ui/spinner";
+import { MoleculeSettings } from "./MoleculeSettings";
+import { Residue } from "./molecule.client";
+import { FormDescription } from "./FormDescription";
 import { useChunked } from "./useChunked";
 import { useResidueChangeHandler } from "./useResidueChangeHandler";
 
-function BindingResiduesSelect({
+type Kind = "pass" | "actpass";
+
+function GlycanResiduesSelect({
+  kind,
   options,
-  selected,
   onChange,
+  selected,
   onHover,
   highlight,
 }: {
+  kind: Kind;
   options: Residue[];
-  selected: ResidueNeighbourSelection;
-  onChange: (selected: ResidueSelection) => void;
+  onChange: (newSelection: ResidueSelection) => void;
+  selected: ResidueSelection;
   onHover: (resno: number | undefined) => void;
-  highlight: number | undefined;
+  highlight?: number;
 }) {
-  const surface = useMemo(
-    () => options.filter((r) => r.surface).map((r) => r.resno),
-    [options],
-  );
   const handleChange = useResidueChangeHandler({
     options,
     selected,
     onChange,
-    filter: (resno: number) => surface.includes(resno),
   });
   const chunkSize = 10;
   const chunks = useChunked(options, chunkSize);
 
   function onActiveImport(imported: number[]) {
-    const filtered = imported.filter((r) => surface.includes(r));
     onChange({
-      act: filtered,
-      pass: selected.pass,
+      act: imported,
+      pass: selected.pass.filter((r) => !imported.includes(r)),
+    });
+  }
+  function onPassiveImport(imported: number[]) {
+    onChange({
+      pass: imported,
+      act: selected.act.filter((r) => !imported.includes(r)),
     });
   }
 
   return (
     <>
       <div className="flex flex-row flex-wrap">
-        <div>
-          <p className="text-[0.5rem]">&nbsp;</p>
-          <div className="inline-block text-start font-mono">
-            <div title="Amino acid sequence">
-              {/* use non breaking whitespace to prevent layout shifts */}
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            </div>
-            {<ResidueHeaderItem variant="act" label="Binding site" />}
-          </div>
-        </div>
+        <ResiduesHeader showActive={kind === "actpass"} showPassive={true} />
         {chunks.map((chunk, cindex) => (
           <div key={cindex}>
             <p
@@ -91,19 +81,22 @@ function BindingResiduesSelect({
                   key={r.resno}
                   resno={r.resno}
                   resname={r.resname}
+                  // TODO render resname as seq is always uninformative 'X'
                   seq={r.seq}
                   highlight={highlight === r.resno}
                   activeChecked={selected.act.includes(r.resno)}
-                  activeDisabled={!surface.includes(r.resno)}
-                  passiveChecked={false}
-                  passiveDisabled={true}
+                  passiveChecked={selected.pass.includes(r.resno)}
+                  activeDisabled={false}
+                  passiveDisabled={false}
                   onHover={() => onHover(r.resno)}
                   onActiveChange={(e) =>
                     handleChange(e, cindex * chunkSize + index, "act")
                   }
-                  onPassiveChange={() => {}}
-                  showActive={true}
-                  showPassive={false}
+                  onPassiveChange={(e) =>
+                    handleChange(e, cindex * chunkSize + index, "pass")
+                  }
+                  showActive={kind === "actpass"}
+                  showPassive={true}
                   neighbourChecked={false}
                 />
               ))}
@@ -115,64 +108,46 @@ function BindingResiduesSelect({
         (Hold Shift to select a range of residues. Click residue in 3D viewer to
         select.)
       </FormDescription>
-      <div className="flex flex-row items-center gap-2">
-        Binding site
-        <ImportResidues selected={selected.act} onChange={onActiveImport} />
+      <div className="flex flex-row gap-2">
+        {kind === "actpass" && (
+          <div>
+            Active
+            <ImportResidues selected={selected.act} onChange={onActiveImport} />
+          </div>
+        )}
+        <div>
+          Passive
+          <ImportResidues selected={selected.pass} onChange={onPassiveImport} />
+        </div>
       </div>
     </>
   );
 }
 
-function BindingResiduesSubForm({
-  actpass,
+function ResiduesSubForm({
   molecule,
+  actpass,
   onActPassChange,
-  setSurfaceResidues,
 }: ResidueSubFormProps) {
-  const {
-    resetShowBuriedToggle,
-    surfaceOrBuriedResidues,
-    surfaceBuriedTogglesProps,
-  } = useShowSurfaceBuriedToggles({
-    surfaceResidues: molecule.surfaceResidues,
-    residues: molecule.residues.map((r) => r.resno),
-  });
-  const [renderSelectionAs, setRenderSelectionAs] =
-    useState<StructureRepresentationType>(
-      molecule.residues.length > BIG_MOLECULE ? "surface" : "spacefill",
-    );
+  const [restraintsKind, setRestraintsKind] = useState<Kind>("pass");
   const [busy, setBusy] = useState(false);
   const safeFile = useSafeFile(molecule.file);
-  const [surfaceCutoff, setSurfaceCutoff] = useSurfaceCutoff({
-    setBusy,
-    setSurfaceResidues,
-    safeFile,
-    targetChain: molecule.targetChain,
-  });
+  const [renderSelectionAs, setRenderSelectionAs] =
+    useState<StructureRepresentationType>("spacefill");
   const [hoveredFrom2DResidue, setHoveredFrom2DResidue] = useState<
     number | undefined
   >();
   const [hoveredFrom3DResidue, setHoveredFrom3DResidue] = useState<
     number | undefined
   >();
+  const [picker3D, setPicker3D] = useState<ActPass>("pass");
 
-  useEffect(() => {
-    // If only one residue is present, select it
-    if (molecule.residues.length === 1) {
-      onActPassChange?.({
-        active: [molecule.residues[0].resno],
-        passive: [],
-        neighbours: [],
-        chain: molecule.targetChain,
-        bodyRestraints: actpass.bodyRestraints,
-      });
-    }
-  }, [
-    actpass.bodyRestraints,
-    molecule.residues,
-    molecule.targetChain,
-    onActPassChange,
-  ]);
+  function onRestraintsKindChange(kind: Kind) {
+    setRestraintsKind(kind);
+    // Retain passive selection after switching kind
+    onActPassChange({ ...actpass, active: [] });
+    setPicker3D("pass");
+  }
 
   async function handle2DResidueChange(newSelection: ResidueSelection) {
     if (!onActPassChange || !safeFile) {
@@ -182,7 +157,7 @@ function BindingResiduesSubForm({
     try {
       onActPassChange({
         active: newSelection.act,
-        passive: [],
+        passive: newSelection.pass,
         neighbours: [],
         chain: molecule.targetChain,
         bodyRestraints: actpass.bodyRestraints,
@@ -193,23 +168,24 @@ function BindingResiduesSubForm({
   }
 
   function handle3DResiduePick(chain: string, resno: number) {
-    if (
-      molecule.targetChain !== chain ||
-      !molecule.surfaceResidues.includes(resno)
-    ) {
+    if (molecule.targetChain !== chain) {
       return;
     }
-    const newSelection = toggleResidue(resno, "act", actpass);
+    const newSelection = toggleResidue(resno, picker3D, actpass);
     handle2DResidueChange(newSelection);
-  }
-
-  function onRenderSelectionAsChange(value: StructureRepresentationType) {
-    setRenderSelectionAs(value);
-    resetShowBuriedToggle(value === "surface");
   }
 
   return (
     <>
+      <LabeledRadioGroup
+        label="How would you like to select residues for restraints?"
+        value={restraintsKind}
+        choices={[
+          ["pass", "Selected residues as passive"],
+          ["actpass", "Select active and passive set of residues"],
+        ]}
+        onChange={onRestraintsKindChange}
+      />
       <div className="h-[500px] w-full">
         <Viewer
           structure={molecule.file}
@@ -217,35 +193,33 @@ function BindingResiduesSubForm({
           active={actpass.active}
           passive={actpass.passive}
           renderSelectionAs={renderSelectionAs}
-          surface={surfaceOrBuriedResidues}
+          surface={[]}
           neighbours={[]}
           onPick={handle3DResiduePick}
           higlightResidue={hoveredFrom2DResidue}
           onHover={(_, residue) => setHoveredFrom3DResidue(residue)}
           onMouseLeave={() => setHoveredFrom3DResidue(undefined)}
+          selectionOpacity={0.1}
         />
       </div>
-      <Label>Select ligand binding site residues</Label>
-      <BindingResiduesSelect
+      <GlycanResiduesSelect
+        kind={restraintsKind}
         options={molecule.residues}
         onChange={handle2DResidueChange}
         selected={{
           act: actpass.active,
           pass: actpass.passive,
-          neighbours: actpass.neighbours,
         }}
         onHover={setHoveredFrom2DResidue}
         highlight={hoveredFrom3DResidue}
       />
-      {renderSelectionAs !== "surface" && (
-        <ShowSurfaceBuriedToggles {...surfaceBuriedTogglesProps} />
-      )}
       <div className="flex gap-2">
+        {restraintsKind === "actpass" && (
+          <PickIn3D value={picker3D} onChange={setPicker3D} />
+        )}
         <MoleculeSettings
-          surfaceCutoff={surfaceCutoff}
-          setSurfaceCutoff={setSurfaceCutoff}
           renderSelectionAs={renderSelectionAs}
-          onRenderSelectionAsChange={onRenderSelectionAsChange}
+          onRenderSelectionAsChange={setRenderSelectionAs}
         />
         <Spinner title="Performing computation on server" show={busy} />
       </div>
@@ -253,7 +227,7 @@ function BindingResiduesSubForm({
   );
 }
 
-export function BindingMoleculeSubForm({
+export function GlycanMoleculeSubForm({
   name,
   legend,
   description,
@@ -261,7 +235,7 @@ export function BindingMoleculeSubForm({
   onActPassChange,
   targetChain,
   preprocessPipeline = "",
-  accessibilityCutoff = 0.15,
+  accessibilityCutoff = -1, // Disable surface calculation
 }: {
   name: string;
   legend: string;
@@ -282,7 +256,8 @@ export function BindingMoleculeSubForm({
       targetChain={targetChain}
       preprocessPipeline={preprocessPipeline}
       accessibilityCutoff={accessibilityCutoff}
-      ResiduesSubForm={BindingResiduesSubForm}
+      ResiduesSubForm={ResiduesSubForm}
+      allSelect={"pass"}
     />
   );
 }

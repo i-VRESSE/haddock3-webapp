@@ -60,3 +60,7 @@ const Name2OneLetter = {
 export function getResName1(resname: string) {
   return Name2OneLetter[resname as keyof typeof Name2OneLetter] || "X";
 }
+// TODO only render big proteins as surfaces other molecules as spacefill
+// current workaround is to molecule has more than 50 residues, render as surface
+
+export const BIG_MOLECULE = 50;

@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { FormItem } from "./FormItem";
-import { MoleculeSubFormWrapper } from "./MoleculeSubForm.client";
+import { MoleculeSubFormWrapper } from "./MoleculeSubFormWrapper";
 import { ActPassSelection } from "./ActPassSelection";
 import { LigandViewer } from "./Viewer.client";
 import { Input } from "~/components/ui/input";
@@ -13,6 +13,7 @@ import { HiddenFileInput } from "./HiddenFileInput";
 import { LinkToFile } from "./LinkToFile";
 import { Hetero } from "./Hetero";
 import { cn } from "~/lib/utils";
+import { CopyButton } from "./ResiduesSelect";
 
 async function heterosFromFile(file: File): Promise<Hetero[]> {
   const structure: Structure = await autoLoad(file);
@@ -128,6 +129,9 @@ function UserStructure({
       onReset();
     }
     setFile(file);
+    if (newHeteros.length === 1) {
+      onSelect(newHeteros[0], file);
+    }
   }
 
   function onMySelect(value: string) {
@@ -258,55 +262,54 @@ export function HeteroMoleculeSubForm({
 
   return (
     <MoleculeSubFormWrapper legend={legend} description={description}>
-      <>
-        <UserStructure
-          selected={selected}
-          onSelect={onSelect}
-          onReset={onReset}
-        />
-        {processedFile && (
-          <>
-            <HiddenFileInput name={name} file={processedFile} />
-            <div>
-              Processed structure:{" "}
-              <LinkToFile file={processedFile}>{processedFile.name}</LinkToFile>
-            </div>
-          </>
-        )}
-        {selected && (
-          <div className="flex items-center gap-1">
-            <Label>Selected active residue</Label>
-            <Input
-              readOnly={true}
-              value={actpass.active.join(", ")}
-              className="w-32 p-1"
-            />
+      <UserStructure
+        selected={selected}
+        onSelect={onSelect}
+        onReset={onReset}
+      />
+      {processedFile && (
+        <>
+          <HiddenFileInput name={name} file={processedFile} />
+          <div>
+            Processed structure:{" "}
+            <LinkToFile file={processedFile}>{processedFile.name}</LinkToFile>
           </div>
-        )}
-        {mayUseCustomLigandFiles ||
-          (!mayUseCustomLigandFiles && (
-            <>
-              <FormItem name="ligand_param_fname" label="Custom parameter file">
-                <Input
-                  type="file"
-                  id="ligand_param_fname"
-                  name="ligand_param_fname"
-                  accept=".param"
-                  required
-                />
-              </FormItem>
-              <FormItem name="ligand_top_fname" label="Custom topology file">
-                <Input
-                  type="file"
-                  id="ligand_top_fname"
-                  name="ligand_top_fname"
-                  accept=".top"
-                  required
-                />
-              </FormItem>
-            </>
-          ))}
-      </>
+        </>
+      )}
+      {selected && (
+        <div className="flex items-center gap-1">
+          <Label>Selected active residue</Label>
+          <Input
+            readOnly={true}
+            value={actpass.active.join(", ")}
+            className="w-32 p-1"
+          />
+          <CopyButton content={actpass.active.join(",")} />
+        </div>
+      )}
+      {mayUseCustomLigandFiles ||
+        (!mayUseCustomLigandFiles && (
+          <>
+            <FormItem name="ligand_param_fname" label="Custom parameter file">
+              <Input
+                type="file"
+                id="ligand_param_fname"
+                name="ligand_param_fname"
+                accept=".param"
+                required
+              />
+            </FormItem>
+            <FormItem name="ligand_top_fname" label="Custom topology file">
+              <Input
+                type="file"
+                id="ligand_top_fname"
+                name="ligand_top_fname"
+                accept=".top"
+                required
+              />
+            </FormItem>
+          </>
+        ))}
     </MoleculeSubFormWrapper>
   );
 }

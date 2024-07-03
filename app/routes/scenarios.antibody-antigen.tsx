@@ -18,21 +18,19 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import { action as uploadaction } from "./upload";
-import { FormItem } from "../scenarios/FormItem";
-import { FormDescription } from "../scenarios/FormDescription";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
 import { mustBeAllowedToSubmit } from "~/auth.server";
 import { ClientOnly } from "~/components/ClientOnly";
-import { MoleculeSubForm } from "~/scenarios/MoleculeSubForm.client";
+
 import { ActPassSelection, countSelected } from "~/scenarios/ActPassSelection";
-import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import {
   generateAmbiguousRestraintsFile,
   generateUnAmbiguousRestraintsFile,
 } from "~/scenarios/restraints";
 import { FormErrors } from "~/scenarios/FormErrors";
 import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
+import { MacroMoleculeSubForm } from "~/scenarios/MacroMoleculeSubForm.client";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -265,7 +263,7 @@ export default function AntibodyAntigenScenario() {
           <form onSubmit={onSubmit}>
             <div className="grid grid-cols-2 gap-6">
               {/* TODO nice to have, color residues that are in Complementarity-determining regions (CDRs) */}
-              <MoleculeSubForm
+              <MacroMoleculeSubForm
                 name="antibody"
                 legend="Antibody"
                 description="In tutorial named pdbs/4G6K_clean.pdb"
@@ -276,7 +274,7 @@ export default function AntibodyAntigenScenario() {
                 accessibilityCutoff={0.15}
               />
               <div>
-                <MoleculeSubForm
+                <MacroMoleculeSubForm
                   name="antigen"
                   legend="Antigen"
                   description="In tutorial named pdbs/4I1B_clean.pdb"

@@ -19,11 +19,7 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
-import { FormDescription } from "~/scenarios/FormDescription";
-import { FormItem } from "~/scenarios/FormItem";
-import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import { action as uploadaction } from "./upload";
-import { MoleculeSubForm } from "~/scenarios/MoleculeSubForm.client";
 import { ActPassSelection, countSelected } from "~/scenarios/ActPassSelection";
 import { ClientOnly } from "~/components/ClientOnly";
 import { mustBeAllowedToSubmit } from "~/auth.server";
@@ -33,6 +29,7 @@ import {
 } from "../scenarios/restraints";
 import { FormErrors } from "../scenarios/FormErrors";
 import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
+import { MacroMoleculeSubForm } from "~/scenarios/MacroMoleculeSubForm.client";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -254,7 +251,7 @@ export default function ProteinProteinScenario() {
         {() => (
           <form onSubmit={onSubmit}>
             <div className="grid grid-cols-2 gap-6">
-              <MoleculeSubForm
+              <MacroMoleculeSubForm
                 name="protein1"
                 legend="First protein"
                 description="In example named data/e2a-hpr_1GGR.pdb"
@@ -262,7 +259,7 @@ export default function ProteinProteinScenario() {
                 onActPassChange={setProtein1ActPass}
                 targetChain="A"
               />
-              <MoleculeSubForm
+              <MacroMoleculeSubForm
                 name="protein2"
                 legend="Second protein"
                 description="In example named data/hpr_ensemble.pdb"

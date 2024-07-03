@@ -1,4 +1,4 @@
-import { StructureRepresentationType } from "ngl";
+import type { StructureRepresentationType } from "ngl";
 import { useState } from "react";
 import { useTheme } from "remix-themes";
 import { SlidersHorizontal } from "lucide-react";
@@ -12,28 +12,28 @@ import {
 import { LabeledRadioGroup } from "./LabeledRadioGroup";
 
 export function MoleculeSettings({
-  surfaceCutoff,
-  setSurfaceCutoff,
   renderSelectionAs,
   onRenderSelectionAsChange,
+  surfaceCutoff = undefined,
+  setSurfaceCutoff = undefined,
   neighourRadius = undefined,
   setNeighourRadius = undefined,
 }: {
-  surfaceCutoff: number;
-  setSurfaceCutoff: (cutoff: number) => void;
+  surfaceCutoff?: number;
+  setSurfaceCutoff?: (cutoff: number) => void;
   neighourRadius?: number;
   setNeighourRadius?: (radius: number) => void;
   renderSelectionAs: StructureRepresentationType;
   onRenderSelectionAsChange: (value: StructureRepresentationType) => void;
 }) {
-  const [cutoff, setcutoff] = useState(surfaceCutoff);
+  const [cutoff, setcutoff] = useState(surfaceCutoff || 0);
   const [radius, setradius] = useState(neighourRadius || 0);
   const [theme] = useTheme();
   const style = { colorScheme: theme === "dark" ? "dark" : "light" };
 
   function onOpenChange(open: boolean) {
     if (!open) {
-      if (cutoff !== surfaceCutoff) {
+      if (setSurfaceCutoff !== undefined && cutoff !== surfaceCutoff) {
         setSurfaceCutoff(cutoff);
       }
       if (setNeighourRadius !== undefined && radius !== neighourRadius) {
@@ -48,17 +48,19 @@ export function MoleculeSettings({
         <SlidersHorizontal />
       </PopoverTrigger>
       <PopoverContent>
-        <FormItem name="surface-cutoff" label="Surface cutoff">
-          <Input
-            type="number"
-            step="0.01"
-            min="0.0"
-            max="10"
-            value={cutoff}
-            style={style}
-            onChange={(e) => setcutoff(Number(e.target.value))}
-          />
-        </FormItem>
+        {setSurfaceCutoff !== undefined && (
+          <FormItem name="surface-cutoff" label="Surface cutoff">
+            <Input
+              type="number"
+              step="0.01"
+              min="0.0"
+              max="10"
+              value={cutoff}
+              style={style}
+              onChange={(e) => setcutoff(Number(e.target.value))}
+            />
+          </FormItem>
+        )}
         {setNeighourRadius !== undefined && (
           <FormItem name="neighbour-radius" label="Neighbour radius">
             <Input
@@ -72,6 +74,9 @@ export function MoleculeSettings({
             />
           </FormItem>
         )}
+        {setSurfaceCutoff !== undefined && setNeighourRadius !== undefined && (
+          <span>(Close popover to commit changes)</span>
+        )}
         <LabeledRadioGroup
           label="Render selection as"
           value={renderSelectionAs}
@@ -83,7 +88,6 @@ export function MoleculeSettings({
           ]}
           onChange={onRenderSelectionAsChange}
         />
-        <span>(Close popover to commit changes)</span>
       </PopoverContent>
     </Popover>
   );

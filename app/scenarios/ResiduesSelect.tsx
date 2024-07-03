@@ -1,4 +1,4 @@
-import { ChangeEvent, useId, useMemo, useState } from "react";
+import { ChangeEvent, useId, useMemo } from "react";
 import { FormDescription } from "./FormDescription";
 import { Residue } from "./molecule.client";
 import { Button } from "~/components/ui/button";
@@ -6,6 +6,8 @@ import { Input } from "~/components/ui/input";
 import { useTheme } from "remix-themes";
 import { cn } from "~/lib/utils";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
+import { useChunked } from "./useChunked";
+import { useResidueChangeHandler } from "./useResidueChangeHandler";
 
 type Variant = "act" | "pass" | "highlight" | "";
 
@@ -205,84 +207,29 @@ export function ResiduesSelect({
     () => options.filter((r) => r.surface).map((r) => r.resno),
     [options],
   );
-  const [lastChecked, setLastChecked] = useState<number | null>(null);
-
-  function handleChange(
-    e: ChangeEvent<HTMLInputElement>,
-    index: number,
-    actpass: ActPass,
-  ) {
-    const residue = parseInt(e.target.value);
-    const ne = e.nativeEvent as KeyboardEvent;
-    let newSelected: number[] = [];
-    if (ne.shiftKey && lastChecked !== null) {
-      const start = Math.min(lastChecked, index);
-      const end = Math.max(lastChecked, index);
-      newSelected = [...selected[actpass]];
-      for (let i = start; i <= end; i++) {
-        const resno = options[i].resno;
-        if (!newSelected.includes(resno) && surface.includes(resno)) {
-          newSelected.push(resno);
-        }
-      }
-    } else {
-      if (e.target.checked) {
-        newSelected = [...selected[actpass], residue];
-      } else {
-        newSelected = selected[actpass].filter((r) => r !== residue);
-      }
-    }
-    if (actpass === "act") {
-      // Active should take precedence over passive.
-      // For example given passive is selected,
-      // then selecting same residue as active should remove it from passive.
-      const passiveWithoutAlsoActive = selected.pass.filter(
-        (r) => !newSelected.includes(r),
-      );
-      onChange({
-        act: newSelected,
-        pass: passiveWithoutAlsoActive,
-      });
-    } else {
-      onChange({
-        pass: newSelected,
-        act: selected.act,
-      });
-    }
-
-    if (e.target.checked) {
-      setLastChecked(index);
-    }
-  }
+  const handleChange = useResidueChangeHandler({
+    options,
+    selected,
+    onChange,
+    filter: (resno: number) => surface.includes(resno),
+  });
+  const chunkSize = 10;
+  const chunks = useChunked(options, chunkSize);
 
   function onActiveImport(imported: number[]) {
     const filtered = imported.filter((r) => surface.includes(r));
     onChange({
       act: filtered,
-      pass: selected.pass,
+      pass: selected.pass.filter((r) => !filtered.includes(r)),
     });
   }
   function onPassiveImport(imported: number[]) {
     const filtered = imported.filter((r) => surface.includes(r));
     onChange({
       pass: filtered,
-      act: selected.act,
+      act: selected.act.filter((r) => !filtered.includes(r)),
     });
   }
-
-  const chunkSize = 10;
-  const initialArray: Residue[][] = [];
-  const chunks = options.reduce((resultArray, item, index) => {
-    const chunkIndex = Math.floor(index / chunkSize);
-
-    if (!resultArray[chunkIndex]) {
-      resultArray[chunkIndex] = []; // start a new chunk
-    }
-
-    resultArray[chunkIndex].push(item);
-
-    return resultArray;
-  }, initialArray);
 
   return (
     <>
@@ -395,7 +342,7 @@ export function PickIn3D({
   );
 }
 
-function ResiduesHeader({
+export function ResiduesHeader({
   showActive,
   showPassive,
 }: {

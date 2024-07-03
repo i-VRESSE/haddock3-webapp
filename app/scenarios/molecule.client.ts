@@ -9,12 +9,6 @@ export interface Residue {
   surface?: boolean;
 }
 export type Chains = Record<string, Residue[]>;
-export interface Molecule {
-  structure: Structure;
-  chains: Chains;
-  file: File;
-  originalFile: File; // File not passed through the pdbtools preprocess pipeline
-}
 
 function residuesPerChain<T>(
   structure: Structure,

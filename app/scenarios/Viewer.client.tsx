@@ -515,6 +515,7 @@ export function Viewer({
   onPick,
   onHover,
   onMouseLeave = () => {},
+  selectionOpacity = 0.5,
 }: {
   structure: File;
   chain: string;
@@ -527,6 +528,7 @@ export function Viewer({
   onPick?: (chain: string, residue: number) => void;
   onHover?: (chain: string, residue: number) => void;
   onMouseLeave?: () => void;
+  selectionOpacity?: number;
 }) {
   const [theme] = useTheme();
   const isDark = theme === "dark";
@@ -562,19 +564,19 @@ export function Viewer({
         <NGLResidues
           residues={active}
           color={activeColor}
-          opacity={opacity}
+          opacity={selectionOpacity}
           representation={renderSelectionAs}
         />
         <NGLResidues
           residues={passive}
           color={passiveColor}
-          opacity={opacity}
+          opacity={selectionOpacity}
           representation={renderSelectionAs}
         />
         <NGLResidues
           residues={neighbours}
           color={passiveColor}
-          opacity={opacity}
+          opacity={selectionOpacity}
           representation={renderSelectionAs}
         />
         <NGLResidues
