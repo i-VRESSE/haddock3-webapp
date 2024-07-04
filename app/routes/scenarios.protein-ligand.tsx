@@ -52,8 +52,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = uploadaction;
 
 const Schema = object({
-  protein: instance(File, "Protein structure as PDB file"),
-  ligand: instance(File, "Ligand structure as PDB file"),
+  protein: instance(File, "Need a protein structure as PDB file"),
+  ligand: instance(File, "Need a ligand structure as PDB file"),
   nrSelectedProteinResidues: pipe(
     string(),
     transform(Number),
@@ -67,21 +67,21 @@ const Schema = object({
     minValue(1, "At least one residue must be selected for the ligand."),
   ),
   ambig_actpass_fname: pipe(
-    instance(File, "Ambiguous active+passive restraints as TBL file"),
+    instance(File, "Need a ambiguous active+passive restraints as TBL file"),
     minSize(
       1,
       "Ambiguous restraints file should not be empty. Please select residues.",
     ),
   ),
   ambig_pass_fname: pipe(
-    instance(File, "Ambiguous passive restraints as TBL file"),
+    instance(File, "Need a ambiguous passive restraints as TBL file"),
     minSize(
       1,
       "Ambiguous restraints file should not be empty. Please select residues.",
     ),
   ),
-  ligand_param_fname: instance(File, "Custom ligand parameter file"),
-  ligand_top_fname: instance(File, "Custom ligand topology file"),
+  ligand_param_fname: instance(File, "Need a custom ligand parameter file"),
+  ligand_top_fname: instance(File, "Need a custom ligand topology file"),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
   reference_fname: optional(instance(File, "Reference structure as PDB file")),
 });
@@ -128,13 +128,11 @@ molecules =  [
 
 # ====================================================================
 [topoaa]
-autohis = true
 ${param_line}
 ${top_line}
 delenph = false
 
 [rigidbody]
-tolerance = 5
 ambig_fname = "${data.ambig_actpass_fname.name}"
 ${param_line}
 ${top_line}
@@ -151,7 +149,6 @@ select = 200
 ${ref_line}
 
 [flexref]
-tolerance = 5
 ambig_fname = "${data.ambig_pass_fname.name}"
 ${param_line}
 ${top_line}
