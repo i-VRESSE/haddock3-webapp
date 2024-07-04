@@ -41,8 +41,8 @@ export async function getJobs(bartenderToken: string, limit = 100, offset = 0) {
       },
     },
   });
-  if (!response.ok) {
-    throw response;
+  if (!response.ok || !data) {
+    throw new Response(response.statusText, { status: response.status });
   }
   return data;
 }
@@ -57,7 +57,7 @@ export async function getJobById(jobid: number, bartenderToken: string) {
     },
   });
   if (!response.ok || !data) {
-    throw response;
+    throw new Response(response.statusText, { status: response.status });
   }
   return data;
 }
@@ -83,7 +83,7 @@ export async function deleteJob(jobid: number, bartenderToken: string) {
     },
   });
   if (!response.ok) {
-    throw response;
+    throw new Response(response.statusText, { status: response.status });
   }
 }
 
@@ -184,7 +184,7 @@ export async function listInputFiles(jobid: number, bartenderToken: string) {
     },
   });
   if (!response.ok || !data) {
-    throw response;
+    throw new Response(response.statusText, { status: response.status });
   }
   const nonInputFiles = new Set([...BOOK_KEEPING_FILES, JOB_OUTPUT_DIR]);
   // TODO instead of filtering here add exclude parameter to bartender endpoint.
@@ -328,7 +328,7 @@ export async function updateJobName(
     body: name,
   });
   if (!response.ok) {
-    throw response;
+    throw new Response(response.statusText, { status: response.status });
   }
 }
 
