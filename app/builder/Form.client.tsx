@@ -20,64 +20,43 @@ import type { loader } from "~/routes/builder";
 import { DownloadButton } from "./DownloadButton";
 import { UploadButton } from "./UploadButton";
 import { ClearButton } from "./ClearButton";
+import useIndexedDb from "./useIndexedDb";
+import useSaveOnLeave from "./useSaveOnLeave";
 
 const App = () => {
+  // save builder data when users leaves the route
+  useSaveOnLeave(location.pathname);
   const { catalog, submitAllowed, archive } = useLoaderData<typeof loader>();
   const setCatalog = useSetCatalog();
   const activeCatalog = useCatalog();
   const { loadWorkflowArchive } = useWorkflow();
+  const { loading } = useIndexedDb({ activeCatalogTitle: activeCatalog.title });
+
+  // console.group("App")
+  // console.log("archive...", archive)
+  // console.log("activeCatalog...", activeCatalog)
+  // console.log("catalog...", catalog)
+  // console.log("loading...", loading)
+  // console.log("useSaveOnLeave...", route)
+  // console.groupEnd()
+
   useEffect(() => {
-    setCatalog(prepareCatalog(catalog)); // On mount configure catalog
-  }, [catalog]); // eslint-disable-line react-hooks/exhaustive-deps
+    // On mount configure catalog
+    setCatalog(prepareCatalog(catalog));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [catalog]);
 
   useEffect(() => {
     if (archive !== undefined && activeCatalog.title !== "") {
       // Only load archive once active catalog is set
       loadWorkflowArchive(archive);
     }
-  }, [archive, activeCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [archive, activeCatalog]);
 
-  useEffect(() => {
-    // on builder page check for zip in browser storage and loads it
-    if (activeCatalog.title === "") {
-      return;
-    }
-    if (typeof indexedDB === "undefined") {
-      console.error(
-        "IndexedDB not supported, unable to save workflow.zip file.",
-      );
-      return;
-    }
-    const open = indexedDB.open("haddock3", 1);
-    open.onsuccess = function () {
-      const db = open.result;
-      try {
-        const tx = db.transaction("zips", "readwrite");
-        const zips = tx.objectStore("zips");
-        const request = zips.get("workflow.zip");
-        request.onsuccess = function () {
-          const zip: Blob = request.result;
-          console.log("zip", zip);
-          if (zip === undefined) {
-            return;
-          }
-          const url = URL.createObjectURL(zip);
-          loadWorkflowArchive(url)
-            .finally(() => {
-              URL.revokeObjectURL(url);
-            })
-            .catch((error) => {
-              console.error("Error loading workflow from indexeddb", error);
-            });
-          // remove zip from indexeddb so next visit to builder page loads nothing
-          zips.delete("workflow.zip");
-        };
-      } catch (error) {
-        console.log("Error loading workflow from indexeddb");
-        console.error(error);
-      }
-    };
-  }, [activeCatalog]); // eslint-disable-line react-hooks/exhaustive-deps
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <>
