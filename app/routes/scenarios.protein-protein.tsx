@@ -192,7 +192,7 @@ export default function ProteinProteinScenario() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
-    formData.set("nrSelectedProtei1nResidues", countSelected(protein1ActPass));
+    formData.set("nrSelectedProtein1Residues", countSelected(protein1ActPass));
     formData.set("nrSelectedProtein2Residues", countSelected(protein2ActPass));
 
     const ambig_fname = await generateAmbiguousRestraintsFile(
