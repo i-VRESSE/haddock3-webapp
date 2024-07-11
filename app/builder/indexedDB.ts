@@ -57,12 +57,15 @@ export function openDB({
  * @param e
  */
 function onDbUpgrade(e: Event) {
-  // debugger
   const db = (e.target as IDBOpenDBRequest).result;
-  // create builder object
-  db.createObjectStore("builder");
-  // create zips object store
-  db.createObjectStore("zips");
+  if (db.objectStoreNames.contains("builder") === false) {
+    // create builder object
+    db.createObjectStore("builder");
+  }
+  if (db.objectStoreNames.contains("zips") === false) {
+    // create zips object store
+    db.createObjectStore("zips");
+  }
 }
 
 export function getBuilderData(db: IDBDatabase): Promise<Blob> {
@@ -158,8 +161,8 @@ export function saveBuilderData({
       .transaction(["builder"], "readwrite")
       .objectStore("builder");
 
-    // get builder.zip
-    const request = builder.add(zip, "builder.zip");
+    // save builder.zip
+    const request = builder.put(zip, "builder.zip");
 
     // resolve onsuccess
     request.onsuccess = () => {

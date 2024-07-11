@@ -49,7 +49,6 @@ export default function useSaveOnLeave(pathname: string) {
         ])
           .then(([db, zip]) => {
             // debugger
-            // save zip to indexedDB
             return saveBuilderData({ db, zip });
           })
           .then((status) => {
@@ -58,7 +57,8 @@ export default function useSaveOnLeave(pathname: string) {
             console.log("useSaveOnLeave...", status);
           })
           .catch((e) => {
-            console.error("useSaveOnLeave: ", e?.message);
+            // debugger
+            console.error("useSaveOnLeave...FAILED:", e);
           });
       }
     };
