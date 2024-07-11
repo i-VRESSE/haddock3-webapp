@@ -20,10 +20,10 @@ export default function useIndexedDb({
   const [loading, setLoading] = useState(true);
   const { loadWorkflowArchive } = useWorkflow();
 
-  console.group("useIndexedDb");
-  console.log("activeCatalogTitle...", activeCatalogTitle);
-  console.log("loading...", loading);
-  console.groupEnd();
+  // console.group("useIndexedDb");
+  // console.log("activeCatalogTitle...", activeCatalogTitle);
+  // console.log("loading...", loading);
+  // console.groupEnd();
 
   useEffect(() => {
     // use abort flag to prevent status update on removed process

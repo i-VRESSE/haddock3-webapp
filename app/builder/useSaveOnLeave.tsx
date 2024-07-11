@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useNavigation } from "@remix-run/react";
 import {
   useCatalog,
   useFiles,
@@ -14,6 +15,7 @@ import { openDB, dbName, dbVersion, saveBuilderData } from "./indexedDB";
  * @returns routeToSave {string} as confirmation of route to "guard"
  */
 export default function useSaveOnLeave(pathname: string) {
+  const navigation = useNavigation();
   const { nodes, global } = useWorkflow();
   const files = useFiles();
   const catalog = useCatalog();
@@ -28,17 +30,10 @@ export default function useSaveOnLeave(pathname: string) {
         pathname !== location.pathname &&
         // and at least one node and one file are present
         nodes.length > 0 &&
-        Object.keys(files).length > 0
+        Object.keys(files).length > 0 &&
+        // no formMethod is present -> submit button creates form POST to endpoint /jobs/?
+        navigation.formMethod !== "POST"
       ) {
-        console.group("useSaveOnLeave");
-        console.log(pathname, "...CLOSING");
-        // console.log("nodes...", nodes)
-        // console.log("global...", global)
-        // console.log("files...", files)
-        console.log("location...", location.pathname);
-        // console.log("pathname...", pathname)
-        console.groupEnd();
-
         // create toml for zip
         const tomlSchemas = catalog2tomlSchemas(catalog);
 
@@ -60,9 +55,11 @@ export default function useSaveOnLeave(pathname: string) {
             // debugger
             console.error("useSaveOnLeave...FAILED:", e);
           });
+      } else {
+        console.info("useSaveOnLeave...IGNORE");
       }
     };
-  }, [pathname, nodes, global, files, catalog]);
+  }, [pathname, nodes, global, files, catalog, navigation]);
 
   return pathname;
 }

@@ -56,7 +56,7 @@ export function openDB({
  * zips objectStore keeps scenarios data
  * @param e
  */
-function onDbUpgrade(e: Event) {
+export function onDbUpgrade(e: Event) {
   const db = (e.target as IDBOpenDBRequest).result;
   if (db.objectStoreNames.contains("builder") === false) {
     // create builder object
@@ -174,4 +174,20 @@ export function saveBuilderData({
       rej("Failed to load builder data from indexed DB");
     };
   });
+}
+
+/**
+ * This method can be used to remove any temp data saved without any error messaging on fail.
+ */
+export function removeBuilderData() {
+  openDB({ dbName, dbVersion })
+    .then((db) => {
+      return deleteBuilderData(db);
+    })
+    .then(() => {
+      console.info("Builder data removed");
+    })
+    .catch(() => {
+      console.info("Failed to remove builder data");
+    });
 }
