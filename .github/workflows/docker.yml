@@ -16,7 +16,7 @@ jobs:
       packages: write
       contents: read
     env:
-      HADDOCK3_GHORG: haddocking"
+      HADDOCK3_GHORG: "haddocking"
       HADDOCK3_VERSION: "main"
       BARTENDER_VERSION: "main"
       GDOCK_VERSION: "main"
