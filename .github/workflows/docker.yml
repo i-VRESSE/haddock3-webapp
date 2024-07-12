@@ -16,11 +16,8 @@ jobs:
       packages: write
       contents: read
     env:
-      # TODO use main when https://github.com/haddocking/haddock3/pull/841 is merged
-      # HADDOCK3_GHORG: haddocking"
-      # HADDOCK3_VERSION: "main"
-      HADDOCK3_GHORG: "i-VRESSE"
-      HADDOCK3_VERSION: "web-service"
+      HADDOCK3_GHORG: haddocking"
+      HADDOCK3_VERSION: "main"
       BARTENDER_VERSION: "main"
       GDOCK_VERSION: "main"
       LIGHTDOCK_VERSION: "0.9.4"
