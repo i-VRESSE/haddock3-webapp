@@ -66,6 +66,7 @@ function hideExecutionParameters(catalog: ICatalog) {
     "postprocess",
     "clean",
     "offline",
+    "less_io",
   ];
   const globalProps = catalog.global.schema.properties!;
   for (const param of executionParameters) {
