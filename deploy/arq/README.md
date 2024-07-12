@@ -38,7 +38,7 @@ To use image from a certain released version use the following command:
 WEBAPP_TAG=0.2.1 BARTENDER_TAG=0.2.1 CERTMAKER_TAG=0.2.1 docker compose -f deploy/arq/docker-compose.yml up --pull always
 ```
 
-The application by default expects to be running at / path.
+The application by default assumes to be running at / path.
 To build with prefix /haddock3/ use the following command:
 
 ```shell
