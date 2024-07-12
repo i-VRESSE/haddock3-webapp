@@ -16,8 +16,8 @@ Next steps are to go to http://localhost:8080/register to register as admin and 
 ## Alternative versions
 
 The command above uses the latest released version or main branch of the repositories.
-If you are interested in using a different version of the repositories, 
-for example if you want to try out a feature in a haddock3 pull request, 
+If you are interested in using a different version of the repositories,
+for example if you want to try out a feature in a haddock3 pull request,
 you can change the version of each repository by setting environment variables.
 
 To use published images of the main branch use the following command:
@@ -28,7 +28,7 @@ WEBAPP_TAG=main BARTENDER_TAG=main CERTMAKER_TAG=main docker compose -f deploy/a
 
 To use images from certain pull requests use the following command:
 
-```shell 
+```shell
 WEBAPP_TAG=pr-104 BARTENDER_TAG=pr-105 CERTMAKER_TAG=pr-106 HADDOCK3_VERSION=pr-107 HADDOCK3_GHORG=i-VRESSE docker compose -f deploy/arq/docker-compose.yml up --pull always
 ```
 
