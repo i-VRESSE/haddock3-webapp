@@ -4,7 +4,7 @@ You can submit a workflow to the webapp that can contain any parameter that hadd
 However we do not want a user to tell the webapp for example which run dir, queue to use, which cns executable, etc.
 The webapp should control most of the [global parameters](https://github.com/i-VRESSE/workflow-builder/blob/main/packages/haddock3_catalog/public/catalog/haddock3.guru.yaml) except molecules parameter and preprocess parameter.
 
-Currently the submitted workflow is rewritten at [app/models/applicaton.server.ts](app/models/applicaton.server.ts) to defaults fit for bartender job service.
+Currently the submitted workflow is rewritten at [app/models/applicaton.server.ts](../app/models/applicaton.server.ts) to defaults fit for bartender job service.
 
 The following parameters can be rewritten with environment variables:
 
