@@ -28,7 +28,7 @@ import { useTheme } from "remix-themes";
 
 type Kind = "pass" | "actpass";
 
-function GlycanResiduesSelect({
+export function GlycanResiduesSelect({
   kind,
   options,
   onChange,
