@@ -2,9 +2,9 @@ import { Structure, autoLoad } from "ngl";
 import { useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { useTheme } from "remix-themes";
+import { HiddenFileInput, LinkToFile } from "@i-vresse/haddock3-ui";
 
 import { ActPassSelection } from "./ActPassSelection";
-import { HiddenFileInput } from "./HiddenFileInput";
 import { RestraintsErrorsReport } from "./RestraintsErrorsReport";
 import { UserStructure } from "./UserStructure";
 import { MoleculeSubFormWrapper } from "./MoleculeSubFormWrapper";
@@ -15,7 +15,6 @@ import {
   processUserStructure,
 } from "./restraints";
 import { Button } from "~/components/ui/button";
-import { LinkToFile } from "./LinkToFile";
 import { ChainSelect } from "./ChainSelect";
 import { ActPass } from "./ResiduesSelect";
 

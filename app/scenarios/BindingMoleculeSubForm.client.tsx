@@ -1,5 +1,7 @@
 import { StructureRepresentationType } from "ngl";
 import { useEffect, useMemo, useState } from "react";
+import { useChunked } from "@i-vresse/haddock3-ui/useChunked";
+
 import { ActPassSelection } from "./ActPassSelection";
 import { BIG_MOLECULE } from "./constants";
 import { toggleResidue } from "./toggleResidue";
@@ -27,7 +29,6 @@ import {
 } from "./AtomStructureSubForm.client";
 import { useSurfaceCutoff } from "./useSurfaceCutoff";
 import { useSafeFile } from "./useSafeFile";
-import { useChunked } from "./useChunked";
 import { useResidueChangeHandler } from "./useResidueChangeHandler";
 
 function BindingResiduesSelect({

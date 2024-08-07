@@ -1,4 +1,8 @@
 import { useState } from "react";
+import { StructureRepresentationType } from "ngl";
+import { useChunked } from "@i-vresse/haddock3-ui/useChunked";
+import { useTheme } from "remix-themes";
+
 import { ActPassSelection } from "./ActPassSelection";
 import {
   AtomStructureSubForm,
@@ -7,7 +11,6 @@ import {
 import { PreprocessPipeline } from "./restraints";
 import { LabeledRadioGroup } from "./LabeledRadioGroup";
 import { Viewer } from "./Viewer.client";
-import { StructureRepresentationType } from "ngl";
 import { toggleResidue } from "./toggleResidue";
 import {
   ActPass,
@@ -22,9 +25,7 @@ import { Spinner } from "~/components/ui/spinner";
 import { MoleculeSettings } from "./MoleculeSettings";
 import { Residue } from "./molecule.client";
 import { FormDescription } from "./FormDescription";
-import { useChunked } from "./useChunked";
 import { useResidueChangeHandler } from "./useResidueChangeHandler";
-import { useTheme } from "remix-themes";
 
 type Kind = "pass" | "actpass";
 

@@ -9,11 +9,10 @@ import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Label } from "~/components/ui/label";
 import { hetGrepFile } from "../haddock3-restraints-client/hetGrep";
 import { jsonSafeFile, preprocessPdb, restrainBodies } from "./restraints";
-import { HiddenFileInput } from "./HiddenFileInput";
-import { LinkToFile } from "./LinkToFile";
 import { Hetero } from "./Hetero";
 import { cn } from "~/lib/utils";
 import { CopyButton } from "./ResiduesSelect";
+import { HiddenFileInput, LinkToFile } from "@i-vresse/haddock3-ui";
 
 async function heterosFromFile(file: File): Promise<Hetero[]> {
   const structure: Structure = await autoLoad(file);

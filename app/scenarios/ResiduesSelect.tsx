@@ -1,12 +1,14 @@
 import { ChangeEvent, useId, useMemo } from "react";
+import { useChunked } from "@i-vresse/haddock3-ui/useChunked";
+import { CopyToClipBoardIcon } from "@i-vresse/haddock3-ui";
+import { useTheme } from "remix-themes";
+
 import { FormDescription } from "./FormDescription";
 import { Residue } from "./molecule.client";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { useTheme } from "remix-themes";
 import { cn } from "~/lib/utils";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
-import { useChunked } from "./useChunked";
 import { useResidueChangeHandler } from "./useResidueChangeHandler";
 
 type Variant = "act" | "pass" | "highlight" | "";
@@ -17,25 +19,6 @@ const residueVariants: Record<Variant, string> = {
   highlight: "bg-secondary dark:bg-secondary-foreground",
   "": "bg-inherit dark:bg-inherit",
 };
-
-function CopyToClipBoardIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 14 15"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M11.746.07A.5.5 0 0011.5.003h-6a.5.5 0 00-.5.5v2.5H.5a.5.5 0 00-.5.5v10a.5.5 0 00.5.5h8a.5.5 0 00.5-.5v-2.5h4.5a.5.5 0 00.5-.5v-8a.498.498 0 00-.15-.357L11.857.154a.506.506 0 00-.11-.085zM9 10.003h4v-7h-1.5a.5.5 0 01-.5-.5v-1.5H6v2h.5a.5.5 0 01.357.15L8.85 5.147c.093.09.15.217.15.357v4.5zm-8-6v9h7v-7H6.5a.5.5 0 01-.5-.5v-1.5H1z"
-        fill="currentColor"
-      ></path>
-    </svg>
-  );
-}
 
 export function ImportResidues({
   selected,

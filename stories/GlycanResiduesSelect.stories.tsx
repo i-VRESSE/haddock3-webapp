@@ -12,28 +12,28 @@ export default meta;
 type Story = StoryObj<typeof GlycanResiduesSelect>;
 
 export const ActPass: Story = {
-    args: {
-      kind: "actpass",
-      options: [
-        {
-          resno: 1,
-          resname: "NDG",
-          seq: "X",
-          surface: true,
-        },
-        {
-          resno: 2,
-          resname: "NAG",
-          seq: "X",
-          surface: true,
-        },
-      ],
-      selected: {
-        act: [],
-        pass: [1],
+  args: {
+    kind: "actpass",
+    options: [
+      {
+        resno: 1,
+        resname: "NDG",
+        seq: "X",
+        surface: true,
       },
-      onChange: fn(),
-      onHover: fn(),
-      highlight: undefined,
-    }
-  }
+      {
+        resno: 2,
+        resname: "NAG",
+        seq: "X",
+        surface: true,
+      },
+    ],
+    selected: {
+      act: [],
+      pass: [1],
+    },
+    onChange: fn(),
+    onHover: fn(),
+    highlight: undefined,
+  },
+};

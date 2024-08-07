@@ -1,5 +1,5 @@
 import { Structure, autoLoad } from "ngl";
-import { getResName1 } from "./constants";
+import { getResName1 } from "@i-vresse/haddock3-ui/getResName1";
 import ResidueProxy from "ngl/dist/declarations/proxy/residue-proxy";
 
 export interface Residue {
