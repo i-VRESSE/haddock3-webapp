@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { fn } from "@storybook/test";
 
-import { GlycanResiduesSelect } from "../app/scenarios/GlycanMoleculeSubForm";
+import { GlycanResiduesSelect } from "../app/scenarios/GlycanMoleculeSubForm.client";
 
 const meta: Meta<typeof GlycanResiduesSelect> = {
   component: GlycanResiduesSelect,

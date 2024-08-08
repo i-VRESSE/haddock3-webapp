@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { StructureRepresentationType } from "ngl";
+import { type StructureRepresentationType } from "ngl";
 import { useChunked } from "@i-vresse/haddock3-ui/useChunked";
 import { ResiduesHeader } from "@i-vresse/haddock3-ui/toggles/ResidueHeader";
 import { Viewer } from "@i-vresse/haddock3-ui";
