@@ -6,18 +6,11 @@ import { ResidueHeaderItem } from "@i-vresse/haddock3-ui/toggles/ResidueHeader";
 import { ActPassSelection } from "./ActPassSelection";
 import { BIG_MOLECULE } from "./constants";
 import { toggleResidue } from "./toggleResidue";
-import { Residue } from "./molecule.client";
 import { PreprocessPipeline } from "./restraints";
 import { Label } from "~/components/ui/label";
 import { Spinner } from "~/components/ui/spinner";
 import { MoleculeSettings } from "./MoleculeSettings";
-import { FormDescription } from "./FormDescription";
-import {
-  ImportResidues,
-  ResidueCheckbox,
-  ResidueNeighbourSelection,
-  ResidueSelection,
-} from "./ResiduesSelect";
+import { ImportResidues } from "./ResiduesSelect";
 import {
   ShowSurfaceBuriedToggles,
   useShowSurfaceBuriedToggles,
@@ -28,9 +21,16 @@ import {
 } from "./AtomStructureSubForm.client";
 import { useSurfaceCutoff } from "./useSurfaceCutoff";
 import { useSafeFile } from "./useSafeFile";
-import { useResidueChangeHandler } from "./useResidueChangeHandler";
 import { Viewer } from "@i-vresse/haddock3-ui";
 import { useTheme } from "remix-themes";
+import {
+  FormDescription,
+  Residue,
+  ResidueCheckbox,
+  ResidueNeighbourSelection,
+  ResidueSelection,
+  useResidueChangeHandler,
+} from "@i-vresse/haddock3-ui/toggles";
 
 function BindingResiduesSelect({
   options,
@@ -45,6 +45,7 @@ function BindingResiduesSelect({
   onHover: (resno: number | undefined) => void;
   highlight: number | undefined;
 }) {
+  const [theme] = useTheme();
   const surface = useMemo(
     () => options.filter((r) => r.surface).map((r) => r.resno),
     [options],
@@ -107,6 +108,7 @@ function BindingResiduesSelect({
                   showActive={true}
                   showPassive={false}
                   neighbourChecked={false}
+                  theme={theme === null ? "light" : theme}
                 />
               ))}
             </div>

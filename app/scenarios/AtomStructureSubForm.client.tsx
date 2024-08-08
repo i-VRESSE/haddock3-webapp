@@ -8,7 +8,7 @@ import { ActPassSelection } from "./ActPassSelection";
 import { RestraintsErrorsReport } from "./RestraintsErrorsReport";
 import { UserStructure } from "./UserStructure";
 import { MoleculeSubFormWrapper } from "./MoleculeSubFormWrapper";
-import { Residue, chainsFromStructure } from "./molecule.client";
+import { chainsFromStructure } from "./molecule.client";
 import {
   PreprocessPipeline,
   RestraintsErrors,
@@ -16,7 +16,7 @@ import {
 } from "./restraints";
 import { Button } from "~/components/ui/button";
 import { ChainSelect } from "./ChainSelect";
-import { ActPass } from "./ResiduesSelect";
+import { ActPass, Residue } from "@i-vresse/haddock3-ui/toggles";
 
 export interface Molecule {
   userFile: File;

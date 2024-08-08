@@ -1,6 +1,7 @@
-import { ActPass } from "./ResiduesSelect";
+import { ActPass } from "@i-vresse/haddock3-ui/toggles";
 import { ActPassSelection } from "./ActPassSelection";
 
+// TODO move to haddock3-ui?
 export function toggleResidue(
   resno: number,
   pick: ActPass,

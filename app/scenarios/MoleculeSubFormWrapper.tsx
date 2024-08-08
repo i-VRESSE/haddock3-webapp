@@ -1,4 +1,4 @@
-import { FormDescription } from "./FormDescription";
+import { FormDescription } from "@i-vresse/haddock3-ui/toggles";
 
 export function MoleculeSubFormWrapper({
   legend,

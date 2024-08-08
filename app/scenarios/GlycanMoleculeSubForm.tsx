@@ -2,6 +2,15 @@ import { useState } from "react";
 import { StructureRepresentationType } from "ngl";
 import { useChunked } from "@i-vresse/haddock3-ui/useChunked";
 import { ResiduesHeader } from "@i-vresse/haddock3-ui/toggles/ResidueHeader";
+import { Viewer } from "@i-vresse/haddock3-ui";
+import {
+  ActPass,
+  FormDescription,
+  Residue,
+  ResidueCheckbox,
+  ResidueSelection,
+  useResidueChangeHandler,
+} from "@i-vresse/haddock3-ui/toggles";
 import { useTheme } from "remix-themes";
 
 import { ActPassSelection } from "./ActPassSelection";
@@ -12,20 +21,10 @@ import {
 import { PreprocessPipeline } from "./restraints";
 import { LabeledRadioGroup } from "./LabeledRadioGroup";
 import { toggleResidue } from "./toggleResidue";
-import {
-  ActPass,
-  ImportResidues,
-  PickIn3D,
-  ResidueCheckbox,
-  ResidueSelection,
-} from "./ResiduesSelect";
+import { ImportResidues, PickIn3D } from "./ResiduesSelect";
 import { useSafeFile } from "./useSafeFile";
 import { Spinner } from "~/components/ui/spinner";
 import { MoleculeSettings } from "./MoleculeSettings";
-import { Residue } from "./molecule.client";
-import { FormDescription } from "./FormDescription";
-import { useResidueChangeHandler } from "./useResidueChangeHandler";
-import { Viewer } from "@i-vresse/haddock3-ui";
 
 type Kind = "pass" | "actpass";
 
@@ -44,6 +43,7 @@ export function GlycanResiduesSelect({
   onHover: (resno: number | undefined) => void;
   highlight?: number;
 }) {
+  const [theme] = useTheme();
   const handleChange = useResidueChangeHandler({
     options,
     selected,
@@ -100,6 +100,7 @@ export function GlycanResiduesSelect({
                   showActive={kind === "actpass"}
                   showPassive={true}
                   neighbourChecked={false}
+                  theme={theme === null ? "light" : theme}
                 />
               ))}
             </div>

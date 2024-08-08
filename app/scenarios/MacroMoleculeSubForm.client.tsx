@@ -1,13 +1,7 @@
 import { StructureRepresentationType } from "ngl";
 import { useState, useEffect, ReactNode } from "react";
 
-import {
-  ResiduesSelect,
-  ResidueSelection,
-  ActPass,
-  PickIn3D,
-  CopyButton,
-} from "./ResiduesSelect";
+import { ResiduesSelect, PickIn3D, CopyButton } from "./ResiduesSelect";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { PreprocessPipeline } from "./restraints";
@@ -35,6 +29,7 @@ import { computeNeighbours, useNeighbourRadius } from "./useNeighbourRadius";
 import { useSafeFile } from "./useSafeFile";
 import { useTheme } from "remix-themes";
 import { Viewer } from "@i-vresse/haddock3-ui";
+import { ActPass, ResidueSelection } from "@i-vresse/haddock3-ui/toggles";
 
 export function ResiduesSubForm({
   molecule,
