@@ -1,6 +1,7 @@
 import { StructureRepresentationType } from "ngl";
 import { useEffect, useMemo, useState } from "react";
 import { useChunked } from "@i-vresse/haddock3-ui/useChunked";
+import { ResidueHeaderItem } from "@i-vresse/haddock3-ui/toggles/ResidueHeader";
 
 import { ActPassSelection } from "./ActPassSelection";
 import { BIG_MOLECULE } from "./constants";
@@ -8,14 +9,12 @@ import { toggleResidue } from "./toggleResidue";
 import { Residue } from "./molecule.client";
 import { PreprocessPipeline } from "./restraints";
 import { Label } from "~/components/ui/label";
-import { Viewer } from "./Viewer.client";
 import { Spinner } from "~/components/ui/spinner";
 import { MoleculeSettings } from "./MoleculeSettings";
 import { FormDescription } from "./FormDescription";
 import {
   ImportResidues,
   ResidueCheckbox,
-  ResidueHeaderItem,
   ResidueNeighbourSelection,
   ResidueSelection,
 } from "./ResiduesSelect";
@@ -30,6 +29,8 @@ import {
 import { useSurfaceCutoff } from "./useSurfaceCutoff";
 import { useSafeFile } from "./useSafeFile";
 import { useResidueChangeHandler } from "./useResidueChangeHandler";
+import { Viewer } from "@i-vresse/haddock3-ui";
+import { useTheme } from "remix-themes";
 
 function BindingResiduesSelect({
   options,
@@ -138,6 +139,7 @@ function BindingResiduesSubForm({
     surfaceResidues: molecule.surfaceResidues,
     residues: molecule.residues.map((r) => r.resno),
   });
+  const [theme] = useTheme();
   const [renderSelectionAs, setRenderSelectionAs] =
     useState<StructureRepresentationType>(
       molecule.residues.length > BIG_MOLECULE ? "surface" : "spacefill",
@@ -224,6 +226,7 @@ function BindingResiduesSubForm({
           higlightResidue={hoveredFrom2DResidue}
           onHover={(_, residue) => setHoveredFrom3DResidue(residue)}
           onMouseLeave={() => setHoveredFrom3DResidue(undefined)}
+          theme={theme === null ? undefined : theme}
         />
       </div>
       <Label>Select ligand binding site residues</Label>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { StructureRepresentationType } from "ngl";
 import { useChunked } from "@i-vresse/haddock3-ui/useChunked";
+import { ResiduesHeader } from "@i-vresse/haddock3-ui/toggles/ResidueHeader";
 import { useTheme } from "remix-themes";
 
 import { ActPassSelection } from "./ActPassSelection";
@@ -10,7 +11,6 @@ import {
 } from "./AtomStructureSubForm.client";
 import { PreprocessPipeline } from "./restraints";
 import { LabeledRadioGroup } from "./LabeledRadioGroup";
-import { Viewer } from "./Viewer.client";
 import { toggleResidue } from "./toggleResidue";
 import {
   ActPass,
@@ -18,7 +18,6 @@ import {
   PickIn3D,
   ResidueCheckbox,
   ResidueSelection,
-  ResiduesHeader,
 } from "./ResiduesSelect";
 import { useSafeFile } from "./useSafeFile";
 import { Spinner } from "~/components/ui/spinner";
@@ -26,6 +25,7 @@ import { MoleculeSettings } from "./MoleculeSettings";
 import { Residue } from "./molecule.client";
 import { FormDescription } from "./FormDescription";
 import { useResidueChangeHandler } from "./useResidueChangeHandler";
+import { Viewer } from "@i-vresse/haddock3-ui";
 
 type Kind = "pass" | "actpass";
 
@@ -204,6 +204,7 @@ function ResiduesSubForm({
           onHover={(_, residue) => setHoveredFrom3DResidue(residue)}
           onMouseLeave={() => setHoveredFrom3DResidue(undefined)}
           selectionOpacity={selectionOpacity}
+          theme={theme === null ? undefined : theme}
         />
       </div>
       <GlycanResiduesSelect

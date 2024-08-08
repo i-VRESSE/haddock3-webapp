@@ -1,46 +1,22 @@
 import { useId, useState } from "react";
+import {
+  HiddenFileInput,
+  LigandViewer,
+  LinkToFile,
+} from "@i-vresse/haddock3-ui";
+import { Hetero, heterosFromFile } from "@i-vresse/haddock3-ui/Hetero";
+
 import { FormItem } from "./FormItem";
 import { MoleculeSubFormWrapper } from "./MoleculeSubFormWrapper";
 import { ActPassSelection } from "./ActPassSelection";
-import { LigandViewer } from "./Viewer.client";
 import { Input } from "~/components/ui/input";
-import { type Structure, autoLoad } from "ngl";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Label } from "~/components/ui/label";
 import { hetGrepFile } from "../haddock3-restraints-client/hetGrep";
 import { jsonSafeFile, preprocessPdb, restrainBodies } from "./restraints";
-import { Hetero } from "./Hetero";
 import { cn } from "~/lib/utils";
 import { CopyButton } from "./ResiduesSelect";
-import { HiddenFileInput, LinkToFile } from "@i-vresse/haddock3-ui";
-
-async function heterosFromFile(file: File): Promise<Hetero[]> {
-  const structure: Structure = await autoLoad(file);
-  const heteros: Hetero[] = [];
-  structure.eachResidue((r) => {
-    if (r.isHetero() && !r.isWater() && !r.isIon()) {
-      const hetero: Hetero = {
-        resno: r.resno,
-        resname: r.resname,
-        chain: r.chain.chainname,
-      };
-      if (r.entity) {
-        hetero.description = r.entity.description;
-      }
-      heteros.push(hetero);
-    }
-  });
-  heteros.sort((a, b) => {
-    if (a.resname !== b.resname) {
-      return a.resname.localeCompare(b.resname);
-    }
-    if (a.chain !== b.chain) {
-      return a.chain.localeCompare(b.chain);
-    }
-    return a.resno - b.resno;
-  });
-  return heteros;
-}
+import { useTheme } from "remix-themes";
 
 function HeteroRadioGroup({
   options,
@@ -106,6 +82,7 @@ function UserStructure({
   onSelect: (selected: Hetero, file: File) => void;
   onReset: () => void;
 }) {
+  const [theme] = useTheme();
   const [file, setFile] = useState<File | undefined>();
   const [heteros, setHeteros] = useState<Hetero[]>([]);
   const [hoveredFrom2DResidue, setHoveredFrom2DResidue] = useState<string>();
@@ -179,6 +156,7 @@ function UserStructure({
               onMouseLeave={() => setHoveredFrom3DResidue(undefined)}
               highlight={hoveredFrom2DResidue}
               onPick={onMySelect}
+              theme={theme === null ? undefined : theme}
             />
           )}
         </div>
