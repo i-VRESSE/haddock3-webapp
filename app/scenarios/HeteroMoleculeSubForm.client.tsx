@@ -4,7 +4,7 @@ import {
   LigandViewer,
   LinkToFile,
 } from "@i-vresse/haddock3-ui";
-import { Hetero, heterosFromFile } from "@i-vresse/haddock3-ui/Hetero";
+import { Hetero, heterosFromFile, hetGrepFile } from "@i-vresse/haddock3-ui/hetero";
 
 import { FormItem } from "./FormItem";
 import { MoleculeSubFormWrapper } from "./MoleculeSubFormWrapper";
@@ -12,7 +12,6 @@ import { ActPassSelection } from "./ActPassSelection";
 import { Input } from "~/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Label } from "~/components/ui/label";
-import { hetGrepFile } from "../haddock3-restraints-client/hetGrep";
 import { jsonSafeFile, preprocessPdb, restrainBodies } from "./restraints";
 import { cn } from "~/lib/utils";
 import { CopyButton } from "./ResiduesSelect";
