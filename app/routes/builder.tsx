@@ -5,7 +5,7 @@ import {
 } from "@remix-run/node";
 import { type ICatalog } from "@i-vresse/wb-core/dist/types";
 
-import { getCatalog } from "~/catalogs/index.server";
+import { getCatalogForBuilder } from "~/catalogs/index.server";
 import { submitJob } from "~/models/applicaton.server";
 import { isSubmitAllowed } from "~/models/user.server";
 import { ClientOnly } from "~/components/ClientOnly";
@@ -27,7 +27,7 @@ export const loader = async ({
   // can still use builder with easy level
   // but cannot submit only download
   const catalogLevel = level === "" ? "easy" : level;
-  const catalog = getCatalog(catalogLevel);
+  const catalog = getCatalogForBuilder(catalogLevel);
   return {
     catalog,
     submitAllowed: isSubmitAllowed(level ?? ""),
