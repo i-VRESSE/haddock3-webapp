@@ -149,7 +149,7 @@ export function ResiduesSelect({
 }
 
 // Not using same component from haddock3-ui package,
-// because we want to use shad/cn compopnents
+// as we want to use shadcn/ui styled components
 // and package uses plain radio group
 export function PickIn3D({
   value,
