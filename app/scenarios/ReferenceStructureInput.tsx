@@ -1,4 +1,4 @@
-import { FormDescription } from "./FormDescription";
+import { FormDescription } from "@i-vresse/haddock3-ui/toggles";
 import { FormItem } from "./FormItem";
 import { PDBFileInput } from "./PDBFileInput.client";
 

@@ -1,7 +1,8 @@
+import { NGLComponent, NGLStage } from "@i-vresse/haddock3-ui";
 import { useState } from "react";
 
 import { Button } from "~/components/ui/button";
-import { NGLComponent, NGLStage } from "~/scenarios/Viewer.client";
+
 import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 
 export function MolViewerDialog({ structure }: { structure?: File }) {
