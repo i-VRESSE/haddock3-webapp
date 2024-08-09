@@ -237,7 +237,7 @@ export interface RestraintsErrors {
   passiveFromActive?: string;
 }
 
-export async function calclulateRestraints(
+export async function processUserStructure(
   file: File,
   userSelectedChain: string,
   targetChain: string,
@@ -251,10 +251,14 @@ export async function calclulateRestraints(
     preprocessPipeline,
   );
   const safeProcessed = await jsonSafeFile(processed);
-  const [surfaceResidues, error] = await calculateAccessibility(
-    safeProcessed,
-    accessibilityCutoff,
-  );
+  let surfaceResidues: Record<string, number[]> = {};
+  let error: string | undefined = undefined;
+  if (accessibilityCutoff > 0) {
+    [surfaceResidues, error] = await calculateAccessibility(
+      safeProcessed,
+      accessibilityCutoff,
+    );
+  }
   const bodyRestraints = await restrainBodies(safeProcessed);
   let errors: RestraintsErrors | undefined = undefined;
   if (error) {

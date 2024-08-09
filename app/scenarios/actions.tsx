@@ -1,4 +1,5 @@
 import { NavigateFunction, SubmitFunction } from "@remix-run/react";
+import { dbName, dbVersion, onDbUpgrade } from "~/builder/indexedDB";
 import { Button } from "~/components/ui/button";
 
 export function doUpload(zipPromise: Promise<Blob>, submit: SubmitFunction) {
@@ -23,14 +24,11 @@ export function onRefine(
     return;
   }
 
-  const open = indexedDB.open("haddock3", 1);
+  const open = indexedDB.open(dbName, dbVersion);
   open.onerror = function () {
     console.error("Error opening indexeddb", open.error);
   };
-  open.onupgradeneeded = function () {
-    const db = open.result;
-    db.createObjectStore("zips");
-  };
+  open.onupgradeneeded = onDbUpgrade;
   open.onblocked = function () {
     console.error("Error opening indexeddb, blocked");
   };

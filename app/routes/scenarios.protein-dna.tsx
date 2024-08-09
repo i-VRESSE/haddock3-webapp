@@ -19,11 +19,7 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
-import { FormDescription } from "~/scenarios/FormDescription";
-import { FormItem } from "~/scenarios/FormItem";
-import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import { action as uploadaction } from "./upload";
-import { MoleculeSubForm } from "~/scenarios/MoleculeSubForm.client";
 import { ActPassSelection, countSelected } from "~/scenarios/ActPassSelection";
 import { ClientOnly } from "~/components/ClientOnly";
 import { mustBeAllowedToSubmit } from "~/auth.server";
@@ -32,6 +28,8 @@ import {
   generateUnAmbiguousRestraintsFile,
 } from "../scenarios/restraints";
 import { FormErrors } from "../scenarios/FormErrors";
+import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
+import { MacroMoleculeSubForm } from "~/scenarios/MacroMoleculeSubForm.client";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -260,7 +258,7 @@ export default function Page() {
         {() => (
           <form onSubmit={onSubmit}>
             <div className="grid grid-cols-2 gap-6">
-              <MoleculeSubForm
+              <MacroMoleculeSubForm
                 name="protein"
                 legend="Protein"
                 description="In example named data/cro.pdb or 3CRO_complex.pdb"
@@ -268,7 +266,7 @@ export default function Page() {
                 onActPassChange={setProteinActPass}
                 targetChain="A"
               />
-              <MoleculeSubForm
+              <MacroMoleculeSubForm
                 name="dna"
                 legend="Nucleic acid (DNA and/or RNA)"
                 description="In example named data/dna.pdb or OR1_unbound.pdb"
@@ -278,12 +276,9 @@ export default function Page() {
                 targetChain="B"
               />
             </div>
-            <FormItem name="reference_fname" label="Reference structure">
-              <PDBFileInput name="reference_fname" />
-              <FormDescription>
-                In example named data/target.pdb
-              </FormDescription>
-            </FormItem>
+            <ReferenceStructureInput>
+              In example named data/target.pdb
+            </ReferenceStructureInput>
             <FormErrors errors={errors} />
             <ActionButtons />
           </form>

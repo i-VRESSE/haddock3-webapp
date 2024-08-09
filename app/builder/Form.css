@@ -436,3 +436,7 @@ code .table {
   color: hsl(var(--foregrond, #212529));
   background-color: hsl(var(--background, #fff));
 }
+
+.workflow-builder-app .d-none {
+  display: none;
+}

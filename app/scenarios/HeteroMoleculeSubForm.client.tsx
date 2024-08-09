@@ -1,46 +1,25 @@
 import { useId, useState } from "react";
+import {
+  HiddenFileInput,
+  LigandViewer,
+  LinkToFile,
+} from "@i-vresse/haddock3-ui";
+import {
+  Hetero,
+  heterosFromFile,
+  hetGrepFile,
+} from "@i-vresse/haddock3-ui/hetero";
+
 import { FormItem } from "./FormItem";
-import { MoleculeSubFormWrapper } from "./MoleculeSubForm.client";
+import { MoleculeSubFormWrapper } from "./MoleculeSubFormWrapper";
 import { ActPassSelection } from "./ActPassSelection";
-import { LigandViewer } from "./Viewer.client";
 import { Input } from "~/components/ui/input";
-import { type Structure, autoLoad } from "ngl";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Label } from "~/components/ui/label";
-import { hetGrepFile } from "../haddock3-restraints-client/hetGrep";
 import { jsonSafeFile, preprocessPdb, restrainBodies } from "./restraints";
-import { HiddenFileInput } from "./HiddenFileInput";
-import { LinkToFile } from "./LinkToFile";
-import { Hetero } from "./Hetero";
 import { cn } from "~/lib/utils";
-
-async function heterosFromFile(file: File): Promise<Hetero[]> {
-  const structure: Structure = await autoLoad(file);
-  const heteros: Hetero[] = [];
-  structure.eachResidue((r) => {
-    if (r.isHetero() && !r.isWater() && !r.isIon()) {
-      const hetero: Hetero = {
-        resno: r.resno,
-        resname: r.resname,
-        chain: r.chain.chainname,
-      };
-      if (r.entity) {
-        hetero.description = r.entity.description;
-      }
-      heteros.push(hetero);
-    }
-  });
-  heteros.sort((a, b) => {
-    if (a.resname !== b.resname) {
-      return a.resname.localeCompare(b.resname);
-    }
-    if (a.chain !== b.chain) {
-      return a.chain.localeCompare(b.chain);
-    }
-    return a.resno - b.resno;
-  });
-  return heteros;
-}
+import { CopyButton } from "./ResiduesSelect";
+import { useTheme } from "remix-themes";
 
 function HeteroRadioGroup({
   options,
@@ -106,6 +85,7 @@ function UserStructure({
   onSelect: (selected: Hetero, file: File) => void;
   onReset: () => void;
 }) {
+  const [theme] = useTheme();
   const [file, setFile] = useState<File | undefined>();
   const [heteros, setHeteros] = useState<Hetero[]>([]);
   const [hoveredFrom2DResidue, setHoveredFrom2DResidue] = useState<string>();
@@ -128,6 +108,9 @@ function UserStructure({
       onReset();
     }
     setFile(file);
+    if (newHeteros.length === 1) {
+      onSelect(newHeteros[0], file);
+    }
   }
 
   function onMySelect(value: string) {
@@ -176,6 +159,7 @@ function UserStructure({
               onMouseLeave={() => setHoveredFrom3DResidue(undefined)}
               highlight={hoveredFrom2DResidue}
               onPick={onMySelect}
+              theme={theme === null ? undefined : theme}
             />
           )}
         </div>
@@ -214,6 +198,32 @@ export function HeteroMoleculeSubForm({
 }) {
   const [processedFile, setProcessedFile] = useState<File | undefined>();
   const [selected, setSelected] = useState<Hetero | undefined>();
+
+  // TODO remove if once https://github.com/haddocking/haddock3/issues/914 is fixed
+  if (!mayUseCustomLigandFiles) {
+    return (
+      <MoleculeSubFormWrapper legend={legend} description={""}>
+        <div className="text-destructive text-xl">
+          <p>
+            Your expertise level is to low to set all the parameters needed for
+            a ligand.
+          </p>
+          <p>
+            Once{" "}
+            <a
+              href="https://github.com/haddocking/haddock3/issues/914"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              haddock3 issue #914
+            </a>{" "}
+            is solved, you will be allowed use this scenario.
+          </p>
+        </div>
+      </MoleculeSubFormWrapper>
+    );
+  }
 
   async function onSelect(newSelected: Hetero, file: File) {
     const pdbWithSingleHet = await hetGrepFile(
@@ -258,58 +268,53 @@ export function HeteroMoleculeSubForm({
 
   return (
     <MoleculeSubFormWrapper legend={legend} description={description}>
-      <>
-        <UserStructure
-          selected={selected}
-          onSelect={onSelect}
-          onReset={onReset}
-        />
-        {processedFile && (
-          <>
-            <HiddenFileInput name={name} file={processedFile} />
-            <div>
-              Processed structure:{" "}
-              <LinkToFile file={processedFile}>{processedFile.name}</LinkToFile>
-            </div>
-          </>
-        )}
-        {selected && (
-          <div className="flex items-center gap-1">
-            <Label>Selected active residue</Label>
-            <Input
-              readOnly={true}
-              value={actpass.active.join(", ")}
-              className="w-32 p-1"
-            />
+      <UserStructure
+        selected={selected}
+        onSelect={onSelect}
+        onReset={onReset}
+      />
+      {processedFile && (
+        <>
+          <HiddenFileInput name={name} file={processedFile} />
+          <div>
+            Processed structure:{" "}
+            <LinkToFile file={processedFile}>{processedFile.name}</LinkToFile>
           </div>
-        )}
-        {mayUseCustomLigandFiles && (
-          <>
-            <FormItem
+        </>
+      )}
+      {selected && (
+        <div className="flex items-center gap-1">
+          <Label>Selected active residue</Label>
+          <Input
+            readOnly={true}
+            value={actpass.active.join(", ")}
+            className="w-32 p-1"
+          />
+          <CopyButton content={actpass.active.join(",")} />
+        </div>
+      )}
+      {mayUseCustomLigandFiles && (
+        <>
+          <FormItem name="ligand_param_fname" label="Custom parameter file">
+            <Input
+              type="file"
+              id="ligand_param_fname"
               name="ligand_param_fname"
-              label="Custom parameter file (optional)"
-            >
-              <Input
-                type="file"
-                id="ligand_param_fname"
-                name="ligand_param_fname"
-                accept=".param"
-              />
-            </FormItem>
-            <FormItem
+              accept=".param"
+              required
+            />
+          </FormItem>
+          <FormItem name="ligand_top_fname" label="Custom topology file">
+            <Input
+              type="file"
+              id="ligand_top_fname"
               name="ligand_top_fname"
-              label="Custom topology file (optional)"
-            >
-              <Input
-                type="file"
-                id="ligand_top_fname"
-                name="ligand_top_fname"
-                accept=".top"
-              />
-            </FormItem>
-          </>
-        )}
-      </>
+              accept=".top"
+              required
+            />
+          </FormItem>
+        </>
+      )}
     </MoleculeSubFormWrapper>
   );
 }

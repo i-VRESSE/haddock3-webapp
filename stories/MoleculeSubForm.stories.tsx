@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { fn, within } from "@storybook/test";
 
-import { MoleculeSubForm } from "../app/scenarios/MoleculeSubForm.client";
+import { MacroMoleculeSubForm } from "../app/scenarios/MacroMoleculeSubForm.client";
 
-const meta: Meta<typeof MoleculeSubForm> = {
-  component: MoleculeSubForm,
+const meta: Meta<typeof MacroMoleculeSubForm> = {
+  component: MacroMoleculeSubForm,
 };
 
 export default meta;
 
-type Story = StoryObj<typeof MoleculeSubForm>;
+type Story = StoryObj<typeof MacroMoleculeSubForm>;
 
 export const Surface: Story = {
   args: {

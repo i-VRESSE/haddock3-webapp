@@ -154,6 +154,13 @@
           "description": "Completely isolate the haddock3 run & results from internet.",
           "$comment": "For interactive plots, we are using the plotly library. It can be embedded as a link to the plotly.js library and fetched from the web, or directly copied on the html files AT THE COST OF ~3Mb per file. Setting this parameter to `true` will add the javascript library in generated files, therefore completely isolating haddock3 from any web call.",
           "type": "boolean"
+        },
+        "less_io": {
+          "default": false,
+          "title": "Reduce the amount of I/O operations.",
+          "description": "Reduce the amount of I/O operations.",
+          "$comment": "This option will reduce the amount of I/O operations by writing less files to disk. This can be useful for example when running on a network file system where I/O operations are slow.",
+          "type": "boolean"
         }
       },
       "required": ["run_dir"],
@@ -201,6 +208,9 @@
         "ui:group": "clean"
       },
       "offline": {
+        "ui:group": "execution"
+      },
+      "less_io": {
         "ui:group": "execution"
       }
     },

@@ -25,11 +25,7 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
-import { FormDescription } from "~/scenarios/FormDescription";
-import { FormItem } from "~/scenarios/FormItem";
-import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import { action as uploadaction } from "./upload";
-import { MoleculeSubForm } from "~/scenarios/MoleculeSubForm.client";
 import { ActPassSelection, countSelected } from "~/scenarios/ActPassSelection";
 import { ClientOnly } from "~/components/ClientOnly";
 import { mustBeAllowedToSubmit } from "~/auth.server";
@@ -39,6 +35,8 @@ import {
 } from "../scenarios/restraints";
 import { FormErrors } from "../scenarios/FormErrors";
 import { HeteroMoleculeSubForm } from "~/scenarios/HeteroMoleculeSubForm.client";
+import { BindingMoleculeSubForm } from "~/scenarios/BindingMoleculeSubForm.client";
+import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await mustBeAllowedToSubmit(request);
@@ -54,8 +52,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = uploadaction;
 
 const Schema = object({
-  protein: instance(File, "Protein structure as PDB file"),
-  ligand: instance(File, "Ligand structure as PDB file"),
+  protein: instance(File, "Need a protein structure as PDB file"),
+  ligand: instance(File, "Need a ligand structure as PDB file"),
   nrSelectedProteinResidues: pipe(
     string(),
     transform(Number),
@@ -69,31 +67,27 @@ const Schema = object({
     minValue(1, "At least one residue must be selected for the ligand."),
   ),
   ambig_actpass_fname: pipe(
-    instance(File, "Ambiguous active+passive restraints as TBL file"),
+    instance(File, "Need a ambiguous active+passive restraints as TBL file"),
     minSize(
       1,
       "Ambiguous restraints file should not be empty. Please select residues.",
     ),
   ),
   ambig_pass_fname: pipe(
-    instance(File, "Ambiguous passive restraints as TBL file"),
+    instance(File, "Need a ambiguous passive restraints as TBL file"),
     minSize(
       1,
       "Ambiguous restraints file should not be empty. Please select residues.",
     ),
   ),
-  ligand_param_fname: optional(instance(File, "Custom ligand parameter file")),
-  ligand_top_fname: optional(instance(File, "Custom ligand topology file")),
+  ligand_param_fname: instance(File, "Need a custom ligand parameter file"),
+  ligand_top_fname: instance(File, "Need a custom ligand topology file"),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
   reference_fname: optional(instance(File, "Reference structure as PDB file")),
 });
 type Schema = InferOutput<typeof Schema>;
 
-function generateWorkflow(
-  data: Schema,
-  proteinActPass: ActPassSelection,
-  ligandActPass: ActPassSelection,
-) {
+function generateWorkflow(data: Schema) {
   // Workflow based on
   // https://github.com/haddocking/haddock3/blob/main/examples/docking-protein-ligand/docking-protein-ligand-full.cfg
   // made valid for easy expertise level
@@ -109,12 +103,6 @@ function generateWorkflow(
     ? `ligand_top_fname = "${data.ligand_top_fname.name}"`
     : "";
 
-  const resdic_A = JSON.stringify([
-    ...proteinActPass.active,
-    ...proteinActPass.passive,
-    ...proteinActPass.neighbours,
-  ]);
-  const resdic_B = JSON.stringify(ligandActPass.active);
   return `
 # ====================================================================
 # Protein-ligand docking example
@@ -140,13 +128,11 @@ molecules =  [
 
 # ====================================================================
 [topoaa]
-autohis = true
 ${param_line}
 ${top_line}
 delenph = false
 
 [rigidbody]
-tolerance = 5
 ambig_fname = "${data.ambig_actpass_fname.name}"
 ${param_line}
 ${top_line}
@@ -163,7 +149,6 @@ select = 200
 ${ref_line}
 
 [flexref]
-tolerance = 5
 ambig_fname = "${data.ambig_pass_fname.name}"
 ${param_line}
 ${top_line}
@@ -173,9 +158,7 @@ mdsteps_cool1 = 0
 [caprieval]
 ${ref_line}
 
-[rmsdmatrix]
-resdic_A = ${resdic_A}
-resdic_B = ${resdic_B}
+[ilrmsdmatrix]
 
 [clustrmsd]
 criterion = 'maxclust'
@@ -257,21 +240,22 @@ export default function Page() {
     formData.set("nrSelectedLigandResidues", countSelected(ligandActPass));
 
     const ambig_actpass_fname = await generateAmbiguousRestraintsFile(
-      proteinActPass,
+      {
+        active: proteinActPass.active,
+        passive: [],
+        neighbours: [],
+        chain: proteinActPass.chain,
+        bodyRestraints: proteinActPass.bodyRestraints,
+      },
       ligandActPass,
     );
     formData.set("ambig_actpass_fname", ambig_actpass_fname);
 
-    // when user only selected active residues, treat them as passive
-    const onlyPassive =
-      proteinActPass.passive.length === 0 &&
-      proteinActPass.active.length > 0 &&
-      proteinActPass.neighbours.length === 0;
     const ambig_pass_fname = await generateAmbiguousRestraintsFile(
       {
         active: [],
-        passive: onlyPassive ? proteinActPass.active : proteinActPass.passive,
-        neighbours: proteinActPass.neighbours,
+        passive: proteinActPass.active,
+        neighbours: [],
         chain: proteinActPass.chain,
         bodyRestraints: proteinActPass.bodyRestraints,
       },
@@ -290,7 +274,7 @@ export default function Page() {
     try {
       const data = parseFormData(formData, Schema);
       setErrors(undefined);
-      const workflow = generateWorkflow(data, proteinActPass, ligandActPass);
+      const workflow = generateWorkflow(data);
       const zipPromise = createZip(workflow, data);
       handleActionButton(event.nativeEvent, zipPromise, navigate, submit);
     } catch (e) {
@@ -329,13 +313,14 @@ export default function Page() {
         {() => (
           <form onSubmit={onSubmit}>
             <div className="grid grid-cols-2 gap-6">
-              <MoleculeSubForm
+              <BindingMoleculeSubForm
                 name="protein"
                 legend="Protein"
                 description="In example named 2J8S-renumbered.pdb"
                 actpass={proteinActPass}
                 onActPassChange={setProteinActPass}
                 targetChain="A"
+                preprocessPipeline="delhetatmkeepcoord"
               />
               <HeteroMoleculeSubForm
                 name="ligand"
@@ -347,15 +332,9 @@ export default function Page() {
                 mayUseCustomLigandFiles={mayUseCustomLigandFiles}
               />
             </div>
-            <FormItem
-              name="reference_fname"
-              label="Reference structure (optional)"
-            >
-              <PDBFileInput name="reference_fname" />
-              <FormDescription>
-                In example named data/target.pdb
-              </FormDescription>
-            </FormItem>
+            <ReferenceStructureInput label="Reference structure (optional)">
+              In example named data/target.pdb
+            </ReferenceStructureInput>
             <FormErrors errors={errors} />
             <ActionButtons />
           </form>
