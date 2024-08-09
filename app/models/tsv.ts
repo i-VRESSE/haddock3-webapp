@@ -12,9 +12,6 @@ export function parseTsv<TRow>(
   if (dropComments) {
     lines = removeComments(lines);
   }
-  // have to use dynamic import because
-  // thats what makes it available in commonjs modules
-  // according to remix dev error
   const rows = tsvParse(lines, autoType);
   return rows as unknown as TRow[];
 }

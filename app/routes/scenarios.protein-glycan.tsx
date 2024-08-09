@@ -30,7 +30,7 @@ import {
 import { FormErrors } from "../scenarios/FormErrors";
 import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
 import { MacroMoleculeSubForm } from "~/scenarios/MacroMoleculeSubForm.client";
-import { GlycanMoleculeSubForm } from "~/scenarios/GlycanMoleculeSubForm";
+import { GlycanMoleculeSubForm } from "~/scenarios/GlycanMoleculeSubForm.client";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);

@@ -1,22 +1,16 @@
 import { StructureRepresentationType } from "ngl";
 import { useEffect, useMemo, useState } from "react";
+import { useChunked } from "@i-vresse/haddock3-ui/useChunked";
+import { ResidueHeaderItem } from "@i-vresse/haddock3-ui/toggles/ResidueHeader";
+
 import { ActPassSelection } from "./ActPassSelection";
 import { BIG_MOLECULE } from "./constants";
 import { toggleResidue } from "./toggleResidue";
-import { Residue } from "./molecule.client";
 import { PreprocessPipeline } from "./restraints";
 import { Label } from "~/components/ui/label";
-import { Viewer } from "./Viewer.client";
 import { Spinner } from "~/components/ui/spinner";
 import { MoleculeSettings } from "./MoleculeSettings";
-import { FormDescription } from "./FormDescription";
-import {
-  ImportResidues,
-  ResidueCheckbox,
-  ResidueHeaderItem,
-  ResidueNeighbourSelection,
-  ResidueSelection,
-} from "./ResiduesSelect";
+import { ImportResidues } from "./ResiduesSelect";
 import {
   ShowSurfaceBuriedToggles,
   useShowSurfaceBuriedToggles,
@@ -27,8 +21,16 @@ import {
 } from "./AtomStructureSubForm.client";
 import { useSurfaceCutoff } from "./useSurfaceCutoff";
 import { useSafeFile } from "./useSafeFile";
-import { useChunked } from "./useChunked";
-import { useResidueChangeHandler } from "./useResidueChangeHandler";
+import { Viewer } from "@i-vresse/haddock3-ui";
+import { useTheme } from "remix-themes";
+import {
+  FormDescription,
+  Residue,
+  ResidueCheckbox,
+  ResidueNeighbourSelection,
+  ResidueSelection,
+  useResidueChangeHandler,
+} from "@i-vresse/haddock3-ui/toggles";
 
 function BindingResiduesSelect({
   options,
@@ -43,6 +45,7 @@ function BindingResiduesSelect({
   onHover: (resno: number | undefined) => void;
   highlight: number | undefined;
 }) {
+  const [theme] = useTheme();
   const surface = useMemo(
     () => options.filter((r) => r.surface).map((r) => r.resno),
     [options],
@@ -85,7 +88,10 @@ function BindingResiduesSelect({
             >
               {chunk[0].resno}
             </p>
-            <div onMouseLeave={() => onHover(undefined)}>
+            <div
+              onMouseLeave={() => onHover(undefined)}
+              className="flex flex-row"
+            >
               {chunk.map((r, index) => (
                 <ResidueCheckbox
                   key={r.resno}
@@ -105,6 +111,7 @@ function BindingResiduesSelect({
                   showActive={true}
                   showPassive={false}
                   neighbourChecked={false}
+                  theme={theme === null ? "light" : theme}
                 />
               ))}
             </div>
@@ -137,6 +144,7 @@ function BindingResiduesSubForm({
     surfaceResidues: molecule.surfaceResidues,
     residues: molecule.residues.map((r) => r.resno),
   });
+  const [theme] = useTheme();
   const [renderSelectionAs, setRenderSelectionAs] =
     useState<StructureRepresentationType>(
       molecule.residues.length > BIG_MOLECULE ? "surface" : "spacefill",
@@ -223,6 +231,7 @@ function BindingResiduesSubForm({
           higlightResidue={hoveredFrom2DResidue}
           onHover={(_, residue) => setHoveredFrom3DResidue(residue)}
           onMouseLeave={() => setHoveredFrom3DResidue(undefined)}
+          theme={theme === null ? undefined : theme}
         />
       </div>
       <Label>Select ligand binding site residues</Label>

@@ -1,8 +1,9 @@
 import { Structure, autoLoad } from "ngl";
 import { useState } from "react";
+import { SimpleViewer } from "@i-vresse/haddock3-ui";
+
 import { FormItem } from "./FormItem";
 import { ChainRadioGroup } from "./ChainRadioGroup";
-import { SimpleViewer } from "./Viewer.client";
 import { Input } from "~/components/ui/input";
 
 export function UserStructure({
