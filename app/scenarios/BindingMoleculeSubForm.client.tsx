@@ -88,7 +88,10 @@ function BindingResiduesSelect({
             >
               {chunk[0].resno}
             </p>
-            <div onMouseLeave={() => onHover(undefined)}>
+            <div
+              onMouseLeave={() => onHover(undefined)}
+              className="flex flex-row"
+            >
               {chunk.map((r, index) => (
                 <ResidueCheckbox
                   key={r.resno}

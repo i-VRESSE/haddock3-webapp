@@ -4,7 +4,11 @@ import {
   LigandViewer,
   LinkToFile,
 } from "@i-vresse/haddock3-ui";
-import { Hetero, heterosFromFile, hetGrepFile } from "@i-vresse/haddock3-ui/hetero";
+import {
+  Hetero,
+  heterosFromFile,
+  hetGrepFile,
+} from "@i-vresse/haddock3-ui/hetero";
 
 import { FormItem } from "./FormItem";
 import { MoleculeSubFormWrapper } from "./MoleculeSubFormWrapper";
