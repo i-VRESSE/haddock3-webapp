@@ -1,4 +1,4 @@
-import { Output, boolean, object } from "valibot";
+import { InferOutput, boolean, object } from "valibot";
 import type { PlotlyProps } from "~/components/PlotlyPlot";
 import { getPlotFromHtml } from "~/lib/html";
 import {
@@ -49,7 +49,7 @@ export const Schema = object({
   generate_chordchart: boolean(),
   generate_heatmap: boolean(),
 });
-export type Schema = Output<typeof Schema>;
+export type Schema = InferOutput<typeof Schema>;
 
 export async function getParams({
   jobid,

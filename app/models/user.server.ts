@@ -129,14 +129,33 @@ export async function oauthregister(email: string, photo?: string) {
       isAdmin,
       photo: photo ?? generatePhoto(email),
     })
-    .onConflictDoNothing()
+    .onConflictDoUpdate({
+      set: {
+        photo: photo ?? generatePhoto(email),
+      },
+      target: users.email,
+      targetWhere: sql`email = ${email}`,
+    })
     .returning({
       id: users.id,
     });
   return user[0].id;
 }
 
-export async function getUserById(userId: string): Promise<User> {
+export async function portalregister(id: number, email: string) {
+  const user = await db
+    .insert(users)
+    .values({
+      id,
+      email,
+      photo: generatePhoto(email),
+    })
+    .onConflictDoNothing()
+    .returning(userSelect);
+  return user[0];
+}
+
+export async function getUserById(userId: number): Promise<User> {
   const foundUsers = await db
     .select(userSelect)
     .from(users)
@@ -173,7 +192,7 @@ export function listExpertiseLevels() {
 const now = sql<string>`now()`;
 
 export async function assignExpertiseLevel(
-  userId: string,
+  userId: number,
   level: ExpertiseLevel,
 ) {
   // set preferred level to the assigned level if no preferred level is set
@@ -198,7 +217,7 @@ export async function assignExpertiseLevel(
 }
 
 export async function unassignExpertiseLevel(
-  userId: string,
+  userId: number,
   level: ExpertiseLevel,
 ) {
   const user = await getUserById(userId);
@@ -220,8 +239,8 @@ export async function unassignExpertiseLevel(
 }
 
 export async function setPreferredExpertiseLevel(
-  userId: string,
-  preferredExpertiseLevel: ExpertiseLevel,
+  userId: number,
+  preferredExpertiseLevel: ExpertiseLevel | null,
 ) {
   await db
     .update(users)
@@ -232,7 +251,7 @@ export async function setPreferredExpertiseLevel(
     .where(eq(users.id, userId));
 }
 
-export async function setIsAdmin(userId: string, isAdmin: boolean) {
+export async function setIsAdmin(userId: number, isAdmin: boolean) {
   await db
     .update(users)
     .set({
@@ -243,7 +262,7 @@ export async function setIsAdmin(userId: string, isAdmin: boolean) {
 }
 
 export async function setBartenderToken(
-  userId: string,
+  userId: number,
   token: string,
   expireAt: number,
 ) {

@@ -5,13 +5,13 @@ export function ErrorMessages({
   errors,
 }: {
   path: string;
-  errors?: FlatErrors;
+  errors?: FlatErrors<undefined>;
 }) {
   if (!errors) return <></>;
   let issues: [string, ...string[]] | undefined = undefined;
   if (path === "root" && errors.root) {
     issues = errors.root;
-  } else if (errors.nested[path] !== undefined) {
+  } else if (errors.nested !== undefined && errors.nested[path] !== undefined) {
     issues = errors.nested[path];
   }
   if (!issues) return <></>;

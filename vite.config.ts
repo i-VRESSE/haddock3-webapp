@@ -1,4 +1,5 @@
 /// <reference types="vitest" />
+import "dotenv/config";
 import { vitePlugin as remix } from "@remix-run/dev";
 import { installGlobals } from "@remix-run/node";
 import { defineConfig } from "vite";
@@ -9,7 +10,7 @@ installGlobals();
 const isStorybook = process.argv[1]?.includes("storybook");
 const isTestEnv = process.env.VITEST;
 
-const prefix = process.env.HADDOCK3_WEBAPP_PREFIX || "/";
+const prefix = process.env.HADDOCK3WEBAPP_PREFIX || "/";
 const remixConfig = {
   basename: prefix,
 };

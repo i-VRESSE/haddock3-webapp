@@ -65,7 +65,7 @@ export async function getBartenderTokenByUser(user: User) {
   const tokenIsExpired = user.bartenderTokenExpiresAt < nowInSeconds + leeway;
   if (tokenIsExpired || !user.bartenderToken) {
     await generator.init();
-    const token = await generator.generate(user.id, user.email);
+    const token = await generator.generate(user.id.toString(), user.email);
     const { exp } = decodeJwt(token);
     await setBartenderToken(user.id, token, exp!);
     return token;

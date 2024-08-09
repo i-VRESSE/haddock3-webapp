@@ -77,6 +77,7 @@ mode = 'local'
 postprocess = true
 clean = true
 offline = false
+less_io = true
 ncores = 1
 `;
     const output_config = await retrieveConfigFromArchive(result);
@@ -98,6 +99,7 @@ mode = 'local'
 postprocess = true
 clean = true
 offline = false
+less_io = true
 ncores = 1
 `;
     const output_config = await retrieveConfigFromArchive(result);
@@ -127,6 +129,7 @@ ncores = 1
 postprocess = true
 clean = true
 offline = false
+less_io = true
 `;
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
@@ -151,6 +154,7 @@ mode = 'local'
 postprocess = true
 clean = true
 offline = false
+less_io = true
 ncores = 1
 
 [seletop]
@@ -177,6 +181,7 @@ mode = 'local'
 postprocess = true
 clean = true
 offline = false
+less_io = true
 ncores = 1
 
 [clustfcc]

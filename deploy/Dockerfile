@@ -1,17 +1,15 @@
 # Docker file for haddock3-webapp
 # base node image
-FROM node:18-bookworm-slim as base
+FROM node:20-bookworm-slim as base
 
 LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/Dockerfile
 LABEL org.opencontainers.image.licenses=Apache-2.0
-LABEL org.opencontainers.image.description="Haddock3 webapplication image."
+LABEL org.opencontainers.image.description="Haddock3 web application image."
 
-ARG HADDOCK3_WEBAPP_PREFIX=/
+ARG HADDOCK3WEBAPP_PREFIX=/
 
 # set for base and all layer that inherit from it
 ENV NODE_ENV production
-
-RUN apt update && apt install -y libssl3
 
 # Install all node_modules, including dev dependencies
 FROM base as deps
@@ -19,19 +17,28 @@ FROM base as deps
 WORKDIR /myapp
 
 ADD package.json package-lock.json tsconfig.json ./
-RUN npm install --production=false
+
+ENV NODE_ENV development
+RUN npm install
+
+# Workaround for Error: Cannot find module @rollup/rollup-linux-arm64-gnu.
+ARG TARGETPLATFORM
+RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; then npm install --no-save @rollup/rollup-linux-arm64-gnu; fi
 
 # Setup production node_modules
 FROM base as production-deps
 
 WORKDIR /myapp
 
+RUN apt update && apt install -y curl && \
+    curl -sf https://gobinaries.com/tj/node-prune | sh
+
 COPY --from=deps /myapp/node_modules /myapp/node_modules
 ADD package.json package-lock.json ./
-RUN npm prune --production 
+RUN npm prune --production && node-prune
 
 # Build the app
-ENV HADDOCK3_WEBAPP_PREFIX=${HADDOCK3_WEBAPP_PREFIX}
+ENV HADDOCK3WEBAPP_PREFIX=${HADDOCK3WEBAPP_PREFIX}
 FROM base as build
 
 WORKDIR /myapp

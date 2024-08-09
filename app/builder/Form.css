@@ -254,7 +254,7 @@ Btn classes are copied from app/components/ui/button.tsx
 
 .workflow-builder-app .page {
   display: grid;
-  grid-template-columns: 9rem minmax(16rem, 1fr) 3fr;
+  grid-template-columns: 9rem minmax(20rem, 1fr) 3fr;
   gap: 1rem;
 }
 
@@ -435,4 +435,8 @@ code .table {
   padding: 0.5rem 0.75rem;
   color: hsl(var(--foregrond, #212529));
   background-color: hsl(var(--background, #fff));
+}
+
+.workflow-builder-app .d-none {
+  display: none;
 }

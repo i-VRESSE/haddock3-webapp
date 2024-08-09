@@ -3,10 +3,15 @@ import { useActionData, useSubmit, useNavigate, json } from "@remix-run/react";
 import {
   object,
   instance,
-  Output,
+  InferOutput,
   optional,
   minSize,
   ValiError,
+  pipe,
+  integer,
+  minValue,
+  string,
+  transform,
 } from "valibot";
 import JSZip from "jszip";
 import { LoaderFunctionArgs } from "@remix-run/node";
@@ -14,14 +19,8 @@ import { LoaderFunctionArgs } from "@remix-run/node";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
-import { FormDescription } from "~/scenarios/FormDescription";
-import { FormItem } from "~/scenarios/FormItem";
-import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
 import { action as uploadaction } from "./upload";
-import {
-  ActPassSelection,
-  MoleculeSubForm,
-} from "~/scenarios/MoleculeSubForm.client";
+import { ActPassSelection, countSelected } from "~/scenarios/ActPassSelection";
 import { ClientOnly } from "~/components/ClientOnly";
 import { mustBeAllowedToSubmit } from "~/auth.server";
 import {
@@ -29,6 +28,8 @@ import {
   generateUnAmbiguousRestraintsFile,
 } from "../scenarios/restraints";
 import { FormErrors } from "../scenarios/FormErrors";
+import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
+import { MacroMoleculeSubForm } from "~/scenarios/MacroMoleculeSubForm.client";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -41,16 +42,32 @@ const Schema = object({
   // TODO check content of pdb files are valid
   protein1: instance(File, "First protein structure as PDB file"),
   protein2: instance(File, "Second protein structure as PDB file"),
-  ambig_fname: instance(File, "Ambiguous restraints as TBL file", [
+  nrSelectedProtein1Residues: pipe(
+    string(),
+    transform(Number),
+    integer(),
+    minValue(1, "At least one residue must be selected for the first protein."),
+  ),
+  nrSelectedProtein2Residues: pipe(
+    string(),
+    transform(Number),
+    integer(),
+    minValue(
+      1,
+      "At least one residue must be selected for the second protein.",
+    ),
+  ),
+  ambig_fname: pipe(
+    instance(File, "Ambiguous restraints as TBL file"),
     minSize(
       1,
       "Ambiguous restraints file should not be empty. Please select residues.",
     ),
-  ]),
+  ),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
   reference_fname: optional(instance(File, "Reference structure as PDB file")),
 });
-type Schema = Output<typeof Schema>;
+type Schema = InferOutput<typeof Schema>;
 
 function generateWorkflow(data: Schema) {
   // Workflow based on
@@ -175,6 +192,9 @@ export default function ProteinProteinScenario() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
+    formData.set("nrSelectedProtein1Residues", countSelected(protein1ActPass));
+    formData.set("nrSelectedProtein2Residues", countSelected(protein2ActPass));
+
     const ambig_fname = await generateAmbiguousRestraintsFile(
       protein1ActPass,
       protein2ActPass,
@@ -231,7 +251,7 @@ export default function ProteinProteinScenario() {
         {() => (
           <form onSubmit={onSubmit}>
             <div className="grid grid-cols-2 gap-6">
-              <MoleculeSubForm
+              <MacroMoleculeSubForm
                 name="protein1"
                 legend="First protein"
                 description="In example named data/e2a-hpr_1GGR.pdb"
@@ -239,7 +259,7 @@ export default function ProteinProteinScenario() {
                 onActPassChange={setProtein1ActPass}
                 targetChain="A"
               />
-              <MoleculeSubForm
+              <MacroMoleculeSubForm
                 name="protein2"
                 legend="Second protein"
                 description="In example named data/hpr_ensemble.pdb"
@@ -248,12 +268,9 @@ export default function ProteinProteinScenario() {
                 targetChain="B"
               />
             </div>
-            <FormItem name="reference_fname" label="Reference structure">
-              <PDBFileInput name="reference_fname" />
-              <FormDescription>
-                In example named data/e2a-hpr_1GGR.pdb
-              </FormDescription>
-            </FormItem>
+            <ReferenceStructureInput>
+              In example named data/e2a-hpr_1GGR.pdb
+            </ReferenceStructureInput>
             <FormErrors errors={errors} />
             <ActionButtons />
           </form>

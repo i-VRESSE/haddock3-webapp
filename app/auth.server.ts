@@ -1,11 +1,13 @@
 import { Authenticator, type StrategyVerifyCallback } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
+import { GitHubEmails, GitHubStrategy } from "remix-auth-github";
 import {
   type OAuth2Profile,
   OAuth2Strategy,
   type OAuth2StrategyVerifyParams,
 } from "remix-auth-oauth2";
 import { json } from "@remix-run/node";
+import { email, object, parse, string, pipe } from "valibot";
 
 import { sessionStorage } from "./session.server";
 import {
@@ -14,17 +16,26 @@ import {
   isSubmitAllowed,
   localLogin,
   oauthregister,
+  User,
+  portalregister,
+  UserNotFoundError,
+  setPreferredExpertiseLevel,
 } from "./models/user.server";
-import { email, object, parse, string } from "valibot";
+import {
+  CsbUser,
+  getOptionalPortalUser,
+  inPortalMode,
+  mapPermissions,
+} from "./portal.server";
 
 // Create an instance of the authenticator, pass a generic with what
 // strategies will return and will store in the session
-export const authenticator = new Authenticator<string>(sessionStorage, {
+export const authenticator = new Authenticator<number>(sessionStorage, {
   throwOnError: true,
 });
 
 const CredentialsSchema = object({
-  email: string([email()]),
+  email: pipe(string(), email()),
   password: string(),
 });
 
@@ -41,63 +52,61 @@ authenticator.use(
   "user-pass",
 );
 
-// remix-auth-github is not compatible with the remix v2
-// TODO uncomment when it is fixed
-// /**
-//  * The super class GitHubStrategy returns emails that are not verified.
-//  * This subclass filters out unverified emails.
-//  */
-// class GitHubStrategyWithVerifiedEmail extends GitHubStrategy<string> {
-//   // From https://github.com/sergiodxa/remix-auth-github/blob/75cedd281b58523c5d3db5f7bbe92218cb733c46/src/index.ts#L197
-//   protected async userEmails(accessToken: string): Promise<GitHubEmails> {
-//     // url & agent are private to super class so we have to copy them here
-//     const userEmailsURL = "https://api.github.com/user/emails";
-//     const userAgent = "Haddock3WebApp";
-//     const response = await fetch(userEmailsURL, {
-//       headers: {
-//         Accept: "application/vnd.github.v3+json",
-//         Authorization: `token ${accessToken}`,
-//         "User-Agent": userAgent,
-//       },
-//     });
+/**
+ * The super class GitHubStrategy returns emails that are not verified.
+ * This subclass filters out unverified emails.
+ */
+class GitHubStrategyWithVerifiedEmail extends GitHubStrategy<number> {
+  // From https://github.com/sergiodxa/remix-auth-github/blob/75cedd281b58523c5d3db5f7bbe92218cb733c46/src/index.ts#L197
+  protected async userEmails(accessToken: string): Promise<GitHubEmails> {
+    // url & agent are private to super class so we have to copy them here
+    const userEmailsURL = "https://api.github.com/user/emails";
+    const userAgent = "Haddock3WebApp";
+    const response = await fetch(userEmailsURL, {
+      headers: {
+        Accept: "application/vnd.github.v3+json",
+        Authorization: `token ${accessToken}`,
+        "User-Agent": userAgent,
+      },
+    });
 
-//     const data: {
-//       email: string;
-//       verified: boolean;
-//       primary: boolean;
-//       visibility: string;
-//     }[] = await response.json();
-//     const emails: GitHubEmails = data
-//       .filter((e) => e.verified)
-//       .map(({ email }) => ({ value: email }));
-//     return emails;
-//   }
-// }
+    const data: {
+      email: string;
+      verified: boolean;
+      primary: boolean;
+      visibility: string;
+    }[] = await response.json();
+    const emails: GitHubEmails = data
+      .filter((e) => e.verified)
+      .map(({ email }) => ({ value: email }));
+    return emails;
+  }
+}
 
-// if (
-//   process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID &&
-//   process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET
-// ) {
-//   const gitHubStrategy = new GitHubStrategyWithVerifiedEmail(
-//     {
-//       clientID: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID,
-//       clientSecret: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET,
-//       callbackURL:
-//         process.env.HADDOCK3WEBAPP_GITHUB_CALLBACK_URL ||
-//         "http://localhost:3000/auth/github/callback",
-//       userAgent: "Haddock3WebApp",
-//     },
-//     async ({ profile }) => {
-//       // TODO store users display name in database for more personal greeting
-//       const primaryEmail = profile.emails[0].value;
-//       const photo = profile.photos[0].value ?? undefined;
-//       const userId = await oauthregister(primaryEmail, photo);
-//       return userId;
-//     }
-//   );
+if (
+  process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID &&
+  process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET
+) {
+  const gitHubStrategy = new GitHubStrategyWithVerifiedEmail(
+    {
+      clientID: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID,
+      clientSecret: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET,
+      callbackURL:
+        process.env.HADDOCK3WEBAPP_GITHUB_CALLBACK_URL ||
+        "http://localhost:3000/auth/github/callback",
+      userAgent: "Haddock3WebApp",
+    },
+    async ({ profile }) => {
+      // TODO store users display name in database for more personal greeting
+      const primaryEmail = profile.emails[0].value;
+      const photo = profile.photos[0].value ?? undefined;
+      const userId = await oauthregister(primaryEmail, photo);
+      return userId;
+    },
+  );
 
-//   authenticator.use(gitHubStrategy);
-// }
+  authenticator.use(gitHubStrategy);
+}
 
 if (
   process.env.HADDOCK3WEBAPP_ORCID_CLIENT_ID &&
@@ -167,7 +176,9 @@ if (
       const headers = {
         Authorization: `Bearer ${accessToken}`,
       };
-      const profileResponse = await fetch(this.profileEndpoint, { headers });
+      const profileResponse = await fetch(this.profileEndpoint, {
+        headers,
+      });
       const profile = await profileResponse.json();
       const emails = await this.userEmails(profile.sub);
       // TODO store Orcid id into database
@@ -198,15 +209,60 @@ if (
   authenticator.use(orcidStrategy);
 }
 
-export async function mustBeAuthenticated(request: Request) {
-  const userId = await authenticator.isAuthenticated(request);
-  if (userId === null) {
-    throw json({ error: "Unauthorized" }, { status: 401 });
+if (inPortalMode) {
+  // Disable all strategies in portal mode
+  // portal mode bypasses the authenticator
+  authenticator.unuse("user-pass");
+  authenticator.unuse("egi");
+  authenticator.unuse("github");
+  authenticator.unuse("orcid");
+}
+
+async function mergeUser(csbUser: CsbUser, webappUser: User): Promise<User> {
+  const { isAdmin, expertiseLevels, preferredExpertiseLevel } = mapPermissions(
+    csbUser.permissions,
+  );
+  const user = {
+    ...webappUser,
+    id: csbUser.id,
+    email: csbUser.email,
+    isAdmin,
+    expertiseLevels,
+  };
+  if (!user.preferredExpertiseLevel && preferredExpertiseLevel) {
+    user.preferredExpertiseLevel = preferredExpertiseLevel;
   }
-  return userId;
+  if (
+    user.preferredExpertiseLevel !== null &&
+    !expertiseLevels.includes(user.preferredExpertiseLevel)
+  ) {
+    // If user no longer has the level they prefer then pick one from available levels
+    await setPreferredExpertiseLevel(user.id, preferredExpertiseLevel);
+    user.preferredExpertiseLevel = preferredExpertiseLevel;
+  }
+  return user;
 }
 
 export async function getOptionalUser(request: Request) {
+  if (inPortalMode) {
+    const csbUser = await getOptionalPortalUser(request);
+    if (!csbUser) {
+      return null;
+    }
+    if (csbUser.suspended) {
+      throw json({ error: "Suspended" }, { status: 403 });
+    }
+    try {
+      const webappUser = await getUserById(csbUser.id);
+      return await mergeUser(csbUser, webappUser);
+    } catch (error) {
+      if (error instanceof UserNotFoundError) {
+        // New user from the portal sync them with the webapp
+        const webappUser = await portalregister(csbUser.id, csbUser.email);
+        return await mergeUser(csbUser, webappUser);
+      }
+    }
+  }
   const userId = await authenticator.isAuthenticated(request);
   if (userId === null) {
     return null;

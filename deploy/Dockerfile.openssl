@@ -4,7 +4,7 @@
 FROM alpine:3.19
 LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/Dockerfile.openssl
 LABEL org.opencontainers.image.licenses=Apache-2.0
-LABEL org.opencontainers.image.description="Generates a rsa private/public key pair on startup"
+LABEL org.opencontainers.image.description="Generates a rsa private key (/certs/private_key.pem file) and public key (/certs/public_key.pem file) pair on startup."
 
 RUN apk add --no-cache openssl
 
