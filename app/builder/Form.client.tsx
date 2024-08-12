@@ -32,14 +32,6 @@ const App = () => {
   const { loadWorkflowArchive } = useWorkflow();
   const { loading } = useIndexedDb({ activeCatalogTitle: activeCatalog.title });
 
-  // console.group("App")
-  // console.log("archive...", archive)
-  // console.log("activeCatalog...", activeCatalog)
-  // console.log("catalog...", catalog)
-  // console.log("loading...", loading)
-  // console.log("useSaveOnLeave...", route)
-  // console.groupEnd()
-
   useEffect(() => {
     // On mount configure catalog
     setCatalog(prepareCatalog(catalog));
