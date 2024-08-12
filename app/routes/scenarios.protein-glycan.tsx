@@ -16,7 +16,10 @@ import {
 import JSZip from "jszip";
 import { LoaderFunctionArgs } from "@remix-run/node";
 
-import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
+import {
+  JOB_OUTPUT_DIR,
+  WORKFLOW_CONFIG_FILENAME,
+} from "~/bartender-client/constants";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
 import { action as uploadaction } from "./upload";
@@ -83,20 +86,7 @@ function generateWorkflow(data: Schema) {
 #
 # ==================================================
 
-run_dir = "run1-full"
-
-# execution mode
-# for running locally uncomment the next two lines 
-# and comment the lines under the HPC execution
-#mode = "local"
-#ncores = 40
-
-# BATCH/HPC EXECUTION
-mode = "batch"
-# concatenate models inside each job
-concat = 5
-#  Limit the number of concurrent submissions to the queue
-queue_limit = 100
+run_dir = "${JOB_OUTPUT_DIR}"
 
 # molecules to be docked
 molecules = [

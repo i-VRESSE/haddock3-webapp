@@ -16,7 +16,10 @@ import {
 import JSZip from "jszip";
 import { LoaderFunctionArgs } from "@remix-run/node";
 
-import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
+import {
+  JOB_OUTPUT_DIR,
+  WORKFLOW_CONFIG_FILENAME,
+} from "~/bartender-client/constants";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
 import { action as uploadaction } from "./upload";
@@ -82,17 +85,7 @@ function generateWorkflow(data: Schema) {
 # protein-DNA docking example
 
 # directory in which the scoring will be done
-run_dir = "run1-full"
-
-# execution mode
-mode = "batch"
-# in which queue the jobs should run, if nothing is defined
-#  it will take the system's default
-# queue = "short"
-# concatenate models inside each job, concat = 5 each .job will produce 5 models
-concat = 5
-#  Limit the number of concurrent submissions to the queue
-queue_limit = 100
+run_dir = "${JOB_OUTPUT_DIR}"
 
 # molecules to be docked
 molecules =  [
