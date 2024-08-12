@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
+import { prefix } from "~/prefix";
 
 const LoggedInButton = () => {
   const user = useUser();
@@ -22,7 +23,11 @@ const LoggedInButton = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {/* TODO button is not vertically centered */}
-        <Button variant="outline" size="icon" className="rounded-full">
+        <Button
+          variant="outline"
+          size="icon"
+          className="rounded-full overflow-hidden"
+        >
           <img alt="gravatar" src={user.photo} className="dark:invert" />
         </Button>
       </DropdownMenuTrigger>
@@ -43,11 +48,17 @@ const LoggedInButton = () => {
   );
 };
 
-const LoginButton = () => (
-  <Link className={navigationMenuTriggerStyle()} to="/login">
-    Login
-  </Link>
-);
+const LoginButton = () => {
+  const { pathname } = useLocation();
+  return (
+    <Link
+      className={navigationMenuTriggerStyle()}
+      to={`/login?redirect_uri=${prefix}${pathname.slice(1)}`}
+    >
+      Login
+    </Link>
+  );
+};
 
 function MyNavLink({
   to,
@@ -69,6 +80,21 @@ function MyNavLink({
   );
 }
 
+export function MenuList() {
+  return (
+    <NavigationMenu className="">
+      <NavigationMenuList className="flex space-x-5">
+        <MyNavLink to="/scenarios">Scenario</MyNavLink>
+        <MyNavLink to="/builder">Builder</MyNavLink>
+        <MyNavLink to="/upload">Upload</MyNavLink>
+        <MyNavLink to="/jobs">Manage</MyNavLink>
+        <MyNavLink to="/about">About</MyNavLink>
+        <MyNavLink to="/help">Help</MyNavLink>
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+
 export const Navbar = () => {
   const loggedIn = useIsLoggedIn();
 
@@ -79,16 +105,7 @@ export const Navbar = () => {
           Haddock3
         </NavLink>
       </div>
-      <NavigationMenu className="">
-        <NavigationMenuList className="flex space-x-5">
-          <MyNavLink to="/builder">Builder</MyNavLink>
-          <MyNavLink to="/scenarios">Scenario</MyNavLink>
-          <MyNavLink to="/upload">Upload</MyNavLink>
-          <MyNavLink to="/jobs">Manage</MyNavLink>
-          <MyNavLink to="/about">About</MyNavLink>
-          <MyNavLink to="/help">Help</MyNavLink>
-        </NavigationMenuList>
-      </NavigationMenu>
+      <MenuList />
       <div className="ml-auto">
         {loggedIn ? <LoggedInButton /> : <LoginButton />}
       </div>

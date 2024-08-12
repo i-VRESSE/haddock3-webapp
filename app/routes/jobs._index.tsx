@@ -5,6 +5,7 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
@@ -18,11 +19,13 @@ import {
   PencilIcon,
 } from "lucide-react";
 import { PropsWithChildren, useState } from "react";
+import { useTheme } from "remix-themes";
 
 import { getBartenderToken } from "~/bartender-client/token.server";
 import { JobModelDTO } from "~/bartender-client/types";
 import { DataTablePagination } from "~/components/DataTablePagination";
 import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import {
   Table,
   TableBody,
@@ -35,9 +38,25 @@ import { cn } from "~/lib/utils";
 import { getJobs } from "~/models/job.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const token = await getBartenderToken(request);
-  const jobs = await getJobs(token);
-  return json({ jobs });
+  try {
+    const token = await getBartenderToken(request);
+    const jobs = await getJobs(token);
+    return json({
+      jobs: (jobs as JobModelDTO[]) ?? ([] as JobModelDTO[]),
+      error: null,
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (resp: any) {
+    // authentication errors are handled by error boundary
+    if ([401, 403].includes(resp.status)) {
+      throw resp;
+    } else {
+      return json({
+        jobs: [] as JobModelDTO[],
+        error: `${resp.status ?? 500} - ${resp.statusText ?? "Server error"}`,
+      });
+    }
+  }
 };
 
 const columnHelper = createColumnHelper<JobModelDTO>();
@@ -150,8 +169,11 @@ function DeleteAction({
 }
 
 export default function JobsPage() {
-  const { jobs } = useLoaderData<typeof loader>();
+  const { jobs, error } = useLoaderData<typeof loader>();
   const { submit, state: fetcherState } = useFetcher();
+  const [theme] = useTheme();
+  const colorScheme = { colorScheme: theme === "dark" ? "dark" : "light" };
+
   const columns = [
     columnHelper.accessor("id", {
       cell: ({ row }) => (
@@ -230,6 +252,7 @@ export default function JobsPage() {
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
     },
@@ -242,6 +265,19 @@ export default function JobsPage() {
 
   return (
     <main>
+      <div className="flex items-center pb-4">
+        <Input
+          placeholder="Filter jobs by name..."
+          type="search"
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          onChange={({ target }) => {
+            // console.log("onChange...", target.value)
+            table.getColumn("name")?.setFilterValue(target.value);
+          }}
+          style={colorScheme}
+          className="max-w-sm"
+        />
+      </div>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -275,7 +311,13 @@ export default function JobsPage() {
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No jobs.
+                {error ? (
+                  <span className="text-error">
+                    Failed to load job list. {error}
+                  </span>
+                ) : (
+                  <span className="">No jobs</span>
+                )}
               </TableCell>
             </TableRow>
           )}

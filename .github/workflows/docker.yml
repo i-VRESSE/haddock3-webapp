@@ -1,0 +1,163 @@
+name: Deployment images
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+  pull_request:
+  # TODO have way to rebuild bartender image when it and its deps have updated
+
+jobs:
+  bartender:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    env:
+      HADDOCK3_GHORG: "haddocking"
+      HADDOCK3_VERSION: "main"
+      BARTENDER_VERSION: "main"
+      GDOCK_VERSION: "main"
+      LIGHTDOCK_VERSION: "0.9.4"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/i-vresse/bartender
+          labels: |
+            org.opencontainers.image.description=bartender web service with haddock3, lightdock, gdock executables. Image does not contain real cns executable, downstream should bind or copy it to /opt/haddock3/bin/cns.
+            org.opencontainers.image.url=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/README.md#images
+            org.opencontainers.image.documentation.url=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/README.md#images
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: deploy
+          file: deploy/Dockerfile.bartenderhaddock3
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: ${{startsWith(steps.meta.outputs.version, 'pr-') && 'linux/amd64' || 'linux/arm64,linux/amd64' }}
+          build-args: |
+            HADDOCK3_VERSION=${{ env.HADDOCK3_VERSION }}
+            HADDOCK3_GHORG=${{ env.HADDOCK3_GHORG }}
+            BARTENDER_VERSION=${{ env.BARTENDER_VERSION }}
+            GDOCK_VERSION=${{ env.GDOCK_VERSION }}
+            LIGHTDOCK_VERSION=${{ env.LIGHTDOCK_VERSION }}
+  certmaker:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/i-vresse/certmaker
+          labels: |
+            org.opencontainers.image.description=Generates a rsa private key (/certs/private_key.pem file) and public key (/certs/public_key.pem file) pair on startup.
+            org.opencontainers.image.url=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/README.md#images
+            org.opencontainers.image.documentation.url=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/README.md#images
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: deploy
+          file: deploy/Dockerfile.openssl
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: ${{startsWith(steps.meta.outputs.version, 'pr-') && 'linux/amd64' || 'linux/arm64,linux/amd64' }}
+  webapp:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/i-vresse/haddock3-webapp
+          labels: |
+            org.opencontainers.image.description=Haddock3 web application image.
+            org.opencontainers.image.url=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/README.md#images
+            org.opencontainers.image.documentation.url=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/README.md#images
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          file: deploy/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: ${{startsWith(steps.meta.outputs.version, 'pr-') && 'linux/amd64' || 'linux/arm64,linux/amd64' }}
+  playwright:
+    needs:
+      - bartender
+      - certmaker
+      - webapp
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Fake cns
+        run: cp /usr/bin/uptime deploy/cns
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/i-vresse/haddock3-webapp
+      - name: Pull images
+        run: docker compose -f deploy/arq/docker-compose.yml -p playwright pull
+        env:
+          WEBAPP_TAG: ${{ steps.meta.outputs.version }}
+          BARTENDER_TAG: ${{ steps.meta.outputs.version }}
+          CERTMAKER_TAG: ${{ steps.meta.outputs.version }}
+      - name: Run Playwright tests
+        run: npx playwright test
+        env:
+          WEBAPP_TAG: ${{ steps.meta.outputs.version }}
+          BARTENDER_TAG: ${{ steps.meta.outputs.version }}
+          CERTMAKER_TAG: ${{ steps.meta.outputs.version }}

@@ -18,11 +18,21 @@ const scenarios: Scenario[] = [
     title: "Protein Protein",
     description: "Based on HADDOCK2.4 Protein Protein docking tutorial",
   },
-  // TODO add protein-dna see https://www.bonvinlab.org/education/HADDOCK24/HADDOCK24-protein-DNA-basic
-  // should render nulceotides in residue sub form
-  // should be preprocesed like in tutorial
-  // TODO add protein-ligand see https://www.bonvinlab.org/education/HADDOCK24/HADDOCK24-binding-sites
-  // TODO add protein-shape see https://www.bonvinlab.org/education/HADDOCK24/shape-small-molecule
+  {
+    url: "/scenarios/protein-dna",
+    title: "Protein DNA/RNA",
+    description: "Based on HADDOCK2.4 Protein DNA docking tutorial",
+  },
+  {
+    url: "/scenarios/protein-ligand",
+    title: "Protein Ligand",
+    description: "Based on HADDOCK2.4 Protein Small Molecule docking tutorial",
+  },
+  {
+    url: "/scenarios/protein-glycan",
+    title: "Protein Glycan",
+    description: "Based on HADDOCK3 Protein Glycan docking example",
+  },
 ];
 
 function ScenarioCard({ url, title, description }: Scenario) {

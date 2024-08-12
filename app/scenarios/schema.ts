@@ -1,6 +1,6 @@
-import { BaseSchema, parse } from "valibot";
+import { GenericSchema, parse } from "valibot";
 
-export function parseFormData<T extends BaseSchema>(
+export function parseFormData<T extends GenericSchema>(
   formData: FormData,
   schema: T,
 ) {

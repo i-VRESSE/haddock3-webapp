@@ -1,0 +1,31 @@
+name: Docker Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const issue_number = context.payload.pull_request?.number;
+            const package_version_id = `pr-${issue_number}`;
+            const images = [
+              `haddock3-webapp`,
+              `bartender`,
+              `certmaker`
+            ];
+            let message = 'Please delete the images belonging to this Pull Request as they are no longer useful.\n\n';
+            for (const image of images) {
+              message += `- [ghcr.io/i-vresse/${image}](https://github.com/i-VRESSE/haddock3-webapp/pkgs/container/${image}/versions)\n`;
+            }
+            message += `\nGoto versions page of each image, find version called ${package_version_id}, filter on tagged versions by clicking "N tagged" button in table header, click on **...** button and select **Delete version**.\n`;
+            await github.rest.issues.createComment({
+              issue_number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });

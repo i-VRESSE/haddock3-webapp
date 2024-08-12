@@ -1,7 +1,9 @@
 import { Link } from "@remix-run/react";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
+import { useInPortalMode } from "~/portal";
 
 export default function Help() {
+  const inPortalModel = useInPortalMode();
   return (
     <main>
       <h1 className="py-4 text-2xl">Help</h1>
@@ -49,25 +51,39 @@ export default function Help() {
         User
       </h2>
 
-      <p className="py-2">
-        When you have not logged in before you can login on the{" "}
-        <Link to="/login" className="underline">
-          login page
-        </Link>{" "}
-        with your socials like{" "}
-        <a href="https://aai.egi.eu/" className="underline">
-          EGI Check-in account
-        </a>{" "}
-        or{" "}
-        <a href="https://orcid.org" className="underline">
-          Orcid account
-        </a>{" "}
-        or register a new account on the{" "}
-        <Link to="/register" className="underline">
-          register page
-        </Link>
-        . After registration you will be logged in immediatly.
-      </p>
+      {inPortalModel ? (
+        <p className="py-2">
+          When you have not logged in before you can login on the{" "}
+          <a href="/new/login" className="underline">
+            login page
+          </a>{" "}
+          or register a new account on the{" "}
+          <a href="/new/registration" className="underline">
+            register page
+          </a>
+          .
+        </p>
+      ) : (
+        <p className="py-2">
+          When you have not logged in before you can login on the{" "}
+          <Link to="/login" className="underline">
+            login page
+          </Link>{" "}
+          with your socials like{" "}
+          <a href="https://aai.egi.eu/" className="underline">
+            EGI Check-in account
+          </a>{" "}
+          or{" "}
+          <a href="https://orcid.org" className="underline">
+            Orcid account
+          </a>{" "}
+          or register a new account on the{" "}
+          <Link to="/register" className="underline">
+            register page
+          </Link>
+          . After registration you will be logged in immediately.
+        </p>
+      )}
 
       <p className="py-2">
         To submit a job you need to be logged in and have an expertise level
@@ -190,7 +206,7 @@ export default function Help() {
         You can refresh the page to see the current status of the job.
       </p>
 
-      <p>
+      <div>
         A job goes through the following states:
         <ul className="list-inside list-disc">
           <li>
@@ -209,7 +225,7 @@ export default function Help() {
             hints why it errored.
           </li>
         </ul>
-      </p>
+      </div>
 
       <p className="py-2">
         If you want to see all the jobs you submitted, you can go to the{" "}
@@ -263,7 +279,7 @@ export default function Help() {
         report page is unavailable.
       </p>
 
-      <p className="py-2">
+      <div className="py-2">
         The browse page has 4 columns:
         <ul className="list-inside list-disc">
           <li>Job info - like its id, when it ran and logs.</li>
@@ -295,7 +311,7 @@ export default function Help() {
             module.
           </li>
         </ul>
-      </p>
+      </div>
     </main>
   );
 }

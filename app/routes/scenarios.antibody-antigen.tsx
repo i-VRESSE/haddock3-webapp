@@ -2,33 +2,35 @@ import { useState } from "react";
 import { json, useActionData, useNavigate, useSubmit } from "@remix-run/react";
 import JSZip from "jszip";
 import {
-  Output,
+  InferOutput,
   ValiError,
   instance,
+  integer,
   minSize,
+  minValue,
   object,
   optional,
+  pipe,
+  string,
+  transform,
 } from "valibot";
 import { LoaderFunctionArgs } from "@remix-run/node";
 
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import { action as uploadaction } from "./upload";
-import { FormItem } from "../scenarios/FormItem";
-import { FormDescription } from "../scenarios/FormDescription";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
 import { mustBeAllowedToSubmit } from "~/auth.server";
 import { ClientOnly } from "~/components/ClientOnly";
-import {
-  ActPassSelection,
-  MoleculeSubForm,
-} from "~/scenarios/MoleculeSubForm.client";
-import { PDBFileInput } from "~/scenarios/PDBFileInput.client";
+
+import { ActPassSelection, countSelected } from "~/scenarios/ActPassSelection";
 import {
   generateAmbiguousRestraintsFile,
   generateUnAmbiguousRestraintsFile,
 } from "~/scenarios/restraints";
 import { FormErrors } from "~/scenarios/FormErrors";
+import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
+import { MacroMoleculeSubForm } from "~/scenarios/MacroMoleculeSubForm.client";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -38,20 +40,31 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = uploadaction;
 
 const Schema = object({
-  antibody: instance(File, "Antibody structure as PDB file", []),
-  antigen: instance(File, "Antibody structure as PDB file", []),
-  ambig_fname: instance(File, "Ambiguous restraints as TBL file", [
+  antibody: instance(File, "Antibody structure as PDB file"),
+  antigen: instance(File, "Antibody structure as PDB file"),
+  ambig_fname: pipe(
+    instance(File, "Ambiguous restraints as TBL file"),
     minSize(
       1,
       "Ambiguous restraints file should not be empty. Please select some residues.",
     ),
-  ]),
+  ),
   unambig_fname: optional(instance(File, "Unambiguous restraints as TBL file")),
-  reference_fname: optional(
-    instance(File, "Reference structure as PDB file", []),
+  reference_fname: optional(instance(File, "Reference structure as PDB file")),
+  nrSelectedAntibodyResidues: pipe(
+    string(),
+    transform(Number),
+    integer(),
+    minValue(1, "At least one residue must be selected for the antibody."),
+  ),
+  nrSelectedAntigenResidues: pipe(
+    string(),
+    transform(Number),
+    integer(),
+    minValue(1, "At least one residue must be selected for the antigen."),
   ),
 });
-type Schema = Output<typeof Schema>;
+type Schema = InferOutput<typeof Schema>;
 
 function generateWorkflow(data: Schema) {
   // create workflow.cfg with form data as values for filename fields
@@ -199,6 +212,9 @@ export default function AntibodyAntigenScenario() {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
+    formData.set("nrSelectedAntibodyResidues", countSelected(antibodyActPass));
+    formData.set("nrSelectedAntigenResidues", countSelected(antigenActPass));
+
     const ambig_fname = await generateAmbiguousRestraintsFile(
       antibodyActPass,
       antigenActPass,
@@ -247,7 +263,7 @@ export default function AntibodyAntigenScenario() {
           <form onSubmit={onSubmit}>
             <div className="grid grid-cols-2 gap-6">
               {/* TODO nice to have, color residues that are in Complementarity-determining regions (CDRs) */}
-              <MoleculeSubForm
+              <MacroMoleculeSubForm
                 name="antibody"
                 legend="Antibody"
                 description="In tutorial named pdbs/4G6K_clean.pdb"
@@ -258,7 +274,7 @@ export default function AntibodyAntigenScenario() {
                 accessibilityCutoff={0.15}
               />
               <div>
-                <MoleculeSubForm
+                <MacroMoleculeSubForm
                   name="antigen"
                   legend="Antigen"
                   description="In tutorial named pdbs/4I1B_clean.pdb"
@@ -274,12 +290,9 @@ export default function AntibodyAntigenScenario() {
               {/* either using the NMR identified residues as active in HADDOCK, 
             or combining those with the surface neighbors and use this combination as passive only. */}
             </div>
-            <FormItem name="reference_fname" label="Reference structure">
-              <PDBFileInput name="reference_fname" />
-              <FormDescription>
-                In tutorial named pdbs/4G6M_matched.pdb
-              </FormDescription>
-            </FormItem>
+            <ReferenceStructureInput>
+              In tutorial named pdbs/4G6M_matched.pdb
+            </ReferenceStructureInput>
             <FormErrors errors={errors} />
             <ActionButtons />
           </form>

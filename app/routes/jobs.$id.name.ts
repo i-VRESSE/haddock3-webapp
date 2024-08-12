@@ -6,12 +6,13 @@ import {
   object,
   safeParse,
   string,
+  pipe,
 } from "valibot";
 import { getBartenderToken } from "~/bartender-client/token.server";
 import { jobIdFromParams, updateJobName } from "~/models/job.server";
 
 export const Schema = object({
-  name: string([minLength(1), maxLength(200)]),
+  name: pipe(string(), minLength(1), maxLength(200)),
 });
 
 export async function action({ request, params }: ActionFunctionArgs) {

@@ -27,6 +27,7 @@ import {
   optional,
   picklist,
   parse as valibotParse,
+  pipe,
 } from "valibot";
 import { NodeOnDiskFile } from "@remix-run/node";
 
@@ -36,12 +37,13 @@ export async function submitJob(
   expertiseLevels: ExpertiseLevel[],
 ) {
   const Schema = object({
-    upload: instance(NodeOnDiskFile, [
+    upload: pipe(
+      instance(NodeOnDiskFile),
       mimeType(
         ["application/zip", "application/x-zip-compressed"],
         "Please upload a zip file",
       ),
-    ]),
+    ),
     kind: optional(picklist(["run", "workflow"]), "workflow"),
   });
   const obj = Object.fromEntries(rawFormData.entries());
@@ -125,6 +127,7 @@ function rewriteConfig(table: ReturnType<typeof parse>) {
   table.postprocess = true;
   table.clean = true;
   table.offline = false;
+  table.less_io = true;
 
   const haddock3_ncores = getNCores();
   if (haddock3_ncores > 0) {
@@ -201,7 +204,9 @@ export async function rewriteConfigInArchive(
     await zip.loadAsync(await upload.arrayBuffer());
   } catch (e) {
     if (e instanceof Error) {
-      throw new InvalidUploadError(`Unable to read archive`, { cause: e });
+      throw new InvalidUploadError(`Unable to read archive`, {
+        cause: e,
+      });
     }
     throw e;
   }

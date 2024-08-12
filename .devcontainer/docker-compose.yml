@@ -52,15 +52,16 @@ services:
     build:
       context: ../deploy
       dockerfile: ./Dockerfile.bartenderhaddock3
-      args:
-        HADDOCK3_VERSION: web-service
-        HADDOCK3_GHORG: i-VRESSE
     restart: always
     command: sh -c '/wait && alembic upgrade head && bartender serve'
     volumes:
       - type: bind
         source: ../deploy/arq/bartender-config.yaml
         target: /opt/bartender/config.yaml
+      - type: bind
+        source: ../deploy/cns
+        target: /opt/haddock3/bin/cns
+        read_only: true
       - bartender-certs:/certs:ro
       - bartender-job-data:/jobs
     depends_on:
@@ -104,15 +105,16 @@ services:
     build:
       context: ../deploy
       dockerfile: ./Dockerfile.bartenderhaddock3
-      args:
-        HADDOCK3_VERSION: web-service
-        HADDOCK3_GHORG: i-VRESSE
     restart: always
     command: sh -c 'bartender perform'
     volumes:
       - type: bind
         source: ../deploy/arq/bartender-config.yaml
         target: /opt/bartender/config.yaml
+      - type: bind
+        source: ../deploy/cns
+        target: /opt/haddock3/bin/cns
+        read_only: true
       - bartender-job-data:/jobs
     depends_on:
       redis:
@@ -133,9 +135,6 @@ services:
     build:
       context: ../deploy
       dockerfile: ./Dockerfile.bartenderhaddock3
-      args:
-        HADDOCK3_VERSION: web-service
-        HADDOCK3_GHORG: i-VRESSE
     restart: always
     command: sh -c 'uvicorn --host 0.0.0.0 --port 5000 haddock.clis.restraints.webservice:app'
 

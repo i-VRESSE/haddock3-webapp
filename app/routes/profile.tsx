@@ -4,33 +4,36 @@ import {
   type LoaderFunctionArgs,
 } from "@remix-run/node";
 import { Form, Link, useSubmit } from "@remix-run/react";
-import { mustBeAuthenticated } from "~/auth.server";
+import { getUser } from "~/auth.server";
 import { useUser } from "~/auth";
 import {
   listExpertiseLevels,
   setPreferredExpertiseLevel,
 } from "~/models/user.server";
-import { enumType, object, safeParse } from "valibot";
+import { object, picklist, safeParse } from "valibot";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { useTheme, Theme } from "remix-themes";
+import { useInPortalMode } from "~/portal";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await mustBeAuthenticated(request);
+  await getUser(request);
   return json({});
 };
 
+const ActionSchema = object({
+  preferredExpertiseLevel: picklist(listExpertiseLevels()),
+});
+
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const userId = await mustBeAuthenticated(request);
+  const user = await getUser(request);
   const formData = await request.formData();
-  const ActionSchema = object({
-    preferredExpertiseLevel: enumType(listExpertiseLevels()),
-  });
   const result = safeParse(ActionSchema, Object.fromEntries(formData));
+
   if (result.success) {
     await setPreferredExpertiseLevel(
-      userId,
+      user.id,
       result.output.preferredExpertiseLevel,
     );
   } else {
@@ -43,6 +46,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function Page() {
   const user = useUser();
   const submit = useSubmit();
+  const inPortalModel = useInPortalMode();
   const handleChangePreferredExpertiseLevel = (
     event: React.ChangeEvent<HTMLFormElement>,
   ) => {
@@ -106,10 +110,14 @@ export default function Page() {
         </RadioGroup>
       </fieldset>
 
-      {/* TODO add change password form if user is not authenticated with a social login */}
-      <Button asChild variant="outline">
-        <Link to="/logout">Logout</Link>
-      </Button>
+      {!inPortalModel && (
+        <>
+          {/* TODO add change password form if user is not authenticated with a social login */}
+          <Button asChild variant="outline">
+            <Link to="/logout">Logout</Link>
+          </Button>
+        </>
+      )}
     </main>
   );
 }

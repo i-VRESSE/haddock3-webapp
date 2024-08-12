@@ -7,6 +7,7 @@ import {
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import { type FlatErrors, ValiError, flatten } from "valibot";
 import { availableSocialLogins } from "~/auth";
+import { disabledInPortalMode } from "~/portal.server";
 import { AuthorizationError } from "remix-auth";
 import { authenticator, getOptionalUser } from "~/auth.server";
 import { ErrorMessages } from "~/components/ErrorMessages";
@@ -16,6 +17,7 @@ import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  disabledInPortalMode();
   const user = await getOptionalUser(request);
   if (user) {
     return redirect("/");
@@ -25,13 +27,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
+  disabledInPortalMode();
   try {
+    const successRedirect =
+      new URL(request.url, "http://localhost").searchParams.get(
+        "redirect_uri",
+      ) ?? "/";
     return await authenticator.authenticate("user-pass", request, {
-      successRedirect: "/",
+      successRedirect,
     });
   } catch (error) {
     if (error instanceof AuthorizationError && error.cause) {
-      let errors: FlatErrors;
+      let errors: FlatErrors<undefined>;
       if (error.cause instanceof WrongPasswordError) {
         errors = {
           nested: { password: [error.message] },
@@ -41,7 +48,7 @@ export async function action({ request }: ActionFunctionArgs) {
           nested: { email: [error.message] },
         };
       } else if (error.cause instanceof ValiError) {
-        errors = flatten(error.cause);
+        errors = flatten(error.cause.issues);
       } else {
         throw error;
       }
@@ -53,7 +60,9 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function LoginPage() {
-  const actionData = useActionData<{ errors: FlatErrors } | undefined>();
+  const actionData = useActionData<
+    { errors: FlatErrors<undefined> } | undefined
+  >();
   const { socials } = useLoaderData<typeof loader>();
   // Shared style between login and register. Extract if we use it more often?
   const centeredColumn = "flex flex-col items-center gap-4";

@@ -9,7 +9,7 @@ import {
 } from "../bartender-client/constants";
 import { CompletedJobs, type DirectoryItem } from "~/bartender-client/types";
 import { BartenderError } from "./errors";
-import { type Output, parse, BaseSchema } from "valibot";
+import { type InferOutput, parse, GenericSchema } from "valibot";
 
 const BOOK_KEEPING_FILES = [
   "stderr.txt",
@@ -17,6 +17,11 @@ const BOOK_KEEPING_FILES = [
   "returncode",
   "workflow.cfg.orig",
 ];
+
+export const HADDOCK3WEBAPP_REFRESH_RATE_MS = process.env
+  .HADDOCK3WEBAPP_REFRESH_RATE_MS
+  ? parseInt(process.env.HADDOCK3WEBAPP_REFRESH_RATE_MS)
+  : 10000;
 
 export function jobIdFromParams(params: Params) {
   const jobId = params.id;
@@ -37,7 +42,7 @@ export async function getJobs(bartenderToken: string, limit = 100, offset = 0) {
     },
   });
   if (!response.ok || !data) {
-    throw response;
+    throw new Response(response.statusText, { status: response.status });
   }
   return data;
 }
@@ -52,7 +57,7 @@ export async function getJobById(jobid: number, bartenderToken: string) {
     },
   });
   if (!response.ok || !data) {
-    throw response;
+    throw new Response(response.statusText, { status: response.status });
   }
   return data;
 }
@@ -78,7 +83,7 @@ export async function deleteJob(jobid: number, bartenderToken: string) {
     },
   });
   if (!response.ok) {
-    throw response;
+    throw new Response(response.statusText, { status: response.status });
   }
 }
 
@@ -179,7 +184,7 @@ export async function listInputFiles(jobid: number, bartenderToken: string) {
     },
   });
   if (!response.ok || !data) {
-    throw response;
+    throw new Response(response.statusText, { status: response.status });
   }
   const nonInputFiles = new Set([...BOOK_KEEPING_FILES, JOB_OUTPUT_DIR]);
   // TODO instead of filtering here add exclude parameter to bartender endpoint.
@@ -323,7 +328,7 @@ export async function updateJobName(
     body: name,
   });
   if (!response.ok) {
-    throw response;
+    throw new Response(response.statusText, { status: response.status });
   }
 }
 
@@ -394,7 +399,7 @@ export async function fetchHtml({
   return await response.text();
 }
 
-export async function getParamsCfg<Schema extends BaseSchema>({
+export async function getParamsCfg<Schema extends GenericSchema>({
   jobid,
   moduleIndex,
   bartenderToken,
@@ -410,7 +415,7 @@ export async function getParamsCfg<Schema extends BaseSchema>({
   isInteractive: boolean;
   moduleName: string;
   schema: Schema;
-}): Promise<Output<Schema>> {
+}): Promise<InferOutput<Schema>> {
   const path = buildPath({
     moduleIndex,
     isInteractive,

@@ -11,7 +11,7 @@ export function FormItem({
 }: PropsWithChildren<{
   name: string;
   label: string;
-  errors?: FlatErrors;
+  errors?: FlatErrors<undefined>;
 }>) {
   return (
     <div>

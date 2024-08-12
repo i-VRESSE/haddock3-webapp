@@ -5,7 +5,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" serial PRIMARY KEY NOT NULL,
 	"created_at" timestamp(3) DEFAULT now() NOT NULL,
 	"updated_at" timestamp(3) DEFAULT now() NOT NULL,
 	"email" text NOT NULL,
