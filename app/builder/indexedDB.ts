@@ -1,21 +1,6 @@
 export const dbName = "haddock3";
 export const dbVersion = 2;
 
-export function deleteDatabase(dbName: string) {
-  // delete database
-  const delDB = indexedDB.deleteDatabase(dbName);
-
-  delDB.onerror = () => {
-    // debugger
-    console.error("Error deleting database."), event;
-  };
-
-  delDB.onsuccess = () => {
-    // debugger
-    console.log("Database deleted successfully");
-  };
-}
-
 type OpenDBProps = {
   dbName: string;
   dbVersion: number;
@@ -174,20 +159,4 @@ export function saveBuilderData({
       rej("Failed to load builder data from indexed DB");
     };
   });
-}
-
-/**
- * This method can be used to remove any temp data saved without any error messaging on fail.
- */
-export function removeBuilderData() {
-  openDB({ dbName, dbVersion })
-    .then((db) => {
-      return deleteBuilderData(db);
-    })
-    .then(() => {
-      console.info("Builder data removed");
-    })
-    .catch(() => {
-      console.info("Failed to remove builder data");
-    });
 }

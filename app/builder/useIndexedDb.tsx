@@ -20,11 +20,6 @@ export default function useIndexedDb({
   const [loading, setLoading] = useState(true);
   const { loadWorkflowArchive } = useWorkflow();
 
-  // console.group("useIndexedDb");
-  // console.log("activeCatalogTitle...", activeCatalogTitle);
-  // console.log("loading...", loading);
-  // console.groupEnd();
-
   useEffect(() => {
     // use abort flag to prevent status update on removed process
     let abort = false;
@@ -52,8 +47,6 @@ export default function useIndexedDb({
             URL.revokeObjectURL(url);
             // delete workflow zip from database after use
             await deleteWorkflowZip(db);
-            // log message about loading scenario from indexedDB
-            console.log("useIndexedDb...scenario loaded");
             // exit hook because we can load only one workflow at the time
             return;
           }
@@ -80,8 +73,6 @@ export default function useIndexedDb({
             URL.revokeObjectURL(url);
             // delete loaded data
             await deleteBuilderData(db);
-            // log message about loading scenario from indexedDB
-            console.log("useIndexedDb...builder data loaded");
           }
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
