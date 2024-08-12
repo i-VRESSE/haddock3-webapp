@@ -71,9 +71,9 @@ export default function useIndexedDb({
             await loadWorkflowArchive(url);
             // remove url
             URL.revokeObjectURL(url);
-            // delete loaded data
-            await deleteBuilderData(db);
           }
+          // delete builder data from db as it has been loaded in builder or user decided to not use it
+          await deleteBuilderData(db);
         }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
