@@ -90,9 +90,7 @@ export function getCatalogForBuilder(catalogLevel: ExpertiseLevel) {
     catalog.global.schema.properties &&
     typeof catalog.global.schema.properties.run_dir === "object"
   ) {
-    // Delete run_dir as it is always set when workflow.cfg is rewritten
-    // downside that when you download from builder it is no longer valid on cli
-    delete catalog.global.schema.properties.run_dir;
+    // Make run_dir optional
     catalog.global.schema.required = catalog.global.schema.required?.filter(
       (prop) => prop !== "run_dir",
     );
