@@ -18,7 +18,6 @@ export function getCatalog(level: ExpertiseLevel) {
 
 function loadCatalog(catalog: ICatalog) {
   catalog.examples = {};
-  // Set default run_dir to JOB_OUTPUT_DIR
   return hideExecutionParameters(alwaysPlotMatrix(prepareCatalog(catalog)));
 }
 
