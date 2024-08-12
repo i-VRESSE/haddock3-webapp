@@ -170,7 +170,7 @@ In Orcid site set the redirect URL to `https://<your hostname>:8443/auth/callbac
 ## EGI Check-in login
 
 The web app can be configured to login with your [EGI Check-in](https://aai.egi.eu/)
-account.
+account (or demo env at https://aai-demo.egi.eu).
 
 To enable perform following steps:
 

@@ -27,6 +27,7 @@ import {
   inPortalMode,
   mapPermissions,
 } from "./portal.server";
+import { EgiStrategy } from "./auth-egi.server";
 
 // Create an instance of the authenticator, pass a generic with what
 // strategies will return and will store in the session
@@ -51,6 +52,39 @@ authenticator.use(
   }),
   "user-pass",
 );
+
+if (
+  process.env.HADDOCK3WEBAPP_EGI_CLIENT_ID &&
+  process.env.HADDOCK3WEBAPP_EGI_CLIENT_SECRET
+) {
+  const egiStrategy = new EgiStrategy(
+    {
+      clientID: process.env.HADDOCK3WEBAPP_EGI_CLIENT_ID,
+      clientSecret: process.env.HADDOCK3WEBAPP_EGI_CLIENT_SECRET,
+      callbackURL:
+        process.env.HADDOCK3WEBAPP_EGI_CALLBACK_URL ||
+        "http://localhost:3000/auth/egi/callback",
+      environment:
+        (process.env.HADDOCK3WEBAPP_EGI_ENVIRONMENT as
+          | "development"
+          | "production"
+          | "demo") || "production",
+    },
+    async ({ profile }) => {
+      const primaryEmail = profile.emails![0].value;
+      if (!profile._json.email_verified) {
+        throw new Error("Email not verified");
+      }
+      const photo = profile.photos ? profile.photos![0].value : undefined;
+      const userId = await oauthregister(primaryEmail, photo);
+      // TODO store egi fields like orcid, eduperson or voperson into database
+      // in far future could be used to submit job on GRID with users credentials
+      return userId;
+    }
+  );
+
+  authenticator.use(egiStrategy);
+}
 
 /**
  * The super class GitHubStrategy returns emails that are not verified.
