@@ -85,11 +85,8 @@ function hideExecutionParameters(catalog: ICatalog) {
 
 export function getCatalogForBuilder(catalogLevel: ExpertiseLevel) {
   const catalog = structuredClone(getCatalog(catalogLevel));
-  if (
-    catalog.global.schema.properties &&
-    typeof catalog.global.schema.properties.run_dir === "object"
-  ) {
-    // Make run_dir optional
+  // Make run_dir optional
+  if (catalog.global.schema.required) {
     catalog.global.schema.required = catalog.global.schema.required?.filter(
       (prop) => prop !== "run_dir",
     );
