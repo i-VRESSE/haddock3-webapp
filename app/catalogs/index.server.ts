@@ -4,7 +4,6 @@ import easy from "./haddock3.easy.json?raw";
 import expert from "./haddock3.expert.json?raw";
 import guru from "./haddock3.guru.json?raw";
 import type { ExpertiseLevel } from "~/drizzle/schema.server";
-import { JOB_OUTPUT_DIR } from "~/bartender-client/constants";
 import { prepareCatalog } from "@i-vresse/wb-core/dist/catalog.js";
 
 // Load catalogs during startup
@@ -19,13 +18,6 @@ export function getCatalog(level: ExpertiseLevel) {
 
 function loadCatalog(catalog: ICatalog) {
   catalog.examples = {};
-  // Set default run_dir to JOB_OUTPUT_DIR
-  if (
-    catalog.global.schema.properties &&
-    typeof catalog.global.schema.properties.run_dir === "object"
-  ) {
-    catalog.global.schema.properties.run_dir.default = JOB_OUTPUT_DIR;
-  }
   return hideExecutionParameters(alwaysPlotMatrix(prepareCatalog(catalog)));
 }
 
@@ -88,5 +80,16 @@ function hideExecutionParameters(catalog: ICatalog) {
     ...catalog.global.uiSchema,
     ...uiSchema,
   };
+  return catalog;
+}
+
+export function getCatalogForBuilder(catalogLevel: ExpertiseLevel) {
+  const catalog = structuredClone(getCatalog(catalogLevel));
+  // Make run_dir optional
+  if (catalog.global.schema.required) {
+    catalog.global.schema.required = catalog.global.schema.required?.filter(
+      (prop) => prop !== "run_dir",
+    );
+  }
   return catalog;
 }
