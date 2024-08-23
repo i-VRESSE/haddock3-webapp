@@ -89,7 +89,10 @@
           "type": "string",
           "minLength": 0,
           "maxLength": 20,
-          "enum": ["local", "batch"]
+          "enum": [
+            "local",
+            "batch"
+          ]
         },
         "batch_type": {
           "default": "slurm",
@@ -99,7 +102,10 @@
           "type": "string",
           "minLength": 0,
           "maxLength": 100,
-          "enum": ["slurm", "torque"]
+          "enum": [
+            "slurm",
+            "torque"
+          ]
         },
         "queue": {
           "title": "Queue name",
@@ -140,17 +146,31 @@
           "description": "Completely isolate the haddock3 run & results from internet.",
           "$comment": "For interactive plots, we are using the plotly library. It can be embedded as a link to the plotly.js library and fetched from the web, or directly copied on the html files AT THE COST OF ~3Mb per file. Setting this parameter to `true` will add the javascript library in generated files, therefore completely isolating haddock3 from any web call.",
           "type": "boolean"
-        },
-        "less_io": {
-          "default": false,
-          "title": "Reduce the amount of I/O operations.",
-          "description": "Reduce the amount of I/O operations.",
-          "$comment": "This option will reduce the amount of I/O operations by writing less files to disk. This can be useful for example when running on a network file system where I/O operations are slow.",
-          "type": "boolean"
         }
       },
-      "required": ["run_dir"],
-      "additionalProperties": false
+      "required": [
+        "run_dir"
+      ],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "batch"
+          }
+        }
+      },
+      "then": {},
+      "else": {
+        "properties": {
+          "less_io": {
+            "default": false,
+            "title": "Reduce the amount of I/O operations.",
+            "description": "Reduce the amount of I/O operations.",
+            "$comment": "This option will reduce the amount of I/O operations by writing less files to disk. This can be useful for example when running on a network file system where I/O operations are slow.",
+            "type": "boolean"
+          }
+        }
+      }
     },
     "uiSchema": {
       "molecules": {
@@ -200,7 +220,7 @@
     {
       "id": "alascan",
       "category": "analysis",
-      "label": "",
+      "label": "HADDOCK3 module for alanine scan.",
       "description": "HADDOCK3 module for alanine scan.",
       "schema": {
         "type": "object",
@@ -305,7 +325,7 @@
     {
       "id": "caprieval",
       "category": "analysis",
-      "label": "",
+      "label": "Calculate CAPRI metrics for the input models.",
       "description": "HADDOCK3 module to calculate the CAPRI metrics.",
       "schema": {
         "type": "object",
@@ -381,7 +401,9 @@
             "format": "chain"
           },
           "ligand_chains": {
-            "default": ["B"],
+            "default": [
+              "B"
+            ],
             "title": "Ligand ChainIDs",
             "description": "Ligand ChainIDs to be considered for the RMSD calculations.",
             "$comment": "Ligand ChainIDs to be considered for the RMSD calculations. This determines which chains will be treated as the ligand for the L-RMSD and for I-L-RMSD.",
@@ -401,7 +423,14 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 20,
-            "enum": ["score", "irmsd", "lrmsd", "ilrmsd", "fnat", "dockq"]
+            "enum": [
+              "score",
+              "irmsd",
+              "lrmsd",
+              "ilrmsd",
+              "fnat",
+              "dockq"
+            ]
           },
           "sort_ascending": {
             "default": true,
@@ -418,7 +447,10 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["structure", "sequence"]
+            "enum": [
+              "structure",
+              "sequence"
+            ]
           },
           "lovoalign_exec": {
             "title": "Location (path) of the LovoAlign executable",
@@ -504,7 +536,7 @@
     {
       "id": "clustfcc",
       "category": "analysis",
-      "label": "",
+      "label": "Cluster modules with FCC.",
       "description": "HADDOCK3 module for clustering with FCC.",
       "schema": {
         "type": "object",
@@ -598,8 +630,8 @@
             "description": "Value of cutoff cophenetic distance.",
             "$comment": "Value of cutoff cophenetic distance. When criterion is maxclust, this value is ignored.",
             "type": "number",
-            "maximum": 9999,
-            "minimum": 1
+            "maximum": 100,
+            "minimum": 0.1
           },
           "plot_matrix": {
             "default": false,
@@ -640,7 +672,7 @@
     {
       "id": "contactmap",
       "category": "analysis",
-      "label": "Compute contacts and generate heatmaps.",
+      "label": "Compute contacts between chains in complexes.",
       "description": "HADDOCK3 module to compute complexes contacts and generate heatmap.",
       "schema": {
         "type": "object",
@@ -729,7 +761,10 @@
             "type": "string",
             "minLength": 5,
             "maxLength": 30,
-            "enum": ["ca-ca-dist", "shortest-dist"]
+            "enum": [
+              "ca-ca-dist",
+              "shortest-dist"
+            ]
           }
         },
         "required": [],
@@ -834,7 +869,12 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["none", "all", "alpha", "alphabeta"]
+            "enum": [
+              "none",
+              "all",
+              "alpha",
+              "alphabeta"
+            ]
           },
           "error_dih": {
             "default": 10,
@@ -912,7 +952,7 @@
     {
       "id": "emscoring",
       "category": "scoring",
-      "label": "EM scoring module.\n\nThis module performs energy minimization and scoring of the models generated in\nthe previous step of the workflow. No restraints are applied during this step.\n",
+      "label": "EM scoring module.",
       "description": "HADDOCK3 module to perform energy minimization scoring.",
       "schema": {
         "type": "object",
@@ -997,7 +1037,12 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["none", "all", "alpha", "alphabeta"]
+            "enum": [
+              "none",
+              "all",
+              "alpha",
+              "alphabeta"
+            ]
           },
           "error_dih": {
             "default": 10,
@@ -1124,7 +1169,9 @@
             "format": "chain"
           },
           "ligand_chains": {
-            "default": ["B"],
+            "default": [
+              "B"
+            ],
             "title": "Ligand ChainIDs",
             "description": "Ligand ChainIDs to be considered for the IL-RMSD calculations.",
             "$comment": "Ligand ChainIDs to be considered for the IL-RMSD calculations. This determines which chains will be treated as the ligand for the IL-RMSD.",
@@ -1321,7 +1368,7 @@
     {
       "id": "mdref",
       "category": "refinement",
-      "label": "Water refinement with CNS.",
+      "label": "Explicit solvent MD refinement with CNS.",
       "description": "HADDOCK3 module for water refinement.",
       "schema": {
         "type": "object",
@@ -1380,7 +1427,12 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["none", "all", "alpha", "alphabeta"]
+            "enum": [
+              "none",
+              "all",
+              "alpha",
+              "alphabeta"
+            ]
           },
           "error_dih": {
             "default": 10,
@@ -1413,7 +1465,10 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["water", "dmso"]
+            "enum": [
+              "water",
+              "dmso"
+            ]
           }
         },
         "required": [],
@@ -1465,7 +1520,7 @@
     {
       "id": "mdscoring",
       "category": "scoring",
-      "label": "MD scoring module.\n\nThis module will perform a short MD simulation on the input models and\nscore them. No restraints are applied during this step.\n",
+      "label": "MD scoring module.",
       "description": "HADDOCK3 module to perform energy minimization scoring.",
       "schema": {
         "type": "object",
@@ -1478,7 +1533,12 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["none", "all", "alpha", "alphabeta"]
+            "enum": [
+              "none",
+              "all",
+              "alpha",
+              "alphabeta"
+            ]
           },
           "error_dih": {
             "default": 10,
@@ -1511,7 +1571,10 @@
             "type": "string",
             "minLength": 0,
             "maxLength": 100,
-            "enum": ["water", "dmso"]
+            "enum": [
+              "water",
+              "dmso"
+            ]
           }
         },
         "required": [],
@@ -1713,7 +1776,7 @@
     {
       "id": "seletop",
       "category": "analysis",
-      "label": "",
+      "label": "Select a number of models.",
       "description": "HADDOCK3 module to select top cluster/model.",
       "schema": {
         "type": "object",
@@ -1741,7 +1804,7 @@
     {
       "id": "seletopclusts",
       "category": "analysis",
-      "label": "",
+      "label": "Select models from the top clusters.",
       "description": "Haddock Module for 'seletopclusts'.",
       "schema": {
         "type": "object",
