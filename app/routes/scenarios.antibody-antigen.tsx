@@ -16,7 +16,10 @@ import {
 } from "valibot";
 import { LoaderFunctionArgs } from "@remix-run/node";
 
-import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
+import {
+  JOB_OUTPUT_DIR,
+  WORKFLOW_CONFIG_FILENAME,
+} from "~/bartender-client/constants";
 import { action as uploadaction } from "./upload";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { parseFormData } from "~/scenarios/schema";
@@ -89,21 +92,7 @@ unambig_fname = "${data.unambig_fname.name}"`
 # ====================================================================
 
 # directory name of the run
-run_dir = "scenario2a-NMR-epitope-pass-short"
-
-# Compute mode
-mode = "local"
-# 10 cores
-ncores = 10
-
-# Self contained rundir
-#self_contained = false
-
-# Post-processing to generate statistics and plots
-postprocess = true
-
-# Cleaning
-clean = true
+run_dir = "${JOB_OUTPUT_DIR}"
 
 # molecules to be docked
 molecules =  [

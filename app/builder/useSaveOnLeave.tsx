@@ -12,9 +12,9 @@ import { openDB, dbName, dbVersion, saveBuilderData } from "./indexedDB";
 /**
  * Hook to save builder data when user navigates away from the specific page.
  * @param pathname the value of location.pathname that triggers saving when changed
- * @returns routeToSave {string} as confirmation of route to "guard"
+ * @returns pathName as confirmation of route to "guard"
  */
-export default function useSaveOnLeave(pathname: string) {
+export default function useSaveOnLeave(pathname: string): string {
   const navigation = useNavigation();
   const { nodes, global } = useWorkflow();
   const files = useFiles();
@@ -46,17 +46,10 @@ export default function useSaveOnLeave(pathname: string) {
             // debugger
             return saveBuilderData({ db, zip });
           })
-          .then((status) => {
-            // debugger
-            // log status: OK
-            console.log("useSaveOnLeave...", status);
-          })
           .catch((e) => {
             // debugger
             console.error("useSaveOnLeave...FAILED:", e);
           });
-      } else {
-        console.info("useSaveOnLeave...IGNORE");
       }
     };
   }, [pathname, nodes, global, files, catalog, navigation]);

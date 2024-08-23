@@ -84,8 +84,8 @@ export function MenuList() {
   return (
     <NavigationMenu className="">
       <NavigationMenuList className="flex space-x-5">
-        <MyNavLink to="/builder">Builder</MyNavLink>
         <MyNavLink to="/scenarios">Scenario</MyNavLink>
+        <MyNavLink to="/builder">Builder</MyNavLink>
         <MyNavLink to="/upload">Upload</MyNavLink>
         <MyNavLink to="/jobs">Manage</MyNavLink>
         <MyNavLink to="/about">About</MyNavLink>
