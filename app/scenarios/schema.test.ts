@@ -1,6 +1,15 @@
 import { assert, describe, test } from "vitest";
 import { parseFormData } from "./schema";
-import { array, instance, object, optional, pipe, string, transform, union } from "valibot";
+import {
+  array,
+  instance,
+  object,
+  optional,
+  pipe,
+  string,
+  transform,
+  union,
+} from "valibot";
 
 describe("parseFormData()", () => {
   test("should return single values", () => {
@@ -43,9 +52,12 @@ describe("parseFormData()", () => {
     formData.append("key", file2);
     const schema = object({
       key: union([
-        pipe(instance(File, "Must be a file"), transform(v => [v])),  
+        pipe(
+          instance(File, "Must be a file"),
+          transform((v) => [v]),
+        ),
         array(instance(File, "Must be a file")),
-    ])
+      ]),
     });
     const result = parseFormData(formData, schema);
     assert.deepEqual(result, { key: [file, file2] });
@@ -70,9 +82,13 @@ describe("parseFormData()", () => {
     formData.append("key", file);
     const schema = object({
       key: union([
-        pipe(instance(File, "Must be a file"), transform(v => [v])),  
+        pipe(
+          instance(File, "Must be a file"),
+          transform((v) => [v]),
+        ),
         array(instance(File, "Must be a file")),
-    ])});
+      ]),
+    });
     const result = parseFormData(formData, schema);
     assert.deepEqual(result, { key: [file] });
   });
