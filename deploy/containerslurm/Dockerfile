@@ -42,7 +42,7 @@ ENV GDOCK_PATH=/opt/gdock
 
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
-RUN echo cachebust=2 && git clone --depth 1 -b ${HADDOCK3_VERSION} --recursive https://github.com/${HADDOCK3_GHORG}/haddock3.git .
+RUN echo cachebust=3 && git clone --depth 1 -b ${HADDOCK3_VERSION} --recursive https://github.com/${HADDOCK3_GHORG}/haddock3.git .
 WORKDIR /opt/haddock3/src/fcc/src
 RUN make
 WORKDIR /opt/haddock3/src/fast-rmsdmatrix/src
