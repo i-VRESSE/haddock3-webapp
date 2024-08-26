@@ -32,7 +32,7 @@ services:
 
   webappdb:
     image: postgres:15.4-bullseye
-    restart: always
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -52,7 +52,7 @@ services:
     build:
       context: ../deploy
       dockerfile: ./Dockerfile.bartenderhaddock3
-    restart: always
+    restart: unless-stopped
     command: sh -c '/wait && alembic upgrade head && bartender serve'
     volumes:
       - type: bind
@@ -83,7 +83,7 @@ services:
 
   bartenderdb:
     image: postgres:15.4-bullseye
-    restart: always
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -98,14 +98,14 @@ services:
 
   redis:
     image: redis:6.2.6
-    restart: always
+    restart: unless-stopped
 
   bartenderworker:
     image: ghcr.io/i-vresse/bartender:${BARTENDER_TAG:-latest}
     build:
       context: ../deploy
       dockerfile: ./Dockerfile.bartenderhaddock3
-    restart: always
+    restart: unless-stopped
     command: sh -c 'bartender perform'
     volumes:
       - type: bind
@@ -135,7 +135,7 @@ services:
     build:
       context: ../deploy
       dockerfile: ./Dockerfile.bartenderhaddock3
-    restart: always
+    restart: unless-stopped
     command: sh -c 'uvicorn --host 0.0.0.0 --port 5000 haddock.clis.restraints.webservice:app'
 
 volumes:
