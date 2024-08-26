@@ -147,17 +147,28 @@
           "description": "Completely isolate the haddock3 run & results from internet.",
           "$comment": "For interactive plots, we are using the plotly library. It can be embedded as a link to the plotly.js library and fetched from the web, or directly copied on the html files AT THE COST OF ~3Mb per file. Setting this parameter to `true` will add the javascript library in generated files, therefore completely isolating haddock3 from any web call.",
           "type": "boolean"
-        },
-        "less_io": {
-          "default": false,
-          "title": "Reduce the amount of I/O operations.",
-          "description": "Reduce the amount of I/O operations.",
-          "$comment": "This option will reduce the amount of I/O operations by writing less files to disk. This can be useful for example when running on a network file system where I/O operations are slow.",
-          "type": "boolean"
         }
       },
       "required": ["run_dir"],
-      "additionalProperties": false
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "batch"
+          }
+        }
+      },
+      "then": {},
+      "else": {
+        "properties": {
+          "less_io": {
+            "default": false,
+            "title": "Reduce the amount of I/O operations.",
+            "description": "Reduce the amount of I/O operations.",
+            "$comment": "This option will reduce the amount of I/O operations by writing less files to disk. This can be useful for example when running on a network file system where I/O operations are slow.",
+            "type": "boolean"
+          }
+        }
+      }
     },
     "uiSchema": {
       "molecules": {
@@ -210,7 +221,7 @@
     {
       "id": "alascan",
       "category": "analysis",
-      "label": "",
+      "label": "HADDOCK3 module for alanine scan.",
       "description": "HADDOCK3 module for alanine scan.",
       "schema": {
         "type": "object",
@@ -345,7 +356,7 @@
     {
       "id": "caprieval",
       "category": "analysis",
-      "label": "",
+      "label": "Calculate CAPRI metrics for the input models.",
       "description": "HADDOCK3 module to calculate the CAPRI metrics.",
       "schema": {
         "type": "object",
@@ -544,7 +555,7 @@
     {
       "id": "clustfcc",
       "category": "analysis",
-      "label": "",
+      "label": "Cluster modules with FCC.",
       "description": "HADDOCK3 module for clustering with FCC.",
       "schema": {
         "type": "object",
@@ -677,8 +688,8 @@
             "description": "Value of cutoff cophenetic distance.",
             "$comment": "Value of cutoff cophenetic distance. When criterion is maxclust, this value is ignored.",
             "type": "number",
-            "maximum": 9999,
-            "minimum": 1
+            "maximum": 100,
+            "minimum": 0.1
           },
           "plot_matrix": {
             "default": false,
@@ -725,7 +736,7 @@
     {
       "id": "contactmap",
       "category": "analysis",
-      "label": "Compute contacts and generate heatmaps.",
+      "label": "Compute contacts between chains in complexes.",
       "description": "HADDOCK3 module to compute complexes contacts and generate heatmap.",
       "schema": {
         "type": "object",
@@ -2831,7 +2842,7 @@
     {
       "id": "emscoring",
       "category": "scoring",
-      "label": "EM scoring module.\n\nThis module performs energy minimization and scoring of the models generated in\nthe previous step of the workflow. No restraints are applied during this step.\n",
+      "label": "EM scoring module.",
       "description": "HADDOCK3 module to perform energy minimization scoring.",
       "schema": {
         "type": "object",
@@ -5471,7 +5482,7 @@
     {
       "id": "mdref",
       "category": "refinement",
-      "label": "Water refinement with CNS.",
+      "label": "Explicit solvent MD refinement with CNS.",
       "description": "HADDOCK3 module for water refinement.",
       "schema": {
         "type": "object",
@@ -6617,17 +6628,17 @@
           "sampling_factor": {
             "default": 1,
             "title": "Sampling factor for each starting model",
-            "description": "This paramater control how many times a model will be refined.",
-            "$comment": "This paramater control how many times a model will be refined.",
+            "description": "This parameter control how many times a model will be refined.",
+            "$comment": "This parameter control how many times a model will be refined.",
             "type": "number",
-            "maximum": 200,
+            "maximum": 400,
             "minimum": 1
           },
           "max_nmodels": {
             "default": 10000,
             "title": "Maximum number of models to refine",
-            "description": "This paramater controls the maximum number of models to refine.",
-            "$comment": "This paramater controls the maximum number of models to refine.",
+            "description": "This parameter controls the maximum number of models to refine.",
+            "$comment": "This parameter controls the maximum number of models to refine.",
             "type": "number",
             "maximum": 50000,
             "minimum": 1
@@ -7520,7 +7531,7 @@
     {
       "id": "mdscoring",
       "category": "scoring",
-      "label": "MD scoring module.\n\nThis module will perform a short MD simulation on the input models and\nscore them. No restraints are applied during this step.\n",
+      "label": "MD scoring module.",
       "description": "HADDOCK3 module to perform energy minimization scoring.",
       "schema": {
         "type": "object",
@@ -9352,7 +9363,7 @@
     {
       "id": "seletop",
       "category": "analysis",
-      "label": "",
+      "label": "Select a number of models.",
       "description": "HADDOCK3 module to select top cluster/model.",
       "schema": {
         "type": "object",
@@ -9380,7 +9391,7 @@
     {
       "id": "seletopclusts",
       "category": "analysis",
-      "label": "",
+      "label": "Select models from the top clusters.",
       "description": "Haddock Module for 'seletopclusts'.",
       "schema": {
         "type": "object",
