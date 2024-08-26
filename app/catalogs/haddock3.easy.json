@@ -143,7 +143,6 @@
         }
       },
       "required": ["run_dir"],
-      "additionalProperties": true,
       "if": {
         "properties": {
           "mode": {
