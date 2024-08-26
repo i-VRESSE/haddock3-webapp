@@ -33,6 +33,11 @@ const scenarios: Scenario[] = [
     title: "Protein Glycan",
     description: "Based on HADDOCK3 Protein Glycan docking example",
   },
+  {
+    url: "/scenarios/scoring",
+    title: "Scoring",
+    description: "Based on HADDOCK3 CAPRI Scoring example",
+  },
 ];
 
 function ScenarioCard({ url, title, description }: Scenario) {
