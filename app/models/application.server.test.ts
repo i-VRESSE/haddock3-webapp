@@ -195,4 +195,31 @@ plot_matrix = true
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
   });
+
+  test("plot and output should be set to true for alascan module", async () => {
+    const input_config = `\
+[alascan]
+`;
+    const archive = await prepareArchive(input_config);
+
+    const result = await rewriteConfigInArchive(archive, ["easy"]);
+
+    const expected_config = `\
+
+run_dir = 'output'
+mode = 'local'
+postprocess = true
+clean = true
+offline = false
+less_io = true
+ncores = 1
+
+[alascan]
+
+plot = true
+output = true
+`;
+    const output_config = await retrieveConfigFromArchive(result);
+    assert.equal(output_config, expected_config);
+  })
 });
