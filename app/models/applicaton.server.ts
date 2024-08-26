@@ -147,7 +147,7 @@ function rewriteConfig(table: ReturnType<typeof parse>) {
   Object.entries(table).forEach(([key, value]) => {
     if (typeof value === "object" && value !== null) {
       const isModuleWithPlotMatrix = ["clustfcc", "clustrmsd"].includes(key);
-      if (isModuleWithPlotMatrix ) {
+      if (isModuleWithPlotMatrix) {
         (value as Record<string, boolean>).plot_matrix = true;
       }
       if (key === "alascan") {

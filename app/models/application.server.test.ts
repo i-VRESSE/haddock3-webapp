@@ -221,5 +221,5 @@ output = true
 `;
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
-  })
+  });
 });
