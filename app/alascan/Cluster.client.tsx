@@ -57,10 +57,10 @@ export function Cluster({ info }: { info: ClusterInfo }) {
   return (
     <div>
       <PlotlyPlot data={info.plot.data} layout={info.plot.layout} />
-      <a className="underline flex gap-1" href={info.csv}>
+      <a className="underline flex gap-1" href={info.csv} title="Download plot data as CSV">
         <Download /> CSV
       </a>
-      <h2 className="text-xl">Models</h2>
+      <h2 className="text-xl">Models of cluster {info.id}</h2>
       <RadioGroup
         defaultValue={shownModelId}
         onValueChange={setShownnModelId}
@@ -95,9 +95,6 @@ export function Cluster({ info }: { info: ClusterInfo }) {
         ))}
       </RadioGroup>
       <ScoreViewer pdb={shownModel!.pdb} />
-      {/* TODO show cluster_*_model_*_alascan.pdb.gz files in 3D viewer */}
-      {/* TODO show z_scores from scan_cluster_*_model_*.csv in 3D viewer */}
-      {/* TODO download links for scan_cluster_*_model_*.csv  */}
     </div>
   );
 }

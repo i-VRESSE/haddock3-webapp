@@ -135,7 +135,7 @@ export default function ScoringScenario() {
 
   return (
     <>
-      <h1 className="text-3xl">Protein-protein docking scenario</h1>
+      <h1 className="text-3xl">Scoring scenario</h1>
       <p>
         Based on the{" "}
         <a
