@@ -146,11 +146,10 @@ function rewriteConfig(table: ReturnType<typeof parse>) {
   // force plot_matrix to true for clustfcc, clustrmsd modules
   Object.entries(table).forEach(([key, value]) => {
     if (typeof value === "object" && value !== null) {
-      const isModuleWithPlotMatrix = ["clustfcc", "clustrmsd"].includes(key);
-      if (isModuleWithPlotMatrix) {
+      if (key.startsWith("clustfcc") || key.startsWith("clustrmsd")) {
         (value as Record<string, boolean>).plot_matrix = true;
       }
-      if (key === "alascan") {
+      if (key.startsWith("alascan")) {
         (value as Record<string, boolean>).plot = true;
         (value as Record<string, boolean>).output = true;
       }

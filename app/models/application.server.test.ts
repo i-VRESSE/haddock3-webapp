@@ -222,4 +222,35 @@ output = true
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
   });
+
+  test("plot_matrix should be set for repeated modules", async () => {
+    const input_config = `\
+[clustfcc]
+[clustfcc]
+`;
+    const archive = await prepareArchive(input_config);
+
+    const result = await rewriteConfigInArchive(archive, ["easy"]);
+
+    const expected_config = `\
+
+run_dir = 'output'
+mode = 'local'
+postprocess = true
+clean = true
+offline = false
+less_io = true
+ncores = 1
+
+[clustfcc]
+
+plot_matrix = true
+
+['clustfcc.1']
+
+plot_matrix = true
+`;
+    const output_config = await retrieveConfigFromArchive(result);
+    assert.equal(output_config, expected_config);
+  });
 });
