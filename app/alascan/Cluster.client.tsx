@@ -57,7 +57,11 @@ export function Cluster({ info }: { info: ClusterInfo }) {
   return (
     <div>
       <PlotlyPlot data={info.plot.data} layout={info.plot.layout} />
-      <a className="underline flex gap-1" href={info.csv} title="Download plot data as CSV">
+      <a
+        className="underline flex gap-1"
+        href={info.csv}
+        title="Download plot data as CSV"
+      >
         <Download /> CSV
       </a>
       <h2 className="text-xl">Models of cluster {info.id}</h2>
