@@ -44,6 +44,28 @@ function listOutputFilesOfModule(
   return listFilesAt(moduleInfo.jobid, path, bartenderToken, maxDepth);
 }
 
+export interface ModelInfo {
+  id: string;
+  // Path to cluster_1_model_2_alascan.pdb.gz
+  pdb: string;
+  // Path to scan_cluster_1_model_1.csv
+  csv: string;
+}
+
+function modelInfo(moduleInfo: ModuleInfo, clusterId: string, modelId: string) {
+  return {
+    id: modelId,
+    pdb: downloadPath(
+      moduleInfo,
+      `cluster_${clusterId}_model_${modelId}_alascan.pdb.gz`,
+    ),
+    csv: downloadPath(
+      moduleInfo,
+      `scan_cluster_${clusterId}_model_${modelId}.csv`,
+    ),
+  };
+}
+
 export async function getClusters(
   moduleInfo: ModuleInfo,
   bartenderToken: string,
@@ -53,25 +75,38 @@ export async function getClusters(
     throw new Error("No clusters found");
   }
   const clusterIds: string[] = [];
+  const models: Record<string, ModelInfo[]> = {};
   // scan_clt_1.html to 1
-  const regex = /scan_clt_(\d+)\.html/;
+  const clusterRegex = /scan_clt_(\d+)\.html/;
+  // scan_cluster_1_model_1.csv
+  const modelRegex = /scan_cluster_(\d+)_model_(\d+)\.csv/;
   for (const child of files.children) {
-    const match = child.name.match(regex);
-    if (match) {
-      const clusterId = match[1];
+    const clusterMatch = child.name.match(clusterRegex);
+    if (clusterMatch) {
+      const clusterId = clusterMatch[1];
       clusterIds.push(clusterId);
+    }
+    const modelMatch = child.name.match(modelRegex);
+    if (modelMatch) {
+      const clusterId = modelMatch[1];
+      const modelId = modelMatch[2];
+      if (!models[clusterId]) {
+        models[clusterId] = [];
+      }
+      models[clusterId].push(modelInfo(moduleInfo, clusterId, modelId));
     }
   }
   if (clusterIds.length === 0) {
     throw new Error(`No clusters found`);
   }
-  return clusterIds;
+  return { clusterIds, models };
 }
 
 export interface ClusterInfo {
   id: string;
   plot: PlotlyProps;
   csv: string;
+  models: ModelInfo[];
 }
 
 export async function getClusterInfo(
@@ -96,5 +131,6 @@ export async function getClusterInfo(
     id: clusterId,
     plot,
     csv,
+    models: [],
   };
 }

@@ -21,15 +21,16 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 
   const moduleInfo = await isAlaScanModule(jobid, moduleIndex, bartenderToken);
 
-  const clusterIds = await getClusters(moduleInfo, bartenderToken);
+  const clusters = await getClusters(moduleInfo, bartenderToken);
   if (params.cluster === undefined) {
     return redirect(
-      `/jobs/${jobid}/analysis/alascan/${moduleIndex}/${clusterIds[0]}`,
+      `/jobs/${jobid}/analysis/alascan/${moduleIndex}/${clusters.clusterIds[0]}`,
     );
   }
   const clusterId = params.cluster;
   const cluster = await getClusterInfo(clusterId, moduleInfo, bartenderToken);
-  return json({ moduleIndex, clusterIds, cluster, jobid });
+  cluster.models = clusters.models[clusterId];
+  return json({ moduleIndex, clusterIds: clusters.clusterIds, cluster, jobid });
 };
 
 export default function AlaScanPage() {
