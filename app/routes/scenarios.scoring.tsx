@@ -215,7 +215,8 @@ export default function ScoringScenario() {
               </FormDescription>
               <PDBFilesInput name="molecules" required />
             </div>
-            <div className="flex flex-col gap-2">
+            <details className="flex flex-col gap-2">
+              <summary>Advanced options</summary>
               <div>
                 <Label htmlFor="min_population">
                   {fieldDescriptions.min_population.title}
@@ -284,7 +285,7 @@ export default function ScoringScenario() {
                   defaultValue={fieldDescriptions.top_models.default}
                 />
               </div>
-            </div>
+            </details>
             <FormErrors errors={errors} />
             <ActionButtons />
           </form>

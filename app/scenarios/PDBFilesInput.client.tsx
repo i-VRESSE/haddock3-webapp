@@ -52,7 +52,7 @@ export function PDBFilesInput({
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col rounded-md border border-input bg-background">
       <Input
         type="file"
         id={name}
@@ -61,11 +61,12 @@ export function PDBFilesInput({
         multiple
         accept=".pdb"
         onChange={onChange}
+        className="border-none"
       />
-      <ol className="list-decimal list-inside">
+      <ol className="list-decimal list-inside px-2">
         {files.map((file) => (
           <li key={file.name}>
-            <MolViewerDialog structure={file} label={file.name} />
+            <MolViewerDialog structure={file} label={`👁 ${file.name}`} />
           </li>
         ))}
       </ol>
