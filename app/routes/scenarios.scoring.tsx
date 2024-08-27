@@ -1,9 +1,16 @@
 import {
   array,
+  check,
   InferOutput,
   instance,
+  integer,
+  maxLength,
+  maxValue,
+  minLength,
+  minValue,
   object,
   pipe,
+  string,
   transform,
   union,
   ValiError,
@@ -24,6 +31,13 @@ import { parseFormData } from "~/scenarios/schema";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { FormErrors } from "~/scenarios/FormErrors";
 import { ClientOnly } from "~/components/ClientOnly";
+import { Label } from "~/components/ui/label";
+import { Input } from "~/components/ui/input";
+import {
+  Description,
+  getModuleDescriptions,
+} from "~/catalogs/descriptionsFromSchema";
+import { FormDescription } from "@i-vresse/haddock3-ui/toggles";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -32,14 +46,63 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = uploadaction;
 
+const fieldDescriptions = {
+  ...getModuleDescriptions("global", ["molecules"]),
+  ...getModuleDescriptions(`clustfcc`, ["clust_cutoff", "min_population"]),
+  ...getModuleDescriptions(`seletopclusts`, ["top_models", "top_cluster"]),
+} as {
+  // TODO do fancy ttypescipt so cast is not needed
+  molecules: Description;
+  clust_cutoff: Description;
+  min_population: Description;
+  top_cluster: Description;
+  top_models: Description;
+};
+
+const max1Gb = (file: File) => file.size <= 1e9;
+const maxTotal1Gb = (files: File[]) =>
+  files.reduce((acc, f) => acc + f.size, 0) <= 1e9;
+const file = pipe(
+  instance(File, "Must be a file"),
+  check(max1Gb, "File size must be less than 1GB"),
+);
+
 const Schema = object({
   molecules: union([
     pipe(
-      instance(File, "Must be a file"),
+      file,
       transform((v) => [v]),
     ),
-    array(instance(File, "Must be a file")),
+    pipe(
+      array(file),
+      minLength(fieldDescriptions.molecules.minimum),
+      maxLength(fieldDescriptions.molecules.maximum),
+      check(maxTotal1Gb, "Total size of all files must be less than 1GB"),
+    ),
   ]),
+  min_population: pipe(
+    string(),
+    transform(Number),
+    integer(),
+    minValue(fieldDescriptions.min_population.minimum),
+    maxValue(fieldDescriptions.min_population.maximum),
+  ),
+  clust_cutoff: pipe(string(), transform(Number), minValue(0), maxValue(1)),
+
+  top_cluster: pipe(
+    string(),
+    transform(Number),
+    integer(),
+    minValue(fieldDescriptions.top_cluster.minimum),
+    maxValue(fieldDescriptions.top_cluster.maximum),
+  ),
+  top_models: pipe(
+    string(),
+    transform(Number),
+    integer(),
+    minValue(fieldDescriptions.top_models.minimum),
+    maxValue(fieldDescriptions.top_models.maximum),
+  ),
 });
 type Schema = InferOutput<typeof Schema>;
 
@@ -70,27 +133,22 @@ molecules = ${molecules}
 
 # ===================================================================================
 [topoaa]
+tolerance = 10
 
 [emscoring]
-
-[clustfcc]
-min_population = 2
-
-[seletopclusts]
-top_cluster = 1
-top_models = 2
-
-[mdscoring]
-
-[clustfcc]
-min_population = 2
-
-[seletopclusts]
+tolerance = 10
 
 [caprieval]
 
-[alascan]
+[clustfcc]
+min_population = ${data.min_population}
+clust_cutoff = ${data.clust_cutoff}
 
+[seletopclusts]
+top_models = ${data.top_models}
+top_cluster = ${data.top_cluster}
+
+[caprieval]
 # ===================================================================================
   `;
 }
@@ -136,7 +194,7 @@ export default function ScoringScenario() {
   return (
     <>
       <h1 className="text-3xl">Scoring scenario</h1>
-      <p>
+      <p className="py-2">
         Based on the{" "}
         <a
           target="_blank"
@@ -151,8 +209,83 @@ export default function ScoringScenario() {
       <ClientOnly fallback={<p>Loading...</p>}>
         {() => (
           <form onSubmit={onSubmit}>
-            <label htmlFor="molecules">Molecules</label>
-            <PDBFilesInput name="molecules" required />
+            <div className="py-2">
+              <label htmlFor="molecules">Molecules</label>
+              <FormDescription>
+                {fieldDescriptions.molecules.longDescription}
+              </FormDescription>
+              <PDBFilesInput name="molecules" required />
+            </div>
+            <div className="flex flex-col gap-2">
+              <div>
+                <Label htmlFor="min_population">
+                  {fieldDescriptions.min_population.title}
+                </Label>
+                <FormDescription>
+                  {fieldDescriptions.min_population.longDescription}
+                </FormDescription>
+                <Input
+                  type="number"
+                  name="min_population"
+                  id="min_population"
+                  required
+                  max={fieldDescriptions.min_population.maximum}
+                  min={fieldDescriptions.min_population.minimum}
+                  defaultValue={fieldDescriptions.min_population.default}
+                />
+              </div>
+              <div>
+                <Label htmlFor="clust_cutoff">
+                  {fieldDescriptions.clust_cutoff.title}
+                </Label>
+                <FormDescription>
+                  {fieldDescriptions.clust_cutoff.longDescription}
+                </FormDescription>
+                <Input
+                  type="text"
+                  name="clust_cutoff"
+                  id="clust_cutoff"
+                  required
+                  max={fieldDescriptions.clust_cutoff.maximum}
+                  min={fieldDescriptions.clust_cutoff.minimum}
+                  defaultValue={fieldDescriptions.clust_cutoff.default}
+                />
+              </div>
+              <div>
+                <Label htmlFor="top_cluster">
+                  {fieldDescriptions.top_cluster.title}
+                </Label>
+                <FormDescription>
+                  {fieldDescriptions.top_cluster.longDescription}
+                </FormDescription>
+                <Input
+                  type="number"
+                  name="top_cluster"
+                  id="top_cluster"
+                  required
+                  max={fieldDescriptions.top_cluster.maximum}
+                  min={fieldDescriptions.top_cluster.minimum}
+                  defaultValue={fieldDescriptions.top_cluster.default}
+                />
+              </div>
+              <div>
+                <Label htmlFor="top_models">
+                  {fieldDescriptions.top_models.title}
+                </Label>
+                <FormDescription>
+                  {fieldDescriptions.top_models.longDescription}
+                </FormDescription>
+                <Input
+                  type="number"
+                  name="top_models"
+                  id="top_models"
+                  required
+                  max={fieldDescriptions.top_models.maximum}
+                  min={fieldDescriptions.top_models.minimum}
+                  defaultValue={fieldDescriptions.top_models.default}
+                />
+              </div>
+            </div>
             <FormErrors errors={errors} />
             <ActionButtons />
           </form>

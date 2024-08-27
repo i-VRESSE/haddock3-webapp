@@ -3,18 +3,20 @@ import rawcatalog from "./haddock3.guru.json?raw";
 
 const catalog = JSON.parse(rawcatalog);
 
+export interface Description {
+  description: string;
+  title: string;
+  longDescription: string;
+  default: number;
+  maximum: number;
+  minimum: number;
+}
+
 function descriptionsFromSchema(
   schema: ICatalog["global"]["schema"],
   whitelist: string[],
 ) {
-  const descriptions: Record<
-    string,
-    {
-      description: string;
-      title: string;
-      longDescription: string;
-    }
-  > = {};
+  const descriptions: Record<string, Description> = {};
   if (!schema.properties) {
     throw new Error("No properties found in schema");
   }
@@ -29,6 +31,9 @@ function descriptionsFromSchema(
       description: field.description || "",
       title: field.title || name,
       longDescription: (field as { $comment?: string })["$comment"] || "",
+      default: field.default as number,
+      maximum: field.maximum ?? field.maxItems ?? 99999,
+      minimum: field.minimum ?? field.minItems ?? -1,
     };
   }
   return descriptions;
