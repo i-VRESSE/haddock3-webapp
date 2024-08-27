@@ -27,6 +27,8 @@ function descriptionsFromSchema(
     if (field === false || field === true) {
       continue;
     }
+    // TODO handle type boolean and string,
+    // now only works for number and array as those are used at the moment
     descriptions[name] = {
       description: field.description || "",
       title: field.title || name,

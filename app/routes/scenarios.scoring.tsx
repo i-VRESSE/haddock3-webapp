@@ -1,6 +1,5 @@
 import {
   array,
-  check,
   InferOutput,
   instance,
   integer,
@@ -59,25 +58,21 @@ const fieldDescriptions = {
   top_models: Description;
 };
 
-const max1Gb = (file: File) => file.size <= 1e9;
-const maxTotal1Gb = (files: File[]) =>
-  files.reduce((acc, f) => acc + f.size, 0) <= 1e9;
-const file = pipe(
-  instance(File, "Must be a file"),
-  check(max1Gb, "File size must be less than 1GB"),
-);
-
+// TODO limit file size and total file size
+// worked with check((f) => f.size <=1e9, 'too big')
+// but returned incorrect error message
+// now server will give
+// Error: Field "upload" exceeded upload size of 1000000000 bytes.
 const Schema = object({
   molecules: union([
     pipe(
-      file,
+      instance(File, "Must be a file"),
       transform((v) => [v]),
     ),
     pipe(
-      array(file),
+      array(instance(File, "Must be a file")),
       minLength(fieldDescriptions.molecules.minimum),
       maxLength(fieldDescriptions.molecules.maximum),
-      check(maxTotal1Gb, "Total size of all files must be less than 1GB"),
     ),
   ]),
   min_population: pipe(
@@ -87,8 +82,12 @@ const Schema = object({
     minValue(fieldDescriptions.min_population.minimum),
     maxValue(fieldDescriptions.min_population.maximum),
   ),
-  clust_cutoff: pipe(string(), transform(Number), minValue(0), maxValue(1)),
-
+  clust_cutoff: pipe(
+    string(),
+    transform(Number),
+    minValue(fieldDescriptions.clust_cutoff.minimum),
+    maxValue(fieldDescriptions.clust_cutoff.maximum),
+  ),
   top_cluster: pipe(
     string(),
     transform(Number),
