@@ -110,6 +110,15 @@ export const OutputReport = ({
                     &#128208;
                   </Link>
                 )}
+                {module.name === "alascan" && withTools && (
+                  <Link
+                    title="Alanine scan report"
+                    to={`/jobs/${jobid}/analysis/alascan/${module.id}`}
+                    className="dark:invert"
+                  >
+                    &#128208;
+                  </Link>
+                )}
                 {module.report && withTools && (
                   <>
                     <a

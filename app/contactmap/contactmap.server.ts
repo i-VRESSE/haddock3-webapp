@@ -1,14 +1,8 @@
 import { InferOutput, boolean, object } from "valibot";
 import type { PlotlyProps } from "~/components/PlotlyPlot";
 import { getPlotFromHtml } from "~/lib/html";
-import {
-  buildPath,
-  fetchHtml,
-  getParamsCfg,
-  listOutputFiles,
-} from "~/models/job.server";
-import { moduleInfo } from "~/models/module_utils";
-import { prefix } from "~/prefix";
+import { fetchHtml, getParamsCfg, listOutputFiles } from "~/models/job.server";
+import { downloadPath, ModuleInfo, moduleInfo } from "~/models/module_utils";
 
 export interface ContactMapCluster {
   id: number;
@@ -20,18 +14,11 @@ export interface ContactMapCluster {
   interchain_contacts: string;
 }
 
-interface ModuleInfo {
-  indexPadding: number;
-  name: string;
-  index: number;
-  jobid: number;
-}
-
 export async function isContactMapModule(
   jobid: number,
   index: number,
   bartenderToken: string,
-) {
+): Promise<ModuleInfo> {
   const outputFiles = await listOutputFiles(jobid, bartenderToken, 1);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [name, hasInteractiveVersion, indexPadding] = moduleInfo(
@@ -41,7 +28,7 @@ export async function isContactMapModule(
   if (name !== "contactmap") {
     throw new Error(`Module ${index} is not a contactmap`);
   }
-  return { indexPadding, name, jobid, index };
+  return { indexPadding, name, jobid, index, hasInteractiveVersion };
 }
 
 export const Schema = object({
@@ -117,18 +104,12 @@ export async function getClusterInfo(
   return {
     id: clusterId,
     name: `Cluster_${clusterId}`,
-    contacts: downloadPath(
-      module.jobid,
-      module,
-      `cluster${clusterId}_contmap_contacts.tsv`,
-    ),
+    contacts: downloadPath(module, `cluster${clusterId}_contmap_contacts.tsv`),
     heavyatoms_interchain_contacts: downloadPath(
-      module.jobid,
       module,
       `cluster${clusterId}_contmap_heavyatoms_interchain_contacts.tsv`,
     ),
     interchain_contacts: downloadPath(
-      module.jobid,
       module,
       `cluster${clusterId}_contmap_interchain_contacts.tsv`,
     ),
@@ -155,19 +136,6 @@ async function getChartData(
     isAnalysis: false,
   });
   return getPlotFromHtml(html, 1);
-}
-
-function downloadPath(jobid: number, module: ModuleInfo, filename: string) {
-  return (
-    `${prefix}jobs/${jobid}/files/` +
-    buildPath({
-      moduleIndex: module.index,
-      moduleName: module.name,
-      isInteractive: false,
-      moduleIndexPadding: module.indexPadding,
-      suffix: filename,
-    })
-  );
 }
 
 export function parseReport(content: string) {

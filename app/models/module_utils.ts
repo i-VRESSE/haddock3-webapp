@@ -1,5 +1,6 @@
 import type { DirectoryItem } from "~/bartender-client/types";
-import { getModuleIndexPadding } from "~/models/job.server";
+import { buildPath, getModuleIndexPadding } from "~/models/job.server";
+import { prefix } from "~/prefix";
 
 export function hasInteractiveVersion(
   moduleIndex: number,
@@ -55,4 +56,24 @@ export function moduleInfo(
   const pad = getModuleIndexPadding(files);
   const interactivness = hasInteractiveVersion(moduleIndex, files);
   return [moduleName, interactivness, pad];
+}
+
+export interface ModuleInfo {
+  indexPadding: number;
+  name: string;
+  index: number;
+  jobid: number;
+  hasInteractiveVersion: boolean;
+}
+export function downloadPath(module: ModuleInfo, filename: string) {
+  return (
+    `${prefix}jobs/${module.jobid}/files/` +
+    buildPath({
+      moduleIndex: module.index,
+      moduleName: module.name,
+      isInteractive: false,
+      moduleIndexPadding: module.indexPadding,
+      suffix: filename,
+    })
+  );
 }
