@@ -35,7 +35,11 @@ import { Label } from "~/components/ui/label";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { FormErrors } from "~/scenarios/FormErrors";
 import { PDBFilesInput } from "~/scenarios/PDBFilesInput.client";
-import { parseFormData } from "~/scenarios/schema";
+import {
+  moleculeFieldDescription,
+  MoleculesSchema,
+  parseFormData,
+} from "~/scenarios/schema";
 import { action as uploadaction } from "./upload";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -46,7 +50,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = uploadaction;
 
 const fieldDescriptions = {
-  ...getModuleDescriptions("global", ["molecules"]),
+  molecules: moleculeFieldDescription,
   ...getModuleDescriptions(`clustfcc`, ["clust_cutoff", "min_population"]),
   ...getModuleDescriptions(`seletopclusts`, ["top_models", "top_cluster"]),
 } as {
@@ -64,17 +68,7 @@ const fieldDescriptions = {
 // now server will give
 // Error: Field "upload" exceeded upload size of 1000000000 bytes.
 const Schema = object({
-  molecules: union([
-    pipe(
-      instance(File, "Must be a file"),
-      transform((v) => [v]),
-    ),
-    pipe(
-      array(instance(File, "Must be a file")),
-      minLength(fieldDescriptions.molecules.minimum),
-      maxLength(fieldDescriptions.molecules.maximum),
-    ),
-  ]),
+  molecules: MoleculesSchema,
   min_population: pipe(
     string(),
     transform(Number),
@@ -199,7 +193,7 @@ export default function ScoringScenario() {
           target="_blank"
           rel="noreferrer"
           className="hover:underline"
-          href="https://github.com/haddocking/haddock3/blob/main/examples/examples/scoring/capri-scoring-test.cfg"
+          href="https://github.com/haddocking/haddock3/blob/main/examples/scoring/capri-scoring-test.cfg"
         >
           HADDOCK3 capri scoring example
         </a>

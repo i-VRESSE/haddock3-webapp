@@ -12,7 +12,7 @@ import {
 } from "valibot";
 import { assert, describe, test } from "vitest";
 
-import { parseFormData } from "./schema";
+import { MoleculesSchema, parseFormData } from "./schema";
 
 describe("parseFormData()", () => {
   test("should return single values", () => {
@@ -54,13 +54,7 @@ describe("parseFormData()", () => {
     const file2 = new File(["content"], "filename2.txt");
     formData.append("key", file2);
     const schema = object({
-      key: union([
-        pipe(
-          instance(File, "Must be a file"),
-          transform((v) => [v]),
-        ),
-        array(instance(File, "Must be a file")),
-      ]),
+      key: MoleculesSchema,
     });
     const result = parseFormData(formData, schema);
     assert.deepEqual(result, { key: [file, file2] });
@@ -84,13 +78,7 @@ describe("parseFormData()", () => {
     const file = new File(["content"], "filename.txt");
     formData.append("key", file);
     const schema = object({
-      key: union([
-        pipe(
-          instance(File, "Must be a file"),
-          transform((v) => [v]),
-        ),
-        array(instance(File, "Must be a file")),
-      ]),
+      key: MoleculesSchema,
     });
     const result = parseFormData(formData, schema);
     assert.deepEqual(result, { key: [file] });
