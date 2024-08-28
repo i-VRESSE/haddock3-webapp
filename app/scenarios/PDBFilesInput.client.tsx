@@ -1,11 +1,9 @@
-import { Input } from "~/components/ui/input";
+import { NGLComponent, NGLStage } from "@i-vresse/haddock3-ui";
 import { useState } from "react";
 
-import { NGLComponent, NGLStage } from "@i-vresse/haddock3-ui";
-
 import { Button } from "~/components/ui/button";
-
 import { Dialog, DialogContent, DialogTrigger } from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
 
 export function MolViewerDialog({
   structure,

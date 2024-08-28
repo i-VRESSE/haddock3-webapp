@@ -58,14 +58,14 @@ export function moduleInfo(
   return [moduleName, interactivness, pad];
 }
 
-export interface ModuleInfo {
+export interface JobModuleInfo {
   indexPadding: number;
   name: string;
   index: number;
   jobid: number;
   hasInteractiveVersion: boolean;
 }
-export function downloadPath(module: ModuleInfo, filename: string) {
+export function downloadPath(module: JobModuleInfo, filename: string) {
   return (
     `${prefix}jobs/${module.jobid}/files/` +
     buildPath({

@@ -2,7 +2,7 @@ import { InferOutput, boolean, object } from "valibot";
 import type { PlotlyProps } from "~/components/PlotlyPlot";
 import { getPlotFromHtml } from "~/lib/html";
 import { fetchHtml, getParamsCfg, listOutputFiles } from "~/models/job.server";
-import { downloadPath, ModuleInfo, moduleInfo } from "~/models/module_utils";
+import { downloadPath, JobModuleInfo, moduleInfo } from "~/models/module_utils";
 
 export interface ContactMapCluster {
   id: number;
@@ -18,7 +18,7 @@ export async function isContactMapModule(
   jobid: number,
   index: number,
   bartenderToken: string,
-): Promise<ModuleInfo> {
+): Promise<JobModuleInfo> {
   const outputFiles = await listOutputFiles(jobid, bartenderToken, 1);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [name, hasInteractiveVersion, indexPadding] = moduleInfo(
@@ -61,7 +61,7 @@ export async function getParams({
 }
 
 export async function getClusters(
-  module: ModuleInfo,
+  module: JobModuleInfo,
   bartenderToken: string,
 ): Promise<number[]> {
   const contents = await fetchHtml({
@@ -79,7 +79,7 @@ export async function getClusters(
 
 export async function getClusterInfo(
   clusterId: number,
-  module: ModuleInfo,
+  module: JobModuleInfo,
   bartenderToken: string,
   params: Schema,
 ): Promise<ContactMapCluster> {
@@ -120,7 +120,7 @@ export async function getClusterInfo(
 
 async function getChartData(
   clusterId: number,
-  module: ModuleInfo,
+  module: JobModuleInfo,
   bartenderToken: string,
   filename: string,
 ): Promise<PlotlyProps> {

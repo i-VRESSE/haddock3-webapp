@@ -1,10 +1,6 @@
 import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
-import { getBartenderToken } from "~/bartender-client/token.server";
-import { getCompletedJobById, jobIdFromParams } from "~/models/job.server";
-import { Button } from "~/components/ui/button";
-import { ClientOnly } from "~/components/ClientOnly";
 import {
   getClusterInfo,
   getClusters,
@@ -12,6 +8,10 @@ import {
   type ClusterInfo,
 } from "~/alascan/alascan.server";
 import { Cluster } from "~/alascan/Cluster.client";
+import { getBartenderToken } from "~/bartender-client/token.server";
+import { ClientOnly } from "~/components/ClientOnly";
+import { Button } from "~/components/ui/button";
+import { getCompletedJobById, jobIdFromParams } from "~/models/job.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobid = jobIdFromParams(params);

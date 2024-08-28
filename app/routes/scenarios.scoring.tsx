@@ -1,3 +1,8 @@
+import { FormDescription } from "@i-vresse/haddock3-ui/toggles";
+import { json, LoaderFunctionArgs } from "@remix-run/node";
+import { useActionData, useNavigate, useSubmit } from "@remix-run/react";
+import JSZip from "jszip";
+import { useState } from "react";
 import {
   array,
   InferOutput,
@@ -14,29 +19,24 @@ import {
   union,
   ValiError,
 } from "valibot";
-import { json, LoaderFunctionArgs } from "@remix-run/node";
-import { useState } from "react";
-import { useActionData, useNavigate, useSubmit } from "@remix-run/react";
 
-import { action as uploadaction } from "./upload";
 import { mustBeAllowedToSubmit } from "~/auth.server";
 import {
   JOB_OUTPUT_DIR,
   WORKFLOW_CONFIG_FILENAME,
 } from "~/bartender-client/constants";
-import JSZip from "jszip";
-import { PDBFilesInput } from "~/scenarios/PDBFilesInput.client";
-import { parseFormData } from "~/scenarios/schema";
-import { ActionButtons, handleActionButton } from "~/scenarios/actions";
-import { FormErrors } from "~/scenarios/FormErrors";
-import { ClientOnly } from "~/components/ClientOnly";
-import { Label } from "~/components/ui/label";
-import { Input } from "~/components/ui/input";
 import {
   Description,
   getModuleDescriptions,
 } from "~/catalogs/descriptionsFromSchema";
-import { FormDescription } from "@i-vresse/haddock3-ui/toggles";
+import { ClientOnly } from "~/components/ClientOnly";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { ActionButtons, handleActionButton } from "~/scenarios/actions";
+import { FormErrors } from "~/scenarios/FormErrors";
+import { PDBFilesInput } from "~/scenarios/PDBFilesInput.client";
+import { parseFormData } from "~/scenarios/schema";
+import { action as uploadaction } from "./upload";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -50,7 +50,7 @@ const fieldDescriptions = {
   ...getModuleDescriptions(`clustfcc`, ["clust_cutoff", "min_population"]),
   ...getModuleDescriptions(`seletopclusts`, ["top_models", "top_cluster"]),
 } as {
-  // TODO do fancy ttypescipt so cast is not needed
+  // TODO do fancy typescipt so cast is not needed
   molecules: Description;
   clust_cutoff: Description;
   min_population: Description;

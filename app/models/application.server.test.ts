@@ -1,8 +1,8 @@
 import JSZip from "jszip";
 import { assert, describe, test } from "vitest";
 
-import { rewriteConfigInArchive } from "./applicaton.server";
 import { WORKFLOW_CONFIG_FILENAME } from "../bartender-client/constants";
+import { rewriteConfigInArchive } from "./applicaton.server";
 
 const HY3_PDB = `\
 ATOM      1  SHA SHA S   1      30.913  40.332   2.133  1.00 36.12      S       

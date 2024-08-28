@@ -9,7 +9,7 @@ import {
 } from "~/models/job.server";
 import {
   downloadPath,
-  type ModuleInfo,
+  type JobModuleInfo,
   moduleInfo,
 } from "~/models/module_utils";
 
@@ -17,7 +17,7 @@ export async function isAlaScanModule(
   jobid: number,
   index: number,
   bartenderToken: string,
-): Promise<ModuleInfo> {
+): Promise<JobModuleInfo> {
   const outputFiles = await listOutputFiles(jobid, bartenderToken, 1);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [name, hasInteractiveVersion, indexPadding] = moduleInfo(
@@ -31,7 +31,7 @@ export async function isAlaScanModule(
 }
 
 function listOutputFilesOfModule(
-  moduleInfo: ModuleInfo,
+  moduleInfo: JobModuleInfo,
   bartenderToken: string,
   maxDepth: number = 1,
 ): Promise<DirectoryItem> {
@@ -52,7 +52,11 @@ export interface ModelInfo {
   csv: string;
 }
 
-function modelInfo(moduleInfo: ModuleInfo, clusterId: string, modelId: string) {
+function modelInfo(
+  moduleInfo: JobModuleInfo,
+  clusterId: string,
+  modelId: string,
+) {
   return {
     id: modelId,
     pdb: downloadPath(
@@ -67,7 +71,7 @@ function modelInfo(moduleInfo: ModuleInfo, clusterId: string, modelId: string) {
 }
 
 export async function getClusters(
-  moduleInfo: ModuleInfo,
+  moduleInfo: JobModuleInfo,
   bartenderToken: string,
 ) {
   const files = await listOutputFilesOfModule(moduleInfo, bartenderToken);
@@ -111,7 +115,7 @@ export interface ClusterInfo {
 
 export async function getClusterInfo(
   clusterId: string,
-  module: ModuleInfo,
+  module: JobModuleInfo,
   bartenderToken: string,
 ): Promise<ClusterInfo> {
   // scan_clt_1.html with plotly data at id=data1

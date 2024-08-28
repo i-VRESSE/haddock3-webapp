@@ -1,8 +1,3 @@
-import { PlotlyPlot } from "~/components/PlotlyPlot";
-import type { ClusterInfo } from "./alascan.server";
-import { useEffect, useId, useState } from "react";
-import { Label } from "~/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import {
   ErrorBoundary,
   NGLComponent,
@@ -11,6 +6,12 @@ import {
   useStage,
 } from "@i-vresse/haddock3-ui/molviewer";
 import { Download } from "lucide-react";
+import { useEffect, useId, useState } from "react";
+
+import { PlotlyPlot } from "~/components/PlotlyPlot";
+import { Label } from "~/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import type { ClusterInfo } from "./alascan.server";
 
 function ColorByBFactor() {
   const stage = useStage();

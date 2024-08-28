@@ -1,7 +1,6 @@
-import { assert, describe, test } from "vitest";
-import { parseFormData } from "./schema";
 import {
   array,
+  check,
   instance,
   object,
   optional,
@@ -9,7 +8,11 @@ import {
   string,
   transform,
   union,
+  ValiError,
 } from "valibot";
+import { assert, describe, test } from "vitest";
+
+import { parseFormData } from "./schema";
 
 describe("parseFormData()", () => {
   test("should return single values", () => {
@@ -91,5 +94,33 @@ describe("parseFormData()", () => {
     });
     const result = parseFormData(formData, schema);
     assert.deepEqual(result, { key: [file] });
+  });
+
+  test.todo("should complain when file to big", () => {
+    const formData = new FormData();
+    const file = new File(["content"], "filename.txt");
+    formData.append("key", file);
+    // TODO make schema gives right error message, now it gives:
+    // Invalid type: Expected File | Array but received File
+    const schema = object({
+      key: union([
+        pipe(
+          instance(File, "Must be a file"),
+          check((f) => f.size < 5, "file too big"),
+          transform((v) => [v]),
+        ),
+        array(
+          pipe(
+            instance(File, "Must be a file"),
+            check((f) => f.size < 5, "file too big"),
+          ),
+        ),
+      ]),
+    });
+    assert.throws(
+      () => parseFormData(formData, schema),
+      ValiError,
+      /file too big/,
+    );
   });
 });
