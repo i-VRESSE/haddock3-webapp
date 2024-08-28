@@ -4,19 +4,14 @@ import { useActionData, useNavigate, useSubmit } from "@remix-run/react";
 import JSZip from "jszip";
 import { useState } from "react";
 import {
-  array,
   InferOutput,
-  instance,
   integer,
-  maxLength,
   maxValue,
-  minLength,
   minValue,
   object,
   pipe,
   string,
   transform,
-  union,
   ValiError,
 } from "valibot";
 
@@ -280,7 +275,7 @@ export default function ScoringScenario() {
                 />
               </div>
             </details>
-            <FormErrors errors={errors} />
+            <FormErrors errors={errors ?? actionData?.errors} />
             <ActionButtons />
           </form>
         )}

@@ -56,18 +56,73 @@ function modelInfo(
   moduleInfo: JobModuleInfo,
   clusterId: string,
   modelId: string,
+  fromModule: string = "",
 ) {
   return {
     id: modelId,
     pdb: downloadPath(
       moduleInfo,
-      `cluster_${clusterId}_model_${modelId}_alascan.pdb.gz`,
+      clusterId === "-"
+        ? `${fromModule}_${modelId}_alascan.pdb.gz`
+        : `cluster_${clusterId}_model_${modelId}_alascan.pdb.gz`,
     ),
     csv: downloadPath(
       moduleInfo,
-      `scan_cluster_${clusterId}_model_${modelId}.csv`,
+      clusterId === "-"
+        ? `scan_${fromModule}_${modelId}.csv`
+        : `scan_cluster_${clusterId}_model_${modelId}.csv`,
     ),
   };
+}
+
+export function getClustersAndModels(
+  files: DirectoryItem,
+  moduleInfo: JobModuleInfo,
+) {
+  if (!files.children) {
+    throw new Error("No clusters found");
+  }
+  const clusterIds: string[] = [];
+  const models: Record<string, ModelInfo[]> = {};
+  // scan_clt_1.html to 1 or
+  // scan_clt_-.html to -
+  const clusterRegex = /^scan_clt_(\d+|-)\.html$/;
+  // scan_cluster_1_model_1.csv or
+  const clusteredModelRegex = /^scan_cluster_(\d+)_model_(\d+)\.csv$/;
+  // scan_mdref_2.csv
+  const unclusteredModelRegex = /^scan_(\w+)_(\d+)\.csv$/;
+  for (const child of files.children) {
+    const clusterMatch = child.name.match(clusterRegex);
+    if (clusterMatch) {
+      const clusterId = clusterMatch[1];
+      clusterIds.push(clusterId);
+    }
+    const clusteredModelMatch = child.name.match(clusteredModelRegex);
+    if (clusteredModelMatch) {
+      const clusterId = clusteredModelMatch[1];
+      const modelId = clusteredModelMatch[2];
+      if (!models[clusterId]) {
+        models[clusterId] = [];
+      }
+      models[clusterId].push(modelInfo(moduleInfo, clusterId, modelId));
+    }
+    const unclusteredModelMatch = child.name.match(unclusteredModelRegex);
+    if (unclusteredModelMatch) {
+      const fromModule = unclusteredModelMatch[1];
+      const modelId = unclusteredModelMatch[2];
+      if (fromModule === "clt" || fromModule.startsWith("cluster_")) {
+        continue;
+      }
+      if (!models["-"]) {
+        models["-"] = [];
+      }
+      models["-"].push(modelInfo(moduleInfo, "-", modelId, fromModule));
+    }
+  }
+  if (clusterIds.length === 0) {
+    throw new Error(`No clusters found`);
+  }
+  return { clusterIds, models };
 }
 
 export async function getClusters(
@@ -75,35 +130,7 @@ export async function getClusters(
   bartenderToken: string,
 ) {
   const files = await listOutputFilesOfModule(moduleInfo, bartenderToken);
-  if (!files.children) {
-    throw new Error("No clusters found");
-  }
-  const clusterIds: string[] = [];
-  const models: Record<string, ModelInfo[]> = {};
-  // scan_clt_1.html to 1
-  const clusterRegex = /scan_clt_(\d+)\.html/;
-  // scan_cluster_1_model_1.csv
-  const modelRegex = /scan_cluster_(\d+)_model_(\d+)\.csv/;
-  for (const child of files.children) {
-    const clusterMatch = child.name.match(clusterRegex);
-    if (clusterMatch) {
-      const clusterId = clusterMatch[1];
-      clusterIds.push(clusterId);
-    }
-    const modelMatch = child.name.match(modelRegex);
-    if (modelMatch) {
-      const clusterId = modelMatch[1];
-      const modelId = modelMatch[2];
-      if (!models[clusterId]) {
-        models[clusterId] = [];
-      }
-      models[clusterId].push(modelInfo(moduleInfo, clusterId, modelId));
-    }
-  }
-  if (clusterIds.length === 0) {
-    throw new Error(`No clusters found`);
-  }
-  return { clusterIds, models };
+  return getClustersAndModels(files, moduleInfo);
 }
 
 export interface ClusterInfo {

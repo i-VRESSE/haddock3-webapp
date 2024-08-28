@@ -63,6 +63,8 @@ function generateWorkflow(data: Schema) {
     ? `reference_fname = "${data.reference_fname.name}"`
     : "";
 
+  // mdref parameters used in template are not available to easy expertise level
+  // so we do not make them configurable by the user
   return `
 # ====================================================================
 # Refinment of a complex example
@@ -159,7 +161,7 @@ export default function RefinementScenario() {
             <ReferenceStructureInput>
               In example named data/ee2a-hpr_1GGR.pdb
             </ReferenceStructureInput>
-            <FormErrors errors={errors} />
+            <FormErrors errors={errors ?? actionData?.errors} />
             <ActionButtons />
           </form>
         )}
