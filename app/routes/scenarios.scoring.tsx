@@ -110,7 +110,7 @@ function generateWorkflow(
     2,
   );
 
-  // easy is not allowed to use tolerance
+  // easy is not allowed to set tolerance
   const tolerance_line =
     preferredExpertiseLevel === "easy" ? "" : "tolerance = 10";
 

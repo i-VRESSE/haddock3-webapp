@@ -68,7 +68,7 @@ function generateWorkflow(
     ? `reference_fname = "${data.reference_fname.name}"`
     : "";
 
-  // easy is not allowed to use tolerance or sampling_factor
+  // easy is not allowed to set tolerance
   const tolerance_line =
     preferredExpertiseLevel === "easy" ? "" : "tolerance = 10";
   const sampling_factor =
