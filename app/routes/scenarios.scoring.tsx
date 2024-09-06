@@ -36,6 +36,8 @@ import {
   parseFormData,
 } from "~/scenarios/schema";
 import { action as uploadaction } from "./upload";
+import { useUser } from "~/auth";
+import type { ExpertiseLevel } from "~/drizzle/schema.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -94,7 +96,10 @@ const Schema = object({
 });
 type Schema = InferOutput<typeof Schema>;
 
-function generateWorkflow(data: Schema) {
+function generateWorkflow(
+  data: Schema,
+  preferredExpertiseLevel: ExpertiseLevel,
+) {
   // Workflow based on
   // https://github.com/haddocking/haddock3/blob/main/examples/scoring/capri-scoring-test.cfg
   // made valid for easy expertise level + added alascan
@@ -104,6 +109,10 @@ function generateWorkflow(data: Schema) {
     undefined,
     2,
   );
+
+  // easy is not allowed to use tolerance
+  const tolerance_line =
+    preferredExpertiseLevel === "easy" ? "" : "tolerance = 10";
 
   return `
 # ===================================================================================
@@ -121,10 +130,10 @@ molecules = ${molecules}
 
 # ===================================================================================
 [topoaa]
-tolerance = 10
+${tolerance_line}
 
 [emscoring]
-tolerance = 10
+${tolerance_line}
 
 [caprieval]
 
@@ -153,6 +162,7 @@ async function createZip(workflow: string, data: Schema) {
 
 export default function ScoringScenario() {
   const actionData = useActionData<typeof uploadaction>();
+  const { preferredExpertiseLevel } = useUser();
   const submit = useSubmit();
   const navigate = useNavigate();
 
@@ -168,7 +178,7 @@ export default function ScoringScenario() {
     try {
       const data = parseFormData(formData, Schema);
       setErrors(undefined);
-      const workflow = generateWorkflow(data);
+      const workflow = generateWorkflow(data, preferredExpertiseLevel!);
       const zipPromise = createZip(workflow, data);
       handleActionButton(event.nativeEvent, zipPromise, navigate, submit);
     } catch (e) {

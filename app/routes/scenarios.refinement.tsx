@@ -25,6 +25,8 @@ import {
   parseFormData,
 } from "~/scenarios/schema";
 import { action as uploadaction } from "./upload";
+import type { ExpertiseLevel } from "~/drizzle/schema.server";
+import { useUser } from "~/auth";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await mustBeAllowedToSubmit(request);
@@ -48,7 +50,10 @@ const Schema = object({
 });
 type Schema = InferOutput<typeof Schema>;
 
-function generateWorkflow(data: Schema) {
+function generateWorkflow(
+  data: Schema,
+  preferredExpertiseLevel: ExpertiseLevel,
+) {
   // Workflow based on
   // https://github.com/haddocking/haddock3/blob/main/examples/refine-complex/refine-complex-test.cfg
   // made valid for easy expertise level + added alascan and contactmap
@@ -63,6 +68,14 @@ function generateWorkflow(data: Schema) {
     ? `reference_fname = "${data.reference_fname.name}"`
     : "";
 
+  // easy is not allowed to use tolerance or sampling_factor
+  const tolerance_line =
+    preferredExpertiseLevel === "easy" ? "" : "tolerance = 10";
+  const tolerance_line_md =
+    preferredExpertiseLevel === "easy" ? "" : "tolerance = 5";
+  const sampling_factor =
+    preferredExpertiseLevel === "easy" ? "" : "sampling_factor = 10";
+
   // mdref parameters used in template are not available to easy expertise level
   // so we do not make them configurable by the user
   return `
@@ -75,11 +88,11 @@ molecules = ${molecules}
 
 # ===================================================================================
 [topoaa]
-tolerance = 10
+${tolerance_line}
 
 [mdref]
-tolerance = 5
-sampling_factor = 10
+${tolerance_line_md}
+${sampling_factor}
 
 [caprieval]
 ${ref_line}
@@ -106,6 +119,7 @@ async function createZip(workflow: string, data: Schema) {
 
 export default function RefinementScenario() {
   const actionData = useActionData<typeof uploadaction>();
+  const { preferredExpertiseLevel } = useUser();
   const submit = useSubmit();
   const navigate = useNavigate();
 
@@ -121,7 +135,7 @@ export default function RefinementScenario() {
     try {
       const data = parseFormData(formData, Schema);
       setErrors(undefined);
-      const workflow = generateWorkflow(data);
+      const workflow = generateWorkflow(data, preferredExpertiseLevel!);
       const zipPromise = createZip(workflow, data);
       handleActionButton(event.nativeEvent, zipPromise, navigate, submit);
     } catch (e) {
