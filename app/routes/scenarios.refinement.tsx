@@ -71,8 +71,6 @@ function generateWorkflow(
   // easy is not allowed to use tolerance or sampling_factor
   const tolerance_line =
     preferredExpertiseLevel === "easy" ? "" : "tolerance = 10";
-  const tolerance_line_md =
-    preferredExpertiseLevel === "easy" ? "" : "tolerance = 5";
   const sampling_factor =
     preferredExpertiseLevel === "easy" ? "" : "sampling_factor = 10";
 
@@ -91,7 +89,6 @@ molecules = ${molecules}
 ${tolerance_line}
 
 [mdref]
-${tolerance_line_md}
 ${sampling_factor}
 
 [caprieval]
