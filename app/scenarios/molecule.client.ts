@@ -14,7 +14,9 @@ function residuesPerChain<T>(
     const chainName = c.chainname;
     let residues: T[] = [];
     c.eachResidue((r) => {
-      residues.push(accessor(r));
+      if (r.resname !== 'HOH') {
+        residues.push(accessor(r));
+      }
     });
     // Same chain can be before+after TER line
     // See https://github.com/haddocking/haddock3/blob/main/examples/data/1a2k_r_u.pdb
