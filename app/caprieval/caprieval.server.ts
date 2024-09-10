@@ -27,8 +27,10 @@ import {
 } from "./constants";
 import type {
   ClusterTable,
+} from "@i-vresse/haddock3-ui/table/ClusterTable";
+import type {
   StructureTable,
-} from "@i-vresse/haddock3-analysis-components";
+} from "@i-vresse/haddock3-ui/table/StructureTable";
 import { BartenderError } from "~/models/errors";
 import { getDataFromHtml, getPlotFromHtml } from "~/lib/html";
 

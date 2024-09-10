@@ -1,7 +1,9 @@
 import {
   ClusterTable,
+} from "@i-vresse/haddock3-ui/table/ClusterTable";
+import {
   StructureTable,
-} from "@i-vresse/haddock3-analysis-components";
+} from "@i-vresse/haddock3-ui/table/StructureTable";
 import "./CaprievalReport.client.css";
 
 import { ScatterPlots } from "./ScatterPlots";
