@@ -252,6 +252,7 @@ export default function ProteinProteinScenario() {
                 actpass={protein1ActPass}
                 onActPassChange={setProtein1ActPass}
                 targetChain="A"
+                preprocessPipeline="delhetatmkeepcoord"
               />
               <MacroMoleculeSubForm
                 name="protein2"
@@ -260,6 +261,7 @@ export default function ProteinProteinScenario() {
                 actpass={protein2ActPass}
                 onActPassChange={setProtein2ActPass}
                 targetChain="B"
+                preprocessPipeline="delhetatmkeepcoord"
               />
             </div>
             <ReferenceStructureInput>
