@@ -4,7 +4,6 @@ import {
 import {
   StructureTable,
 } from "@i-vresse/haddock3-ui/table/StructureTable";
-import "./CaprievalReport.client.css";
 
 import { ScatterPlots } from "./ScatterPlots";
 import { useSearchParams } from "@remix-run/react";
