@@ -1,9 +1,5 @@
-import {
-  ClusterTable,
-} from "@i-vresse/haddock3-ui/table/ClusterTable";
-import {
-  StructureTable,
-} from "@i-vresse/haddock3-ui/table/StructureTable";
+import { ClusterTable } from "@i-vresse/haddock3-ui/table/ClusterTable";
+import { StructureTable } from "@i-vresse/haddock3-ui/table/StructureTable";
 
 import { ScatterPlots } from "./ScatterPlots";
 import { useSearchParams } from "@remix-run/react";
