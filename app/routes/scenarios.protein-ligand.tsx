@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  useActionData,
-  useSubmit,
-  useNavigate,
-  json,
-} from "@remix-run/react";
+import { useActionData, useSubmit, useNavigate, json } from "@remix-run/react";
 import {
   object,
   instance,
