@@ -4,7 +4,6 @@ import {
   useSubmit,
   useNavigate,
   json,
-  useLoaderData,
 } from "@remix-run/react";
 import {
   object,
@@ -42,14 +41,8 @@ import { BindingMoleculeSubForm } from "~/scenarios/BindingMoleculeSubForm.clien
 import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const user = await mustBeAllowedToSubmit(request);
-  // Only expert and higher can use custom ligand files
-  // See https://www.bonvinlab.org/haddock3/modules/topology/haddock.modules.topology.topoaa.html#ligand-param-fname
-  return json({
-    mayUseCustomLigandFiles:
-      user.preferredExpertiseLevel !== null &&
-      ["expert", "guru"].includes(user.preferredExpertiseLevel),
-  });
+  await mustBeAllowedToSubmit(request);
+  return json({});
 };
 
 export const action = uploadaction;
@@ -201,7 +194,6 @@ async function createZip(workflow: string, data: Schema) {
 }
 
 export default function Page() {
-  const { mayUseCustomLigandFiles } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof uploadaction>();
   const submit = useSubmit();
   const navigate = useNavigate();
@@ -322,7 +314,6 @@ export default function Page() {
                 actpass={ligandActPass}
                 onActPassChange={setLigandActPass}
                 targetChain="B"
-                mayUseCustomLigandFiles={mayUseCustomLigandFiles}
               />
             </div>
             <ReferenceStructureInput label="Reference structure (optional)">
