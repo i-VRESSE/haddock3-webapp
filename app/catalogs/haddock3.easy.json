@@ -363,6 +363,13 @@
             "$comment": "Evaluate DockQ. A single continuous quality measure for protein docked models based on the CAPRI criteria, a combination of i-RMSD, l-RMSD and FNAT value. For details check the DockQ publication `DOI:10.1371/journal.pone.0161879`",
             "type": "boolean"
           },
+          "global_rmsd": {
+            "default": true,
+            "title": "Calculate global RMSD",
+            "description": "Calculate full structure RMSD.",
+            "$comment": "Compute full structure RMSD between reference structure and the model after superimposition. Note that a sequence alignment is performed to obtain the mapping between the reference and the model. If the one of the structure contain a 'small-molecule', we assume that the compared structure atoms are in the same order. With default parameters `allatoms = false`, only backbone RMSD will be computed.",
+            "type": "boolean"
+          },
           "irmsd_cutoff": {
             "default": 10,
             "title": "Distance cutoff (Å) used to define interface residues.",
@@ -392,7 +399,7 @@
             "format": "chain"
           },
           "ligand_chains": {
-            "default": ["B"],
+            "default": [],
             "title": "Ligand ChainIDs",
             "description": "Ligand ChainIDs to be considered for the RMSD calculations.",
             "$comment": "Ligand ChainIDs to be considered for the RMSD calculations. This determines which chains will be treated as the ligand for the L-RMSD and for I-L-RMSD.",
@@ -477,6 +484,9 @@
           "ui:group": "analysis"
         },
         "dockq": {
+          "ui:group": "analysis"
+        },
+        "global_rmsd": {
           "ui:group": "analysis"
         },
         "irmsd_cutoff": {
@@ -785,6 +795,7 @@
           "mol_shape": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Shape(s)",
             "items": {
               "default": false,
               "title": "Is the molecule a shape?",
@@ -835,10 +846,9 @@
             "$comment": "Force constant applied to the dihedral angle restraints read from dihe_fname.",
             "type": "number",
             "maximum": 9999,
-            "minimum": -9999
+            "minimum": 0
           },
           "ssdihed": {
-            "default": "none",
             "title": "Define automatically backbone dihedral angle restraints",
             "description": "If turned on, this option will automatically defined backbone dihedral angle restraints for the selected regions.",
             "$comment": "This option allows to utomatically defined backbone dihedral angle restraints for the selected regions. The restraints will be defined for the phi and psi backbone dihedral angles of amino acids, with the target value taken from the measured angle in the input structure, and the error bound defined by the error_dih parameter. Those restraints can be applied to the entire structure (all), the alpha/beta secondary structure elements (alphabeta) or only to the alpha helical regions (alpha). Those are automatically detected based on the measured dihedral angle combinations.",
@@ -853,8 +863,8 @@
             "description": "Force constant for backbone dihedral angle restraints (ssdihed option)",
             "$comment": "Force constant for backbone dihedral angle restraints (ssdihed option)",
             "type": "number",
-            "maximum": 9999,
-            "minimum": -9999
+            "maximum": 180,
+            "minimum": 0
           },
           "dnarest_on": {
             "default": false,
@@ -862,6 +872,20 @@
             "description": "Automatically creates restraints to maintain the conformation of DNA/RNA",
             "$comment": "This option allows to restraint the conformation of nucleic acids based on the values from the input structures. The following restraints will be automatically defined: - single base planarity - sugar pucker - phosphate backbone diherdral angle restraints - Watson-Crick base pairing",
             "type": "boolean"
+          },
+          "ligand_param_fname": {
+            "title": "Custom ligand parameter file",
+            "description": "Ligand parameter file in CNS format",
+            "$comment": "Ligand parameter file in CNS format containing all force field parameters (bond, angles, dihedrals, impropers, van der waals) for any ligand not supported by default by HADDOCK",
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "ligand_top_fname": {
+            "title": "Custom ligand topology file",
+            "description": "Ligand topology file in CNS format",
+            "$comment": "Ligand topology file in CNS format containing the ligand topologies (atoms, masses, charges, bond definitions...) for any ligand not supported by default by HADDOCK",
+            "type": "string",
+            "format": "uri-reference"
           },
           "elecflag": {
             "default": true,
@@ -910,6 +934,14 @@
         "dnarest_on": {
           "ui:group": "other restraints"
         },
+        "ligand_param_fname": {
+          "ui:widget": "file",
+          "ui:group": "force field"
+        },
+        "ligand_top_fname": {
+          "ui:widget": "file",
+          "ui:group": "force field"
+        },
         "elecflag": {
           "ui:group": "force field"
         }
@@ -928,6 +960,20 @@
       "schema": {
         "type": "object",
         "properties": {
+          "ligand_param_fname": {
+            "title": "Custom ligand parameter file",
+            "description": "Ligand parameter file in CNS format",
+            "$comment": "Ligand parameter file in CNS format containing all force field parameters (bond, angles, dihedrals, impropers, van der waals) for any ligand not supported by default by HADDOCK",
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "ligand_top_fname": {
+            "title": "Custom ligand topology file",
+            "description": "Ligand topology file in CNS format",
+            "$comment": "Ligand topology file in CNS format containing the ligand topologies (atoms, masses, charges, bond definitions...) for any ligand not supported by default by HADDOCK",
+            "type": "string",
+            "format": "uri-reference"
+          },
           "elecflag": {
             "default": true,
             "title": "Include electrostatics energy",
@@ -940,6 +986,14 @@
         "additionalProperties": false
       },
       "uiSchema": {
+        "ligand_param_fname": {
+          "ui:widget": "file",
+          "ui:group": "force field"
+        },
+        "ligand_top_fname": {
+          "ui:widget": "file",
+          "ui:group": "force field"
+        },
         "elecflag": {
           "ui:group": "force field"
         }
@@ -957,6 +1011,7 @@
           "mol_shape": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Shape(s)",
             "items": {
               "default": false,
               "title": "Is the molecule a shape?",
@@ -1001,7 +1056,6 @@
             "type": "boolean"
           },
           "ssdihed": {
-            "default": "none",
             "title": "Define automatically backbone dihedral angle restraints",
             "description": "If turned on, this option will automatically defined backbone dihedral angle restraints for the selected regions.",
             "$comment": "This option allows to utomatically defined backbone dihedral angle restraints for the selected regions. The restraints will be defined for the phi and psi backbone dihedral angles of amino acids, with the target value taken from the measured angle in the input structure, and the error bound defined by the error_dih parameter. Those restraints can be applied to the entire structure (all), the alpha/beta secondary structure elements (alphabeta) or only to the alpha helical regions (alpha). Those are automatically detected based on the measured dihedral angle combinations.",
@@ -1016,8 +1070,8 @@
             "description": "Force constant for backbone dihedral angle restraints (ssdihed option)",
             "$comment": "Force constant for backbone dihedral angle restraints (ssdihed option)",
             "type": "number",
-            "maximum": 9999,
-            "minimum": -9999
+            "maximum": 180,
+            "minimum": 0
           },
           "dnarest_on": {
             "default": false,
@@ -1025,6 +1079,20 @@
             "description": "Automatically creates restraints to maintain the conformation of DNA/RNA",
             "$comment": "This option allows to restraint the conformation of nucleic acids based on the values from the input structures. The following restraints will be automatically defined: - single base planarity - sugar pucker - phosphate backbone diherdral angle restraints - Watson-Crick base pairing",
             "type": "boolean"
+          },
+          "ligand_param_fname": {
+            "title": "Custom ligand parameter file",
+            "description": "Ligand parameter file in CNS format",
+            "$comment": "Ligand parameter file in CNS format containing all force field parameters (bond, angles, dihedrals, impropers, van der waals) for any ligand not supported by default by HADDOCK",
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "ligand_top_fname": {
+            "title": "Custom ligand topology file",
+            "description": "Ligand topology file in CNS format",
+            "$comment": "Ligand topology file in CNS format containing the ligand topologies (atoms, masses, charges, bond definitions...) for any ligand not supported by default by HADDOCK",
+            "type": "string",
+            "format": "uri-reference"
           },
           "elecflag": {
             "default": true,
@@ -1078,6 +1146,14 @@
         },
         "dnarest_on": {
           "ui:group": "other restraints"
+        },
+        "ligand_param_fname": {
+          "ui:widget": "file",
+          "ui:group": "force field"
+        },
+        "ligand_top_fname": {
+          "ui:widget": "file",
+          "ui:group": "force field"
         },
         "elecflag": {
           "ui:group": "force field"
@@ -1135,10 +1211,10 @@
             "format": "chain"
           },
           "ligand_chains": {
-            "default": ["B"],
+            "default": [],
             "title": "Ligand ChainIDs",
             "description": "Ligand ChainIDs to be considered for the IL-RMSD calculations.",
-            "$comment": "Ligand ChainIDs to be considered for the IL-RMSD calculations. This determines which chains will be treated as the ligand for the IL-RMSD.",
+            "$comment": "Ligand ChainIDs to be considered for the IL-RMSD calculations. This determines which chains will be treated as the ligand for the IL-RMSD. By default, all chains are considered with the exception of the receptor chain.",
             "type": "array",
             "minItems": 0,
             "maxItems": 100,
@@ -1340,6 +1416,7 @@
           "mol_shape": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Shape(s)",
             "items": {
               "default": false,
               "title": "Is the molecule a shape?",
@@ -1383,8 +1460,16 @@
             "$comment": "Turns on dihedral angle restraints. Those should be defined in the dihe_fname file.",
             "type": "boolean"
           },
+          "dihedrals_scale": {
+            "default": 200,
+            "title": "Force constant for dihedral angle restraints",
+            "description": "Force constant applied to the dihedral angle restraints read from dihe_fname.",
+            "$comment": "Force constant applied to the dihedral angle restraints read from dihe_fname.",
+            "type": "number",
+            "maximum": 9999,
+            "minimum": 0
+          },
           "ssdihed": {
-            "default": "none",
             "title": "Define automatically backbone dihedral angle restraints",
             "description": "If turned on, this option will automatically defined backbone dihedral angle restraints for the selected regions.",
             "$comment": "This option allows to utomatically defined backbone dihedral angle restraints for the selected regions. The restraints will be defined for the phi and psi backbone dihedral angles of amino acids, with the target value taken from the measured angle in the input structure, and the error bound defined by the error_dih parameter. Those restraints can be applied to the entire structure (all), the alpha/beta secondary structure elements (alphabeta) or only to the alpha helical regions (alpha). Those are automatically detected based on the measured dihedral angle combinations.",
@@ -1399,7 +1484,7 @@
             "description": "Force constant for backbone dihedral angle restraints (ssdihed option)",
             "$comment": "Force constant for backbone dihedral angle restraints (ssdihed option)",
             "type": "number",
-            "maximum": 1000,
+            "maximum": 180,
             "minimum": 0
           },
           "dnarest_on": {
@@ -1408,6 +1493,20 @@
             "description": "Automatically creates restraints to maintain the conformation of DNA/RNA",
             "$comment": "This option allows to restraint the conformation of nucleic acids based on the values from the input structures. The following restraints will be automatically defined: - single base planarity - sugar pucker - phosphate backbone diherdral angle restraints - Watson-Crick base pairing",
             "type": "boolean"
+          },
+          "ligand_param_fname": {
+            "title": "Custom ligand parameter file",
+            "description": "Ligand parameter file in CNS format",
+            "$comment": "Ligand parameter file in CNS format containing all force field parameters (bond, angles, dihedrals, impropers, van der waals) for any ligand not supported by default by HADDOCK",
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "ligand_top_fname": {
+            "title": "Custom ligand topology file",
+            "description": "Ligand topology file in CNS format",
+            "$comment": "Ligand topology file in CNS format containing the ligand topologies (atoms, masses, charges, bond definitions...) for any ligand not supported by default by HADDOCK",
+            "type": "string",
+            "format": "uri-reference"
           },
           "elecflag": {
             "default": true,
@@ -1454,6 +1553,9 @@
         "dihedrals_on": {
           "ui:group": "dihedral restraints"
         },
+        "dihedrals_scale": {
+          "ui:group": "dihedral restraints"
+        },
         "ssdihed": {
           "ui:group": "dihedral restraints"
         },
@@ -1462,6 +1564,14 @@
         },
         "dnarest_on": {
           "ui:group": "other restraints"
+        },
+        "ligand_param_fname": {
+          "ui:widget": "file",
+          "ui:group": "force field"
+        },
+        "ligand_top_fname": {
+          "ui:widget": "file",
+          "ui:group": "force field"
         },
         "elecflag": {
           "ui:group": "force field"
@@ -1482,7 +1592,6 @@
         "type": "object",
         "properties": {
           "ssdihed": {
-            "default": "none",
             "title": "Define automatically backbone dihedral angle restraints",
             "description": "If turned on, this option will automatically defined backbone dihedral angle restraints for the selected regions.",
             "$comment": "This option allows to utomatically defined backbone dihedral angle restraints for the selected regions. The restraints will be defined for the phi and psi backbone dihedral angles of amino acids, with the target value taken from the measured angle in the input structure, and the error bound defined by the error_dih parameter. Those restraints can be applied to the entire structure (all), the alpha/beta secondary structure elements (alphabeta) or only to the alpha helical regions (alpha). Those are automatically detected based on the measured dihedral angle combinations.",
@@ -1506,6 +1615,20 @@
             "description": "Automatically creates restraints to maintain the conformation of DNA/RNA",
             "$comment": "This option allows to restraint the conformation of nucleic acids based on the values from the input structures. The following restraints will be automatically defined: - single base planarity - sugar pucker - phosphate backbone diherdral angle restraints - Watson-Crick base pairing",
             "type": "boolean"
+          },
+          "ligand_param_fname": {
+            "title": "Custom ligand parameter file",
+            "description": "Ligand parameter file in CNS format",
+            "$comment": "Ligand parameter file in CNS format containing all force field parameters (bond, angles, dihedrals, impropers, van der waals) for any ligand not supported by default by HADDOCK",
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "ligand_top_fname": {
+            "title": "Custom ligand topology file",
+            "description": "Ligand topology file in CNS format",
+            "$comment": "Ligand topology file in CNS format containing the ligand topologies (atoms, masses, charges, bond definitions...) for any ligand not supported by default by HADDOCK",
+            "type": "string",
+            "format": "uri-reference"
           },
           "elecflag": {
             "default": true,
@@ -1538,6 +1661,14 @@
         "dnarest_on": {
           "ui:group": "other restraints"
         },
+        "ligand_param_fname": {
+          "ui:widget": "file",
+          "ui:group": "force field"
+        },
+        "ligand_top_fname": {
+          "ui:widget": "file",
+          "ui:group": "force field"
+        },
         "elecflag": {
           "ui:group": "force field"
         }
@@ -1555,6 +1686,7 @@
           "mol_shape": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Shape(s)",
             "items": {
               "default": false,
               "title": "Is the molecule a shape?",
@@ -1816,6 +1948,20 @@
             "$comment": "Since HADDOCK uses a united atom force field, the non-polar hydrogen atoms can be in principle discarded. This saves computing time. However this should not be done if you are defining distance restraints to specific hydrogen atoms (e.g. when using NMR distance restraints).",
             "type": "boolean"
           },
+          "ligand_param_fname": {
+            "title": "Custom ligand parameter file",
+            "description": "Ligand parameter file in CNS format",
+            "$comment": "Ligand parameter file in CNS format containing all force field parameters (bond, angles, dihedrals, impropers, van der waals) for any ligand not supported by default by HADDOCK",
+            "type": "string",
+            "format": "uri-reference"
+          },
+          "ligand_top_fname": {
+            "title": "Custom ligand topology file",
+            "description": "Ligand topology file in CNS format",
+            "$comment": "Ligand topology file in CNS format containing the ligand topologies (atoms, masses, charges, bond definitions...) for any ligand not supported by default by HADDOCK",
+            "type": "string",
+            "format": "uri-reference"
+          },
           "mol": {
             "title": "Input molecule configuration",
             "$comment": "You can expand this parameter and associated sub-parameters to the other input molecules. For example, if you input three molecules, you can define mol1, mol2, and mol3 subparameters. Those not defined will be populated with the defaults.",
@@ -1829,48 +1975,6 @@
                   "description": "Defines the molecule as a cyclic peptide",
                   "$comment": "This option defines the molecule as a cyclic peptide and HADDOCK will generate a peptide bond between the N- and C-ter provided those are within 2A. This cutoff can be changed in the generate-topology.cns script.",
                   "type": "boolean"
-                },
-                "nhisd": {
-                  "default": 0,
-                  "title": "Number of HISD residue",
-                  "description": "Defines the number of HISD residues (neutral HIS with the proton on the ND atom) residues when autohis=false",
-                  "$comment": "Defines the number of HISD residues (neutral HIS with the proton on the ND atom) residues. The corresponding residue numbers must be defined in the following parameter (hisd_1, hisd_2, ...). Add as many as needed. Note that HIS is interpreted as a charged Histidine)",
-                  "type": "number",
-                  "maximum": 9999,
-                  "minimum": 0
-                },
-                "hisd": {
-                  "type": "array",
-                  "items": {
-                    "title": "HISD residue number",
-                    "description": "Residue number of the Histidine to be defined as HISD",
-                    "$comment": "Residue number of the Histidine to be defined as HISD",
-                    "type": "number",
-                    "maximum": 9999,
-                    "minimum": -9999,
-                    "format": "residue"
-                  }
-                },
-                "nhise": {
-                  "default": 0,
-                  "title": "Number of HISE residue",
-                  "description": "Defines the number of HISE residues (neutral HIS with the proton on the NE atom) residues when autohis=false",
-                  "$comment": "Defines the number of HISE residues (neutral HIS with the proton on the NE atom) residues. The corresponding residue numbers must be defined in the following parameter (hise_1, hise_2, ...). Add as many as needed. Note that HIS is interpreted as a charged Histidine)",
-                  "type": "number",
-                  "maximum": 9999,
-                  "minimum": 0
-                },
-                "hise": {
-                  "type": "array",
-                  "items": {
-                    "title": "HISE residue number",
-                    "description": "Residue number of the Histidine to be defined as HISE",
-                    "$comment": "Residue number of the Histidine to be defined as HISE",
-                    "type": "number",
-                    "maximum": 9999,
-                    "minimum": -9999,
-                    "format": "residue"
-                  }
                 }
               },
               "required": [],
@@ -1886,6 +1990,14 @@
         "delenph": {
           "ui:group": "molecule"
         },
+        "ligand_param_fname": {
+          "ui:widget": "file",
+          "ui:group": "force field"
+        },
+        "ligand_top_fname": {
+          "ui:widget": "file",
+          "ui:group": "force field"
+        },
         "mol": {
           "ui:indexable": true,
           "ui:group": "input molecules"
@@ -1895,15 +2007,7 @@
         "mol": {
           "indexed": true,
           "items": {
-            "sectioned": true,
-            "properties": {
-              "hisd": {
-                "indexed": true
-              },
-              "hise": {
-                "indexed": true
-              }
-            }
+            "sectioned": true
           }
         }
       }
