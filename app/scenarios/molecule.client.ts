@@ -15,7 +15,9 @@ function residuesPerChain<T>(
     const chainName = c.chainname;
     let residues: T[] = [];
     c.eachResidue((r) => {
-      if (r.resname !== "HOH" && !uniqueResidues.has(r.resno)) {
+      if (r.isWater() || r.isIon() || uniqueResidues.has(r.resno)) {
+        // Skip water and ions and residues already added
+      } else {
         residues.push(accessor(r));
       }
       uniqueResidues.add(r.resno);
