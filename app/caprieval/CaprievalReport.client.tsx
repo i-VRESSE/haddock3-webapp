@@ -1,13 +1,11 @@
-import {
-  ClusterTable,
-  StructureTable,
-} from "@i-vresse/haddock3-analysis-components";
-import "./CaprievalReport.client.css";
+import { ClusterTable } from "@i-vresse/haddock3-ui/table/ClusterTable";
+import { StructureTable } from "@i-vresse/haddock3-ui/table/StructureTable";
 
 import { ScatterPlots } from "./ScatterPlots";
 import { useSearchParams } from "@remix-run/react";
 import { BoxPlots } from "./BoxPlots";
 import type { CaprievalData } from "./caprieval.server";
+import { useTheme } from "remix-themes";
 
 /*
  * Component has to be client only due
@@ -16,11 +14,13 @@ import type { CaprievalData } from "./caprieval.server";
 
 export const CaprievalReport = ({ scatters, boxes, table }: CaprievalData) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [theme] = useTheme();
+  const style = { colorScheme: theme === "dark" ? "dark" : "light" };
   const hasOtherCluster =
     "clusters" in table &&
     table.clusters.some((c) => c["cluster_id"] === "Other");
   return (
-    <div className="caprieval-report flex flex-col gap-4">
+    <div className="caprieval-report flex flex-col gap-4" style={style}>
       {"clusters" in table ? (
         <ClusterTable {...table} />
       ) : (

@@ -35,8 +35,7 @@
     "/coverage"
   ],
   "dependencies": {
-    "@i-vresse/haddock3-analysis-components": "^0.4.4",
-    "@i-vresse/haddock3-ui": "^0.1.9",
+    "@i-vresse/haddock3-ui": "^0.2.2",
     "@i-vresse/wb-core": "^3.2.1",
     "@i-vresse/wb-form": "^2.0.1",
     "@radix-ui/react-checkbox": "^1.0.4",
