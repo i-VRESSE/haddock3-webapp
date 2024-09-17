@@ -257,6 +257,7 @@ export default function ProteinProteinScenario() {
                 actpass={proteinActPass}
                 onActPassChange={setProteinActPass}
                 targetChain="A"
+                preprocessPipeline="delhetatmkeepcoord"
               />
               {/* TODO treat glycan as glycan, 
               disable surface calculation (example fails calc),
