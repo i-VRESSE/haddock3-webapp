@@ -892,6 +892,7 @@
           "mol_fix_origin": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Fix origin(s)",
             "items": {
               "default": false,
               "title": "Fix molecule",
@@ -903,6 +904,7 @@
           "mol_shape": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Shape(s)",
             "items": {
               "default": false,
               "title": "Is the molecule a shape?",
@@ -939,7 +941,7 @@
             "type": "string",
             "format": "uri-reference"
           },
-          "amb_scale": {
+          "ambig_scale": {
             "default": 50,
             "title": "Force constant for ambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in ambig_fname.",
@@ -948,7 +950,7 @@
             "maximum": 1000,
             "minimum": 0
           },
-          "unamb_scale": {
+          "unambig_scale": {
             "default": 50,
             "title": "Force constant for unambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in unambig_fname.",
@@ -1019,10 +1021,9 @@
             "$comment": "Force constant applied to the dihedral angle restraints read from dihe_fname.",
             "type": "number",
             "maximum": 9999,
-            "minimum": -9999
+            "minimum": 0
           },
           "ssdihed": {
-            "default": "none",
             "title": "Define automatically backbone dihedral angle restraints",
             "description": "If turned on, this option will automatically defined backbone dihedral angle restraints for the selected regions.",
             "$comment": "This option allows to utomatically defined backbone dihedral angle restraints for the selected regions. The restraints will be defined for the phi and psi backbone dihedral angles of amino acids, with the target value taken from the measured angle in the input structure, and the error bound defined by the error_dih parameter. Those restraints can be applied to the entire structure (all), the alpha/beta secondary structure elements (alphabeta) or only to the alpha helical regions (alpha). Those are automatically detected based on the measured dihedral angle combinations.",
@@ -1037,8 +1038,8 @@
             "description": "Force constant for backbone dihedral angle restraints (ssdihed option)",
             "$comment": "Force constant for backbone dihedral angle restraints (ssdihed option)",
             "type": "number",
-            "maximum": 9999,
-            "minimum": -9999
+            "maximum": 180,
+            "minimum": 0
           },
           "dnarest_on": {
             "default": false,
@@ -1081,6 +1082,7 @@
           },
           "c2sym": {
             "type": "array",
+            "title": "C2 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -1154,6 +1156,7 @@
           },
           "c3sym": {
             "type": "array",
+            "title": "C3 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -1254,6 +1257,7 @@
           },
           "c4sym": {
             "type": "array",
+            "title": "C4 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -1381,6 +1385,7 @@
           },
           "c5sym": {
             "type": "array",
+            "title": "C5 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -1535,6 +1540,7 @@
           },
           "c6sym": {
             "type": "array",
+            "title": "C6 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -1716,6 +1722,7 @@
           },
           "s3sym": {
             "type": "array",
+            "title": "S3 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -1832,6 +1839,7 @@
           },
           "ncs": {
             "type": "array",
+            "title": "Non-crystallographic symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -1999,22 +2007,25 @@
           },
           "dihedflag": {
             "default": true,
+            "title": "Use torsion angle dihedral energy term",
+            "description": "Turns on the torsion angle dihedral energy terms of the force field.",
+            "$comment": "Turns on the torsion angle dihedral energy terms of the force field.",
             "type": "boolean"
           },
           "sampling_factor": {
             "default": 1,
             "title": "Sampling factor for each starting model",
-            "description": "This paramater control how many times a model will be refined.",
-            "$comment": "This paramater control how many times a model will be refined. For EM refinement only it does not make sense to increase it unless random removal of restraints is turned on. If not then the energy minimisation will lead to the same final conformation.",
+            "description": "This parameter control how many times a model will be refined.",
+            "$comment": "This parameter control how many times a model will be refined. For EM refinement only it does not make sense to increase it unless random removal of restraints is turned on. If not then the energy minimisation will lead to the same final conformation.",
             "type": "number",
-            "maximum": 200,
+            "maximum": 500,
             "minimum": 1
           },
           "max_nmodels": {
             "default": 50000,
             "title": "Maximum number of models to refine",
-            "description": "This paramater controls the maximum number of models to refine.",
-            "$comment": "This paramater controls the maximum number of models to refine.",
+            "description": "This parameter controls the maximum number of models to refine.",
+            "$comment": "This parameter controls the maximum number of models to refine.",
             "type": "number",
             "maximum": 100000,
             "minimum": 1
@@ -2029,7 +2040,7 @@
             "minimum": 1
           },
           "tolerance": {
-            "default": 0,
+            "default": 5,
             "title": "Failure tolerance percentage",
             "description": "Percentage of allowed failures for a module to successfully complete",
             "$comment": "Percentage of allowed failures for a module to successfully complete",
@@ -2049,6 +2060,7 @@
           "seg": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Semi-flexible segments",
             "items": {
               "type": "array",
               "items": {
@@ -2249,217 +2261,52 @@
             "maximum": 1000,
             "minimum": -1
           },
-          "nfle1": {
+          "nfle": {
             "default": 0,
             "title": "Number of fully flexible segments",
             "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
+            "$comment": "This parameter defines the number of fully flexible segments for all molecules. If >=1 then those must be defined manually with segment ID (segid) in the fle_seg_* variable, followed by the starting and ending residue numbers in the fle_sta_* and fle_end_* variables.",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
           },
           "fle": {
             "type": "array",
-            "maxItemsFrom": "molecules",
+            "title": "Fully flexible segments",
             "items": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "sta": {
-                    "title": "Starting residue number",
-                    "description": "Residue number defining the start of the fully flexible segment.",
-                    "$comment": "Residue number defining the start of the fully flexible segment.",
-                    "type": "number",
-                    "maximum": 9999,
-                    "minimum": -9999,
-                    "format": "residue"
-                  },
-                  "end": {
-                    "title": "End residue number",
-                    "description": "Residue number defining the end of the fully flexible segment.",
-                    "$comment": "Residue number defining the end of the fully flexible segment.",
-                    "type": "number",
-                    "maximum": 9999,
-                    "minimum": -9999,
-                    "format": "residue"
-                  }
+              "type": "object",
+              "properties": {
+                "sta": {
+                  "title": "Starting residue number",
+                  "description": "Residue number defining the start of the fully flexible segment.",
+                  "$comment": "Residue number defining the start of this (1st) fully flexible segment.",
+                  "type": "number",
+                  "maximum": 9999,
+                  "minimum": -9999,
+                  "format": "residue"
                 },
-                "required": [],
-                "additionalProperties": false
-              }
+                "end": {
+                  "title": "End residue number",
+                  "description": "Residue number defining the end of the fully flexible segment.",
+                  "$comment": "Residue number defining the end of this (1st) fully flexible segment.",
+                  "type": "number",
+                  "maximum": 9999,
+                  "minimum": -9999,
+                  "format": "residue"
+                },
+                "seg": {
+                  "title": "Segment ID (segid)",
+                  "description": "Segment ID of the molecule for which this flexible segment is defined.",
+                  "$comment": "Segment ID of the molecule for which this (1st) flexible segment is defined.",
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4,
+                  "format": "chain"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
             }
-          },
-          "nfle2": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle3": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle4": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle5": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle6": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle7": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle8": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle9": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle10": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle11": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle12": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle13": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle14": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle15": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle16": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle17": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle18": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle19": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle20": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
           }
         },
         "required": [],
@@ -2489,10 +2336,10 @@
           "ui:widget": "file",
           "ui:group": "distance restraints"
         },
-        "amb_scale": {
+        "ambig_scale": {
           "ui:group": "distance restraints"
         },
-        "unamb_scale": {
+        "unambig_scale": {
           "ui:group": "distance restraints"
         },
         "hbond_scale": {
@@ -2713,70 +2560,11 @@
         "nseg20": {
           "ui:group": "flexibility"
         },
-        "nfle1": {
+        "nfle": {
           "ui:group": "flexibility"
         },
         "fle": {
-          "items": {
-            "ui:field": "table"
-          },
-          "ui:group": "flexibility"
-        },
-        "nfle2": {
-          "ui:group": "flexibility"
-        },
-        "nfle3": {
-          "ui:group": "flexibility"
-        },
-        "nfle4": {
-          "ui:group": "flexibility"
-        },
-        "nfle5": {
-          "ui:group": "flexibility"
-        },
-        "nfle6": {
-          "ui:group": "flexibility"
-        },
-        "nfle7": {
-          "ui:group": "flexibility"
-        },
-        "nfle8": {
-          "ui:group": "flexibility"
-        },
-        "nfle9": {
-          "ui:group": "flexibility"
-        },
-        "nfle10": {
-          "ui:group": "flexibility"
-        },
-        "nfle11": {
-          "ui:group": "flexibility"
-        },
-        "nfle12": {
-          "ui:group": "flexibility"
-        },
-        "nfle13": {
-          "ui:group": "flexibility"
-        },
-        "nfle14": {
-          "ui:group": "flexibility"
-        },
-        "nfle15": {
-          "ui:group": "flexibility"
-        },
-        "nfle16": {
-          "ui:group": "flexibility"
-        },
-        "nfle17": {
-          "ui:group": "flexibility"
-        },
-        "nfle18": {
-          "ui:group": "flexibility"
-        },
-        "nfle19": {
-          "ui:group": "flexibility"
-        },
-        "nfle20": {
+          "ui:field": "table",
           "ui:group": "flexibility"
         }
       },
@@ -2841,10 +2629,7 @@
         "fle": {
           "indexed": true,
           "items": {
-            "indexed": true,
-            "items": {
-              "flatten": true
-            }
+            "flatten": true
           }
         }
       }
@@ -2979,7 +2764,7 @@
             "minimum": 1
           },
           "tolerance": {
-            "default": 0,
+            "default": 5,
             "title": "Failure tolerance percentage",
             "description": "Percentage of allowed failures for a module to successfully complete",
             "$comment": "Percentage of allowed failures for a module to successfully complete",
@@ -3056,6 +2841,7 @@
           "mol_fix_origin": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Fix origin(s)",
             "items": {
               "default": false,
               "title": "Fix molecule",
@@ -3067,6 +2853,7 @@
           "mol_shape": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Shape(s)",
             "items": {
               "default": false,
               "title": "Is the molecule a shape?",
@@ -3103,74 +2890,74 @@
             "type": "string",
             "format": "uri-reference"
           },
-          "amb_hot": {
+          "ambig_hot": {
             "default": 10,
             "title": "Hot phase SA force constant for ambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in ambig_fname during the hot phase of the SA.",
-            "$comment": "Force constant applied to the distance restraints defined in ambig_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle_X parameter).",
+            "$comment": "Force constant applied to the distance restraints defined in ambig_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle parameter).",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
           },
-          "amb_cool1": {
+          "ambig_cool1": {
             "default": 10,
             "title": "First cooling SA force constant for ambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in ambig_fname during the first cooling phase of the SA.",
-            "$comment": "Force constant applied to the distance restraints defined in ambig_fname during the first cooling phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle_X parameter).",
+            "$comment": "Force constant applied to the distance restraints defined in ambig_fname during the first cooling phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle parameter).",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
           },
-          "amb_cool2": {
+          "ambig_cool2": {
             "default": 50,
             "title": "Second cooling SA force constant for ambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in ambig_fname during the second cooling phase of the SA.",
-            "$comment": "Force constant applied to the distance restraints defined in ambig_fname during the second cooling phase of the simulatd annealing protocol. Side-chains at the interface are treated as flexible and any region defined in fully flexible segments as fully flexible (see nfle_X parameter).",
+            "$comment": "Force constant applied to the distance restraints defined in ambig_fname during the second cooling phase of the simulatd annealing protocol. Side-chains at the interface are treated as flexible and any region defined in fully flexible segments as fully flexible (see nfle parameter).",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
           },
-          "amb_cool3": {
+          "ambig_cool3": {
             "default": 50,
             "title": "Third cooling SA force constant for ambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in ambig_fname during the third cooling phase of the SA.",
-            "$comment": "Force constant applied to the distance restraints defined in ambig_fname during the third cooling phase of the simulatd annealing protocol. Side-chains and backbone at the interface are treated as flexible and any region defined in fully flexible segments as fully flexible (see nfle_X parameter).",
+            "$comment": "Force constant applied to the distance restraints defined in ambig_fname during the third cooling phase of the simulatd annealing protocol. Side-chains and backbone at the interface are treated as flexible and any region defined in fully flexible segments as fully flexible (see nfle parameter).",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
           },
-          "unamb_hot": {
+          "unambig_hot": {
             "default": 10,
             "title": "Hot phase SA force constant for unambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in unambig_fname during the hot phase of the SA.",
-            "$comment": "Force constant applied to the distance restraints defined in unambig_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle_X parameter).",
+            "$comment": "Force constant applied to the distance restraints defined in unambig_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle parameter).",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
           },
-          "unamb_cool1": {
+          "unambig_cool1": {
             "default": 10,
             "title": "Hot phase SA force constant for unambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in unambig_fname during the hot phase of the SA.",
-            "$comment": "Force constant applied to the distance restraints defined in unambig_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle_X parameter).",
+            "$comment": "Force constant applied to the distance restraints defined in unambig_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle parameter).",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
           },
-          "unamb_cool2": {
+          "unambig_cool2": {
             "default": 50,
             "title": "Hot phase SA force constant for unambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in ambig_fname during the hot phase of the SA.",
-            "$comment": "Force constant applied to the distance restraints defined in unambig_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle_X parameter).",
+            "$comment": "Force constant applied to the distance restraints defined in unambig_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle parameter).",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
           },
-          "unamb_cool3": {
+          "unambig_cool3": {
             "default": 50,
             "title": "Hot phase SA force constant for unambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in unambig_fname during the hot phase of the SA.",
-            "$comment": "Force constant applied to the distance restraints defined in unambig_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle_X parameter).",
+            "$comment": "Force constant applied to the distance restraints defined in unambig_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle parameter).",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
@@ -3179,7 +2966,7 @@
             "default": 10,
             "title": "Hot phase SA force constant for hbond distance restraints",
             "description": "Force constant applied to the hydrogen bond restraints defined in hbond_fname during the hot phase of the SA.",
-            "$comment": "Force constant applied to the hydrogen bond restraints defined in hbond_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle_X parameter).",
+            "$comment": "Force constant applied to the hydrogen bond restraints defined in hbond_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle parameter).",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
@@ -3188,7 +2975,7 @@
             "default": 10,
             "title": "Hot phase SA force constant for hydrogen bond restraints",
             "description": "Force constant applied to the hydrogen bond restraints defined in hbond_fname during the hot phase of the SA.",
-            "$comment": "Force constant applied to the hydrogen bond restraints defined in hbond_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle_X parameter).",
+            "$comment": "Force constant applied to the hydrogen bond restraints defined in hbond_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle parameter).",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
@@ -3197,7 +2984,7 @@
             "default": 50,
             "title": "Hot phase SA force constant for hydrogen bond restraints",
             "description": "Force constant applied to the hydrogen bond restraints defined in hbond_fname during the hot phase of the SA.",
-            "$comment": "Force constant applied to the hydrogen bond restraints defined in hbond_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle_X parameter).",
+            "$comment": "Force constant applied to the hydrogen bond restraints defined in hbond_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle parameter).",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
@@ -3206,7 +2993,7 @@
             "default": 50,
             "title": "Hot phase SA force constant for hydrogen bond restraints",
             "description": "Force constant applied to the hydrogen bond restraints defined in hbond_fname during the hot phase of the SA.",
-            "$comment": "Force constant applied to the hydrogen bond restraints defined in hbond_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle_X parameter).",
+            "$comment": "Force constant applied to the hydrogen bond restraints defined in hbond_fname during the initial hot phase of the simulatd annealing protocol. Molecules are treated as rigid bodies unless fully flexible segments are defined (see nfle parameter).",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
@@ -3317,7 +3104,6 @@
             "minimum": 0
           },
           "ssdihed": {
-            "default": "none",
             "title": "Define automatically backbone dihedral angle restraints",
             "description": "If turned on, this option will automatically defined backbone dihedral angle restraints for the selected regions.",
             "$comment": "This option allows to utomatically defined backbone dihedral angle restraints for the selected regions. The restraints will be defined for the phi and psi backbone dihedral angles of amino acids, with the target value taken from the measured angle in the input structure, and the error bound defined by the error_dih parameter. Those restraints can be applied to the entire structure (all), the alpha/beta secondary structure elements (alphabeta) or only to the alpha helical regions (alpha). Those are automatically detected based on the measured dihedral angle combinations.",
@@ -3332,8 +3118,8 @@
             "description": "Force constant for backbone dihedral angle restraints (ssdihed option)",
             "$comment": "Force constant for backbone dihedral angle restraints (ssdihed option)",
             "type": "number",
-            "maximum": 9999,
-            "minimum": -9999
+            "maximum": 180,
+            "minimum": 0
           },
           "dnarest_on": {
             "default": false,
@@ -3376,6 +3162,7 @@
           },
           "c2sym": {
             "type": "array",
+            "title": "C2 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -3449,6 +3236,7 @@
           },
           "c3sym": {
             "type": "array",
+            "title": "C3 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -3549,6 +3337,7 @@
           },
           "c4sym": {
             "type": "array",
+            "title": "C4 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -3676,6 +3465,7 @@
           },
           "c5sym": {
             "type": "array",
+            "title": "C5 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -3830,6 +3620,7 @@
           },
           "c6sym": {
             "type": "array",
+            "title": "C6 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -4011,6 +3802,7 @@
           },
           "s3sym": {
             "type": "array",
+            "title": "S3 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -4127,6 +3919,7 @@
           },
           "ncs": {
             "type": "array",
+            "title": "Non-crystallographic symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -4348,7 +4141,7 @@
             "default": 1000,
             "title": "Second cooling phase SA MD steps",
             "description": "Number of MD steps for the second cooling phase of the SA.",
-            "$comment": "Number of MD steps for the second cooling phase of torsion angle dynamics of the simulated annealing protocol with flexible side-chains at the interface. Full flexibility is applied to the segments defined as fully flexible (see nfle_X and related parameters).",
+            "$comment": "Number of MD steps for the second cooling phase of torsion angle dynamics of the simulated annealing protocol with flexible side-chains at the interface. Full flexibility is applied to the segments defined as fully flexible (see nfle and related parameters).",
             "type": "number",
             "maximum": 10000,
             "minimum": 0
@@ -4357,7 +4150,7 @@
             "default": 1000,
             "title": "Third cooling phase SA MD steps",
             "description": "Number of MD steps for the third cooling phase of the SA.",
-            "$comment": "Number of MD steps for the third cooling phase of torsion angle dynamics of the simulated annealing protocol with flexible side-chains and backbone at the interface. Full flexibility is applied to the segments defined as fully flexible (see nfle_X and related parameters).",
+            "$comment": "Number of MD steps for the third cooling phase of torsion angle dynamics of the simulated annealing protocol with flexible side-chains and backbone at the interface. Full flexibility is applied to the segments defined as fully flexible (see nfle and related parameters).",
             "type": "number",
             "maximum": 10000,
             "minimum": 0
@@ -4392,6 +4185,7 @@
           "seg": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Semi-flexible segments",
             "items": {
               "type": "array",
               "items": {
@@ -4592,217 +4386,52 @@
             "maximum": 1000,
             "minimum": -1
           },
-          "nfle1": {
+          "nfle": {
             "default": 0,
             "title": "Number of fully flexible segments",
             "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
+            "$comment": "This parameter defines the number of fully flexible segments for all molecules. If >=1 then those must be defined manually with segment ID (segid) in the fle_seg_* variable, followed by the starting and ending residue numbers in the fle_sta_* and fle_end_* variables.",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
           },
           "fle": {
             "type": "array",
-            "maxItemsFrom": "molecules",
+            "title": "Fully flexible segments",
             "items": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "sta": {
-                    "title": "Starting residue number",
-                    "description": "Residue number defining the start of the fully flexible segment.",
-                    "$comment": "Residue number defining the start of the fully flexible segment.",
-                    "type": "number",
-                    "maximum": 9999,
-                    "minimum": -9999,
-                    "format": "residue"
-                  },
-                  "end": {
-                    "title": "End residue number",
-                    "description": "Residue number defining the end of the fully flexible segment.",
-                    "$comment": "Residue number defining the end of the fully flexible segment.",
-                    "type": "number",
-                    "maximum": 9999,
-                    "minimum": -9999,
-                    "format": "residue"
-                  }
+              "type": "object",
+              "properties": {
+                "sta": {
+                  "title": "Starting residue number",
+                  "description": "Residue number defining the start of the fully flexible segment.",
+                  "$comment": "Residue number defining the start of this (1st) fully flexible segment.",
+                  "type": "number",
+                  "maximum": 9999,
+                  "minimum": -9999,
+                  "format": "residue"
                 },
-                "required": [],
-                "additionalProperties": false
-              }
+                "end": {
+                  "title": "End residue number",
+                  "description": "Residue number defining the end of the fully flexible segment.",
+                  "$comment": "Residue number defining the end of this (1st) fully flexible segment.",
+                  "type": "number",
+                  "maximum": 9999,
+                  "minimum": -9999,
+                  "format": "residue"
+                },
+                "seg": {
+                  "title": "Segment ID (segid)",
+                  "description": "Segment ID of the molecule for which this flexible segment is defined.",
+                  "$comment": "Segment ID of the molecule for which this (1st) flexible segment is defined.",
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4,
+                  "format": "chain"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
             }
-          },
-          "nfle2": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle3": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle4": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle5": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle6": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle7": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle8": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle9": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle10": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle11": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle12": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle13": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle14": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle15": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle16": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle17": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle18": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle19": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle20": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
           }
         },
         "required": [],
@@ -4832,28 +4461,28 @@
           "ui:widget": "file",
           "ui:group": "distance restraints"
         },
-        "amb_hot": {
+        "ambig_hot": {
           "ui:group": "distance restraints"
         },
-        "amb_cool1": {
+        "ambig_cool1": {
           "ui:group": "distance restraints"
         },
-        "amb_cool2": {
+        "ambig_cool2": {
           "ui:group": "distance restraints"
         },
-        "amb_cool3": {
+        "ambig_cool3": {
           "ui:group": "distance restraints"
         },
-        "unamb_hot": {
+        "unambig_hot": {
           "ui:group": "distance restraints"
         },
-        "unamb_cool1": {
+        "unambig_cool1": {
           "ui:group": "distance restraints"
         },
-        "unamb_cool2": {
+        "unambig_cool2": {
           "ui:group": "distance restraints"
         },
-        "unamb_cool3": {
+        "unambig_cool3": {
           "ui:group": "distance restraints"
         },
         "hbond_hot": {
@@ -5116,70 +4745,11 @@
         "nseg20": {
           "ui:group": "flexibility"
         },
-        "nfle1": {
+        "nfle": {
           "ui:group": "flexibility"
         },
         "fle": {
-          "items": {
-            "ui:field": "table"
-          },
-          "ui:group": "flexibility"
-        },
-        "nfle2": {
-          "ui:group": "flexibility"
-        },
-        "nfle3": {
-          "ui:group": "flexibility"
-        },
-        "nfle4": {
-          "ui:group": "flexibility"
-        },
-        "nfle5": {
-          "ui:group": "flexibility"
-        },
-        "nfle6": {
-          "ui:group": "flexibility"
-        },
-        "nfle7": {
-          "ui:group": "flexibility"
-        },
-        "nfle8": {
-          "ui:group": "flexibility"
-        },
-        "nfle9": {
-          "ui:group": "flexibility"
-        },
-        "nfle10": {
-          "ui:group": "flexibility"
-        },
-        "nfle11": {
-          "ui:group": "flexibility"
-        },
-        "nfle12": {
-          "ui:group": "flexibility"
-        },
-        "nfle13": {
-          "ui:group": "flexibility"
-        },
-        "nfle14": {
-          "ui:group": "flexibility"
-        },
-        "nfle15": {
-          "ui:group": "flexibility"
-        },
-        "nfle16": {
-          "ui:group": "flexibility"
-        },
-        "nfle17": {
-          "ui:group": "flexibility"
-        },
-        "nfle18": {
-          "ui:group": "flexibility"
-        },
-        "nfle19": {
-          "ui:group": "flexibility"
-        },
-        "nfle20": {
+          "ui:field": "table",
           "ui:group": "flexibility"
         }
       },
@@ -5244,10 +4814,7 @@
         "fle": {
           "indexed": true,
           "items": {
-            "indexed": true,
-            "items": {
-              "flatten": true
-            }
+            "flatten": true
           }
         }
       }
@@ -5500,6 +5067,7 @@
           "mol_fix_origin": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Fix origin(s)",
             "items": {
               "default": false,
               "title": "Fix molecule",
@@ -5511,6 +5079,7 @@
           "mol_shape": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Shape(s)",
             "items": {
               "default": false,
               "title": "Is the molecule a shape?",
@@ -5530,7 +5099,7 @@
             "default": false,
             "title": "Boolean condition on the previous ambiguous distance restraints file",
             "description": "Boolean condition on the previous ambiguous distance restraints file. If true, use the the restraint information coming from the previous CNS module. If false, don't use previous information.",
-            "$comment": "Boolean condition on the ambiguous distance restraints file. If true, use the restraint information coming from the previous CNS module, as long as an ambig_fname is not defined for the current module. If False, don't use previous information.",
+            "$comment": "Boolean condition on the ambiguous distance restraints file. If true, use the restraint information coming from the previous CNS module, as long as an ambig_fname is not defined for the current module. If false, don't use previous information.",
             "type": "boolean"
           },
           "unambig_fname": {
@@ -5547,7 +5116,7 @@
             "type": "string",
             "format": "uri-reference"
           },
-          "amb_scale": {
+          "ambig_scale": {
             "default": 50,
             "title": "Force constant for ambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in ambig_fname.",
@@ -5556,7 +5125,7 @@
             "maximum": 1000,
             "minimum": 0
           },
-          "unamb_scale": {
+          "unambig_scale": {
             "default": 50,
             "title": "Force constant for unambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in unambig_fname.",
@@ -5649,11 +5218,10 @@
             "description": "Force constant applied to the dihedral angle restraints read from dihe_fname.",
             "$comment": "Force constant applied to the dihedral angle restraints read from dihe_fname.",
             "type": "number",
-            "maximum": 1000,
+            "maximum": 9999,
             "minimum": 0
           },
           "ssdihed": {
-            "default": "none",
             "title": "Define automatically backbone dihedral angle restraints",
             "description": "If turned on, this option will automatically defined backbone dihedral angle restraints for the selected regions.",
             "$comment": "This option allows to utomatically defined backbone dihedral angle restraints for the selected regions. The restraints will be defined for the phi and psi backbone dihedral angles of amino acids, with the target value taken from the measured angle in the input structure, and the error bound defined by the error_dih parameter. Those restraints can be applied to the entire structure (all), the alpha/beta secondary structure elements (alphabeta) or only to the alpha helical regions (alpha). Those are automatically detected based on the measured dihedral angle combinations.",
@@ -5668,7 +5236,7 @@
             "description": "Force constant for backbone dihedral angle restraints (ssdihed option)",
             "$comment": "Force constant for backbone dihedral angle restraints (ssdihed option)",
             "type": "number",
-            "maximum": 1000,
+            "maximum": 180,
             "minimum": 0
           },
           "dnarest_on": {
@@ -5712,6 +5280,7 @@
           },
           "c2sym": {
             "type": "array",
+            "title": "C2 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -5785,6 +5354,7 @@
           },
           "c3sym": {
             "type": "array",
+            "title": "C3 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -5885,6 +5455,7 @@
           },
           "c4sym": {
             "type": "array",
+            "title": "C4 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -6012,6 +5583,7 @@
           },
           "c5sym": {
             "type": "array",
+            "title": "C5 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -6166,6 +5738,7 @@
           },
           "c6sym": {
             "type": "array",
+            "title": "C6 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -6347,6 +5920,7 @@
           },
           "s3sym": {
             "type": "array",
+            "title": "S3 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -6463,6 +6037,7 @@
           },
           "ncs": {
             "type": "array",
+            "title": "Non-crystallographic symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -6641,16 +6216,16 @@
             "description": "This parameter control how many times a model will be refined.",
             "$comment": "This parameter control how many times a model will be refined.",
             "type": "number",
-            "maximum": 400,
+            "maximum": 500,
             "minimum": 1
           },
           "max_nmodels": {
-            "default": 10000,
+            "default": 50000,
             "title": "Maximum number of models to refine",
             "description": "This parameter controls the maximum number of models to refine.",
             "$comment": "This parameter controls the maximum number of models to refine.",
             "type": "number",
-            "maximum": 50000,
+            "maximum": 100000,
             "minimum": 1
           },
           "solvent": {
@@ -6720,6 +6295,7 @@
           "seg": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Semi-flexible segments",
             "items": {
               "type": "array",
               "items": {
@@ -6920,217 +6496,52 @@
             "maximum": 1000,
             "minimum": -1
           },
-          "nfle1": {
+          "nfle": {
             "default": 0,
             "title": "Number of fully flexible segments",
             "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
+            "$comment": "This parameter defines the number of fully flexible segments for all molecules. If >=1 then those must be defined manually with segment ID (segid) in the fle_seg_* variable, followed by the starting and ending residue numbers in the fle_sta_* and fle_end_* variables.",
             "type": "number",
             "maximum": 1000,
             "minimum": 0
           },
           "fle": {
             "type": "array",
-            "maxItemsFrom": "molecules",
+            "title": "Fully flexible segments",
             "items": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "sta": {
-                    "title": "Starting residue number",
-                    "description": "Residue number defining the start of the fully flexible segment.",
-                    "$comment": "Residue number defining the start of the fully flexible segment.",
-                    "type": "number",
-                    "maximum": 9999,
-                    "minimum": -9999,
-                    "format": "residue"
-                  },
-                  "end": {
-                    "title": "End residue number",
-                    "description": "Residue number defining the end of the fully flexible segment.",
-                    "$comment": "Residue number defining the end of the fully flexible segment.",
-                    "type": "number",
-                    "maximum": 9999,
-                    "minimum": -9999,
-                    "format": "residue"
-                  }
+              "type": "object",
+              "properties": {
+                "sta": {
+                  "title": "Starting residue number",
+                  "description": "Residue number defining the start of the fully flexible segment.",
+                  "$comment": "Residue number defining the start of this (1st) fully flexible segment.",
+                  "type": "number",
+                  "maximum": 9999,
+                  "minimum": -9999,
+                  "format": "residue"
                 },
-                "required": [],
-                "additionalProperties": false
-              }
+                "end": {
+                  "title": "End residue number",
+                  "description": "Residue number defining the end of the fully flexible segment.",
+                  "$comment": "Residue number defining the end of this (1st) fully flexible segment.",
+                  "type": "number",
+                  "maximum": 9999,
+                  "minimum": -9999,
+                  "format": "residue"
+                },
+                "seg": {
+                  "title": "Segment ID (segid)",
+                  "description": "Segment ID of the molecule for which this flexible segment is defined.",
+                  "$comment": "Segment ID of the molecule for which this (1st) flexible segment is defined.",
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4,
+                  "format": "chain"
+                }
+              },
+              "required": [],
+              "additionalProperties": false
             }
-          },
-          "nfle2": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle3": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle4": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle5": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle6": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle7": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle8": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle9": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle10": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle11": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle12": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle13": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle14": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle15": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle16": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle17": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle18": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle19": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
-          },
-          "nfle20": {
-            "default": 0,
-            "title": "Number of fully flexible segments",
-            "description": "This defines the number of fully flexible segments.",
-            "$comment": "This parameter defines the number of fully flexible segments for the specified molecule. If >=1 then those must be defined manually with starting and end residue numbers in the fle_sta_* and fle_end_* variables.",
-            "type": "number",
-            "maximum": 1000,
-            "minimum": 0
           }
         },
         "required": [],
@@ -7160,10 +6571,10 @@
           "ui:widget": "file",
           "ui:group": "distance restraints"
         },
-        "amb_scale": {
+        "ambig_scale": {
           "ui:group": "distance restraints"
         },
-        "unamb_scale": {
+        "unambig_scale": {
           "ui:group": "distance restraints"
         },
         "hbond_scale": {
@@ -7402,70 +6813,11 @@
         "nseg20": {
           "ui:group": "flexibility"
         },
-        "nfle1": {
+        "nfle": {
           "ui:group": "flexibility"
         },
         "fle": {
-          "items": {
-            "ui:field": "table"
-          },
-          "ui:group": "flexibility"
-        },
-        "nfle2": {
-          "ui:group": "flexibility"
-        },
-        "nfle3": {
-          "ui:group": "flexibility"
-        },
-        "nfle4": {
-          "ui:group": "flexibility"
-        },
-        "nfle5": {
-          "ui:group": "flexibility"
-        },
-        "nfle6": {
-          "ui:group": "flexibility"
-        },
-        "nfle7": {
-          "ui:group": "flexibility"
-        },
-        "nfle8": {
-          "ui:group": "flexibility"
-        },
-        "nfle9": {
-          "ui:group": "flexibility"
-        },
-        "nfle10": {
-          "ui:group": "flexibility"
-        },
-        "nfle11": {
-          "ui:group": "flexibility"
-        },
-        "nfle12": {
-          "ui:group": "flexibility"
-        },
-        "nfle13": {
-          "ui:group": "flexibility"
-        },
-        "nfle14": {
-          "ui:group": "flexibility"
-        },
-        "nfle15": {
-          "ui:group": "flexibility"
-        },
-        "nfle16": {
-          "ui:group": "flexibility"
-        },
-        "nfle17": {
-          "ui:group": "flexibility"
-        },
-        "nfle18": {
-          "ui:group": "flexibility"
-        },
-        "nfle19": {
-          "ui:group": "flexibility"
-        },
-        "nfle20": {
+          "ui:field": "table",
           "ui:group": "flexibility"
         }
       },
@@ -7530,10 +6882,7 @@
         "fle": {
           "indexed": true,
           "items": {
-            "indexed": true,
-            "items": {
-              "flatten": true
-            }
+            "flatten": true
           }
         }
       }
@@ -7584,7 +6933,7 @@
             "default": 0.2,
             "title": "Weight of the intermolecular electrostatic energy",
             "description": "Weight of the intermolecular electrostatic energy in the scoring function",
-            "$comment": "Weight of the intermolecular electrostatic energy in the scoring function. Note that this does not affect the electostatic energy during the EM minimization.",
+            "$comment": "Weight of the intermolecular electrostatic energy in the scoring function. Note that this does not affect the electostatic energy during the MD refinement.",
             "type": "number",
             "maximum": 9999,
             "minimum": -9999
@@ -7615,7 +6964,6 @@
             "minimum": 0
           },
           "ssdihed": {
-            "default": "none",
             "title": "Define automatically backbone dihedral angle restraints",
             "description": "If turned on, this option will automatically defined backbone dihedral angle restraints for the selected regions.",
             "$comment": "This option allows to utomatically defined backbone dihedral angle restraints for the selected regions. The restraints will be defined for the phi and psi backbone dihedral angles of amino acids, with the target value taken from the measured angle in the input structure, and the error bound defined by the error_dih parameter. Those restraints can be applied to the entire structure (all), the alpha/beta secondary structure elements (alphabeta) or only to the alpha helical regions (alpha). Those are automatically detected based on the measured dihedral angle combinations.",
@@ -7682,6 +7030,9 @@
           },
           "dihedflag": {
             "default": true,
+            "title": "Use torsion angle dihedral energy term",
+            "description": "Turns on the torsion angle dihedral energy terms of the force field.",
+            "$comment": "Turns on the torsion angle dihedral energy terms of the force field.",
             "type": "boolean"
           },
           "individualize": {
@@ -7836,6 +7187,7 @@
           "mol_fix_origin": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Fix origin(s)",
             "items": {
               "default": false,
               "title": "Fix molecule",
@@ -7847,6 +7199,7 @@
           "mol_shape": {
             "type": "array",
             "maxItemsFrom": "molecules",
+            "title": "Shape(s)",
             "items": {
               "default": false,
               "title": "Is the molecule a shape?",
@@ -7883,7 +7236,7 @@
             "type": "string",
             "format": "uri-reference"
           },
-          "amb_scale": {
+          "ambig_scale": {
             "default": 50,
             "title": "Force constant for ambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in ambig_fname.",
@@ -7892,7 +7245,7 @@
             "maximum": 1000,
             "minimum": 0
           },
-          "unamb_scale": {
+          "unambig_scale": {
             "default": 50,
             "title": "Force constant for unambiguous distance restraints",
             "description": "Force constant applied to the distance restraints defined in unambig_fname.",
@@ -8062,7 +7415,7 @@
             "minimum": 0
           },
           "tolerance": {
-            "default": 0,
+            "default": 5,
             "title": "Failure tolerance percentage",
             "description": "Percentage of allowed failures for a module to successfully complete",
             "$comment": "Percentage of allowed failures for a module to successfully complete",
@@ -8104,6 +7457,7 @@
           },
           "c2sym": {
             "type": "array",
+            "title": "C2 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -8177,6 +7531,7 @@
           },
           "c3sym": {
             "type": "array",
+            "title": "C3 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -8277,6 +7632,7 @@
           },
           "c4sym": {
             "type": "array",
+            "title": "C4 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -8404,6 +7760,7 @@
           },
           "c5sym": {
             "type": "array",
+            "title": "C5 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -8558,6 +7915,7 @@
           },
           "c6sym": {
             "type": "array",
+            "title": "C6 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -8739,6 +8097,7 @@
           },
           "s3sym": {
             "type": "array",
+            "title": "S3 symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -8855,6 +8214,7 @@
           },
           "ncs": {
             "type": "array",
+            "title": "Non-crystallographic symmetry restraints",
             "items": {
               "type": "object",
               "properties": {
@@ -9057,10 +8417,10 @@
           "ui:widget": "file",
           "ui:group": "distance restraints"
         },
-        "amb_scale": {
+        "ambig_scale": {
           "ui:group": "distance restraints"
         },
-        "unamb_scale": {
+        "unambig_scale": {
           "ui:group": "distance restraints"
         },
         "hbond_scale": {
@@ -9534,6 +8894,7 @@
                 },
                 "hisd": {
                   "type": "array",
+                  "title": "Histidines to be defined as HISD",
                   "items": {
                     "title": "HISD residue number",
                     "description": "Residue number of the Histidine to be defined as HISD",
@@ -9555,6 +8916,7 @@
                 },
                 "hise": {
                   "type": "array",
+                  "title": "Histidines to be defined as HISE",
                   "items": {
                     "title": "HISE residue number",
                     "description": "Residue number of the Histidine to be defined as HISE",
