@@ -144,7 +144,7 @@ export function AtomStructureSubForm({
     const residues = chainsFromStructure(structure)[targetChain];
     residues.forEach((residue) => {
       residue.surface =
-        accessibilityCutoff > 0
+        accessibilityCutoff > 0 && restraints.surfaceResidues.length > 0
           ? restraints.surfaceResidues.includes(residue.resno)
           : true;
     });
@@ -156,7 +156,7 @@ export function AtomStructureSubForm({
       residues,
       file: restraints.file,
       surfaceResidues:
-        accessibilityCutoff > 0
+        accessibilityCutoff > 0 && restraints.surfaceResidues.length > 0
           ? restraints.surfaceResidues
           : residues.map((r) => r.resno),
     };

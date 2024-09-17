@@ -20,8 +20,16 @@ export function useSurfaceCutoff({
     }
     setBusy(true);
     try {
-      const surfaceResidues = await calculateAccessibility(safeFile, cutoff);
-      setSurfaceResidues(surfaceResidues[0][targetChain] || []);
+      const [surfaceResidues, error] = await calculateAccessibility(
+        safeFile,
+        cutoff,
+      );
+      if (error) {
+        console.error(error);
+        setBusy(false);
+        return;
+      }
+      setSurfaceResidues(surfaceResidues[targetChain] || []);
     } finally {
       setBusy(false);
     }
