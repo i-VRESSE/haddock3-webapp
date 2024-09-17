@@ -186,7 +186,6 @@ export function HeteroMoleculeSubForm({
   actpass,
   onActPassChange,
   targetChain,
-  mayUseCustomLigandFiles,
 }: {
   name: string;
   legend: string;
@@ -194,36 +193,9 @@ export function HeteroMoleculeSubForm({
   actpass: ActPassSelection;
   onActPassChange: (actpass: ActPassSelection) => void;
   targetChain: string;
-  mayUseCustomLigandFiles: boolean;
 }) {
   const [processedFile, setProcessedFile] = useState<File | undefined>();
   const [selected, setSelected] = useState<Hetero | undefined>();
-
-  // TODO remove if once https://github.com/haddocking/haddock3/issues/914 is fixed
-  if (!mayUseCustomLigandFiles) {
-    return (
-      <MoleculeSubFormWrapper legend={legend} description={""}>
-        <div className="text-destructive text-xl">
-          <p>
-            Your expertise level is to low to set all the parameters needed for
-            a ligand.
-          </p>
-          <p>
-            Once{" "}
-            <a
-              href="https://github.com/haddocking/haddock3/issues/914"
-              target="_blank"
-              rel="noreferrer"
-              className="underline"
-            >
-              haddock3 issue #914
-            </a>{" "}
-            is solved, you will be allowed use this scenario.
-          </p>
-        </div>
-      </MoleculeSubFormWrapper>
-    );
-  }
 
   async function onSelect(newSelected: Hetero, file: File) {
     const pdbWithSingleHet = await hetGrepFile(
@@ -293,28 +265,24 @@ export function HeteroMoleculeSubForm({
           <CopyButton content={actpass.active.join(",")} />
         </div>
       )}
-      {mayUseCustomLigandFiles && (
-        <>
-          <FormItem name="ligand_param_fname" label="Custom parameter file">
-            <Input
-              type="file"
-              id="ligand_param_fname"
-              name="ligand_param_fname"
-              accept=".param"
-              required
-            />
-          </FormItem>
-          <FormItem name="ligand_top_fname" label="Custom topology file">
-            <Input
-              type="file"
-              id="ligand_top_fname"
-              name="ligand_top_fname"
-              accept=".top"
-              required
-            />
-          </FormItem>
-        </>
-      )}
+      <FormItem name="ligand_param_fname" label="Custom parameter file">
+        <Input
+          type="file"
+          id="ligand_param_fname"
+          name="ligand_param_fname"
+          accept=".param"
+          required
+        />
+      </FormItem>
+      <FormItem name="ligand_top_fname" label="Custom topology file">
+        <Input
+          type="file"
+          id="ligand_top_fname"
+          name="ligand_top_fname"
+          accept=".top"
+          required
+        />
+      </FormItem>
     </MoleculeSubFormWrapper>
   );
 }

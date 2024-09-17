@@ -25,10 +25,8 @@ import {
   CAPRIEVAL_SCATTERPLOT_CHOICES,
   CAPRIEVAL_BOXPLOT_CHOICES,
 } from "./constants";
-import type {
-  ClusterTable,
-  StructureTable,
-} from "@i-vresse/haddock3-analysis-components";
+import type { ClusterTable } from "@i-vresse/haddock3-ui/table/ClusterTable";
+import type { StructureTable } from "@i-vresse/haddock3-ui/table/StructureTable";
 import { BartenderError } from "~/models/errors";
 import { getDataFromHtml, getPlotFromHtml } from "~/lib/html";
 
