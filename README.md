@@ -176,6 +176,7 @@ Then run the app in production mode:
 export $(cat .env |grep -v '#' |xargs)
 npm start
 ```
+
 ## Stack
 
 The tech stack is explained in [docs/stack.md](docs/stack.md).
