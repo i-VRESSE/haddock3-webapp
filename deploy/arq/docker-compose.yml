@@ -63,10 +63,6 @@ services:
         source: ./bartender-config.yaml
         target: /opt/bartender/config.yaml
         read_only: true
-      - type: bind
-        source: ../cns
-        target: /opt/haddock3/bin/cns
-        read_only: true
       - bartender-certs:/certs:ro
       - bartender-job-data:/jobs
     depends_on:
@@ -116,10 +112,6 @@ services:
       - type: bind
         source: ./bartender-config.yaml
         target: /opt/bartender/config.yaml
-        read_only: true
-      - type: bind
-        source: ../cns
-        target: /opt/haddock3/bin/cns
         read_only: true
       - bartender-job-data:/jobs
     depends_on:

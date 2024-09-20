@@ -1,10 +1,9 @@
 # Haddock3 webapp within BonvinLab computational stuctural biology portal
 
-See [docs of portal mode](../docs/portal.md) for more information.
+See [docs of portal mode](../../docs/portal.md) for more information.
 
 ```shell
 # Inside csbportal repo
-cp <cns executable> haddock3-webapp/deploy/cns
 # Start csbportal with haddock3-webapp/deploy/portal/docker-compose.yml included in up command
 ```
 
