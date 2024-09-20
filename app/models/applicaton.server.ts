@@ -127,7 +127,7 @@ function rewriteConfig(table: ReturnType<typeof parse>) {
   table.postprocess = true;
   table.clean = true;
   table.offline = false;
-  table.less_io = true;
+  table.debug = false;
 
   const haddock3_ncores = getNCores();
   if (haddock3_ncores > 0) {
