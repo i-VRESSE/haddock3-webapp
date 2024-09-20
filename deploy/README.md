@@ -1,7 +1,7 @@
 # Deployments
 
--> [!NOTE]
--> All deployment methods contain the `cns` executable which is free non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md.
+> [!NOTE]
+> All deployment methods contain the `cns` executable which is free non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md.
 
 ## Methods
 
