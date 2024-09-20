@@ -31,7 +31,7 @@ jobs:
         with:
           images: ghcr.io/i-vresse/bartender
           labels: |
-            org.opencontainers.image.description=bartender web service with haddock3, lightdock, gdock executables. Image does contain cns executable, which is free non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md.
+            org.opencontainers.image.description=bartender web service with haddock3, lightdock, gdock executables. Image does contain cns executable, which is free for non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md.
             org.opencontainers.image.url=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/README.md#images
             org.opencontainers.image.documentation.url=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/README.md#images
       - name: Login to DockerHub

@@ -39,6 +39,10 @@ Web app->>+Bartender: State of job
 Web app->>+Bartender: Result of job
 ```
 
+## Deployment
+
+Deployments with containers are explained in [deploy/README.md](deploy/README.md).
+
 ## Setup
 
 The web app is written in [Node.js](https://nodejs.org/) to install dependencies run:
@@ -158,7 +162,7 @@ npm run typecheck
 
 For testing see [docs/testing.md](docs/testing.md).
 
-## Deployment
+## Start production server
 
 First, build your app for production:
 
@@ -172,9 +176,6 @@ Then run the app in production mode:
 export $(cat .env |grep -v '#' |xargs)
 npm start
 ```
-
-Other deployments with containers are explained in [deploy/README.md](deploy/README.md).
-
 ## Stack
 
 The tech stack is explained in [docs/stack.md](docs/stack.md).

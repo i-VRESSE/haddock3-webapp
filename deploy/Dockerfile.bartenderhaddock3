@@ -2,7 +2,7 @@
 FROM python:3.9-slim-bookworm AS builder
 LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/Dockerfile.bartenderhaddock3
 LABEL org.opencontainers.image.licenses=Apache-2.0
-LABEL org.opencontainers.image.description="bartender web service with haddock3, lightdock, gdock executables. Image does contain cns executable, which is free non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md."
+LABEL org.opencontainers.image.description="bartender web service with haddock3, lightdock, gdock executables. Image does contain cns executable, which is free for non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md."
 
 ARG HADDOCK3_GHORG=haddocking
 ARG HADDOCK3_VERSION=main

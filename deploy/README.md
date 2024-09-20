@@ -1,7 +1,7 @@
 # Deployments
 
 > [!NOTE]
-> All deployment methods contain the `cns` executable which is free non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md.
+> All deployment methods contain the `cns` executable which is free for non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md.
 
 ## Methods
 
@@ -51,7 +51,7 @@ When a pull request is closed, you are reminded in a comment to remove the image
 
 Bartender web service with haddock3, lightdock, gdock executables.
 
-Image does contain cns executable, which is free non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md.
+Image does contain cns executable, which is free for non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md.
 
 This image can be used to run the
 
