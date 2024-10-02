@@ -58,11 +58,15 @@ WORKDIR /
 
 FROM python:3.9-slim-bookworm
 
+# cns is linked against libquadmath0, so install it
+RUN apt-get update && \
+  apt-get install -y libquadmath0 \
+  &&  \
+  apt-get clean && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /wait /wait
 COPY --from=builder /venv /venv
 COPY --from=builder /opt/haddock3 /opt/haddock3
-# cns executable installed by haddock3 is linked against gcc library quadmath so we need to copy it as well
-COPY --from=builder /lib/x86_64-linux-gnu/libquadmath.so.0 /lib/x86_64-linux-gnu/libquadmath.so.0
 # Just copy the required files
 COPY --from=builder /opt/bartender/alembic.ini /opt/bartender/alembic.ini
 COPY --from=builder /opt/bartender/src/bartender/db/migrations /opt/bartender/src/bartender/db/migrations
