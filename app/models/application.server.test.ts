@@ -211,7 +211,7 @@ mode = 'local'
 postprocess = true
 clean = true
 offline = false
-less_io = true
+debug = false
 ncores = 1
 
 [alascan]
@@ -239,7 +239,7 @@ mode = 'local'
 postprocess = true
 clean = true
 offline = false
-less_io = true
+debug = false
 ncores = 1
 
 [clustfcc]

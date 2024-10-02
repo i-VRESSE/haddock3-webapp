@@ -3,8 +3,6 @@
 ```shell
 # Must be in root of repo
 cd ../..
-# Need cns executable in deploy directory, so it can be mounted into the Docker container
-cp <cns executable> deploy/cns
 # Pull, create and start webapp and its services
 docker compose -f deploy/arq/docker-compose.yml up
 ```

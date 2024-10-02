@@ -1,11 +1,7 @@
 # Deployments
 
 > [!NOTE]
-> All deployment methods require the `cns` executable to available in this directory.
->
-> On Apple M1 and later versions, the `cns` executable should be compiled for the linux arm64 platform. On Intel or AMD processors the `cns` executable should be compiled for the linux amd64 platform.
->
-> The `cns` executable should have its execute bit set with `chmod +x cns`.
+> All deployment methods contain the `cns` executable which is free for non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md.
 
 ## Methods
 
@@ -55,7 +51,7 @@ When a pull request is closed, you are reminded in a comment to remove the image
 
 Bartender web service with haddock3, lightdock, gdock executables.
 
-Image does not contain real cns executable, downstream should bind or copy it to /opt/haddock3/bin/cns.
+Image does contain cns executable, which is free for non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md.
 
 This image can be used to run the
 

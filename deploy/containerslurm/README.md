@@ -5,8 +5,6 @@ To test against a local container with [Slurm](https://github.com/xenon-middlewa
 ```shell
 # Must be in root of repo
 cd ../..
-# Need cns executable in deploy directory, so it can be mounted into the Docker container
-cp <cns executable> deploy/cns
 docker compose -f deploy/remoteslurm/docker-compose.yml -f deploy/containerslurm/docker-compose.yml up --build
 ```
 

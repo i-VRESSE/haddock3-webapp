@@ -16,7 +16,6 @@ node_modules
 /public_key.pem
 
 Caddyfile
-/deploy/cns
 /test-results/
 /playwright-report/
 /blob-report/

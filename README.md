@@ -40,6 +40,10 @@ Web app->>+Bartender: State of job
 Web app->>+Bartender: Result of job
 ```
 
+## Deployment
+
+Deployments with containers are explained in [deploy/README.md](deploy/README.md).
+
 ## Setup
 
 The web app is written in [Node.js](https://nodejs.org/) to install dependencies run:
@@ -94,7 +98,6 @@ See [docs/scenarios.md](docs/scenarios.md) for more information on how the web a
 ### Develop inside devcontainer
 
 You can develop inside a [devcontainer](https://containers.dev/) inside Visual Studio Code. The devcontainer includes all services required by the webapp.
-You just have to supply the cns executable as `./deploy/cns` file, see [deployment](deploy/README.md), before building/starting the containers.
 
 When you exit VS code the containers will keep running, kill by running `docker compose -f .devcontainer/docker-compose.yml -p haddock3-webapp_devcontainer down` in the terminal or in VS Code reopen folder outside container.
 
@@ -160,7 +163,7 @@ npm run typecheck
 
 For testing see [docs/testing.md](docs/testing.md).
 
-## Deployment
+## Start production server
 
 First, build your app for production:
 
@@ -174,8 +177,6 @@ Then run the app in production mode:
 export $(cat .env |grep -v '#' |xargs)
 npm start
 ```
-
-Other deployments with containers are explained in [deploy/README.md](deploy/README.md).
 
 ## Stack
 
