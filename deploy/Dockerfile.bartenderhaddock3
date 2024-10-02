@@ -1,5 +1,5 @@
 # Dockerfile for bartender web service with haddock3, lightdock, gdock executables.
-FROM python:3.12-slim-bookworm AS builder
+FROM python:3.9-slim-bookworm AS builder
 LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/Dockerfile.bartenderhaddock3
 LABEL org.opencontainers.image.licenses=Apache-2.0
 LABEL org.opencontainers.image.description="bartender web service with haddock3, lightdock, gdock executables. Image does contain cns executable, which is free for non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md."
@@ -22,7 +22,7 @@ RUN apt-get update && \
   &&  \
   apt-get clean && rm -rf /var/lib/apt/lists/* \
   && \
-  pip install --upgrade pip
+  pip install --upgrade pip wheel
 
 RUN python3 -m venv /venv
 ENV PATH=/venv/bin:$PATH
@@ -43,7 +43,7 @@ ENV GDOCK_PATH=/opt/gdock
 # bartender ==========================================================================================================
 
 WORKDIR /opt/bartender
-RUN echo cachebust=1 && git clone --depth 1 -b ${BARTENDER_VERSION} https://github.com/i-VRESSE/bartender.git .
+RUN echo cachebust=2 && git clone --depth 1 -b ${BARTENDER_VERSION} https://github.com/i-VRESSE/bartender.git .
 RUN pip install .
 
 # haddock3 ============================================================================================================
@@ -56,11 +56,13 @@ WORKDIR /
 
 # final image =========================================================================================================
 
-FROM python:3.12-slim-bookworm
+FROM python:3.9-slim-bookworm
 
 COPY --from=builder /wait /wait
 COPY --from=builder /venv /venv
 COPY --from=builder /opt/haddock3 /opt/haddock3
+# cns executable installed by haddock3 is linked against gcc library quadmath so we need to copy it as well
+COPY --from=builder /lib/x86_64-linux-gnu/libquadmath.so.0 /lib/x86_64-linux-gnu/libquadmath.so.0
 # Just copy the required files
 COPY --from=builder /opt/bartender/alembic.ini /opt/bartender/alembic.ini
 COPY --from=builder /opt/bartender/src/bartender/db/migrations /opt/bartender/src/bartender/db/migrations
