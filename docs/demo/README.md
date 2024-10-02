@@ -53,6 +53,10 @@ See how form and text visualization are synchronized.
 
 ### Browse page
 
+#### Other visualizations
+
+#### Re-running module
+
 #### Edit
 
 If you found looking at the results that you want use a slightly different workflow, you can edit the job and resubmit it.

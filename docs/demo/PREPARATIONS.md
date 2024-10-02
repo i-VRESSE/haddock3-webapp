@@ -35,16 +35,14 @@ Goto http://localhost:8000/register and fill in the form.
 1. Goto http://localhost:8000/upload
 2. Upload [./input/antibody-antigen-workflow.zip](./input/antibody-antigen-workflow.zip) file
 3. Submit
-4. Wait for the job to complete, on my laoptop this took TODO
+4. Wait for the job to complete, on my laptop it took 17 minutes
 5. Goto report page of job
 6. Goto browse page of job
 7. Download the whole job as a zip file
 8. Rename to `antibody-antigen-completed.zip`
-9. Upload zip to SURFDrive
 
 ### Step 5b: Add completed job
 
-1. Download the `antibody-antigen-completed.zip` from SURFDrive
 2. Goto http://localhost:8000/upload
 3. Select output zip option
 4. Upload the files from the `./antibody-antigen-completed.zip`.
