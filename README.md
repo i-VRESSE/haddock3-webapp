@@ -13,7 +13,6 @@ Uses
 - [workflow-builder](https://github.com/i-VRESSE/workflow-builder) to construct a Haddock3 workflow config file.
 - [haddock3](https://github.com/haddocking/haddock3) to compute and
   - Its embedded restraints web service is also used.
-- [haddock3-analysis-components](https://github.com/i-VRESSE/haddock3-analysis-components) for analysis components.
 - [haddock3-ui](https://github.com/i-VRESSE/haddock3-ui) for reusable UI components.
 
 ```mermaid
