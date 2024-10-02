@@ -258,6 +258,7 @@ export default function Page() {
                 actpass={proteinActPass}
                 onActPassChange={setProteinActPass}
                 targetChain="A"
+                preprocessPipeline="delhetatmkeepcoord"
               />
               <MacroMoleculeSubForm
                 name="dna"

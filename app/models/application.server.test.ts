@@ -1,8 +1,8 @@
 import JSZip from "jszip";
 import { assert, describe, test } from "vitest";
 
-import { rewriteConfigInArchive } from "./applicaton.server";
 import { WORKFLOW_CONFIG_FILENAME } from "../bartender-client/constants";
+import { rewriteConfigInArchive } from "./applicaton.server";
 
 const HY3_PDB = `\
 ATOM      1  SHA SHA S   1      30.913  40.332   2.133  1.00 36.12      S       
@@ -189,6 +189,64 @@ ncores = 1
 plot_matrix = true
 
 [clustrmsd]
+
+plot_matrix = true
+`;
+    const output_config = await retrieveConfigFromArchive(result);
+    assert.equal(output_config, expected_config);
+  });
+
+  test("plot and output should be set to true for alascan module", async () => {
+    const input_config = `\
+[alascan]
+`;
+    const archive = await prepareArchive(input_config);
+
+    const result = await rewriteConfigInArchive(archive, ["easy"]);
+
+    const expected_config = `\
+
+run_dir = 'output'
+mode = 'local'
+postprocess = true
+clean = true
+offline = false
+less_io = true
+ncores = 1
+
+[alascan]
+
+plot = true
+output = true
+`;
+    const output_config = await retrieveConfigFromArchive(result);
+    assert.equal(output_config, expected_config);
+  });
+
+  test("plot_matrix should be set for repeated modules", async () => {
+    const input_config = `\
+[clustfcc]
+[clustfcc]
+`;
+    const archive = await prepareArchive(input_config);
+
+    const result = await rewriteConfigInArchive(archive, ["easy"]);
+
+    const expected_config = `\
+
+run_dir = 'output'
+mode = 'local'
+postprocess = true
+clean = true
+offline = false
+less_io = true
+ncores = 1
+
+[clustfcc]
+
+plot_matrix = true
+
+['clustfcc.1']
 
 plot_matrix = true
 `;

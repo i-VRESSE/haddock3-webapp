@@ -40,5 +40,5 @@ The application by default assumes to be running at / path.
 To build with prefix /haddock3/ use the following command:
 
 ```shell
-docker compose -f deploy/arq/docker-compose.yml build --build-arg HADDOCK3_WEBAPP_PREFIX=/haddock3/
+docker compose -f deploy/arq/docker-compose.yml build --build-arg HADDOCK3WEBAPP_PREFIX=/haddock3/
 ```

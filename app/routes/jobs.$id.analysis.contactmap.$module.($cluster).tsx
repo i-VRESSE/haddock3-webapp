@@ -2,17 +2,18 @@ import { json, redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 
 import { getBartenderToken } from "~/bartender-client/token.server";
-import { getCompletedJobById, jobIdFromParams } from "~/models/job.server";
-import { Button } from "~/components/ui/button";
-import {
-  getClusters,
-  getClusterInfo,
-  isContactMapModule,
-  ContactMapCluster,
-  getParams,
-} from "~/contactmap/contactmap.server";
-import { Cluster } from "~/contactmap/Cluster.client";
 import { ClientOnly } from "~/components/ClientOnly";
+import { Button } from "~/components/ui/button";
+import { Cluster } from "~/contactmap/Cluster.client";
+import {
+  ContactMapCluster,
+  getClusterInfo,
+  getClusters,
+  getModelInfo,
+  getParams,
+  isContactMapModule,
+} from "~/contactmap/contactmap.server";
+import { getCompletedJobById, jobIdFromParams } from "~/models/job.server";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobid = jobIdFromParams(params);
@@ -35,16 +36,27 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const clusterIds = await getClusters(moduleInfo, bartenderToken);
   if (params.cluster === undefined) {
     return redirect(
-      `/jobs/${jobid}/analysis/contactmap/${moduleIndex}/${clusterIds[0]}`,
+      `/jobs/${jobid}/analysis/contactmap/${moduleIndex}/${clusterIds.ids[0]}`,
     );
   }
   const clusterId = params.cluster;
-  const cluster = await getClusterInfo(
-    parseInt(clusterId),
-    moduleInfo,
-    bartenderToken,
-    moduleParams,
-  );
+  let cluster: ContactMapCluster;
+  if (clusterIds.clustered) {
+    cluster = await getClusterInfo(
+      parseInt(clusterId),
+      moduleInfo,
+      bartenderToken,
+      moduleParams,
+    );
+  } else {
+    cluster = await getModelInfo(
+      parseInt(clusterId),
+      moduleInfo,
+      bartenderToken,
+      moduleParams,
+      clusterIds.fns[clusterIds.ids.indexOf(parseInt(clusterId))],
+    );
+  }
   return json({ moduleIndex, clusterIds, cluster, jobid });
 };
 
@@ -62,11 +74,11 @@ export default function ContactMapPage() {
         </Button>
       </div>
       <div className="flex flex-row gap-2 pb-2">
-        {clusterIds.map((id) => {
+        {clusterIds.ids.map((id) => {
           if (id === cluster.id) {
             return (
               <Button key={id} disabled>
-                Cluster {id}
+                {clusterIds.clustered ? "Cluster" : "Model"} {id}
               </Button>
             );
           }
@@ -76,7 +88,7 @@ export default function ContactMapPage() {
                 href={id.toString()}
                 title={`Show contact map plots for cluster ${id}`}
               >
-                Cluster {id}
+                {clusterIds.clustered ? "Cluster" : "Model"} {id}
               </a>
             </Button>
           );
