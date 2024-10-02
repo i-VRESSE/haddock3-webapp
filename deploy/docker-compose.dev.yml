@@ -1,4 +1,3 @@
-version: "3.7"
 services:
   userdb:
     image: postgres:15.2-bullseye

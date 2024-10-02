@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   webapp:
     image: ghcr.io/i-vresse/haddock3-webapp:${WEBAPP_TAG:-latest}

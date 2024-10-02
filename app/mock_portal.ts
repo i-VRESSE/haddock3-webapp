@@ -4,7 +4,8 @@
  * The backend can be used to validate the user's session or logout.
  * The portal revere proxies the haddock3 webapp from the /haddock30 path.
  */
-import http, { OutgoingHttpHeaders } from "node:http";
+import http from "node:http";
+import type { OutgoingHttpHeaders } from "node:http";
 
 import { parse } from "cookie";
 

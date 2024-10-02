@@ -252,18 +252,23 @@ export async function processUserStructure(
   );
   const safeProcessed = await jsonSafeFile(processed);
   let surfaceResidues: Record<string, number[]> = {};
+  let errors: RestraintsErrors | undefined = undefined;
   let error: string | undefined = undefined;
   if (accessibilityCutoff > 0) {
     [surfaceResidues, error] = await calculateAccessibility(
       safeProcessed,
       accessibilityCutoff,
     );
+    if (error) {
+      if (error.includes("Error: Radius is <= 0")) {
+        // Ignore errors like:
+        // Error: Radius is <= 0 (-1.0) for the residue: GLN, atom: HE21
+      } else {
+        errors = { accessibility: error };
+      }
+    }
   }
   const bodyRestraints = await restrainBodies(safeProcessed);
-  let errors: RestraintsErrors | undefined = undefined;
-  if (error) {
-    errors = { accessibility: error };
-  }
   return {
     surfaceResidues: surfaceResidues[targetChain] ?? [],
     bodyRestraints,

@@ -11,7 +11,8 @@
       "extensions": [
         "YoavBls.pretty-ts-errors",
         "bradlc.vscode-tailwindcss",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "vitest.explorer"
       ]
     }
   }

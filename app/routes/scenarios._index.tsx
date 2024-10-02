@@ -11,7 +11,7 @@ const scenarios: Scenario[] = [
   {
     url: "/scenarios/antibody-antigen",
     title: "Antibody Antigen",
-    description: "Based on HADDOCK3 Antibody Antigen tutorial",
+    description: "Based on HADDOCK3 Antibody Antigen docking tutorial",
   },
   {
     url: "/scenarios/protein-protein",
@@ -32,6 +32,16 @@ const scenarios: Scenario[] = [
     url: "/scenarios/protein-glycan",
     title: "Protein Glycan",
     description: "Based on HADDOCK3 Protein Glycan docking example",
+  },
+  {
+    url: "/scenarios/scoring",
+    title: "Scoring",
+    description: "Based on HADDOCK3 CAPRI Scoring example",
+  },
+  {
+    url: "/scenarios/refinement",
+    title: "Refinement",
+    description: "Based on HADDOCK3 Molecular Dynamics refinement example",
   },
 ];
 
