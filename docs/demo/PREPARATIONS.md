@@ -10,7 +10,7 @@ So download the following structures should be from the PDB database:
 
 The files are available in the `./input` directory.
 
-The cli needs preprocessing, the webapp can use PDB files straight from the PDB database and will do preprocessing for you. 
+The cli needs preprocessing, the webapp can use PDB files straight from the PDB database and will do preprocessing for you.
 
 ### Step 2: Start the webapp locally
 
@@ -26,7 +26,7 @@ Goto http://localhost:8000/register and fill in the form.
 
 ### Step 4: Enable light mode and use easy expertise level
 
-1. Goto http://localhost:8000/profile 
+1. Goto http://localhost:8000/profile
 2. Select easy expertise level (this will make the job builder less busy)
 3. Select light mode.
 
@@ -45,7 +45,7 @@ Goto http://localhost:8000/register and fill in the form.
 ### Step 5b: Add completed job
 
 1. Download the `antibody-antigen-completed.zip` from SURFDrive
-2. Goto http://localhost:8000/upload 
+2. Goto http://localhost:8000/upload
 3. Select output zip option
 4. Upload the files from the `./antibody-antigen-completed.zip`.
 5. After completion check that report and browse page work
