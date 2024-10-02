@@ -1,5 +1,5 @@
 # Dockerfile for bartender web service with haddock3, lightdock, gdock executables.
-FROM python:3.9-slim-bookworm AS builder
+FROM python:3.12-slim-bookworm AS builder
 LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/Dockerfile.bartenderhaddock3
 LABEL org.opencontainers.image.licenses=Apache-2.0
 LABEL org.opencontainers.image.description="bartender web service with haddock3, lightdock, gdock executables. Image does contain cns executable, which is free for non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md."
@@ -48,15 +48,15 @@ RUN pip install .
 
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
-RUN echo cachebust=8 && git clone --depth 1 -b ${HADDOCK3_VERSION} https://github.com/${HADDOCK3_GHORG}/haddock3.git .
-# Do not need kaleido (226Mb) for the webapp
-RUN grep -v kaleido requirements.txt > requirements.pruned.txt && mv requirements.pruned.txt requirements.txt
+RUN echo cachebust=9 && git clone --depth 1 -b ${HADDOCK3_VERSION} https://github.com/${HADDOCK3_GHORG}/haddock3.git .
 RUN pip install .
+# For restraints web service
+RUN pip install fastapi uvicorn
 WORKDIR /
 
 # final image =========================================================================================================
 
-FROM python:3.9-slim-bookworm
+FROM python:3.12-slim-bookworm
 
 COPY --from=builder /wait /wait
 COPY --from=builder /venv /venv

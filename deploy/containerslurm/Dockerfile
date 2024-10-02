@@ -23,7 +23,7 @@ RUN apt-get update && \
 RUN add-apt-repository -y ppa:deadsnakes/ppa && \
     DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt install -y python3.9 python3.9-dev python3.9-distutils && \
     wget https://bootstrap.pypa.io/get-pip.py && \
-    python3.9 get-pip.py && \
+    python3 get-pip.py && \
     rm get-pip.py && \
     pip install -U pip==23.3.2
 
@@ -36,14 +36,12 @@ RUN /usr/local/bin/pip install lightdock==${LIGHTDOCK_VERSION}
 WORKDIR /opt/gdock
 RUN git clone --depth 1 -b ${GDOCK_VERSION} https://github.com/gdocking/gdock.git .
 RUN pip install matplotlib==3.8.4  # dont install 3.9.0rc2
-RUN python3.9 setup.py develop
+RUN python3 setup.py develop
 RUN bash install.sh /opt/gdock
 ENV GDOCK_PATH=/opt/gdock
 
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
-RUN echo cachebust=7 && git clone --depth 1 -b ${HADDOCK3_VERSION} https://github.com/${HADDOCK3_GHORG}/haddock3.git .
-# Do not need kaleido (226Mb) for the webapp
-RUN grep -v kaleido requirements.txt > requirements.pruned.txt && mv requirements.pruned.txt requirements.txt
+RUN echo cachebust=8 && git clone --depth 1 -b ${HADDOCK3_VERSION} https://github.com/${HADDOCK3_GHORG}/haddock3.git .
 RUN pip install .
 WORKDIR /
