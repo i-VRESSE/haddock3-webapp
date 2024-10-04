@@ -33,12 +33,13 @@ RUN echo cachebust=1 && pip install lightdock==${LIGHTDOCK_VERSION}
 
 # gdock =============================================================================================================
 
-WORKDIR /opt/gdock
-RUN git clone --depth 1 -b ${GDOCK_VERSION} https://github.com/gdocking/gdock.git .
-RUN pip install matplotlib==3.8.4  # dont install 3.9.0rc2
-RUN python setup.py develop
-RUN bash install.sh /opt/gdock
-ENV GDOCK_PATH=/opt/gdock
+# Gdock installation kaput currently, so skipping, see https://github.com/gdocking/gdock/issues/44 for details
+# WORKDIR /opt/gdock
+# RUN git clone --depth 1 -b ${GDOCK_VERSION} https://github.com/gdocking/gdock.git .
+# RUN pip install matplotlib==3.8.4  # dont install 3.9.0rc2
+# RUN python setup.py develop
+# RUN bash install.sh /opt/gdock
+# ENV GDOCK_PATH=/opt/gdock
 
 # bartender ==========================================================================================================
 
