@@ -107,7 +107,7 @@ molecules =  [
 
 [rigidbody]
 # number of models to generate
-sampling = 200
+sampling = 1000
 # paratope to surface ambig restraints
 ambig_fname = "${data.ambig_fname.name}"
 ${unambig_line}
