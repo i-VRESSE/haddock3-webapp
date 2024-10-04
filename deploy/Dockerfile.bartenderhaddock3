@@ -58,11 +58,16 @@ WORKDIR /
 
 FROM python:3.9-slim-bookworm
 
-# cns executable installed by haddock3 is linked against libquadmath on linux/amd64
+# cns executable installed by haddock3 is linked against libquadmath on linux/amd64 and libgfortran5 on linux/arm64
 ARG TARGETPLATFORM
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
     apt-get update && \
     apt-get install -y libquadmath0 \
+    &&  \
+    apt-get clean && rm -rf /var/lib/apt/lists/*;fi
+RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+    apt-get update && \
+    apt-get install -y libgfortran5 \
     &&  \
     apt-get clean && rm -rf /var/lib/apt/lists/*;fi
 
@@ -81,6 +86,9 @@ ENV PYTHONPATH=/opt/haddock3/src
 CMD ["/venv/bin/bartender", "serve"]
 
 HEALTHCHECK --interval=30s --timeout=5s CMD curl --fail http://localhost:8000/api/health || exit 1
+
+# Make sure cns is linked correctly
+RUN ldd /venv/lib/python3.9/site-packages/haddock/bin/cns
 
 # non-root user ======================================================================================================
 
