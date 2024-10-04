@@ -42,6 +42,7 @@ Web app->>+Bartender: Result of job
 ## Deployment
 
 Deployments with containers are explained in [deploy/README.md](deploy/README.md).
+The easiest deployment is with a single worker at [deploy/arq/README.mnd](deploy/arq/README.md).
 
 ## Setup
 
@@ -79,7 +80,7 @@ See [docs/bartender.md](docs/bartender.md) how to set it up.
 
 ## Haddock3 restraints web service
 
-The scenario forms uses the [haddock3 restraints web service](https://github.com/haddocking/haddock3/blob/main/src/haddock/clis/restraints/webservice.py). to calulate restraints based on given active residues and structures.
+The scenario forms uses the [haddock3 restraints web service](https://github.com/haddocking/haddock3/blob/main/src/haddock/clis/restraints/webservice.py). to calculate restraints based on given active residues and structures.
 
 For the web application to use this service, it needs to be running with
 
@@ -94,88 +95,7 @@ See [docs/scenarios.md](docs/scenarios.md) for more information on how the web a
 
 ## Development
 
-### Develop inside devcontainer
-
-You can develop inside a [devcontainer](https://containers.dev/) inside Visual Studio Code. The devcontainer includes all services required by the webapp.
-
-When you exit VS code the containers will keep running, kill by running `docker compose -f .devcontainer/docker-compose.yml -p haddock3-webapp_devcontainer down` in the terminal or in VS Code reopen folder outside container.
-
-### Development outside devcontainer
-
-To develop the webapp ouside a devcontainer you have the following services running:
-
-1. PostgreSQL database for user management
-2. [Bartender web service](https://github.com/i-VRESSE/bartender/) for job executation and input/output storage.
-3. [Haddock3 restraints web service]() for calculating restraints on scenario pages.
-
-The PostgreSQL database can be started in a container with
-
-```sh
-npm run docker:dev
-```
-
-(Stores data in a Docker volume)
-(You can get a psql shell with `npm run psql:dev`)
-(On CTRL-C the database is stopped. To remove container and volume use `npm run docker:devrm`)
-
-The database must be initialized with
-
-```sh
-npm run setup
-# This will create tables
-```
-
-## Start development server
-
-Start [remix](https://remix.run) development server from your terminal with:
-
-```sh
-npm run dev
-```
-
-This will refresh & rebuild assets on file changes.
-
-## Other development commands
-
-The database setup should be run only once for a fresh database.
-Whenever you change the `app/drizzle/schema.server.ts` file you need to run [npm run generate:migration](https://orm.drizzle.team/kit-docs/commands#generate-migrations) to generate a migration, edit generated `app/drizzle/*.sql` file if needed and then run `npm run setup` to apply migration to database.
-
-To format according to [prettier](https://prettier.io) run
-
-```sh
-npm run format
-```
-
-It's recommended to install an editor plugin (like the [VSCode Prettier plugin](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)) to get auto-formatting on save.
-
-To lint according [eslint](https://eslint.org) run
-
-```sh
-npm run lint
-```
-
-To check the Typescript types run
-
-```sh
-npm run typecheck
-```
-
-For testing see [docs/testing.md](docs/testing.md).
-
-## Start production server
-
-First, build your app for production:
-
-```sh
-npm run build
-```
-
-Then run the app in production mode:
-
-```sh
-export $(cat .env |grep -v '#' |xargs)
-npm start
-```
+For development instructions see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Stack
 
