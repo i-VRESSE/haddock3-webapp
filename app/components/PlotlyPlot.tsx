@@ -1,5 +1,6 @@
 import Plot from "react-plotly.js";
 import type { Data, Layout } from "plotly.js";
+import "./plotly-override.css";
 
 export interface PlotlyProps {
   data: Data[];
