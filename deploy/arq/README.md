@@ -2,7 +2,7 @@
 
 ```shell
 # Must be in root of repo
-cd ../..
+# cd ../..
 # Pull, create and start webapp and its services
 docker compose -f deploy/arq/docker-compose.yml up
 ```
@@ -10,6 +10,16 @@ docker compose -f deploy/arq/docker-compose.yml up
 The haddock3 webapp should be running on http://localhost:8080
 
 Next steps are to go to http://localhost:8080/register to register as admin and finally submit a job.
+
+## Second time running
+
+If you alread did an up once before, you might have an old version of the images.
+To get the latest version of the images use:
+
+```shell
+git pull
+docker compose -f deploy/arq/docker-compose.yml up --pull always
+```
 
 ## Alternative versions
 

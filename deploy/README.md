@@ -14,7 +14,7 @@
 
 The webapp version is what is currently checked out.
 
-Versions of bartender, haddock3, gdock and lightdock are defined in the start of the [./Dockerfile.bartenderhaddock3](./Dockerfile.bartenderhaddock3) file.
+Versions of bartender, haddock3, openmm and lightdock are defined in the start of the [./Dockerfile.bartenderhaddock3](./Dockerfile.bartenderhaddock3) file.
 A version can be a git tag, branch or commit hash.
 They can be overwritten during build with
 
@@ -49,7 +49,7 @@ When a pull request is closed, you are reminded in a comment to remove the image
 
 ## bartender image
 
-Bartender web service with haddock3, lightdock, gdock executables.
+Bartender web service with haddock3, lightdock, openmm executables.
 
 Image does contain cns executable, which is free for non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md.
 
@@ -58,6 +58,11 @@ This image can be used to run the
 1. bartender web service, with `bartender serve` command
 2. bartender worker, with `bartender perform` command
 3. haddock3 restraints web service, with `uvicorn --host 0.0.0.0 --port 5000 haddock.clis.restraints.webservice:app` command
+
+Currently the image will contain the haddock3 installed from the main branch of the haddock3 repository.
+Due to Docker's caching mechanism, not the latest version of the haddock3 repository will be used on rebuilds.
+To force a rebuild of the image with the latest haddock3, update the `cachebust` line in the haddock3 section of the [./Dockerfile.bartenderhaddock3](./Dockerfile.bartenderhaddock3) file and build the image.
+Building of the latest tag can be triggered by creating a new release in this repository.
 
 ## certmaker image
 
