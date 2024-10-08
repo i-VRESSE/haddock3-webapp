@@ -1,3 +1,2 @@
-// TODO only render big proteins as surfaces other molecules as spacefill
-// current workaround is to molecule has more than 50 residues, render as surface
+// if molecule has more than 50 residues, render as surface otherwise as spacefill
 export const BIG_MOLECULE = 50;

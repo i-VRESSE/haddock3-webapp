@@ -86,7 +86,6 @@ export function GlycanResiduesSelect({
                   key={r.resno}
                   resno={r.resno}
                   resname={r.resname}
-                  // TODO render resname as seq is always uninformative 'X'
                   seq={r.seq}
                   highlight={highlight === r.resno}
                   activeChecked={selected.act.includes(r.resno)}
