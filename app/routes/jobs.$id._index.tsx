@@ -5,7 +5,13 @@ import {
   type LoaderFunctionArgs,
   ActionFunctionArgs,
 } from "@remix-run/node";
-import { Link, useLoaderData, useRevalidator } from "@remix-run/react";
+import {
+  Link,
+  useFetcher,
+  useLoaderData,
+  useRevalidator,
+  useSubmit,
+} from "@remix-run/react";
 
 import {
   deleteJob,
@@ -22,6 +28,7 @@ import { ListFiles } from "~/browse/ListFiles";
 import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
 import { prefix } from "~/prefix";
 import { DirectoryItem } from "~/bartender-client/types";
+import { Button } from "~/components/ui/button";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
@@ -65,10 +72,14 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const user = await getUser(request);
   const token = await getBartenderTokenByUser(user);
   await deleteJob(jobId, token);
+  if (request.headers.get("referer") === request.url) {
+    return redirect(prefix);
+  }
   return null;
 };
 
 export default function JobPage() {
+  const submit = useSubmit();
   const { job, HADDOCK3WEBAPP_REFRESH_RATE_MS, lastCheckedOn, inputFiles } =
     useLoaderData<typeof loader>();
   const { revalidate } = useRevalidator();
@@ -106,6 +117,15 @@ export default function JobPage() {
     <main className="flex gap-16">
       <div>
         <JobStatus job={job} lastStateCheckOn={lastCheckedOn} />
+        {(job.state === "queued" || job.state === "running") && (
+          <Button
+            variant="outline"
+            title="Cancel job"
+            onClick={() => deleteJobConfirm(submit)}
+          >
+            Cancel
+          </Button>
+        )}
         {/* show dots loader indicating we monitor state change */}
         {job.state !== "error" && job.state !== "ok" ? (
           <DotsLoader
@@ -115,23 +135,31 @@ export default function JobPage() {
           />
         ) : null}
       </div>
-      {inputFiles.children && inputFiles.children.length && (
-      <div>
-        <h2 className="text-2xl">Input</h2>
-        <ListFiles files={inputFiles!} jobid={job.id} />
-        <p>
-          <a href={`${prefix}jobs/${job.id}/input.zip`}>
-            &#128230; Download archive
-          </a>
-        </p>
-        {hasWorkflow && job.state === 'error' && (
+      {inputFiles.children && inputFiles.children.length > 0 && (
+        <div>
+          <h2 className="text-2xl">Input</h2>
+          <ListFiles files={inputFiles!} jobid={job.id} />
           <p>
-            <Link to={`${prefix}jobs/${job.id}/edit`}>&#128393; Edit</Link>
+            <a href={`${prefix}jobs/${job.id}/input.zip`}>
+              &#128230; Download archive
+            </a>
           </p>
-        )}
-      </div>
+          {hasWorkflow && job.state === "error" && (
+            <p>
+              <Link to={`${prefix}jobs/${job.id}/edit`}>&#128393; Edit</Link>
+            </p>
+          )}
+        </div>
       )}
-      {/* TODO allow job to be cancelled, need bartender support first */}
     </main>
   );
+}
+
+type Submit = ReturnType<typeof useFetcher>["submit"];
+
+function deleteJobConfirm(submit: Submit): void {
+  if (window.confirm("Are you sure you want to cancel job?") === false) {
+    return;
+  }
+  submit({}, { method: "delete" });
 }
