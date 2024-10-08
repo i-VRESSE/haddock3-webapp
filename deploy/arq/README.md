@@ -11,9 +11,9 @@ The haddock3 webapp should be running on http://localhost:8080
 
 Next steps are to go to http://localhost:8080/register to register as admin and finally submit a job.
 
-## Second time running
+## Updating existing deployment
 
-If you alread did an up once before, you might have an old version of the images.
+If you already did an up once before, you might have an old version of the images.
 To get the latest version of the images use:
 
 ```shell
