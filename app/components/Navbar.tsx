@@ -22,7 +22,6 @@ const LoggedInButton = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        {/* TODO button is not vertically centered */}
         <Button
           variant="outline"
           size="icon"
