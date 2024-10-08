@@ -150,7 +150,6 @@ export const OutputReport = ({
             </div>
             <details>
               <summary className="cursor-pointer">Files</summary>
-              {/* TODO should we hide io.json and params.cfg? */}
               <ListFiles files={module.output} jobid={jobid} />
             </details>
           </li>

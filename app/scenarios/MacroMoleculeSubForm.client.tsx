@@ -22,14 +22,17 @@ import {
   Molecule,
   ResidueSubFormProps,
 } from "./AtomStructureSubForm.client";
-import { toggleResidue } from "./toggleResidue";
 import { BIG_MOLECULE } from "./constants";
 import { useSurfaceCutoff } from "./useSurfaceCutoff";
 import { computeNeighbours, useNeighbourRadius } from "./useNeighbourRadius";
 import { useSafeFile } from "./useSafeFile";
 import { useTheme } from "remix-themes";
 import { Viewer } from "@i-vresse/haddock3-ui";
-import { ActPass, ResidueSelection } from "@i-vresse/haddock3-ui/toggles";
+import {
+  ActPass,
+  ResidueSelection,
+  toggleResidue,
+} from "@i-vresse/haddock3-ui/toggles";
 
 export function ResiduesSubForm({
   molecule,
@@ -157,7 +160,10 @@ export function ResiduesSubForm({
     ) {
       return;
     }
-    const newSelection = toggleResidue(resno, picker3D, actpass);
+    const newSelection = toggleResidue(resno, picker3D, {
+      act: actpass.active,
+      pass: actpass.passive,
+    });
     handle2DResidueChange(newSelection);
   }
 

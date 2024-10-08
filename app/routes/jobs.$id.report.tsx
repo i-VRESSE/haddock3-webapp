@@ -20,8 +20,6 @@ import { CaprievalReport } from "~/caprieval/CaprievalReport.client";
 import { JobName } from "~/components/JobName";
 import { buttonVariants } from "~/components/ui/button";
 import { prefix } from "~/prefix";
-// TODO rescore is not used here, so imports should not be from this module
-// move to a separate module called ~/model/modules and ~/models/caprieval
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobid = jobIdFromParams(params);

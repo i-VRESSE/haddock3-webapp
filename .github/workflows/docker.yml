@@ -7,7 +7,6 @@ on:
     tags:
       - v*
   pull_request:
-  # TODO have way to rebuild bartender image when it and its deps have updated
 
 jobs:
   bartender:

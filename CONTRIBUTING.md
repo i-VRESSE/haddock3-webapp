@@ -105,3 +105,17 @@ Then run the app in production mode:
 export $(cat .env |grep -v '#' |xargs)
 npm start
 ```
+
+## Creating a release
+
+If you made changes to the webapp and want to create a new release, follow these steps:
+
+1. Update the version in `package.json`
+2. Goto the [releases page](https://github.com/i-VRESSE/haddock3-webapp/releases)
+3. Copy the first line in the description of the latest release to you clipboard.
+4. Click on the `Draft a new release` button
+5. Paste the line from the clipboard into the `Tag version` field
+6. Set tag and title to same version used in `package.json` with a `v` prefix.
+7. Press `Generate release notes` button
+8. Adjust description if needed
+9. Press `Publish release` button

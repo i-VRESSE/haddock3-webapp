@@ -67,9 +67,6 @@ export function handleActionButton(
 ) {
   const submitEvent = event as SubmitEvent;
   const kind = submitEvent.submitter?.getAttribute("value");
-  // TODO validate zip against catalog
-  // now done on server for kind=upload
-  // or on /builder page in devtools console for kind=refine
   if (kind === "refine") {
     onRefine(zipPromise, navigate);
   } else if (kind === "download") {
