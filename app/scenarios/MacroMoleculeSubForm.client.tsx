@@ -28,7 +28,11 @@ import { computeNeighbours, useNeighbourRadius } from "./useNeighbourRadius";
 import { useSafeFile } from "./useSafeFile";
 import { useTheme } from "remix-themes";
 import { Viewer } from "@i-vresse/haddock3-ui";
-import { ActPass, ResidueSelection, toggleResidue } from "@i-vresse/haddock3-ui/toggles";
+import {
+  ActPass,
+  ResidueSelection,
+  toggleResidue,
+} from "@i-vresse/haddock3-ui/toggles";
 
 export function ResiduesSubForm({
   molecule,
