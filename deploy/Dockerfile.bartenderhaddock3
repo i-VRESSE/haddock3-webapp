@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.description="bartender web service with haddock3,
 
 ARG HADDOCK3_GHORG=haddocking
 ARG HADDOCK3_VERSION=main
-ARG BARTENDER_VERSION=main
+ARG BARTENDER_VERSION=v0.5.1
 ARG GDOCK_VERSION=main
 ARG LIGHTDOCK_VERSION=0.9.4
 ARG OPENMM_VERSION=8.1.2

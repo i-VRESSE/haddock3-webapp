@@ -36,7 +36,7 @@
   ],
   "dependencies": {
     "@i-vresse/haddock3-ui": "^0.3.1",
-    "@i-vresse/wb-core": "^3.2.1",
+    "@i-vresse/wb-core": "^3.2.4",
     "@i-vresse/wb-form": "^2.0.1",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.5",

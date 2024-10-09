@@ -17,7 +17,7 @@ jobs:
     env:
       HADDOCK3_GHORG: "haddocking"
       HADDOCK3_VERSION: "main"
-      BARTENDER_VERSION: "main"
+      BARTENDER_VERSION: "v0.5.1"
       GDOCK_VERSION: "main"
       LIGHTDOCK_VERSION: "0.9.4"
     steps:
