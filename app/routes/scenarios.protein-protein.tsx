@@ -42,7 +42,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = uploadaction;
 
 const Schema = object({
-  // TODO check content of pdb files are valid
   protein1: instance(File, "First protein structure as PDB file"),
   protein2: instance(File, "Second protein structure as PDB file"),
   nrSelectedProtein1Residues: pipe(

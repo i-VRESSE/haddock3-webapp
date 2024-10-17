@@ -6,9 +6,11 @@ LABEL org.opencontainers.image.description="bartender web service with haddock3,
 
 ARG HADDOCK3_GHORG=haddocking
 ARG HADDOCK3_VERSION=main
-ARG BARTENDER_VERSION=main
+ARG BARTENDER_VERSION=v0.5.1
 ARG GDOCK_VERSION=main
 ARG LIGHTDOCK_VERSION=0.9.4
+ARG OPENMM_VERSION=8.1.2
+ARG PDBFIXER_VERSION=1.9
 
 COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
 
@@ -17,7 +19,7 @@ COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
   apt-get install -y --no-install-recommends \
-  build-essential git ca-certificates curl libgfortran5 \
+  build-essential git ca-certificates curl libgfortran5 cmake swig cython3 doxygen \
   wget \
   &&  \
   apt-get clean && rm -rf /var/lib/apt/lists/* \
@@ -33,12 +35,27 @@ RUN echo cachebust=1 && pip install lightdock==${LIGHTDOCK_VERSION}
 
 # gdock =============================================================================================================
 
-WORKDIR /opt/gdock
-RUN git clone --depth 1 -b ${GDOCK_VERSION} https://github.com/gdocking/gdock.git .
-RUN pip install matplotlib==3.8.4  # dont install 3.9.0rc2
-RUN python setup.py develop
-RUN bash install.sh /opt/gdock
-ENV GDOCK_PATH=/opt/gdock
+# Gdock installation kaput currently, so skipping, see https://github.com/gdocking/gdock/issues/44 for details
+# WORKDIR /opt/gdock
+# RUN git clone --depth 1 -b ${GDOCK_VERSION} https://github.com/gdocking/gdock.git .
+# RUN pip install matplotlib==3.8.4  # dont install 3.9.0rc2
+# RUN python setup.py develop
+# RUN bash install.sh /opt/gdock
+# ENV GDOCK_PATH=/opt/gdock
+
+# openmm =============================================================================================================
+
+WORKDIR /opt/openmm
+RUN wget https://github.com/openmm/openmm/archive/refs/tags/${OPENMM_VERSION}.tar.gz && \
+    tar -xzf ${OPENMM_VERSION}.tar.gz && \
+    cd openmm-${OPENMM_VERSION} && \
+    mkdir build && \
+    cd build && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=/venv && \
+    make -j4 && \
+    make install && \
+    make PythonInstall
+RUN pip install https://github.com/openmm/pdbfixer/archive/refs/tags/${PDBFIXER_VERSION}.tar.gz
 
 # bartender ==========================================================================================================
 
@@ -48,7 +65,7 @@ RUN pip install .
 
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
-RUN echo cachebust=10 && git clone --depth 1 -b ${HADDOCK3_VERSION} https://github.com/${HADDOCK3_GHORG}/haddock3.git .
+RUN echo cachebust=13 && git clone --depth 1 -b ${HADDOCK3_VERSION} https://github.com/${HADDOCK3_GHORG}/haddock3.git .
 RUN pip install .
 # For restraints web service
 RUN pip install fastapi uvicorn
@@ -58,11 +75,16 @@ WORKDIR /
 
 FROM python:3.9-slim-bookworm
 
-# cns executable installed by haddock3 is linked against libquadmath on linux/amd64
+# cns executable installed by haddock3 is linked against libquadmath on linux/amd64 and libgfortran5 on linux/arm64
 ARG TARGETPLATFORM
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
     apt-get update && \
     apt-get install -y libquadmath0 \
+    &&  \
+    apt-get clean && rm -rf /var/lib/apt/lists/*;fi
+RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+    apt-get update && \
+    apt-get install -y libgfortran5 \
     &&  \
     apt-get clean && rm -rf /var/lib/apt/lists/*;fi
 

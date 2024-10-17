@@ -259,10 +259,6 @@ export default function ProteinProteinScenario() {
                 targetChain="A"
                 preprocessPipeline="delhetatmkeepcoord"
               />
-              {/* TODO treat glycan as glycan, 
-              disable surface calculation (example fails calc),
-              only active as restraints flavour kind,
-              render as ball+stick  */}
               {/* TODO molstar has carbohydrate representation, check if there is equiv in ngl */}
               <GlycanMoleculeSubForm
                 name="glycan"
