@@ -2,7 +2,7 @@
 
 This a demonstration of the [Antibody-antigen modelling tutorial](https://www.bonvinlab.org/education/HADDOCK3/HADDOCK3-antibody-antigen/), but instead of using the Haddock3 command line interface, we will use the webapp.
 
-This demo can be prepared using the [preparations](PREPARATIONS.md) guide.
+This demo must be prepared using the [preparations](PREPARATIONS.md) guide.
 
 From the original tutorial we use scenario 2b: Docking using the paratope and the NMR-identified epitope as active
 
@@ -51,7 +51,21 @@ See how form and text visualization are synchronized.
 
 ### Report page
 
+A completed job willl show the output of last caprieval module.
+The clusters are shown in a table with all their scores and the top 4 structures. For the Haddock3 score the more negative the better.
+
+[![Screenshot of cluster table on the report page](./screenshots/report-table.png)](./screenshots/report-table.png)
+
+[![Screenshot of 3D complex on the report page](./screenshots/report-3dviewer.png)](./screenshots/report-3dviewer.png)
+
+[![Screenshot of scoring plots on the report page](./screenshots/report-plots.png)](./screenshots/report-plots.png)
+
 ### Browse page
+
+The browse page shows the output of all the modules.
+If the submitted workflow did not have a caprieval module the the browse page is shown.
+
+[![Screenshot of browse page of a completed job](./screenshots/browse.png)](./screenshots/browse.png)
 
 #### Other visualizations
 
@@ -86,6 +100,7 @@ See https://rascar.science.uu.nl/stats
 3. HADDOCK3 is more modular and flexible, while HADDOCK2 can do one workflow
 4. HADDOCK3 workflow aka configuration file is in toml format
 5. HADDOCK3 accepts modules from the community
+6. HADDOCK3 has analyis modules, while in HADDOCK3 they where part of the web application
 
 ### HADDOCK3 web application vs HADDOCK2 application
 
