@@ -9,6 +9,7 @@ import {
   Residue,
   ResidueCheckbox,
   ResidueSelection,
+  toggleResidue,
   useResidueChangeHandler,
 } from "@i-vresse/haddock3-ui/toggles";
 import { useTheme } from "remix-themes";
@@ -20,7 +21,6 @@ import {
 } from "./AtomStructureSubForm.client";
 import { PreprocessPipeline } from "./restraints";
 import { LabeledRadioGroup } from "./LabeledRadioGroup";
-import { toggleResidue } from "./toggleResidue";
 import { ImportResidues, PickIn3D } from "./ResiduesSelect";
 import { useSafeFile } from "./useSafeFile";
 import { Spinner } from "~/components/ui/spinner";
@@ -86,7 +86,6 @@ export function GlycanResiduesSelect({
                   key={r.resno}
                   resno={r.resno}
                   resname={r.resname}
-                  // TODO render resname as seq is always uninformative 'X'
                   seq={r.seq}
                   highlight={highlight === r.resno}
                   activeChecked={selected.act.includes(r.resno)}
@@ -179,7 +178,10 @@ function ResiduesSubForm({
     if (molecule.targetChain !== chain) {
       return;
     }
-    const newSelection = toggleResidue(resno, picker3D, actpass);
+    const newSelection = toggleResidue(resno, picker3D, {
+      act: actpass.active,
+      pass: actpass.passive,
+    });
     handle2DResidueChange(newSelection);
   }
 

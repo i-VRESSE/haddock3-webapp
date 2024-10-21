@@ -124,7 +124,6 @@ Btn classes are copied from app/components/ui/button.tsx
 
 .workflow-builder-app .array-item-add,
 .workflow-builder-app .object-property-expand {
-  /* TODO full width + center plus sign */
   @apply m-4 !w-auto;
 }
 

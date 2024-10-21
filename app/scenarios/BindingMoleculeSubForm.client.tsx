@@ -5,7 +5,6 @@ import { ResidueHeaderItem } from "@i-vresse/haddock3-ui/toggles/ResidueHeader";
 
 import { ActPassSelection } from "./ActPassSelection";
 import { BIG_MOLECULE } from "./constants";
-import { toggleResidue } from "./toggleResidue";
 import { PreprocessPipeline } from "./restraints";
 import { Label } from "~/components/ui/label";
 import { Spinner } from "~/components/ui/spinner";
@@ -29,6 +28,7 @@ import {
   ResidueCheckbox,
   ResidueNeighbourSelection,
   ResidueSelection,
+  toggleResidue,
   useResidueChangeHandler,
 } from "@i-vresse/haddock3-ui/toggles";
 
@@ -207,7 +207,10 @@ function BindingResiduesSubForm({
     ) {
       return;
     }
-    const newSelection = toggleResidue(resno, "act", actpass);
+    const newSelection = toggleResidue(resno, "act", {
+      act: actpass.active,
+      pass: actpass.passive,
+    });
     handle2DResidueChange(newSelection);
   }
 

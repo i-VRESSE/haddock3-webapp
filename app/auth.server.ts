@@ -97,7 +97,6 @@ if (
       userAgent: "Haddock3WebApp",
     },
     async ({ profile }) => {
-      // TODO store users display name in database for more personal greeting
       const primaryEmail = profile.emails[0].value;
       const photo = profile.photos[0].value ?? undefined;
       const userId = await oauthregister(primaryEmail, photo);
@@ -181,7 +180,6 @@ if (
       });
       const profile = await profileResponse.json();
       const emails = await this.userEmails(profile.sub);
-      // TODO store Orcid id into database
       return {
         ...profile,
         emails,

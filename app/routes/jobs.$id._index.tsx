@@ -5,18 +5,30 @@ import {
   type LoaderFunctionArgs,
   ActionFunctionArgs,
 } from "@remix-run/node";
-import { useLoaderData, useRevalidator } from "@remix-run/react";
+import {
+  Link,
+  useFetcher,
+  useLoaderData,
+  useRevalidator,
+  useSubmit,
+} from "@remix-run/react";
 
 import {
   deleteJob,
   getJobById,
   jobIdFromParams,
   HADDOCK3WEBAPP_REFRESH_RATE_MS,
+  listInputFiles,
 } from "~/models/job.server";
 import { getUser } from "~/auth.server";
 import { JobStatus } from "~/components/JobStatus";
 import { getBartenderTokenByUser } from "~/bartender-client/token.server";
 import DotsLoader from "~/components/ui/DotsLoader";
+import { ListFiles } from "~/browse/ListFiles";
+import { WORKFLOW_CONFIG_FILENAME } from "~/bartender-client/constants";
+import { prefix } from "~/prefix";
+import { DirectoryItem } from "~/bartender-client/types";
+import { Button } from "~/components/ui/button";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const jobId = jobIdFromParams(params);
@@ -30,12 +42,25 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
       return redirect("browse");
     }
   }
+  let inputFiles: DirectoryItem = {
+    path: "",
+    name: "",
+    is_file: false,
+    is_dir: true,
+    children: [],
+  };
+  try {
+    inputFiles = await listInputFiles(jobId, token);
+  } catch (error) {
+    // Do nothing, users can look in log files for more information
+  }
 
   return json({
     job,
     // provide refresh rate from env or default of 5 sec.
     HADDOCK3WEBAPP_REFRESH_RATE_MS,
     lastCheckedOn: new Date().toISOString(),
+    inputFiles,
   });
 };
 
@@ -47,11 +72,15 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const user = await getUser(request);
   const token = await getBartenderTokenByUser(user);
   await deleteJob(jobId, token);
+  if (request.headers.get("referer") === request.url) {
+    return redirect(prefix);
+  }
   return null;
 };
 
 export default function JobPage() {
-  const { job, HADDOCK3WEBAPP_REFRESH_RATE_MS, lastCheckedOn } =
+  const submit = useSubmit();
+  const { job, HADDOCK3WEBAPP_REFRESH_RATE_MS, lastCheckedOn, inputFiles } =
     useLoaderData<typeof loader>();
   const { revalidate } = useRevalidator();
 
@@ -80,10 +109,23 @@ export default function JobPage() {
     };
   }, [HADDOCK3WEBAPP_REFRESH_RATE_MS, revalidate, job.state]);
 
+  const hasWorkflow = inputFiles.children?.some(
+    (file) => file.is_file && file.name === WORKFLOW_CONFIG_FILENAME,
+  );
+
   return (
     <main className="flex gap-16">
       <div>
         <JobStatus job={job} lastStateCheckOn={lastCheckedOn} />
+        {(job.state === "queued" || job.state === "running") && (
+          <Button
+            variant="outline"
+            title="Cancel job"
+            onClick={() => deleteJobConfirm(submit)}
+          >
+            Cancel
+          </Button>
+        )}
         {/* show dots loader indicating we monitor state change */}
         {job.state !== "error" && job.state !== "ok" ? (
           <DotsLoader
@@ -93,8 +135,31 @@ export default function JobPage() {
           />
         ) : null}
       </div>
-      {/* TODO allow to read input files when job is not completed */}
-      {/* TODO allow job to be cancelled, need bartender support first */}
+      {inputFiles.children && inputFiles.children.length > 0 && (
+        <div>
+          <h2 className="text-2xl">Input</h2>
+          <ListFiles files={inputFiles!} jobid={job.id} />
+          <p>
+            <a href={`${prefix}jobs/${job.id}/input.zip`}>
+              &#128230; Download archive
+            </a>
+          </p>
+          {hasWorkflow && job.state === "error" && (
+            <p>
+              <Link to={`${prefix}jobs/${job.id}/edit`}>&#128393; Edit</Link>
+            </p>
+          )}
+        </div>
+      )}
     </main>
   );
+}
+
+type Submit = ReturnType<typeof useFetcher>["submit"];
+
+function deleteJobConfirm(submit: Submit): void {
+  if (window.confirm("Are you sure you want to cancel job?") === false) {
+    return;
+  }
+  submit({}, { method: "delete" });
 }

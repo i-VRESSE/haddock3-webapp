@@ -1,5 +1,39 @@
+import { useInPortalMode } from "~/portal";
+
+function PortalFooter() {
+  // Copied from frontend/src/Components/Footer.tsx
+  // TODO add PoweredBy component on certain page
+  const currentYear = new Date().getFullYear();
+  const firstYear = 2008;
+  return (
+    <footer className="bottom-0 left-0 right-0 bg-slate-200 text-white p-2">
+      <div className="text-center text-xs flex-col space-y-1 container mx-auto flex justify-center items-center">
+        <div>
+          <p className=" text-gray-400">
+            {firstYear}-{currentYear} &copy; Computational Structural Biology
+            group (Utrecht University). All rights reserved.
+          </p>
+        </div>
+        <div className="flex items-center">
+          <a href="/conditions" className="text-blue-500 hover:underline">
+            Terms and Conditions
+          </a>
+          <div className="h-4 bg-gray-600 w-px mx-4"></div>
+          <a href="/privacy" className="text-blue-500 hover:underline">
+            Privacy
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 export function Footer() {
-  // TODO in portal mode mimic the footer from the portal
+  const inPortalMode = useInPortalMode();
+  if (inPortalMode) {
+    return <PortalFooter />;
+  }
+
   return (
     <footer className="bg-primary p-1 text-center text-primary-foreground">
       <p className="text-sm">
