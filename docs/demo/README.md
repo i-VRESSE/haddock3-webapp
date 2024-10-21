@@ -67,15 +67,49 @@ If the submitted workflow did not have a caprieval module the the browse page is
 
 [![Screenshot of browse page of a completed job](./screenshots/browse.png)](./screenshots/browse.png)
 
-#### Other visualizations
+You can 
+1. download parts of the jobs like best ranked structures or the whole job.
+2. browse the output files
+3. for some modules, rerun or look at their reports with plots.
 
 #### Re-running module
+
+Click on wrench icon of last caprieval module.
+
+[![Screenshot of re-run module dialog](./screenshots/rescore.png)](./screenshots/rescore.png)
+
+After you change the "Weight of the intermolecular electrostatic energy" to 0.8 and press rescore button, the re-computed HADDOCK3 scores are shown.
+THe second best cluster has changed.
+
+TODO what is caprieval
+
+#### Contactmap report
+
+Click on yellow triangle of the contactmap module to see the report.
+
+[![Screenshot of contactmap analyis report](./screenshots/contactmap.png)](./screenshots/contactmap.png)
+
+Shows per cluster how chain A and B are likely contacting each other.
 
 #### Edit
 
 If you found looking at the results that you want use a slightly different workflow, you can edit the job and resubmit it.
 
 An uploadied completed job can not be edited. So use an actual locally run job if you want to show that off.
+
+#### Alascan report
+
+This module is not part of the antibody-antigen scenario. It is part of the refine scenario, which can be run with https://github.com/haddocking/haddock3/blob/main/examples/docking-protein-protein/data/e2a-hpr_1GGR.pdb as molecules and reference structure input. 
+
+This input will show for residue what the impact of a mutation would be.
+
+[![Screenshot of cluster bar graph of alascan report](./screenshots/alascan-cluster.png)](./screenshots/alascan-cluster.png)
+
+Also shows the energy difference between the wild type and the mutant for each structure.
+
+[![Screenshot of structure of alascan report](./screenshots/alascan-structure.png)](./screenshots/alascan-structure.png)
+
+Module will mutate the interface residues and calculate the energy differences between the wild type and the mutant, thus providing a measure of the impact of such mutation.
 
 ## Talking points
 
@@ -115,6 +149,7 @@ Pharmaceutical companies can run their own HADDOCK3 web application and their da
 1. The workflow builder is a seperate piece of software that can be used in other projects to make a configuration file. You just need defined a JSON schema for the modules/nodes and use TOML format for the workflow output. See https://github.com/i-VRESSE/workflow-builder
 2. The jobs are executed by the bartender web service, which written in Python and can handle running jobs in a locally, pilot job system, slurm batch scheduler or on the grid using DIRAC. See https://i-vresse-bartender.readthedocs.io/
 3. Generic UI components are in own package called [haddock3-ui](https://github.com/i-VRESSE/haddock3-ui). The HADDOCK3 CLI also uses this package to render clusters.
+4. Testing running jobs on Slurm or Dirac can be done with the [Xenon docker images](https://github.com/xenon-middleware/xenon-docker-images).
 
 ### Implementation details
 

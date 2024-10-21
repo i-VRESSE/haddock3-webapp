@@ -49,7 +49,7 @@ Only do this step when you want to update the complete job zip file on SURFDrive
 
 When you do not have time to run a job, you can upload a completed job with following steps:
 
-1. Download `antibody-antigen-completed.zip` from https://surfdrive.surf.nl/files/index.php/s/QI8071oKI5JqHlE/download
+1. Download `antibody-antigen-completed.zip` from https://surfdrive.surf.nl/files/index.php/s/QI8071oKI5JqHlE/download with `curl -L -o antibody-antigen-completed.zip https://surfdrive.surf.nl/files/index.php/s/QI8071oKI5JqHlE/download`
 2. Goto http://localhost:8000/upload
 3. Select "Run: Archive of a haddock3 run" option
 4. Upload the `antibody-antigen-completed.zip` file and press submit button.
@@ -66,6 +66,6 @@ Optional steps to make uploaded completed job archive look like a just ran job
     cp output/data/04_caprieval/4G6M.pdb .
     ```
 
-(The [antibody-antigen-completed-sampling200.zip](antibody-antigen-completed-sampling200.zip) is the same as `antibody-antigen-completed.zip`
+(The [./antibody-antigen-completed-sampling200.zip](./antibody-antigen-completed-sampling200.zip) is the same as `antibody-antigen-completed.zip`
 but refined in workflow builder to have a sampling of 200 instead of 1000. 
 This makes it quicker to run and small enough to fit on GitHub, but has worse results.)
