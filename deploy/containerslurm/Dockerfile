@@ -17,21 +17,16 @@ RUN apt-get update && \
   apt-get install -y --no-install-recommends \
   build-essential git ca-certificates curl libgfortran5 \
   wget software-properties-common gpg-agent \
-  &&  \
+  python3-pip python3.10-dev \
+  libgfortran5 cmake swig cython3 doxygen \
+  && \
+  pip install --upgrade pip wheel \
+  && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# python 3.9 + /usr/local/bin/pip ==========================================================================================================
-
-RUN add-apt-repository -y ppa:deadsnakes/ppa && \
-    DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt install -y python3.9 python3.9-dev python3.9-distutils && \
-    wget https://bootstrap.pypa.io/get-pip.py && \
-    python3 get-pip.py && \
-    rm get-pip.py && \
-    pip install -U pip==23.3.2
 
 # lightdock ==========================================================================================================
 
-RUN /usr/local/bin/pip install lightdock==${LIGHTDOCK_VERSION}
+RUN pip install lightdock==${LIGHTDOCK_VERSION}
 
 # gdock =============================================================================================================
 

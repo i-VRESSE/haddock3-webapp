@@ -4,10 +4,10 @@ The portal mode is used to integrate the webapp within the [BonvinLab computatio
 
 By default the webapp runs in standalone mode, meaning registration, login and user management is done by the webapp.
 
-In portal mode the webapp hands that of the the portal and its backend.
-Also the header and footer of the portal will be shown.
+In portal mode the webapp hands that responsiblity of the the portal and its backend.
+Also the header and footer similar to the portal will be shown.
 
-To steps to render a use a non-anomyous page in the webapp are
+To steps to render a non-anomyous page in the webapp are
 
 1. check if there is a cookie set for the portal
 2. if not redirect to the portal login page
@@ -15,7 +15,7 @@ To steps to render a use a non-anomyous page in the webapp are
 4. combines portal user info with the webapp user info
 
 The portal mode can be enabled by setting the `HADDOCK3WEBAPP_CSB_PORTAL` environment variable to a thruthy value like `1`.
-The portal expects the haddock3 webapp to be running on a subpath of the portal, so the `HADDOCK3WEBAPP_PREFIX` environment variable should be set to something like `/haddock30`.
+The portal expects the haddock3 webapp to be running on a subpath of the portal, so the `HADDOCK3WEBAPP_PREFIX` environment variable should be set to something like `/haddock30`. The portal backend location should be set with `HADDOCK3WEBAPP_CSB_PORTAL_BACKEND` environment variable.
 
 ## Mock portal
 
