@@ -6,7 +6,7 @@ LABEL org.opencontainers.image.description="bartender web service with haddock3,
 
 ARG HADDOCK3_GHORG=haddocking
 ARG HADDOCK3_VERSION=main
-ARG BARTENDER_VERSION=v0.5.1
+ARG BARTENDER_VERSION=v0.5.2
 ARG GDOCK_VERSION=main
 ARG LIGHTDOCK_VERSION=0.9.4
 ARG OPENMM_VERSION=8.1.2
@@ -73,6 +73,7 @@ WORKDIR /
 
 # final image =========================================================================================================
 
+# TODO from ghcr.io/haddocking/haddock3:2024.10.0
 FROM python:3.9-slim-bookworm
 
 # cns executable installed by haddock3 is linked against libquadmath on linux/amd64 and libgfortran5 on linux/arm64

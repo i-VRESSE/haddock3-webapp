@@ -8,6 +8,7 @@ destinations:
         hostname: slurm
         username: xenon
         password: javagat
+      submitter_as_account: true
     filesystem:
       type: sftp
       ssh_config:
