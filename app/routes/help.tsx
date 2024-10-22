@@ -304,6 +304,7 @@ export default function Help() {
                 &#128230; Download - Download the files of the module as an
                 archive.
               </li>
+              <li>&#128208; Report - Report of output of the module.</li>
             </ul>
           </li>
           <li>

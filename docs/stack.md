@@ -5,6 +5,7 @@ We want to make a haddock3 web application that uses
 - [bartender](https://github.com/i-VRESSE/bartender) for job execution.
 - [workflow-builder](https://github.com/i-VRESSE/workflow-builder) to construct a Haddock3 workflow config file.
 - [haddock3](https://github.com/haddocking/haddock3) to compute
+- [haddock3-ui](https://github.com/i-VRESSE/haddock3-ui) for reusable UI components.
 
 As the workflow-builder is written in TypeScript, so we will use TypeScript for the web application.
 We are using NodeJS for runtime.
