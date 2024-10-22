@@ -4,7 +4,11 @@ This a demonstration of the [Antibody-antigen modelling tutorial](https://www.bo
 
 This demo must be prepared using the [preparations](PREPARATIONS.md) guide.
 
-From the original tutorial we use scenario 2b: Docking using the paratope and the NMR-identified epitope as active
+From the original tutorial we use scenario 2b: Docking using the paratope and the NMR-identified epitope as active.
+
+We are using Interleukin-1β as antigen and gevokizumab as antibody in this demonstration.
+Interleukin-1β plays a central role in the regulation of immune and inflammatory responses.
+Gevokizumab inhibits the activity of interleukin-1β.
 
 1. Goto start page at http://localhost:8000
 2. Goto scenarios page
@@ -12,11 +16,12 @@ From the original tutorial we use scenario 2b: Docking using the paratope and th
 4. For antibody
 5. Upload `./input/4G6K.pdb` file
 6. Select chain H
-7. Import active residues: `31,32,33,34,35,52,54,55,56,100,101,102,103,104,105,106,1031,1032,1049,1050,1053,1091,1092,1093,1094,1096`
+7. Import active residues: `31,32,33,34,35,52,54,55,56,100,101,102,103,104,105,106,1031,1032,1049,1050,1053,1091,1092,1093,1094,1096`,
+  these residues are the highly variable loops of the antibody also known as the paratope aka the region that binds the antigen. Residues prediected with [ProABC-2](https://github.com/haddocking/proabc-2), a deep learning framework to predict antibody paratope residues.
 8. For antigen
    1. Upload `./input/4I1B.pdb`
-   2. Import active residues: `72,73,74,75,81,83,84,89,90,92,94,96,97,98,115,116,117`
-9. For reference structure upload `./input/4G6M.pdb` file.
+   2. Import active residues: `72,73,74,75,81,83,84,89,90,92,94,96,97,98,115,116,117`, these residues are the NMR-identified epitope residues of the antigen (table 5 of https://dx.doi.org/10.1016/j.jmb.2012.09.021). The epitope is the region that binds to an antibody.
+9. For reference structure upload `./input/4G6M.pdb` file. The reference structure is a PDB file with the antibody and antigen docked together.
 10. Refine in builder
 
 Do not submit as this will render laptop unusable for a while.
@@ -60,6 +65,9 @@ The clusters are shown in a table with all their scores and the top 4 structures
 
 [![Screenshot of scoring plots on the report page](./screenshots/report-plots.png)](./screenshots/report-plots.png)
 
+The CAPRI Evaluation module uses the Haddock3 scoring function to score the structures and/or clusters.
+CAPRI is a community wide yearly benchmark for docking methods.
+
 ### Browse page
 
 The browse page shows the output of all the modules.
@@ -79,9 +87,7 @@ Click on wrench icon of last caprieval module.
 [![Screenshot of re-run module dialog](./screenshots/rescore.png)](./screenshots/rescore.png)
 
 After you change the "Weight of the intermolecular electrostatic energy" to 0.8 and press rescore button, the re-computed HADDOCK3 scores are shown.
-THe second best cluster has changed.
-
-TODO what is caprieval
+The second best cluster has changed.
 
 #### Contactmap report
 

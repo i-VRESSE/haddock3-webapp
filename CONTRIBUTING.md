@@ -63,6 +63,7 @@ npm run dev
 ```
 
 This will refresh & rebuild assets on file changes.
+Visiting a complicated page for the first time, will need a manual page reload, as the server optimizes dependencies.
 
 ## Other development commands
 
