@@ -51,7 +51,7 @@ Only do this step when you want to update the complete job zip file on SURFDrive
 
 When you do not have time to run a job, you can upload a completed job with following steps:
 
-1. Download `antibody-antigen-completed.zip` from <https://surfdrive.surf.nl/files/index.php/s/QI8071oKI5JqHlE/> download with `curl -L -o antibody-antigen-completed.zip https://surfdrive.surf.nl/files/index.php/s/QI8071okKI5JqHlE/download`
+1. Download `antibody-antigen-completed.zip` from <https://surfdrive.surf.nl/files/index.php/s/QI8071oKI5JqHlE/> download with `curl -L -o antibody-antigen-completed.zip https://surfdrive.surf.nl/files/index.php/s/QI8071oKI5JqHlE/download`
 1. Go to <http://localhost:8000/upload>
 1. Select "Run: Archive of a haddock3 run" option
 1. Upload the `antibody-antigen-completed.zip` file and press submit button.
@@ -60,7 +60,7 @@ When you do not have time to run a job, you can upload a completed job with foll
 Optional steps to make uploaded completed job archive look like a just ran job
 1. Get shell in bartender container with `docker compose -f deploy/arq/docker-compose.yml exec bartender bash`
 1. Go to job dir with `cd /jobs/<job id>`
-1. Put workflow.cfg back with ` cp output/data/configurations/raw_input.toml workflow.cfg`
+1. Put workflow.cfg back with `cp output/data/configurations/raw_input.toml workflow.cfg`
 1. Put files referenced in `workflow.cfg` back with 
     ```shell
     cp output/data/00_topoaa/* .
