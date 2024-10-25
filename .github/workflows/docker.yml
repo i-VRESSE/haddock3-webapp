@@ -125,6 +125,41 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: ${{startsWith(steps.meta.outputs.version, 'pr-') && 'linux/amd64' || 'linux/arm64,linux/amd64' }}
+  webapp4portal:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/i-vresse/haddock3-webapp-portal
+          labels: |
+            org.opencontainers.image.description=Haddock3 web application image.
+            org.opencontainers.image.url=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/README.md#images
+            org.opencontainers.image.documentation.url=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/README.md#images
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          file: deploy/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: "HADDOCK3WEBAPP_PREFIX=/haddock3/"
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: "linux/amd64"
   playwright:
     needs:
       - bartender

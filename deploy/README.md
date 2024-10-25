@@ -71,3 +71,7 @@ Generates a rsa private key (/certs/private_key.pem file) and public key (/certs
 ## haddock3-webapp image
 
 Haddock3 web application image.
+
+## haddock3-webapp-portal image
+
+Haddock3 web application image build with `/haddock3/` prefix.
