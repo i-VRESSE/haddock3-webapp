@@ -17,7 +17,7 @@ Gevokizumab inhibits the activity of interleukin-1β.
 5. Upload `./input/4G6K.pdb` file
 6. Select chain H
 7. Import active residues: `31,32,33,34,35,52,54,55,56,100,101,102,103,104,105,106,1031,1032,1049,1050,1053,1091,1092,1093,1094,1096`,
-  these residues are the highly variable loops of the antibody also known as the paratope aka the region that binds the antigen. Residues prediected with [ProABC-2](https://github.com/haddocking/proabc-2), a deep learning framework to predict antibody paratope residues.
+  these residues are the highly variable loops of the antibody also known as the paratope aka the region that binds the antigen. Residues predicted with [ProABC-2](https://github.com/haddocking/proabc-2), a deep learning framework to predict antibody paratope residues.
 8. For antigen
    1. Upload `./input/4I1B.pdb`
    2. Import active residues: `72,73,74,75,81,83,84,89,90,92,94,96,97,98,115,116,117`, these residues are the NMR-identified epitope residues of the antigen (table 5 of https://dx.doi.org/10.1016/j.jmb.2012.09.021). The epitope is the region that binds to an antibody.
@@ -63,10 +63,14 @@ The clusters are shown in a table with all their scores and the top 4 structures
 
 [![Screenshot of 3D complex on the report page](./screenshots/report-3dviewer.png)](./screenshots/report-3dviewer.png)
 
+Where chain A, the antibody, is colored in red and chain B, the antigen, is colored in blue.
+
 [![Screenshot of scoring plots on the report page](./screenshots/report-plots.png)](./screenshots/report-plots.png)
 
 The CAPRI Evaluation module uses the Haddock3 scoring function to score the structures and/or clusters.
 CAPRI is a community wide yearly benchmark for docking methods.
+
+To zoom in on a chart, select it in the pulldown.
 
 ### Browse page
 
