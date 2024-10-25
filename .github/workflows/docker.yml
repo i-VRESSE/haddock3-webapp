@@ -155,11 +155,11 @@ jobs:
           file: deploy/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          build-args: 'HADDOCK3WEBAPP_PREFIX=/haddock3/'
+          build-args: "HADDOCK3WEBAPP_PREFIX=/haddock3/"
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: 'linux/amd64'
+          platforms: "linux/amd64"
   playwright:
     needs:
       - bartender
