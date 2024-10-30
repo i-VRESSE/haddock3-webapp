@@ -48,7 +48,7 @@ WEBAPP_TAG=main BARTENDER_TAG=main CERTMAKER_TAG=main docker compose -f deploy/a
 To use images from certain pull requests use the following command:
 
 ```shell
-WEBAPP_TAG=pr-104 BARTENDER_TAG=pr-105 CERTMAKER_TAG=pr-106 HADDOCK3_VERSION=pr-107 HADDOCK3_GHORG=i-VRESSE docker compose -f deploy/arq/docker-compose.yml up --pull always
+WEBAPP_TAG=pr-104 BARTENDER_TAG=pr-104 CERTMAKER_TAG=pr-104 docker compose -f deploy/arq/docker-compose.yml up --pull always
 ```
 
 To use image from a certain released version use the following command:
@@ -63,3 +63,11 @@ To build with prefix /haddock3/ use the following command:
 ```shell
 docker compose -f deploy/arq/docker-compose.yml build --build-arg HADDOCK3WEBAPP_PREFIX=/haddock3/
 ```
+
+To use build with another haddock3 version use
+
+```shell
+docker compose -f deploy/arq/docker-compose.yml build bartender --build-arg HADDOCK3_VERSION=pr-107
+```
+
+(Optionally use `--build-arg HADDOCK3_GHORG=i-VRESSE` to use a fork)
