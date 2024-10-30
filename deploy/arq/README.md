@@ -18,8 +18,18 @@ To get the latest version of the images use:
 
 ```shell
 git pull
-docker compose -f deploy/arq/docker-compose.yml up --pull always
+docker compose -f deploy/arq/docker-compose.yml pull
+docker compose -f deploy/arq/docker-compose.yml up
 ```
+
+## Cpu usage
+
+The webapp is configured run a single haddock3 job at a time.
+The haddock3 job will use 4 cpu cores.
+
+To better use your hardware, you can configure the deployment in 2 places
+1. In the docker-compose.yml file, change the `HADDOCK3_NCORES` value of the `haddock3` service to increase the number of cores used by a single haddock3 job.
+2. In the bartender-config.yaml file, change `max_jobs` to increase the number of jobs that can be run at the same time.
 
 ## Alternative versions
 

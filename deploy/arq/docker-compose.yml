@@ -23,6 +23,10 @@ services:
       - SESSION_SECRET_FILE=/certs/session.secret
       - WAIT_PATHS=/certs/private_key.pem
       - HADDOCK3_RESTRAINTS_URL=http://h3restraints:5000
+      # The number of cpu cores a single HADDOCK3 job will use
+      # Together with bartender_config.yml:destinations.haddock3.scheduler.max_jobs
+      # you can control how your machine is used.
+      - HADDOCK3_NCORES=4
       - HADDOCK3WEBAPP_REFRESH_RATE_MS
       - HADDOCK3WEBAPP_GITHUB_CLIENT_ID
       - HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET
@@ -75,6 +79,7 @@ services:
       BARTENDER_DB_USER: postgres
       BARTENDER_DB_PASS: postgres
       BARTENDER_DB_BASE: postgres
+      # Number of workers of the web service, increase to handle more http requests
       BARTENDER_WORKERS_COUNT: 4
       BARTENDER_LOG_LEVEL: error
       BARTENDER_PUBLIC_KEY: /certs/public_key.pem
