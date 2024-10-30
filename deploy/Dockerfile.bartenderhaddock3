@@ -9,7 +9,7 @@ ARG HADDOCK3_VERSION=main
 ARG BARTENDER_VERSION=v0.5.2
 ARG GDOCK_VERSION=main
 ARG LIGHTDOCK_VERSION=0.9.4
-ARG OPENMM_VERSION=8.1.2
+ARG OPENMM_VERSION=8.2.0beta
 ARG PDBFIXER_VERSION=1.9
 
 COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
@@ -51,6 +51,7 @@ RUN wget https://github.com/openmm/openmm/archive/refs/tags/${OPENMM_VERSION}.ta
     cd openmm-${OPENMM_VERSION} && \
     mkdir build && \
     cd build && \
+    pip install numpy==2.* && \
     cmake .. -DCMAKE_INSTALL_PREFIX=/venv && \
     make -j4 && \
     make install && \
@@ -65,7 +66,7 @@ RUN pip install .
 
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
-RUN echo cachebust=13 && git clone --depth 1 -b ${HADDOCK3_VERSION} https://github.com/${HADDOCK3_GHORG}/haddock3.git .
+RUN echo cachebust=14 && git clone --depth 1 -b ${HADDOCK3_VERSION} https://github.com/${HADDOCK3_GHORG}/haddock3.git .
 RUN pip install .
 # For restraints web service
 RUN pip install fastapi uvicorn
