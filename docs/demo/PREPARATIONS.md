@@ -36,16 +36,18 @@ Go to <http://localhost:8080/register> and fill in the form.
 
 Only do this step when you want to update the complete job zip file on SURFDrive.
 
-1. Go to <http://localhost:8080/upload>
-1. Upload [./input/antibody-antigen-workflow.zip](./input/antibody-antigen-workflow.zip) file and upload to `Workflow`
+1. Follow steps 1-10 in [README.md#demonstration](./README.md#demonstration) to create a job.
+   - Alternatively, you can upload workflow `input/antibody-antigen-workflow.zip` at <http://localhost:8080/upload>.
 1. Pres `Submit` button
 1. Wait for the job to complete, on my laptop it took 17 minutes
-1. Go to report page of job
-1. Download the whole job as a zip file by pressing `Download all` button.
-1. Rename to `antibody-antigen-completed.zip`
-1. Upload file to SURFDrive
-1. On SURFDrive make a public read-only passwordless, non-expiring, share link
-1. Copy link to step 5b
+1. Go to browse page of job
+2. Download the output as a zip file by pressing `Download` button in the `Module output` column.
+3. Rename to `antibody-antigen-completed.zip`
+4. Upload file to [SURFDrive](https://surfdrive.surf.nl)
+5. On SURFDrive make a public read-only passwordless, non-expiring, share link
+6.  Copy link to step 5b
+7. Download the input archive so it is easier submit job again
+8. Rename and save as `input/antibody-antigen-workflow.zip`
 
 ## Step 6: Add completed job
 
@@ -67,7 +69,3 @@ Optional steps to make uploaded completed job archive look like a just ran job
     cp output/data/01_rigidbody/ambig.tbl .
     cp output/data/04_caprieval/4G6M.pdb .
     ```
-
-(The [./antibody-antigen-completed-sampling200.zip](./antibody-antigen-completed-sampling200.zip) is the same as `antibody-antigen-completed.zip`
-but refined in workflow builder to have a sampling of 200 instead of 1000. 
-This makes it quicker to run and small enough to fit on GitHub, but has worse results).
