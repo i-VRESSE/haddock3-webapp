@@ -69,3 +69,15 @@ Optional steps to make uploaded completed job archive look like a just ran job
     cp output/data/01_rigidbody/ambig.tbl .
     cp output/data/04_caprieval/4G6M.pdb .
     ```
+
+## Screencast
+
+1. Install vokoscreenNG with [flatpak](https://linuxecke.volkoh.de/vokoscreen/vokoscreen-install.html)
+2. Start webapp
+3. Start recording
+4. Do demo in 2 scenes, before and after job running
+5. Stop recording
+6. Merge to scenes into one video with `mkvmerge -o hadodck3-webapp-demo.mkv haddock3-webapp-scene1.mkv + haddock3-webapp-scene2.mkv`
+7. Write subtitles with a subtitle editor
+8. Merge subtitles with `mkvmerge -o hadodck3-webapp-demo.subtitled.mkv haddock3-webapp-demo.mkv haddock3-webapp-demo.srt`
+9. Upload to SURFDrive
