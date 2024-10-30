@@ -1,15 +1,15 @@
 # Haddock3 webapp with single worker
 
 ```shell
-# Must be in root of repo
-# cd ../..
-# Pull, create and start webapp and its services
+# Install docker compose, see https://docs.docker.com/compose/install/
+# From the root of this locally cloned repository
+# Pull, create and start webapp and its services with the following command
 docker compose -f deploy/arq/docker-compose.yml up
 ```
 
 The haddock3 webapp should be running on http://localhost:8080
 
-Next steps are to go to http://localhost:8080/register to register as admin and finally submit a job.
+Next steps are to go to http://localhost:8080/register to register and finally submit a job.
 
 ## Updating existing deployment
 
@@ -24,16 +24,17 @@ docker compose -f deploy/arq/docker-compose.yml up
 
 ## Cpu usage
 
-The webapp is configured run a single haddock3 job at a time.
-The haddock3 job will use 4 cpu cores.
+The webapp is configured to run a single haddock3 job at a time, later jobs will be queued.
+Each haddock3 job will use 4 cpu cores.
 
 To better use your hardware, you can configure the deployment in 2 places
+
 1. In the docker-compose.yml file, change the `HADDOCK3_NCORES` value of the `haddock3` service to increase the number of cores used by a single haddock3 job.
 2. In the bartender-config.yaml file, change `max_jobs` to increase the number of jobs that can be run at the same time.
 
 ## Alternative versions
 
-The command above uses the latest released version or main branch of the repositories.
+The commands above uses the latest released version of the repositories.
 If you are interested in using a different version of the repositories,
 for example if you want to try out a feature in a haddock3 pull request,
 you can change the version of each repository by setting environment variables.
