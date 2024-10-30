@@ -200,9 +200,26 @@ Pharmaceutical companies can run their own HADDOCK3 web application and their da
 ### Re-usablity of software
 
 1. The workflow builder is a seperate piece of software that can be used in other projects to make a configuration file. You just need defined a JSON schema for the modules/nodes and use TOML format for the workflow output. See https://github.com/i-VRESSE/workflow-builder
-2. The jobs are executed by the bartender web service, which written in Python and can handle running jobs in a locally, pilot job system, slurm batch scheduler or on the grid using DIRAC. See https://i-vresse-bartender.readthedocs.io/
+2. The jobs are executed by the bartender web service, which written in Python and can handle running jobs in a locally, pilot job framework, slurm batch scheduler or on the grid using DIRAC and can transfer files if needed to/from job executation location. See https://i-vresse-bartender.readthedocs.io/
 3. Generic UI components are in own package called [haddock3-ui](https://github.com/i-VRESSE/haddock3-ui). The HADDOCK3 CLI also uses this package to render clusters.
 4. Testing running jobs on Slurm or Dirac can be done with the [Xenon docker images](https://github.com/xenon-middleware/xenon-docker-images).
+
+### Deployment
+
+#### Bonvinlab
+
+The [bonvinlab](https://www.bonvinlab.org/) hosts the application and 10% of the computations are done on their cluster and the rest on the grid (for haddock2, not yet haddock3 as time of writing).
+
+#### Local
+
+It can also be run locally with Docker, with just 2 commands.
+
+```shell
+git clone https://github.com/i-VRESSE/haddock3-webapp.git .
+docker compose -f deploy/arq/docker-compose.yml up
+```
+
+It can be configured to run jobs with a pilot job framework or on a slurm cluster, or on the grid using DIRAC.
 
 ### Implementation details
 
