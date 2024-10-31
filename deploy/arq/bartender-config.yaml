@@ -19,7 +19,11 @@ destinations:
     scheduler:
       type: arq
       redis_dsn: redis://redis:6379
+      # The worker will run one job at a time, later submitted jobs will be queued.
+      # Together with docker-compose.yml:webapp.environment.HADDOCK3_NCORES
+      # you can control how your machine is used.
       max_jobs: 1
+      # How long a job can run before its killed
       job_timeout: PT12H # 12 hours
     filesystem:
       type: local
