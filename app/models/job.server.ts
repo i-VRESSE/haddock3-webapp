@@ -194,6 +194,7 @@ export async function listInputFiles(jobid: number, bartenderToken: string) {
 
 export async function getArchive(jobid: number, bartenderToken: string) {
   const client = createClient(bartenderToken);
+  const filename = `haddock3-${jobid}.zip`;
   const { response } = await client.GET("/api/job/{jobid}/archive", {
     params: {
       path: {
@@ -201,6 +202,7 @@ export async function getArchive(jobid: number, bartenderToken: string) {
       },
       query: {
         archive_format: ".zip",
+        filename,
       },
     },
     parseAs: "stream",
@@ -210,6 +212,7 @@ export async function getArchive(jobid: number, bartenderToken: string) {
 
 export async function getInputArchive(jobid: number, bartenderToken: string) {
   const client = createClient(bartenderToken);
+  const filename = `haddock3-input-${jobid}.zip`;
   const { response } = await client.GET("/api/job/{jobid}/archive", {
     params: {
       path: {
@@ -219,6 +222,7 @@ export async function getInputArchive(jobid: number, bartenderToken: string) {
         archive_format: ".zip",
         exclude: BOOK_KEEPING_FILES,
         exclude_dirs: [JOB_OUTPUT_DIR],
+        filename: filename,
       },
     },
     parseAs: "stream",
@@ -227,13 +231,20 @@ export async function getInputArchive(jobid: number, bartenderToken: string) {
 }
 
 export async function getOutputArchive(jobid: number, bartenderToken: string) {
-  return await getSubDirectoryAsArchive(jobid, JOB_OUTPUT_DIR, bartenderToken);
+  const filename = `haddock3-output-${jobid}.zip`;
+  return await getSubDirectoryAsArchive(
+    jobid,
+    JOB_OUTPUT_DIR,
+    bartenderToken,
+    filename,
+  );
 }
 
 export async function getSubDirectoryAsArchive(
   jobid: number,
   path: string,
   bartenderToken: string,
+  filename: string = "",
 ) {
   const client = createClient(bartenderToken);
   const { response } = await client.GET("/api/job/{jobid}/archive/{path}", {
@@ -244,6 +255,7 @@ export async function getSubDirectoryAsArchive(
       },
       query: {
         archive_format: ".zip",
+        filename: filename,
       },
     },
     parseAs: "stream",
