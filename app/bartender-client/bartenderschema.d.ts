@@ -106,6 +106,11 @@ export interface paths {
      *         job_dir: The job directory.
      *         destination: The destination of the job.
      *         job_root_dir: The root directory of all jobs.
+     *
+     *     Raises:
+     *         HTTPException: When job is not found.
+     *             Or when user is not owner of job.
+     *             Or when job is in state that cannot be deleted.
      */
     delete: operations["delete_job"];
     options?: never;
@@ -269,6 +274,8 @@ export interface paths {
      *             '.tar.xz', '.tar.gz', '.tar.bz2'
      *         exclude: list of filename patterns that should be excluded from archive.
      *         exclude_dirs: list of directory patterns that should be excluded from archive.
+     *         filename: Name of the archive file to be returned.
+     *             If not provided, uses id of the job.
      *
      *     Returns:
      *         FileResponse: Archive containing the content of job_dir
@@ -301,6 +308,8 @@ export interface paths {
      *             '.tar', '.tar.xz', '.tar.gz', '.tar.bz2'
      *         exclude: list of filename patterns that should be excluded from archive.
      *         exclude_dirs: list of directory patterns that should be excluded from archive.
+     *         filename: Name of the archive file to be returned.
+     *             If not provided, uses id of the job.
      *
      *     Returns:
      *         FileResponse: Archive containing the output of job_dir
@@ -853,6 +862,7 @@ export interface operations {
         archive_format?: ".zip" | ".tar" | ".tar.xz" | ".tar.gz" | ".tar.bz2";
         exclude?: string[];
         exclude_dirs?: string[];
+        filename?: string;
       };
       header?: never;
       path: {
@@ -888,6 +898,7 @@ export interface operations {
         archive_format?: ".zip" | ".tar" | ".tar.xz" | ".tar.gz" | ".tar.bz2";
         exclude?: string[];
         exclude_dirs?: string[];
+        filename?: string;
       };
       header?: never;
       path: {
