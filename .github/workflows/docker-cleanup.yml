@@ -15,6 +15,7 @@ jobs:
             const package_version_id = `pr-${issue_number}`;
             const images = [
               `haddock3-webapp`,
+              `haddock3-webapp-portal`,
               `bartender`,
               `certmaker`
             ];
