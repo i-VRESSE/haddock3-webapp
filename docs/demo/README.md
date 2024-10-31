@@ -3,7 +3,9 @@
 This a demonstration of the [Antibody-antigen modelling tutorial](https://www.bonvinlab.org/education/HADDOCK3/HADDOCK3-antibody-antigen/), but instead of using the Haddock3 command line interface, we will use the webapp.
 
 This demo must be prepared using the [preparations](PREPARATIONS.md) guide.
-This demo is also available as a [subtitled screencast]().
+This demo is also available as a subtitled screencast 
+as [haddock3-webapp-demo.mkv](https://surfdrive.surf.nl/files/index.php/s/6j1vB0ZU1bYDbrH) 
+and [haddock3-webapp-demo.srt](https://surfdrive.surf.nl/files/index.php/s/IufytWNnZ4BLWL3).
 
 From the original tutorial we use scenario 2b: Docking using the paratope and the NMR-identified epitope as active.
 
