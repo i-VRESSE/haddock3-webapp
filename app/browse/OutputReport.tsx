@@ -139,8 +139,6 @@ export const OutputReport = ({
                   </>
                 )}
                 <a
-                  target="_blank"
-                  rel="noreferrer"
                   title="Archive of module output"
                   href={`${prefix}jobs/${jobid}/archive/${module.output.path}`}
                 >
