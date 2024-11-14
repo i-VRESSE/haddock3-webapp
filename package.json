@@ -1,7 +1,7 @@
 {
   "name": "haddock3-webapp",
   "private": true,
-  "version": "0.3.11",
+  "version": "0.3.12",
   "sideEffects": false,
   "type": "module",
   "scripts": {
