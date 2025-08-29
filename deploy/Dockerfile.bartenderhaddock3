@@ -100,7 +100,6 @@ COPY --from=builder /opt/bartender/config-example.yaml /opt/bartender/config-exa
 
 WORKDIR /opt/bartender
 ENV PATH=/venv/bin:$PATH
-ENV PYTHONPATH=/opt/haddock3/src
 
 CMD ["/venv/bin/bartender", "serve"]
 
