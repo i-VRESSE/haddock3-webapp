@@ -4,7 +4,7 @@ The portal mode is used to integrate the webapp within the [BonvinLab computatio
 
 By default the webapp runs in standalone mode, meaning registration, login and user management is done by the webapp.
 
-In portal mode the webapp hands that responsiblity of the the portal and its backend.
+In portal mode the webapp hands that responsiblity of the portal and its backend.
 Also the header and footer similar to the portal will be shown.
 
 To steps to render a non-anomyous page in the webapp are
