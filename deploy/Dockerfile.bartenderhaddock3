@@ -66,7 +66,7 @@ RUN pip install .
 
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
-RUN echo cachebust=15 && git clone --depth 1 -b ${HADDOCK3_VERSION} https://github.com/${HADDOCK3_GHORG}/haddock3.git .
+RUN echo cachebust=16 && git clone --depth 1 -b ${HADDOCK3_VERSION} https://github.com/${HADDOCK3_GHORG}/haddock3.git .
 RUN pip install .
 # For restraints web service
 RUN pip install fastapi uvicorn
