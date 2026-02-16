@@ -9220,7 +9220,7 @@
       "schema": {
         "type": "object",
         "properties": {
-          "top_cluster": {
+          "top_clusters": {
             "default": 1000,
             "title": "Number of clusters to consider",
             "description": "Number of clusters to consider (ranked by score)",
