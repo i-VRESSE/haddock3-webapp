@@ -142,8 +142,9 @@ ${ref_line}
 [ilrmsdmatrix]
 
 [clustrmsd]
-criterion = 'maxclust'
-n_clusters = 4 # the number of clusters to be formed
+criterion = 'distance'
+clust_cutoff = 2.5
+plot_matrix = true
 
 [seletopclusts]
 top_models = 4

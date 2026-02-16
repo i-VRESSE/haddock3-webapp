@@ -116,10 +116,11 @@ ${unambig_line}
 
 [clustfcc]
 min_population = 10
+plot_matrix = true
 
 [seletopclusts]
-## select all the clusters
-top_cluster = 500
+## select top 500 clusters
+top_clusters = 500
 ## select the best 10 models of each cluster
 top_models = 10
 
@@ -146,7 +147,9 @@ ${unambig_line}
 [clustfcc]
 
 [seletopclusts]
-top_cluster = 500
+top_clusters = 500
+## select the best 10 models of each cluster
+top_models = 4
 
 [caprieval]
 ${ref_line}
