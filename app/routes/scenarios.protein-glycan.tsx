@@ -115,9 +115,11 @@ ${ref_line}
 [clustrmsd]
 criterion = 'maxclust'
 n_clusters = 50 # the number of clusters to be formed
+plot_matrix = true
 
 [seletopclusts]
-top_models = 5
+top_clusters = 50
+top_models = 20
 
 [caprieval]
 ${ref_line}
@@ -135,8 +137,6 @@ ${ref_line}
 [clustrmsd]
 criterion = 'distance'
 linkage = 'average'
-# full example, 4 models should be present in a cluster
-min_population = 4
 clust_cutoff = 2.5 
 
 [seletopclusts]

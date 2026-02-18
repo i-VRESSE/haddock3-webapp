@@ -29,6 +29,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { FormErrors } from "~/scenarios/FormErrors";
+import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
 import { PDBFilesInput } from "~/scenarios/PDBFilesInput.client";
 import {
   moleculeFieldDescription,
@@ -49,7 +50,7 @@ export const action = uploadaction;
 const fieldDescriptions = {
   molecules: moleculeFieldDescription,
   ...getModuleDescriptions(`clustfcc`, ["clust_cutoff", "min_population"]),
-  ...getModuleDescriptions(`seletopclusts`, ["top_models", "top_cluster"]),
+  ...getModuleDescriptions(`seletopclusts`, ["top_models", "top_clusters"]),
 } as {
   // TODO do fancy typescipt so cast is not needed
   molecules: Description;
@@ -109,6 +110,9 @@ function generateWorkflow(
     undefined,
     2,
   );
+  const ref_line = data.reference_fname
+    ? `reference_fname = "${data.reference_fname.name}"`
+    : "";
 
   // easy is not allowed to set tolerance
   const tolerance_line =
@@ -136,6 +140,7 @@ ${tolerance_line}
 ${tolerance_line}
 
 [caprieval]
+${ref_line}
 
 [clustfcc]
 min_population = ${data.min_population}
@@ -143,9 +148,10 @@ clust_cutoff = ${data.clust_cutoff}
 
 [seletopclusts]
 top_models = ${data.top_models}
-top_cluster = ${data.top_cluster}
+top_clusters = ${data.top_cluster}
 
 [caprieval]
+${ref_line}
 # ===================================================================================
   `;
 }
@@ -285,6 +291,9 @@ export default function ScoringScenario() {
                 />
               </div>
             </details>
+            <ReferenceStructureInput>
+              
+            </ReferenceStructureInput>
             <FormErrors errors={errors ?? actionData?.errors} />
             <ActionButtons />
           </form>

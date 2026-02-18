@@ -164,7 +164,7 @@ export function PickIn3D({
       <ToggleGroup type="single" defaultValue={value} onValueChange={onChange}>
         <ToggleGroupItem
           value="act"
-          className="data-[state=on]:bg-green-100"
+          className="data-[state=on]:bg-red-100"
           aria-label="Picking in 3D viewer will select active"
           title="Picking in 3D viewer will select active"
         >
@@ -172,9 +172,9 @@ export function PickIn3D({
         </ToggleGroupItem>
         <ToggleGroupItem
           value="pass"
-          className="data-[state=on]:bg-yellow-100"
-          aria-label="Picking in 3D will viwer select passive"
-          title="Picking in 3D will viwer select passive"
+          className="data-[state=on]:bg-green-100"
+          aria-label="Picking in 3D viewer will select passive"
+          title="Picking in 3D viewer will select passive"
         >
           P
         </ToggleGroupItem>
