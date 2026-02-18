@@ -295,7 +295,7 @@ export default function ScoringScenario() {
               </div>
             </details>
             <ReferenceStructureInput>
-               In example named data/e2a-hpr_1GGR.pdb
+              In example named data/e2a-hpr_1GGR.pdb
             </ReferenceStructureInput>
             <FormErrors errors={errors ?? actionData?.errors} />
             <ActionButtons />
