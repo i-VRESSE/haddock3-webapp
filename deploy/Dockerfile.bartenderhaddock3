@@ -1,13 +1,12 @@
-# Dockerfile for bartender web service with haddock3, lightdock, gdock executables.
+# Dockerfile for bartender web service with haddock3, lightdock executables.
 FROM python:3.9-slim-bookworm AS builder
 LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/Dockerfile.bartenderhaddock3
 LABEL org.opencontainers.image.licenses=Apache-2.0
-LABEL org.opencontainers.image.description="bartender web service with haddock3, lightdock, gdock executables. Image does contain cns executable, which is free for non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md."
+LABEL org.opencontainers.image.description="bartender web service with haddock3, lightdock executables. Image does contain cns executable, which is free for non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md."
 
 ARG HADDOCK3_GHORG=haddocking
 ARG HADDOCK3_VERSION=main
 ARG BARTENDER_VERSION=v0.5.3
-ARG GDOCK_VERSION=main
 ARG LIGHTDOCK_VERSION=0.9.4
 ARG OPENMM_VERSION=8.2.0beta
 ARG PDBFIXER_VERSION=1.9
@@ -32,16 +31,6 @@ ENV PATH=/venv/bin:$PATH
 # lightdock ==========================================================================================================
 
 RUN echo cachebust=1 && pip install lightdock==${LIGHTDOCK_VERSION}
-
-# gdock =============================================================================================================
-
-# Gdock installation kaput currently, so skipping, see https://github.com/gdocking/gdock/issues/44 for details
-# WORKDIR /opt/gdock
-# RUN git clone --depth 1 -b ${GDOCK_VERSION} https://github.com/gdocking/gdock.git .
-# RUN pip install matplotlib==3.8.4  # dont install 3.9.0rc2
-# RUN python setup.py develop
-# RUN bash install.sh /opt/gdock
-# ENV GDOCK_PATH=/opt/gdock
 
 # openmm =============================================================================================================
 

@@ -1,9 +1,8 @@
-# Dockerfile with slurm scheduler, sshd, haddock3, lightdock, gdock executables.
+# Dockerfile with slurm scheduler, sshd, haddock3, lightdock executables.
 FROM ghcr.io/xenon-middleware/slurm:23
 
 ARG HADDOCK3_GHORG=haddocking
 ARG HADDOCK3_VERSION=main
-ARG GDOCK_VERSION=main
 ARG LIGHTDOCK_VERSION=0.9.4
 ARG OPENMM_VERSION=8.1.2
 ARG PDBFIXER_VERSION=1.9
@@ -27,16 +26,6 @@ RUN apt-get update && \
 # lightdock ==========================================================================================================
 
 RUN pip install lightdock==${LIGHTDOCK_VERSION}
-
-# gdock =============================================================================================================
-
-# Gdock installation kaput currently, so skipping, see https://github.com/gdocking/gdock/issues/44 for details
-# WORKDIR /opt/gdock
-# RUN git clone --depth 1 -b ${GDOCK_VERSION} https://github.com/gdocking/gdock.git .
-# RUN pip install matplotlib==3.8.4  # dont install 3.9.0rc2
-# RUN python3 setup.py develop
-# RUN bash install.sh /opt/gdock
-# ENV GDOCK_PATH=/opt/gdock
 
 # openmm =============================================================================================================
 
