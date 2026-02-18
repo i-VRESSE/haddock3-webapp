@@ -151,7 +151,7 @@ function rewriteConfig(table: ReturnType<typeof parse>) {
       }
       if (key.startsWith("alascan")) {
         (value as Record<string, boolean>).plot = true;
-        (value as Record<string, boolean>).output = true;
+        (value as Record<string, boolean>).output_bfactor = true;
       }
     }
   });
