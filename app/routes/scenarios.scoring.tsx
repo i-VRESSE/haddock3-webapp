@@ -110,6 +110,9 @@ function generateWorkflow(
     undefined,
     2,
   );
+  const ref_line = data.reference_fname
+    ? `reference_fname = "${data.reference_fname.name}"`
+    : "";
 
   // easy is not allowed to set tolerance
   const tolerance_line =
@@ -289,7 +292,7 @@ export default function ScoringScenario() {
               </div>
             </details>
             <ReferenceStructureInput>
-              In example named data/e2a-hpr_1GGR.pdb
+              
             </ReferenceStructureInput>
             <FormErrors errors={errors ?? actionData?.errors} />
             <ActionButtons />
