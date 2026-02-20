@@ -5,10 +5,12 @@ import JSZip from "jszip";
 import { useState } from "react";
 import {
   InferOutput,
+  instance,
   integer,
   maxValue,
   minValue,
   object,
+  optional,
   pipe,
   string,
   transform,
@@ -29,6 +31,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { ActionButtons, handleActionButton } from "~/scenarios/actions";
 import { FormErrors } from "~/scenarios/FormErrors";
+import { ReferenceStructureInput } from "~/scenarios/ReferenceStructureInput";
 import { PDBFilesInput } from "~/scenarios/PDBFilesInput.client";
 import {
   moleculeFieldDescription,
@@ -49,13 +52,13 @@ export const action = uploadaction;
 const fieldDescriptions = {
   molecules: moleculeFieldDescription,
   ...getModuleDescriptions(`clustfcc`, ["clust_cutoff", "min_population"]),
-  ...getModuleDescriptions(`seletopclusts`, ["top_models", "top_cluster"]),
+  ...getModuleDescriptions(`seletopclusts`, ["top_models", "top_clusters"]),
 } as {
   // TODO do fancy typescipt so cast is not needed
   molecules: Description;
   clust_cutoff: Description;
   min_population: Description;
-  top_cluster: Description;
+  top_clusters: Description;
   top_models: Description;
 };
 
@@ -66,6 +69,7 @@ const fieldDescriptions = {
 // Error: Field "upload" exceeded upload size of 1000000000 bytes.
 const Schema = object({
   molecules: MoleculesSchema,
+  reference_fname: optional(instance(File, "Reference structure as PDB file")),
   min_population: pipe(
     string(),
     transform(Number),
@@ -79,12 +83,12 @@ const Schema = object({
     minValue(fieldDescriptions.clust_cutoff.minimum),
     maxValue(fieldDescriptions.clust_cutoff.maximum),
   ),
-  top_cluster: pipe(
+  top_clusters: pipe(
     string(),
     transform(Number),
     integer(),
-    minValue(fieldDescriptions.top_cluster.minimum),
-    maxValue(fieldDescriptions.top_cluster.maximum),
+    minValue(fieldDescriptions.top_clusters.minimum),
+    maxValue(fieldDescriptions.top_clusters.maximum),
   ),
   top_models: pipe(
     string(),
@@ -109,6 +113,9 @@ function generateWorkflow(
     undefined,
     2,
   );
+  const ref_line = data.reference_fname
+    ? `reference_fname = "${data.reference_fname.name}"`
+    : "";
 
   // easy is not allowed to set tolerance
   const tolerance_line =
@@ -136,6 +143,7 @@ ${tolerance_line}
 ${tolerance_line}
 
 [caprieval]
+${ref_line}
 
 [clustfcc]
 min_population = ${data.min_population}
@@ -143,9 +151,10 @@ clust_cutoff = ${data.clust_cutoff}
 
 [seletopclusts]
 top_models = ${data.top_models}
-top_cluster = ${data.top_cluster}
+top_clusters = ${data.top_clusters}
 
 [caprieval]
+${ref_line}
 # ===================================================================================
   `;
 }
@@ -251,20 +260,20 @@ export default function ScoringScenario() {
                 />
               </div>
               <div>
-                <Label htmlFor="top_cluster">
-                  {fieldDescriptions.top_cluster.title}
+                <Label htmlFor="top_clusters">
+                  {fieldDescriptions.top_clusters.title}
                 </Label>
                 <FormDescription>
-                  {fieldDescriptions.top_cluster.longDescription}
+                  {fieldDescriptions.top_clusters.longDescription}
                 </FormDescription>
                 <Input
                   type="number"
-                  name="top_cluster"
-                  id="top_cluster"
+                  name="top_clusters"
+                  id="top_clusters"
                   required
-                  max={fieldDescriptions.top_cluster.maximum}
-                  min={fieldDescriptions.top_cluster.minimum}
-                  defaultValue={fieldDescriptions.top_cluster.default}
+                  max={fieldDescriptions.top_clusters.maximum}
+                  min={fieldDescriptions.top_clusters.minimum}
+                  defaultValue={fieldDescriptions.top_clusters.default}
                 />
               </div>
               <div>
@@ -285,6 +294,9 @@ export default function ScoringScenario() {
                 />
               </div>
             </details>
+            <ReferenceStructureInput>
+              In example named data/e2a-hpr_1GGR.pdb
+            </ReferenceStructureInput>
             <FormErrors errors={errors ?? actionData?.errors} />
             <ActionButtons />
           </form>

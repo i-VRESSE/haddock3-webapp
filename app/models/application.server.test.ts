@@ -196,7 +196,7 @@ plot_matrix = true
     assert.equal(output_config, expected_config);
   });
 
-  test("plot and output should be set to true for alascan module", async () => {
+  test("plot and output_bfactor should be set to true for alascan module", async () => {
     const input_config = `\
 [alascan]
 `;
@@ -217,7 +217,7 @@ ncores = 1
 [alascan]
 
 plot = true
-output = true
+output_bfactor = true
 `;
     const output_config = await retrieveConfigFromArchive(result);
     assert.equal(output_config, expected_config);
