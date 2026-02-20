@@ -1,7 +1,7 @@
 {
   "name": "haddock3-webapp",
   "private": true,
-  "version": "0.3.13",
+  "version": "0.3.14",
   "sideEffects": false,
   "type": "module",
   "scripts": {
@@ -35,7 +35,7 @@
     "/coverage"
   ],
   "dependencies": {
-    "@i-vresse/haddock3-ui": "^0.3.1",
+    "@i-vresse/haddock3-ui": "^0.3.4",
     "@i-vresse/wb-core": "^3.2.4",
     "@i-vresse/wb-form": "^2.0.1",
     "@radix-ui/react-checkbox": "^1.0.4",
