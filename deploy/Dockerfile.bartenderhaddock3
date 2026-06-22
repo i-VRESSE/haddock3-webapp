@@ -1,15 +1,15 @@
 # Dockerfile for bartender web service with haddock3, lightdock executables.
-FROM python:3.9-slim-bookworm AS builder
+FROM python:3.13-slim-bookworm AS builder
 LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/Dockerfile.bartenderhaddock3
 LABEL org.opencontainers.image.licenses=Apache-2.0
 LABEL org.opencontainers.image.description="bartender web service with haddock3, lightdock executables. Image does contain cns executable, which is free for non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md."
 
 ARG HADDOCK3_GHORG=haddocking
 ARG HADDOCK3_VERSION=main
-ARG BARTENDER_VERSION=v0.5.3
+ARG BARTENDER_VERSION=py314
 ARG LIGHTDOCK_VERSION=0.9.4
-ARG OPENMM_VERSION=8.2.0beta
-ARG PDBFIXER_VERSION=1.9
+ARG OPENMM_VERSION=8.5.2
+ARG PDBFIXER_VERSION=v1.12
 
 COPY --from=ghcr.io/ufoscout/docker-compose-wait:latest /wait /wait
 
@@ -30,7 +30,10 @@ ENV PATH=/venv/bin:$PATH
 
 # lightdock ==========================================================================================================
 
-RUN echo cachebust=1 && pip install lightdock==${LIGHTDOCK_VERSION}
+# Lightdock is incompatible with python 3.13, 
+# lightdock/mathutil/cython/cutil.c:3930:27: error: too few arguments to function ‘_PyLong_AsByteArray’
+# so disable it
+# RUN echo cachebust=1 && pip install lightdock==${LIGHTDOCK_VERSION}
 
 # openmm =============================================================================================================
 
@@ -55,7 +58,7 @@ RUN pip install .
 
 # haddock3 ============================================================================================================
 WORKDIR /opt/haddock3
-RUN echo cachebust=16 && git clone --depth 1 -b ${HADDOCK3_VERSION} https://github.com/${HADDOCK3_GHORG}/haddock3.git .
+RUN echo cachebust=17 && git clone --depth 1 -b ${HADDOCK3_VERSION} https://github.com/${HADDOCK3_GHORG}/haddock3.git .
 RUN pip install .
 # For restraints web service
 RUN pip install fastapi uvicorn
@@ -64,7 +67,7 @@ WORKDIR /
 # final image =========================================================================================================
 
 # TODO from ghcr.io/haddocking/haddock3:2024.10.0
-FROM python:3.9-slim-bookworm
+FROM python:3.13-slim-bookworm
 
 # cns executable installed by haddock3 is linked against libquadmath on linux/amd64 and libgfortran5 on linux/arm64
 ARG TARGETPLATFORM
