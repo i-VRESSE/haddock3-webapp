@@ -11,6 +11,6 @@ services:
       # as it is used by the bartender database container.
       - "5433:5432"
     volumes:
-      - webapp-db-data:/var/lib/postgresql/data
+      - webapp-db-data:/var/lib/postgresql
 volumes:
   webapp-db-data:

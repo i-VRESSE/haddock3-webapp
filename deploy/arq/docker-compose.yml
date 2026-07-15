@@ -46,7 +46,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     volumes:
-      - webapp-db-data:/var/lib/postgresql/data
+      - webapp-db-data:/var/lib/postgresql
     healthcheck:
       test: pg_isready -U postgres
       interval: 2s
@@ -93,7 +93,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     volumes:
-      - bartender-db-data:/var/lib/postgresql/data
+      - bartender-db-data:/var/lib/postgresql
     healthcheck:
       test: pg_isready -U postgres
       interval: 2s
@@ -101,7 +101,7 @@ services:
       retries: 40
 
   redis:
-    image: redis:6.2.6
+    image: valkey/valkey:9
     restart: always
 
   bartenderworker:
