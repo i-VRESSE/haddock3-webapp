@@ -5,7 +5,7 @@ LABEL org.opencontainers.image.licenses=Apache-2.0
 LABEL org.opencontainers.image.description="bartender web service with haddock3, lightdock executables. Image does contain cns executable, which is free for non-profit users, see https://github.com/haddocking/haddock3/blob/main/DISCLAIMER.md."
 
 ARG HADDOCK3_GHORG=haddocking
-ARG HADDOCK3_VERSION=main
+ARG HADDOCK3_VERSION=2026.7.0
 ARG BARTENDER_VERSION=py314
 ARG LIGHTDOCK_VERSION=0.9.4
 ARG OPENMM_VERSION=8.5.2
