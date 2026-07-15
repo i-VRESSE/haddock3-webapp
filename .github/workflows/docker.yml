@@ -16,8 +16,8 @@ jobs:
       contents: read
     env:
       HADDOCK3_GHORG: "haddocking"
-      HADDOCK3_VERSION: "main"
-      BARTENDER_VERSION: "v0.5.1"
+      HADDOCK3_VERSION: "2026.7.0"
+      BARTENDER_VERSION: "v0.5.4"
       LIGHTDOCK_VERSION: "0.9.4"
     steps:
       - uses: actions/checkout@v7

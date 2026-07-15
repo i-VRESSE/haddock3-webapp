@@ -37,24 +37,11 @@ ENV PATH=/venv/bin:$PATH
 
 # openmm =============================================================================================================
 
-WORKDIR /opt/openmm
-RUN wget https://github.com/openmm/openmm/archive/refs/tags/${OPENMM_VERSION}.tar.gz && \
-    tar -xzf ${OPENMM_VERSION}.tar.gz && \
-    cd openmm-${OPENMM_VERSION} && \
-    mkdir build && \
-    cd build && \
-    pip install numpy==2.* && \
-    cmake .. -DCMAKE_INSTALL_PREFIX=/venv && \
-    make -j4 && \
-    make install && \
-    make PythonInstall
 RUN pip install https://github.com/openmm/pdbfixer/archive/refs/tags/${PDBFIXER_VERSION}.tar.gz
 
 # bartender ==========================================================================================================
 
 WORKDIR /opt/bartender
-# Force install of bin wheel, bartender install on ci used src wheel and failed
-RUN pip install https://files.pythonhosted.org/packages/12/c6/8c9d076f73f07f995013c791e018a1cd5f31823c2a3187fc8581706aa00f/asyncpg-0.31.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
 RUN echo cachebust=2 && git clone --depth 1 -b ${BARTENDER_VERSION} https://github.com/i-VRESSE/bartender.git .
 RUN pip install .
 
