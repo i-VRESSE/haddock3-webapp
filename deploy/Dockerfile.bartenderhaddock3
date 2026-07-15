@@ -23,7 +23,7 @@ RUN apt-get update && \
   &&  \
   apt-get clean && rm -rf /var/lib/apt/lists/* \
   && \
-  pip install --upgrade pip wheel
+  pip install --upgrade pip wheel setuptools
 
 RUN python3 -m venv /venv
 ENV PATH=/venv/bin:$PATH
@@ -53,6 +53,8 @@ RUN pip install https://github.com/openmm/pdbfixer/archive/refs/tags/${PDBFIXER_
 # bartender ==========================================================================================================
 
 WORKDIR /opt/bartender
+# Force install of bin wheel, bartender install on ci used src wheel and failed
+RUN pip install https://files.pythonhosted.org/packages/12/c6/8c9d076f73f07f995013c791e018a1cd5f31823c2a3187fc8581706aa00f/asyncpg-0.31.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
 RUN echo cachebust=2 && git clone --depth 1 -b ${BARTENDER_VERSION} https://github.com/i-VRESSE/bartender.git .
 RUN pip install .
 
