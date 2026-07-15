@@ -89,7 +89,6 @@ if (
 ) {
   const gitHubStrategy = new GitHubStrategyWithVerifiedEmail(
     {
-
       clientId: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID,
       clientSecret: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET,
       redirectURI:
