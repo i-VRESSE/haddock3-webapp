@@ -242,11 +242,11 @@ offline = false
 debug = false
 ncores = 1
 
-[clustfcc]
+['clustfcc.1']
 
 plot_matrix = true
 
-['clustfcc.1']
+['clustfcc.2']
 
 plot_matrix = true
 `;

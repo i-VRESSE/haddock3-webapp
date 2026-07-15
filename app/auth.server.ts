@@ -89,9 +89,9 @@ if (
 ) {
   const gitHubStrategy = new GitHubStrategyWithVerifiedEmail(
     {
-      clientID: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID,
+      clientId: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_ID,
       clientSecret: process.env.HADDOCK3WEBAPP_GITHUB_CLIENT_SECRET,
-      callbackURL:
+      redirectURI:
         process.env.HADDOCK3WEBAPP_GITHUB_CALLBACK_URL ||
         "http://localhost:3000/auth/github/callback",
       userAgent: "Haddock3WebApp",

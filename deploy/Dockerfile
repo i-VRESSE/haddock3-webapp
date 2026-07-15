@@ -1,6 +1,6 @@
 # Docker file for haddock3-webapp
 # base node image
-FROM node:20-bookworm-slim as base
+FROM node:20-bookworm-slim AS base
 
 LABEL org.opencontainers.image.source=https://github.com/i-VRESSE/haddock3-webapp/blob/main/deploy/Dockerfile
 LABEL org.opencontainers.image.licenses=Apache-2.0
@@ -12,7 +12,7 @@ ARG HADDOCK3WEBAPP_PREFIX=/
 ENV NODE_ENV production
 
 # Install all node_modules, including dev dependencies
-FROM base as deps
+FROM base AS deps
 
 WORKDIR /myapp
 
@@ -26,7 +26,7 @@ ARG TARGETPLATFORM
 RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; then npm install --no-save @rollup/rollup-linux-arm64-gnu; fi
 
 # Setup production node_modules
-FROM base as production-deps
+FROM base AS production-deps
 
 WORKDIR /myapp
 
@@ -39,7 +39,7 @@ RUN npm prune --production && node-prune
 
 # Build the app
 ENV HADDOCK3WEBAPP_PREFIX=${HADDOCK3WEBAPP_PREFIX}
-FROM base as build
+FROM base AS build
 
 WORKDIR /myapp
 
